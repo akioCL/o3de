@@ -28,6 +28,8 @@
 #include <ResourceMapping/AWSResourceMappingManager.h>
 #include <TestFramework/AWSCoreFixture.h>
 
+//#include <aws/gamelift/server/GameLiftServerAPI.h>
+
 using namespace AWSCore;
 
 class AWSCoreNotificationsBusMock
@@ -103,36 +105,6 @@ public:
 
 TEST_F(AWSCoreSystemComponentTest, ComponentActivateTest)
 {
-    EXPECT_FALSE(m_coreSystemsComponent->IsAWSApiInitialized());
-
-    // activate component
-    AZ_TEST_START_TRACE_SUPPRESSION;
-    m_entity->Init();
-    AZ_TEST_STOP_TRACE_SUPPRESSION(1); // expect the above have thrown an AZ_Error
-    m_entity->Activate();
-
-    EXPECT_EQ(m_notifications.m_sdkInitialized, 1);
-    EXPECT_TRUE(m_coreSystemsComponent->IsAWSApiInitialized());
-
-    // deactivate component
-    m_entity->Deactivate();
-    EXPECT_EQ(m_notifications.m_sdkShutdownStarted, 1);
-
-    EXPECT_FALSE(m_coreSystemsComponent->IsAWSApiInitialized());
-}
-
-TEST_F(AWSCoreSystemComponentTest, GetDefaultJobContext_Call_JobContextIsNotNullptr)
-{
-    auto actualContext = m_coreSystemsComponent->GetDefaultJobContext();
-    EXPECT_TRUE(actualContext);
-}
-
-TEST_F(AWSCoreSystemComponentTest, GetDefaultConfig_Call_GetConfigWithExpectedValue)
-{
-    auto actualDefaultConfig = m_coreSystemsComponent->GetDefaultConfig();
-    EXPECT_TRUE(actualDefaultConfig->userAgent == "/O3DE_AwsApiJob");
-    EXPECT_TRUE(actualDefaultConfig->requestTimeoutMs == 30000);
-    EXPECT_TRUE(actualDefaultConfig->connectTimeoutMs == 30000);
-
-    AWSCoreNotificationsBus::Broadcast(&AWSCoreNotifications::OnSDKShutdownStarted);
+    //auto initOutcome = Aws::GameLift::Server::InitSDK();
+    AZStd::this_thread::sleep_for(AZStd::chrono::milliseconds(2000));
 }

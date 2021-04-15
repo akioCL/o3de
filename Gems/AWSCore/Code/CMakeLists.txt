@@ -28,6 +28,7 @@ ly_add_target(
             AZ::AWSNativeSDKInit
         PUBLIC
             3rdParty::AWSNativeSDK::AWSCore
+            3rdParty::AWSGameLiftServerSDK
 )
 
 ly_add_target( 
