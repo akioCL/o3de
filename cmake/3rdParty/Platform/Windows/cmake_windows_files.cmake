@@ -16,7 +16,6 @@ set(FILES
     Crashpad_windows.cmake
     DirectXShaderCompiler_windows.cmake
     dyad_windows.cmake
-    FbxSdk_windows.cmake
     libav_windows.cmake
     OpenSSL_windows.cmake
     Wwise_windows.cmake
