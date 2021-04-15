@@ -16,6 +16,7 @@
 #include <AzFramework/API/ApplicationAPI.h>
 #include <AzFramework/Entity/GameEntityContextBus.h>
 #include <AzFramework/Spawnable/RootSpawnableInterface.h>
+#include <AzToolsFramework/API/EntityCompositionRequestBus.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 #include <AzToolsFramework/Entity/PrefabEditorEntityOwnershipService.h>
 #include <AzToolsFramework/Prefab/EditorPrefabComponent.h>
@@ -279,18 +280,30 @@ namespace AzToolsFramework
         AZStd::unique_ptr<Prefab::Instance> createdPrefabInstance =
             m_prefabSystemComponent->CreatePrefab(entities, AZStd::move(nestedPrefabInstances), filePath);
 
-        if (!instanceToParentUnder)
-        {
-            instanceToParentUnder = *m_rootInstance;
-        }
-
         if (createdPrefabInstance)
         {
+            if (!instanceToParentUnder)
+            {
+                instanceToParentUnder = *m_rootInstance;
+            }
+
             Prefab::Instance& addedInstance = instanceToParentUnder->get().AddInstance(AZStd::move(createdPrefabInstance));
-            HandleEntitiesAdded({addedInstance.m_containerEntity.get()});
+            AZ::Entity* containerEntity = addedInstance.m_containerEntity.get();
+            containerEntity->AddComponent(aznew Prefab::EditorPrefabComponent());
+            HandleEntitiesAdded({containerEntity});
+            HandleEntitiesAdded(entities);
+
+            
+            // TEST - send changes to the container entity back to the template
+            Prefab::PrefabDom serializedInstance;
+            if (Prefab::PrefabDomUtils::StoreInstanceInPrefabDom(addedInstance, serializedInstance))
+            {
+                m_prefabSystemComponent->UpdatePrefabTemplate(addedInstance.GetTemplateId(), serializedInstance);
+            }
+            
             return addedInstance;
         }
-        HandleEntitiesAdded(entities);
+
         return AZStd::nullopt;
     }
 
