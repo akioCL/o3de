@@ -1,0 +1,16 @@
+{
+    "GemFormatVersion": 4,
+    "Uuid": "deda12623060436ca264dec26835db06",
+    "Name": "RenderJoy",
+    "DisplayName": "RenderJoy",
+    "Version": "0.1.0",
+    "Summary": "A shader playground that uses the Atom Renderer",
+    "Tags": ["Shader", "Atom", "Render", "Joy"],
+    "IconPath": "renderJoyIcon.svg",
+    "Modules": [
+        {
+            "Name": "Editor",
+            "Type": "EditorModule"
+        }
+    ]
+}

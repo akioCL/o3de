@@ -1,0 +1,11 @@
+{
+    "project_name": "ProjectRenderJoy",
+    "origin": "The primary repo for ProjectRenderJoy goes here: i.e. http://www.mydomain.com",
+    "license": "What license ProjectRenderJoy uses goes here: i.e. https://opensource.org/licenses/MIT",
+    "display_name": "ProjectRenderJoy",
+    "summary": "A short description of ProjectRenderJoy.",
+    "canonical_tags": ["Project"],
+    "user_tags": ["ProjectRenderJoy"],
+    "icon_path": "preview.png",
+    "engine": "o3de"
+}
