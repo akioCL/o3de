@@ -69,6 +69,7 @@ namespace AZ
             //! Register a Pass/PassTemplate with the library. 
             bool AddPassTemplate(const Name& name, const AZStd::shared_ptr<PassTemplate>& passTemplate, bool hotReloading = false);
             void AddPass(Pass* pass);
+            void RemovePassTemplate(const Name& name); // Added by RenderJoy
 
             //! Returns whether the library has a template/passes associated with a template given a template name
             bool HasTemplate(const Name& templateName) const;

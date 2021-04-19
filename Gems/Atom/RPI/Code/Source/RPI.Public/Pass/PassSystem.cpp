@@ -372,6 +372,12 @@ namespace AZ
             return m_passLibrary.AddPassTemplate(name, passTemplate);
         }
 
+        // Added by RenderJoy
+        void PassSystem::RemovePassTemplate(const Name& name)
+        {
+            m_passLibrary.RemovePassTemplate(name);
+        }
+
         const AZStd::shared_ptr<PassTemplate> PassSystem::GetPassTemplate(const Name& name) const
         {
             return m_passLibrary.GetPassTemplate(name);

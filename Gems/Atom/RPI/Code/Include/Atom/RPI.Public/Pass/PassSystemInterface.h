@@ -136,6 +136,10 @@ namespace AZ
             //! Adds a PassTemplate to the library
             virtual bool AddPassTemplate(const Name& name, const AZStd::shared_ptr<PassTemplate>& passTemplate) = 0;
 
+            //! Added by RenderJoy.
+            //! Removes a PassTemplate from the library, by name.
+            virtual void RemovePassTemplate(const Name& name) = 0;
+
             //! Retrieves a PassTemplate from the library
             virtual const AZStd::shared_ptr<PassTemplate> GetPassTemplate(const Name& name) const = 0;
 
