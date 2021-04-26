@@ -33,7 +33,7 @@ namespace RenderJoy
 {
 
     RenderJoyViewportWidget::RenderJoyViewportWidget(QWidget* parent)
-        : AtomToolsFramework::RenderViewportWidget(AzFramework::InvalidViewportId, parent)
+        : AtomToolsFramework::RenderViewportWidget(parent)
         , m_ui(new Ui::RenderJoyViewportWidget)
     {
         m_ui->setupUi(this);
