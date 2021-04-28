@@ -343,6 +343,7 @@ def Build(Map options, String platform, String type, String workspace) {
             if (env.IS_UNIX) {
                 sh label: "Running ${platform} ${type}",
                    script: "${options.PYTHON_DIR}/python.sh -u ${command}"
+                   archiveArtifacts artifacts: '**/report.html'
             } else {
                 bat label: "Running ${platform} ${type}",
                     script: "${options.PYTHON_DIR}/python.cmd -u ${command}".replace('/','\\')
