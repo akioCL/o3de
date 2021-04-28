@@ -348,7 +348,7 @@ def Build(Map options, String platform, String type, String workspace, Map param
                 bat label: "Running ${platform} ${type}",
                     script: "${options.PYTHON_DIR}/python.cmd -u ${command}".replace('/','\\')
             }
-            if (params.containsKey('TEST_RESULTS') && PARAMETERS.TEST_METRICS == 'True') {
+            if (params.containsKey('TEST_RESULTS') && PARAMETERS.TEST_RESULTS == 'True') {
                 archiveArtifacts artifacts: 'test_results/%{platform}.html'
             }
         }
@@ -403,10 +403,10 @@ def CreateSetupStage(Map pipelineConfig, String repositoryName, String projectNa
     }
 }
 
-def CreateBuildStage(Map pipelineConfig, String platformName, String jobName, Map environmentVars) {
+def CreateBuildStage(Map pipelineConfig, String platformName, String jobName, Map environmentVars, Map params) {
     return {
         stage("${jobName}") {
-            Build(pipelineConfig, platformName, jobName, environmentVars['WORKSPACE'])
+            Build(pipelineConfig, platformName, jobName, environmentVars['WORKSPACE'], params)
         }
     }
 }
