@@ -525,6 +525,11 @@ void CMaterialManager::OnEditorNotifyEvent(EEditorNotifyEvent event)
 //////////////////////////////////////////////////////////////////////////
 void CMaterialManager::ReloadDirtyMaterials()
 {
+    if (!GetIEditor()->Get3DEngine())
+    {
+        return;
+    }
+
     IMaterialManager* runtimeMaterialManager = GetIEditor()->Get3DEngine()->GetMaterialManager();
 
     uint32 mtlCount = 0;
@@ -537,7 +542,7 @@ void CMaterialManager::ReloadDirtyMaterials()
 
         allMaterials.reserve(mtlCount);
 
-        uint32 mtlCountPrev = mtlCount;
+        [[maybe_unused]] uint32 mtlCountPrev = mtlCount;
         runtimeMaterialManager->GetLoadedMaterials(&allMaterials, mtlCount);
         AZ_Assert(mtlCountPrev == mtlCount && mtlCount == allMaterials.size(), "It appears GetLoadedMaterials was not used correctly.");
 
@@ -550,7 +555,6 @@ void CMaterialManager::ReloadDirtyMaterials()
             }
         }
     }
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -665,7 +669,7 @@ void CMaterialManager::AddSourceFileOpeners(const char* fullSourceFileName, [[ma
             }
         };
 
-        openers.push_back({ "Lumberyard_MaterialEditor", "Open In Material Editor...", QIcon(), materialCallback });
+        openers.push_back({ "O3DE_MaterialEditor", "Open In Material Editor...", QIcon(), materialCallback });
     }
 }
 
@@ -744,12 +748,15 @@ int CMaterialManager::GetHighlightFlags(CMaterial* pMaterial) const
         result |= eHighlight_NoSurfaceType;
     }
 
-    if (ISurfaceTypeManager* pSurfaceManager = GetIEditor()->Get3DEngine()->GetMaterialManager()->GetSurfaceTypeManager())
+    if (GetIEditor()->Get3DEngine())
     {
-        const ISurfaceType* pSurfaceType =  pSurfaceManager->GetSurfaceTypeByName(surfaceTypeName.toUtf8().data());
-        if (pSurfaceType && pSurfaceType->GetBreakability() != 0)
+        if (ISurfaceTypeManager* pSurfaceManager = GetIEditor()->Get3DEngine()->GetMaterialManager()->GetSurfaceTypeManager())
         {
-            result |= eHighlight_Breakable;
+            const ISurfaceType* pSurfaceType = pSurfaceManager->GetSurfaceTypeByName(surfaceTypeName.toUtf8().data());
+            if (pSurfaceType && pSurfaceType->GetBreakability() != 0)
+            {
+                result |= eHighlight_Breakable;
+            }
         }
     }
 
