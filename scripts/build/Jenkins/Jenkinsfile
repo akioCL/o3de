@@ -346,10 +346,10 @@ def Build(Map options, String platform, String type, String workspace, Map param
                 
             } else {
                 bat label: "Running ${platform} ${type}",
-                    script: "${options.PYTHON_DIR}/python.cmd -u ${command}".replace('/','\\')
+                    script: "${options.PYTHON_DIR}/python.c md -u ${command}".replace('/','\\')
             }
             if (params.containsKey('TEST_RESULTS') && params.TEST_RESULTS == 'True') {
-                archiveArtifacts artifacts: 'test_results/%{platform}.html'
+                archiveArtifacts artifacts: 'test_results/${platform}.html'
             }
         }
     }
