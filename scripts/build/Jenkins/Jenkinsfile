@@ -69,8 +69,8 @@ def palMove(src, dst) {
         sh label: "Moving ${src} -> ${dst}",
            script: "mv ${src} ${dst}"
     } else {
-        def win_src = path.replace('/','\\')
-        def win_dst = path.replace('/','\\')
+        def win_src = src.replace('/','\\')
+        def win_dst = dst.replace('/','\\')
         bat label: "Moving ${src} -> ${dst}",
             script: "move ${win_src} ${win_dst}"
     }
