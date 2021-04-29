@@ -285,12 +285,13 @@ function(ly_add_pytest)
     endif()
 
     string(REPLACE "::" "_" pytest_report_directory "${PYTEST_XML_OUTPUT_DIR}/${ly_add_pytest_NAME}.xml")
+    string(REPLACE "::" "_" pytest_html_directory "${PYTEST_XML_OUTPUT_DIR}/${ly_add_pytest_NAME}.html")
 
     ly_add_test(
         NAME ${ly_add_pytest_NAME}
         TEST_SUITE ${ly_add_pytest_TEST_SUITE}
         LABELS FRAMEWORK_pytest
-        TEST_COMMAND ${LY_PYTEST_EXECUTABLE} ${ly_add_pytest_PATH} ${ly_add_pytest_EXTRA_ARGS} --junitxml=${pytest_report_directory} ${custom_marks_args}
+        TEST_COMMAND ${LY_PYTEST_EXECUTABLE} ${ly_add_pytest_PATH} ${ly_add_pytest_EXTRA_ARGS} --junitxml=${pytest_report_directory} --html=${pytest_html_directory} --self-contained-html ${custom_marks_args}
         TEST_LIBRARY pytest
         COMPONENT ${ly_add_pytest_COMPONENT}
         ${ly_add_pytest_UNPARSED_ARGUMENTS}
