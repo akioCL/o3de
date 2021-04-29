@@ -64,6 +64,18 @@ def palRm(path) {
     }
 }
 
+def palMove(src, dst) {
+    if (env.IS_UNIX) {
+        sh label: "Moving ${src} -> ${dst}",
+           script: "mv ${src} ${dst}"
+    } else {
+        def win_src = path.replace('/','\\')
+        def win_dst = path.replace('/','\\')
+        bat label: "Moving ${src} -> ${dst}",
+            script: "move ${win_src} ${win_dst}"
+    }
+}
+
 def palRmDir(path) {
     if (env.IS_UNIX) {
         sh label: "Removing ${path}",
@@ -346,10 +358,12 @@ def Build(Map options, String platform, String type, String workspace, Map param
                 
             } else {
                 bat label: "Running ${platform} ${type}",
-                    script: "${options.PYTHON_DIR}/python.c md -u ${command}".replace('/','\\')
+                    script: "${options.PYTHON_DIR}/python.cmd -u ${command}".replace('/','\\')
             }
             if (params.containsKey('TEST_RESULTS') && params.TEST_RESULTS == 'True') {
-                archiveArtifacts artifacts: 'test_results/${platform}.html'
+                palMove("testrun_report/report.html", "testrun_report/report_${platform}_${type}.html")
+                archiveArtifacts artifacts: 'testrun_report/report_${platform}_${type}.html'
+                palRm('testrun_report/report_${platform}_${type}.html')
             }
         }
     }
