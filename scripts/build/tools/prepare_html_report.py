@@ -22,11 +22,16 @@ def parse_args():
 
 if __name__ == "__main__":
     options = parse_args()
+    if not os.path.exists(options.input_path):
+        raise Exception(f"Path {options.input_path} does not exist")
+    
     if not os.path.exists(options.output_path):
         os.makedirs(options.output_path)
         
     for file in os.listdir(options.input_path):
         file_path = os.path.join(options.input_path, file)
         if os.path.isfile(file_path) and file_path.endswith(".html"):
-            shutil.copy(file_path, os.path.join(options.output_path, file))
+            destination = os.path.join(options.output_path, file)
+            shutil.copy(file_path, destination)
+            print(f"copy: {os.path.abspath(file_path)} -> {os.path.abs(destination)}")
     

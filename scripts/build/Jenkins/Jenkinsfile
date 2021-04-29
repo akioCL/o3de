@@ -367,17 +367,18 @@ def Build(Map options, String platform, String type, String workspace, Map param
                     script: "${options.PYTHON_DIR}/python.cmd -u ${command}".replace('/','\\')
             }
             if (params.containsKey('TEST_RESULTS') && params.TEST_RESULTS == 'True') {
-                dir("${workspace}/${params.OUTPUT_DIRECTORY}/build/Testing/Pytest") {
+                def o3deroot = "${workspace}/${ENGINE_REPOSITORY_NAME}"
+                dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
                     def input = "."
                     def output = "${platform}_${type}"
-                    def prepare_cmd = "scripts/build/tools/prepare_html_report.py ${input} ${output}"
+                    def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${input} ${output}"
                     if (env.IS_UNIX) {
                         sh label: "Storing reports",
-                           script: "${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
+                           script: "${o3deroot}/${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
                         
                     } else {
                         bat label: "Storing reports",
-                            script: "${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
+                            script: "${o3deroot}/${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
                     }
                     archiveArtifacts artifacts: "${output}/*.html"
                 }
