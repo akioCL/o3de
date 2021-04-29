@@ -33,5 +33,5 @@ if __name__ == "__main__":
         if os.path.isfile(file_path) and file_path.endswith(".html"):
             destination = os.path.join(options.output_path, file)
             shutil.copy(file_path, destination)
-            print(f"copy: {os.path.abspath(file_path)} -> {os.path.abs(destination)}")
+            print(f"copy: {os.path.abspath(file_path)} -> {os.path.abspath(destination)}")
     
