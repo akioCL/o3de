@@ -38,10 +38,11 @@ class TestStatictoolScripts(object):
     @pytest.mark.test_case_id("LY-124058")
     def test_Statictool_Scripts(self, request, editor):
         static_tools = [
-            os.path.join(editor.workspace.paths.dev(), "Tools", "PakShaders", "gen_shaders.py"),
-            os.path.join(editor.workspace.paths.dev(), "Tools", "PakShaders", "get_shader_list.py"),
-            os.path.join(editor.workspace.paths.dev(), "Tools", "PakShaders", "pak_shaders.py"),
+            os.path.join(editor.workspace.paths.engine_root(), "scripts", "bundler", "gen_shaders.py"),
+            os.path.join(editor.workspace.paths.engine_root(), "scripts", "bundler", "get_shader_list.py"),
+            os.path.join(editor.workspace.paths.engine_root(), "scripts", "bundler", "pak_shaders.py"),
         ]
 
         for tool in static_tools:
             verify_help_message(tool)
+            
