@@ -366,24 +366,25 @@ def Build(Map options, String platform, String type, String workspace, Map param
                 bat label: "Running ${platform} ${type}",
                     script: "${options.PYTHON_DIR}/python.cmd -u ${command}".replace('/','\\')
             }
-            if (params.containsKey('TEST_RESULTS') && params.TEST_RESULTS == 'True') {
-                def o3deroot = "${workspace}/${ENGINE_REPOSITORY_NAME}"
-                dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
-                    def input = "."
-                    def output = "${platform}_${type}"
-                    def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${input} ${output}"
-                    if (env.IS_UNIX) {
-                        sh label: "Storing reports",
-                           script: "${o3deroot}/${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
-                        
-                    } else {
-                        bat label: "Storing reports",
-                            script: "${o3deroot}/${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
-                    }
-                    archiveArtifacts artifacts: "${output}/*.html"
-                }
-            }
         }
+    }
+}
+
+def TestResults(){
+    def o3deroot = "${workspace}/${ENGINE_REPOSITORY_NAME}"
+    dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
+        def input = "."
+        def output = "${platform}_${type}"
+        def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${input} ${output}"
+        if (env.IS_UNIX) {
+            sh label: "Storing reports",
+               script: "${o3deroot}/${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
+            
+        } else {
+            bat label: "Storing reports",
+                script: "${o3deroot}/${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
+        }
+        archiveArtifacts artifacts: "${output}/*.html"
     }
 }
 
@@ -439,6 +440,14 @@ def CreateBuildStage(Map pipelineConfig, String platformName, String jobName, Ma
     return {
         stage("${jobName}") {
             Build(pipelineConfig, platformName, jobName, environmentVars['WORKSPACE'], params)
+        }
+    }
+}
+
+def CreateTestResultsStage(Map pipelineConfig, String platformName, String jobName, Map environmentVars, Map params)
+    return {
+        stage("${jobName}_results") {
+            TestResults(pipelineConfig, platformName, jobName, environmentVars['WORKSPACE'], params)
         }
     }
 }
@@ -545,16 +554,20 @@ try {
 
                                 CreateSetupStage(pipelineConfig, repositoryName, projectName, pipelineName, branchName, platform.key, build_job.key, envVars).call()
 
+                                def params = platform.value.build_types[build_job_name].PARAMETERS;
                                 if(build_job.value.steps) { //this is a pipe with many steps so create all the build stages
                                     build_job.value.steps.each { build_step ->
                                         build_job_name = build_step
-                                        CreateBuildStage(pipelineConfig,  platform.key, build_step, envVars, platform.value.build_types[build_job_name].PARAMETERS).call()
+                                        CreateBuildStage(pipelineConfig,  platform.key, build_step, envVars, params).call()
                                     }
                                 } else {
-                                    CreateBuildStage(pipelineConfig,  platform.key, build_job.key, envVars, platform.value.build_types[build_job_name].PARAMETERS).call()
+                                    CreateBuildStage(pipelineConfig,  platform.key, build_job.key, envVars, params).call()
+                                }
+                                if (params.containsKey('TEST_RESULTS') && params.TEST_RESULTS == 'True') {
+                                    CreateTestResultsStage(pipelineConfig,  platform.key, build_step, envVars, params).call()
                                 }
 
-                                if (env.MARS_REPO && platform.value.build_types[build_job_name].PARAMETERS.containsKey('TEST_METRICS') && platform.value.build_types[build_job_name].PARAMETERS.TEST_METRICS == 'True') {
+                                if (env.MARS_REPO && params.containsKey('TEST_METRICS') && params.TEST_METRICS == 'True') {
                                     def output_directory = platform.value.build_types[build_job_name].PARAMETERS.OUTPUT_DIRECTORY
                                     def configuration = platform.value.build_types[build_job_name].PARAMETERS.CONFIGURATION
                                     CreateTestMetricsStage(pipelineConfig, branchName, envVars, build_job_name, output_directory, configuration).call()
