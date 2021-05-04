@@ -444,7 +444,7 @@ def CreateBuildStage(Map pipelineConfig, String platformName, String jobName, Ma
     }
 }
 
-def CreateTestResultsStage(Map pipelineConfig, String platformName, String jobName, Map environmentVars, Map params)
+def CreateTestResultsStage(Map pipelineConfig, String platformName, String jobName, Map environmentVars, Map params) {
     return {
         stage("${jobName}_results") {
             TestResults(pipelineConfig, platformName, jobName, environmentVars['WORKSPACE'], params)
