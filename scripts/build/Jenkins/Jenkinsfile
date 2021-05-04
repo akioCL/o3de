@@ -375,10 +375,10 @@ def TestResults(Map options, String platform, String type, String workspace, Map
         def o3deroot = "${workspace}/${ENGINE_REPOSITORY_NAME}"
         if (env.IS_UNIX) {
             sh label: "Installing pytest-html",
-               script: "${options.PYTHON_DIR}/pip.sh install lxml"
+               script: "${o3deroot}/${options.PYTHON_DIR}/pip.sh install lxml"
         } else {
             bat label: "Installing pytest-html",
-                script: "${options.PYTHON_DIR}/pip.cmd install lxml".replace('/','\\')
+                script: "${o3deroot}/${options.PYTHON_DIR}/pip.cmd install lxml".replace('/','\\')
         }
         dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
             def input = "."
