@@ -27,7 +27,6 @@ class Tests():
     mesh_removed           = ("Mesh Component removed",            "Failed to remove Mesh Component")
     entity_deleted         = ("Entity deleted",                    "Failed to delete Entity")
     level_edits_present    = ("Level edits persist after saving",  "Failed to save level edits after saving")
-    level_deleted          = ("Level deleted successfully",        "Failed to delete level")
 # fmt: on
 
 
@@ -45,7 +44,6 @@ def Editor_NewExistingLevels():
         8)  Create an Entity
         9)  Delete an Entity
         10) Add a component to an Entity
-        11) Delete a component from an Entity
 
     Expected Behavior:
     All operations succeed and do not cause a crash
@@ -61,7 +59,6 @@ def Editor_NewExistingLevels():
     8)  Open an existing level
     9)  Create a new entity in an existing level
     10) Save, Load and Export an existing level and close editor
-    11) Switch to another level and Delete Temp Level
 
     Note:
     - This test file must be called from the Lumberyard Editor command terminal
@@ -83,7 +80,6 @@ def Editor_NewExistingLevels():
     import azlmbr.editor as editor
     import azlmbr.legacy.general as general
     import azlmbr.math as math
-    import ly_test_tools.environment.file_system as file_system
 
     # 1) Launch editor and Create a new level
     helper.init_idle()
@@ -152,19 +148,12 @@ def Editor_NewExistingLevels():
     level_pak_file = os.path.join("AutomatedTesting", "Levels", test_level_name, "level.pak")
     Report.result(Tests.level_exported, os.path.exists(level_pak_file))
 
-    # 11) Switch to another level and Delete Temp Level
-    helper.init_idle()
-    general.open_level("auto_test")
-    general.idle_wait(2.0)
-    level_path = os.path.join(os.getcwd(), "AutomatedTesting", "Levels", test_level_name)
-    file_system.delete([level_path], True, True)
-    Report.result(Tests.level_deleted, not os.path.exists(level_path))
-
 
 if __name__ == "__main__":
     import ImportPathHelper as imports
+
     imports.init()
 
     from utils import Report
-    Report.start_test(Editor_NewExistingLevels)
 
+    Report.start_test(Editor_NewExistingLevels)
