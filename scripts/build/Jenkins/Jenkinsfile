@@ -383,7 +383,7 @@ def TestResults(Map options, String platform, String type, String workspace, Map
         dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
             def input = "."
             def output = "${platform}_${type}"
-            def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${input} ${output}"
+            def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${platform}_${type} ${input} ${output}"
             if (env.IS_UNIX) {
                 sh label: "Storing reports",
                    script: "${o3deroot}/${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
