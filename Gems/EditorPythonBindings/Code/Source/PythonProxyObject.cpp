@@ -760,7 +760,11 @@ namespace EditorPythonBindings
                             }
 
                             AZStd::string subModuleName = pybind11::cast<AZStd::string>(subModule.attr("__name__"));
-                            PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogClassMethod, subModuleName, globalMethodName, behaviorClass, behaviorMethod);
+                            PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogClassMethod,
+                                AZStd::move(subModuleName),
+                                AZStd::move(globalMethodName),
+                                behaviorClass,
+                                behaviorMethod);
                         }
                         else
                         {
@@ -786,7 +790,10 @@ namespace EditorPythonBindings
                         pybind11::setattr(subModule, constantPropertyName.c_str(), constantValue);
 
                         AZStd::string subModuleName = pybind11::cast<AZStd::string>(subModule.attr("__name__"));
-                        PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogGlobalProperty, subModuleName, constantPropertyName, behaviorProperty);
+                        PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogGlobalProperty,
+                            AZStd::move(subModuleName),
+                            AZStd::move(constantPropertyName),
+                            behaviorProperty);
                     }
                 }
 
@@ -808,16 +815,21 @@ namespace EditorPythonBindings
                     auto syntaxName = Naming::GetPythonSyntax(*behaviorClass);
                     if (syntaxName)
                     {
-                        const char* properSyntax = syntaxName.value().c_str();
-                        subModule.attr(properSyntax) = pybind11::cpp_function([behaviorClassName](pybind11::args pythonArgs)
+                        AZStd::string properSyntax (syntaxName.value().c_str());
+                        subModule.attr(properSyntax.c_str()) = pybind11::cpp_function([behaviorClassName](pybind11::args pythonArgs)
                         {
                             return ConstructPythonProxyObjectByTypename(behaviorClassName, pythonArgs);
                         });
-                        PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogClassWithName, subModuleName, behaviorClass, properSyntax);
+                        PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogClassWithName,
+                            AZStd::move(subModuleName),
+                            behaviorClass,
+                            AZStd::move(properSyntax));
                     }
                     else
                     {
-                        PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogClass, subModuleName, behaviorClass);
+                        PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogClass,
+                            AZStd::move(subModuleName),
+                            behaviorClass);
                     }
                 }
             }

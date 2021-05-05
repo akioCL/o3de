@@ -20,6 +20,8 @@ namespace EditorPythonBindings
         : public AZ::EBusTraits
     {
     public:
+        static const bool EnableEventQueue = true;
+
         //! logs a behavior class type
         virtual void LogClass(AZStd::string_view moduleName, AZ::BehaviorClass* behaviorClass) = 0;
 

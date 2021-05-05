@@ -26,6 +26,7 @@
 #include <AzCore/IO/FileIO.h>
 #include <AzCore/std/sort.h>
 #include <AzCore/Serialization/Utils.h>
+#include <AzCore/Component/TickBus.h>
 
 #include <AzFramework/CommandLine/CommandRegistrationBus.h>
 #include <AzFramework/StringFunc/StringFunc.h>
@@ -94,6 +95,15 @@ namespace EditorPythonBindings
         PythonSymbolEventBus::Handler::BusConnect();
         EditorPythonBindingsNotificationBus::Handler::BusConnect();
         AZ::Interface<AzToolsFramework::EditorPythonConsoleInterface>::Register(this);
+
+        AZ::SystemTickBus::QueueFunction([this]
+        {
+            if (this->m_basePath.empty())
+            {
+                OnPostInitialize();
+                PythonSymbolEventBus::ExecuteQueuedEvents();
+            }
+        });
     }
 
     void PythonLogSymbolsComponent::Deactivate()
