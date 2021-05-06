@@ -393,7 +393,7 @@ def TestResults(Map options, String platform, String type, String workspace, Map
                     script: "${o3deroot}/${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
             }
             archiveArtifacts artifacts: "${output}/*.html"
-            junit testResults: "*.xml"
+            junit "./*.xml"
         }
     }
 }
@@ -560,7 +560,7 @@ try {
                         }
                         withEnv(GetEnvStringList(envVars)) {
                             def build_job_name = build_job.key
-                            def params = platform.value.build_types[build_job_name].PARAMETERS
+                            def params = null
                             try {
                                 CreateSetupStage(pipelineConfig, repositoryName, projectName, pipelineName, branchName, platform.key, build_job.key, envVars).call()
                                 
@@ -572,10 +572,11 @@ try {
                                 } else {
                                     CreateBuildStage(pipelineConfig,  platform.key, build_job.key, envVars).call()
                                 }
+                                params = platform.value.build_types[build_job_name].PARAMETERS
 
                                 if (env.MARS_REPO && params.containsKey('TEST_METRICS') && params.TEST_METRICS == 'True') {
-                                    def output_directory = platform.value.build_types[build_job_name].PARAMETERS.OUTPUT_DIRECTORY
-                                    def configuration = platform.value.build_types[build_job_name].PARAMETERS.CONFIGURATION
+                                    def output_directory = params.OUTPUT_DIRECTORY
+                                    def configuration = params.CONFIGURATION
                                     CreateTestMetricsStage(pipelineConfig, branchName, envVars, build_job_name, output_directory, configuration).call()
                                 }
                             }
@@ -597,7 +598,9 @@ try {
                                         CreateTestResultsStage(pipelineConfig,  platform.key, build_job_name, envVars, params).call()
                                     }
                                 }
-                                catch(Exception e) {}
+                                catch(Exception e) {
+                                    error "Error when collecting test results: ${e}"
+                                }
                                 finally {
                                     CreateTeardownStage(envVars).call()
                                 }
