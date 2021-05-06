@@ -18,7 +18,7 @@
 import argparse
 import shutil
 import os
-import time
+import datetime
 from lxml import html
 
 def parse_args():
@@ -47,10 +47,10 @@ def merge_reports(report_filename, path, files):
     results = []
     sum_secs = 0
     for row in all_tests_html.xpath("//tbody[contains(@class, 'results-table-row')]"):
-        results.append(row.xpath("//td[@class='col-result']")[0].text)
-        sum_secs += float(row.xpath("//td[@class='col-duration']")[0].text)
+        results.append(row.xpath(".//td[@class='col-result']")[0].text)
+        sum_secs += float(row.xpath(".//td[@class='col-duration']")[0].text)
     
-    time_str = time.strftime('%H:%M:%S', time.gmtime(sum_secs))
+    time_str = str(datetime.timedelta(seconds=sum_secs)).split(".")[0]
     all_tests_html.xpath("//body/p")[1].text = f"{len(results)} tests ran in {time_str}"
     passed  = sum(1 for r in results if r == "Passed")
     skipped = sum(1 for r in results if r == "Skipped")
@@ -59,12 +59,24 @@ def merge_reports(report_filename, path, files):
     xfails  = sum(1 for r in results if r == "XFailed")
     xpasses = sum(1 for r in results if r == "XPassed")
     
-    all_tests_html.xpath("//span[@class='passed']")[0].text = f"{passed} passed"
-    all_tests_html.xpath("//span[@class='skipped']")[0].text = f"{skipped} skipped"
-    all_tests_html.xpath("//span[@class='failed']")[0].text = f"{failed} failed"
-    all_tests_html.xpath("//span[@class='error']")[0].text = f"{errors} errors"
-    all_tests_html.xpath("//span[@class='xfailed']")[0].text = f"{xfails} unexpected failures"
-    all_tests_html.xpath("//span[@class='xpassed']")[0].text = f"{xpasses} unexpected passes"
+    def setup_filter(clsname, sufix, value):
+        all_tests_html.xpath(f".//span[@class='{clsname}']")[0].text = f"{value} {sufix}"
+        input_elem = all_tests_html.xpath(f".//input[@data-test-result='{clsname}']")[0]
+        if value > 0:
+            try:
+                del input_elem.attrib["disabled"]
+            except KeyError:
+                pass
+        else:
+            input_elem.set("disabled")
+        
+        
+    setup_filter('passed', 'passed', passed)
+    setup_filter('skipped', 'skipped', skipped)
+    setup_filter('failed', 'failed', failed)
+    setup_filter('error', 'errors', errors)
+    setup_filter('xfailed', 'unexpected failures', xfails)
+    setup_filter('xpassed', 'unexpected passes', xpasses)
     
     with open(f"{os.path.join(path, report_filename)}.html", "wb") as f:
         f.write(html.tostring(all_tests_html, encoding='utf-8'))
