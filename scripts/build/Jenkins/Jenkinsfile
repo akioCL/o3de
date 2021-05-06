@@ -371,31 +371,29 @@ def Build(Map options, String platform, String type, String workspace) {
 }
 
 def TestResults(Map options, String platform, String type, String workspace, Map params) {
-    catchError(buildResult: null, stageResult: null) {
-        def o3deroot = "${workspace}/${ENGINE_REPOSITORY_NAME}"
+    def o3deroot = "${workspace}/${ENGINE_REPOSITORY_NAME}"
+    if (env.IS_UNIX) {
+        sh label: "Installing pytest-html",
+           script: "${o3deroot}/${options.PYTHON_DIR}/pip.sh install lxml"
+    } else {
+        bat label: "Installing pytest-html",
+            script: "${o3deroot}/${options.PYTHON_DIR}/pip.cmd install lxml".replace('/','\\')
+    }
+    dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
+        def input = "."
+        def output = "${platform}_${type}"
+        def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${platform}_${type} ${input} ${output}"
         if (env.IS_UNIX) {
-            sh label: "Installing pytest-html",
-               script: "${o3deroot}/${options.PYTHON_DIR}/pip.sh install lxml"
+            sh label: "Storing reports",
+               script: "${o3deroot}/${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
+            
         } else {
-            bat label: "Installing pytest-html",
-                script: "${o3deroot}/${options.PYTHON_DIR}/pip.cmd install lxml".replace('/','\\')
+            bat label: "Storing reports",
+                script: "${o3deroot}/${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
         }
-        dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
-            def input = "."
-            def output = "${platform}_${type}"
-            def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${platform}_${type} ${input} ${output}"
-            if (env.IS_UNIX) {
-                sh label: "Storing reports",
-                   script: "${o3deroot}/${options.PYTHON_DIR}/python.sh -u ${prepare_cmd}"
-                
-            } else {
-                bat label: "Storing reports",
-                    script: "${o3deroot}/${options.PYTHON_DIR}/python.cmd -u ${prepare_cmd}".replace('/','\\')
-            }
-            archiveArtifacts artifacts: "${output}/*.html"
-            Bat: tree
-            junit "./*.xml"
-        }
+        archiveArtifacts artifacts: "${output}/*.html"
+        Bat: tree
+        junit "./*.xml"
     }
 }
 
