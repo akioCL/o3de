@@ -12,15 +12,17 @@
 
 """
     pytest-html doesn't support merging reports, this utility parses the generated html
-    and merges them into a single html file and adds some enhancements like a loading spinner.
+    and merges them into a single html file and adds some enhancements like a loading spinner and editor.log coloring.
 """
 
 import argparse
 import shutil
 import os
 import datetime
+import re
+from html import escape
 from lxml import html
-    
+
 def merge_reports(report_filename, path, files):
     if len(files) == 0:
         print("Warning: html no files found to merge")
@@ -34,7 +36,42 @@ def merge_reports(report_filename, path, files):
         for row in rows:
             all_tests_table.append(row)
     
-    # Update number of tests passed/skipped/etc
+    
+    def format_log(log_element):
+        # Get rid of inter-html element texts and move every block of text inside a <span>
+        # as this makes way easier to parse the text
+        t = str(log_element.text)
+        log_element.text = ""
+        log_element.insert(0, html.fromstring(f"<span>{t}</span></br>"))
+        for i in log_element:
+            if i.tail:
+                t = escape(i.tail)
+                log_element.insert(log_element.index(i)+1, html.fromstring(f"<span>{t}</span></br>"))
+                i.tail = ""
+       
+        # Now that everything is in spans, enhance the log by setting special color for the files that
+        # match editor.log lines. We divide it into 3 parts head, colored_log and tail
+        for span in log_element.xpath(".//span"):
+            editor_log_start = re.search(r".*\|Editor.log\|", str(span.text), re.IGNORECASE | re.M)
+            if editor_log_start is None:
+                continue
+            
+            if span.attrib.get("class") == "error":
+                # These only have one line, don't do any parsing and just set the new class
+                span.attrib["class"] = "editor_log"
+            else:
+                first_part = span.text[:editor_log_start.start()]
+                next_part = span.text[editor_log_start.start():]
+                editor_log_end = re.search(r"^(?!\|Editor.log\|).+", next_part, re.IGNORECASE | re.M)
+                editor_log_end.start()
+                log = next_part[:editor_log_end.start()]
+                last_part = next_part[editor_log_end.start():]
+                span.text = ""
+                span.append(html.fromstring(f"<span>{escape(first_part)}</span></br>"))
+                span.append(html.fromstring(f'<span class="editor_log">{escape(log)}</span></br>'))
+                span.append(html.fromstring(f"<span>{escape(last_part)}</span></br>"))
+            
+    # Update number of tests passed/skipped/etc and format the log
     all_tests_html.xpath("//h1")[0].text = f"{report_filename}.html"
     
     results = []
@@ -42,6 +79,10 @@ def merge_reports(report_filename, path, files):
     for row in all_tests_html.xpath("//tbody[contains(@class, 'results-table-row')]"):
         results.append(row.xpath(".//td[@class='col-result']")[0].text)
         sum_secs += float(row.xpath(".//td[@class='col-duration']")[0].text)
+        row.xpath("./tr")[1].attrib["class"] = "collapsed"
+        log = row.xpath(".//div[@class='log']")
+        if log:
+            format_log(log[0])
     
     time_str = str(datetime.timedelta(seconds=sum_secs)).split(".")[0]
     all_tests_html.xpath("//body/p")[1].text = f"{len(results)} tests ran in {time_str}"
@@ -72,7 +113,10 @@ def merge_reports(report_filename, path, files):
     setup_filter('xpassed', 'unexpected passes', xpasses)
     
     # Add loading spinner and logic to hide it when loaded
-    spinner_css = """
+    extra_css = """
+    .editor_log {
+      color: #3300ff
+    }
     .lds-dual-ring {
       display: inline-block;
       width: 80px;
@@ -106,14 +150,13 @@ def merge_reports(report_filename, path, files):
     spinner_html = '<div id="loading" class="lds-dual-ring"></div>'
     
     # CSS style
-    all_tests_html.xpath("//head/style")[-1].text += spinner_css
+    all_tests_html.xpath("//head/style")[-1].text += extra_css
     all_tests_table.attrib["style"] = "display: none;"
     # JS code
     script =  all_tests_html.xpath("//body/script")[0]
     script.text = script.text.replace("resetSortHeaders();", "resetSortHeaders();\n" + spinner_js)
     # Insert it just before the result table
-    table_parent = all_tests_table.getparent()
-    table_parent.insert(table_parent.index(all_tests_table), html.fromstring(spinner_html))
+    all_tests_table.addprevious(html.fromstring(spinner_html))
     
     with open(f"{os.path.join(path, report_filename)}.html", "wb") as f:
         f.write(html.tostring(all_tests_html, encoding='utf-8'))
