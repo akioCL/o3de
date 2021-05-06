@@ -12,7 +12,7 @@
 
 """
     pytest-html doesn't support merging reports, this utility parses the generated html
-    and merges them into a single html file.
+    and merges them into a single html file and adds some enhancements like a loading spinner.
 """
 
 import argparse
@@ -20,13 +20,6 @@ import shutil
 import os
 import datetime
 from lxml import html
-
-def parse_args():
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('report_name', help="name of the report")
-    parser.add_argument('input_path', help="path that contains the input htmls")
-    parser.add_argument('output_path', help="output path for the final report")
-    return parser.parse_args()
     
 def merge_reports(report_filename, path, files):
     if len(files) == 0:
@@ -78,9 +71,59 @@ def merge_reports(report_filename, path, files):
     setup_filter('xfailed', 'unexpected failures', xfails)
     setup_filter('xpassed', 'unexpected passes', xpasses)
     
+    # Add loading spinner and logic to hide it when loaded
+    spinner_css = """
+    .lds-dual-ring {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+      margin-left: 50%;
+    }
+    .lds-dual-ring:after {
+      content: " ";
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin-left: -32px;
+      border-radius: 50%;
+      border: 6px solid #888;
+      border-color: #888 transparent #888 transparent;
+      animation: lds-dual-ring 1.2s linear infinite;
+    }
+    @keyframes lds-dual-ring {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    """
+    spinner_js = """
+    document.getElementById('loading').remove();
+    document.getElementById('results-table').removeAttribute('style');
+    """
+    spinner_html = '<div id="loading" class="lds-dual-ring"></div>'
+    
+    # CSS style
+    all_tests_html.xpath("//head/style")[-1].text += spinner_css
+    all_tests_table.attrib["style"] = "display: none;"
+    # JS code
+    script =  all_tests_html.xpath("//body/script")[0]
+    script.text = script.text.replace("resetSortHeaders();", "resetSortHeaders();\n" + spinner_js)
+    # Insert it just before the result table
+    table_parent = all_tests_table.getparent()
+    table_parent.insert(table_parent.index(all_tests_table), html.fromstring(spinner_html))
+    
     with open(f"{os.path.join(path, report_filename)}.html", "wb") as f:
         f.write(html.tostring(all_tests_html, encoding='utf-8'))
     
+def parse_args():
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('report_name', help="name of the report")
+    parser.add_argument('input_path', help="path that contains the input htmls")
+    parser.add_argument('output_path', help="output path for the final report")
+    return parser.parse_args()
     
 if __name__ == "__main__":
     options = parse_args()
@@ -90,7 +133,7 @@ if __name__ == "__main__":
     if not os.path.exists(options.output_path):
         os.makedirs(options.output_path)
       
-    processed_files = []      
+    processed_files = []
     for f in os.listdir(options.input_path):
         file_path = os.path.join(options.input_path, f)
         if os.path.isfile(file_path) and file_path.endswith(".html"):
