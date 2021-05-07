@@ -379,9 +379,9 @@ def TestResults(Map options, String platform, String type, String workspace, Map
         bat label: "Installing pytest-html",
             script: "${o3deroot}/${options.PYTHON_DIR}/pip.cmd install lxml".replace('/','\\')
     }
-    dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing/Pytest") {
-        def input = "."
-        def output = "${platform}_${type}"
+    dir("${o3deroot}/${params.OUTPUT_DIRECTORY}/Testing") {
+        def input = "Pytest"
+        def output = "Pytest/${platform}_${type}"
         def prepare_cmd = "${o3deroot}/scripts/build/tools/prepare_html_report.py ${platform}_${type} ${input} ${output}"
         if (env.IS_UNIX) {
             sh label: "Storing reports",
@@ -394,7 +394,7 @@ def TestResults(Map options, String platform, String type, String workspace, Map
         bat label: "Folder contents:",
             script: "tree /F"
         archiveArtifacts artifacts: "${output}/*.html"
-        junit testResults: "*.xml",
+        junit testResults: "**/*.xml",
               keepLongStdio : true
     }
 }
