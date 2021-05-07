@@ -394,7 +394,8 @@ def TestResults(Map options, String platform, String type, String workspace, Map
         bat label: "Folder contents:",
             script: "tree /F"
         archiveArtifacts artifacts: "${output}/*.html"
-        junit "*.xml"
+        junit testResults: "*.xml",
+              keepLongStdio : true
     }
 }
 
