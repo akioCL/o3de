@@ -83,7 +83,7 @@ def C111111_RigidBody_EnablingGravityWorksUsingNotificationsPoC():
     handler.add_callback("OnCollisionBegin", on_collision_begin)
 
     helper.wait_for_condition(lambda: TouchGround.value, 3.0)
-    Report.result(Tests.ball_fell, TouchGround.value)
+    Report.result(Tests.ball_fell, not TouchGround.value)
 
     # 7) Exit game mode
     helper.exit_game_mode(Tests.exit_game_mode)
