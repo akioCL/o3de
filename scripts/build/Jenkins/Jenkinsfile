@@ -536,7 +536,7 @@ try {
                                     CreateTestMetricsStage(pipelineConfig, branchName, envVars, build_job_name, output_directory, configuration).call()
                                 }
                                 if (params && params.containsKey('TEST_RESULTS') && params.TEST_RESULTS == 'True') {
-                                    CreateExportTestResults(pipelineConfig,  platform.key, build_job_name, envVars, params).call()
+                                    CreateExportTestResultsStage(pipelineConfig,  platform.key, build_job_name, envVars, params).call()
                                 }
                                 CreateTeardownStage(envVars).call()
                             }
