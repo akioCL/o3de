@@ -1,0 +1,6 @@
+<download name="AWSClientAuthTest" type="Map">
+ <index src="filelist.xml" dest="filelist.xml"/>
+ <files>
+  <file src="level.pak" dest="level.pak" size="12FA" md5="31e0afab55c9d3c70b45754e62b443f7"/>
+ </files>
+</download>

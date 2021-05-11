@@ -1,0 +1,21 @@
+{
+    "AWS": 
+    {
+        "LoginWithAmazon": 
+        {
+            "AppClientId": "amzn1.application-oa2-client.bb245da5e30e4ddeae4c2cb64193e1e6",
+            "GrantType":  "device_code",
+            "ResponseType":  "device_code",
+            "OAuthCodeURL": "https://api.amazon.com/auth/o2/create/codepair",
+            "OAuthTokensURL": "https://api.amazon.com/auth/o2/token"
+        },
+        "Google": 
+        {
+            "AppClientId": "560546664154-jmmtba8cm036g7pk6kus8knt47aark9d.apps.googleusercontent.com",
+            "ClientSecret": "vnkzQ5Cl2FgWOP3NnLxFKook",
+            "GrantType": "urn:ietf:params:oauth:grant-type:device_code",
+            "OAuthCodeURL": "https://oauth2.googleapis.com/device/code",
+            "OAuthTokensURL": "https://oauth2.googleapis.com/token"
+        }
+    } 
+}

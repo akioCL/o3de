@@ -1,0 +1,23 @@
+{
+    "AWSResourceMappings": {
+        "AWSClientAuth.CognitoIdentityPoolId": {
+            "Name/ID": "us-west-2:3052197b-8248-48d7-99a4-e354021bf987",
+            "Type": "AWS::Cognito::IdentityPool"
+        },
+        "AWSClientAuth.CognitoUserPoolAppClientId": {
+            "Name/ID": "2klio29g7m7ne3ctpges14i98",
+            "Type": "AWS::Cognito::UserPoolClient"
+        },
+        "AWSClientAuth.CognitoUserPoolId": {
+            "Name/ID": "us-west-2_oMzxKKUAr",
+            "Type": "AWS::Cognito::UserPool"
+        },
+        "awscoretestbucket": {
+            "Name/ID": "awscoretestbucket",
+            "Type": "AWS::S3::Bucket"
+        }
+    },
+    "AccountId": "",
+    "Region": "us-west-2",
+    "Version": "1.0.0"
+}
