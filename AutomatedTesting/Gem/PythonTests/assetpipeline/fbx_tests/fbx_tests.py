@@ -71,12 +71,12 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name="onemeshonematerial/onemeshonematerial.cgf",
+                                    product_name="onemeshonematerial/onemeshonematerial.azmodel",
                                     sub_id=-1588558583,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="onemeshonematerial/onemeshonematerial.dccmtl",
+                                    product_name="onemeshonematerial/onemeshonematerial.azmtl",
                                     sub_id=382053982,
                                     asset_type=b"c88469cf21e741eb96fdbf14fbb05edc"
                                 ),
@@ -122,27 +122,27 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name= "softnaminglod/lodtest.cgf",
+                                    product_name= "softnaminglod/lodtest.azmodel",
                                     sub_id=1091612206,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="softnaminglod/lodtest.dccmtl",
+                                    product_name="softnaminglod/lodtest.azmtl",
                                     sub_id=1960621672,
                                     asset_type=b"c88469cf21e741eb96fdbf14fbb05edc"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="softnaminglod/lodtest_lod1.cgf",
+                                    product_name="softnaminglod/lodtest_lod1.azlod",
                                     sub_id=1091677742,
                                     asset_type=b"9aae4926cb6a4c609948a1a22f51db23"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="softnaminglod/lodtest_lod2.cgf",
+                                    product_name="softnaminglod/lodtest_lod2.azlod",
                                     sub_id=1091743278,
                                     asset_type=b"9aae4926cb6a4c609948a1a22f51db23"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="softnaminglod/lodtest_lod3.cgf",
+                                    product_name="softnaminglod/lodtest_lod3.azlod",
                                     sub_id=1091808814,
                                     asset_type=b"9aae4926cb6a4c609948a1a22f51db23"
                                 ),
@@ -188,7 +188,7 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name= "softnamingphysics/physicstest.cgf",
+                                    product_name= "softnamingphysics/physicstest.azmodel",
                                     sub_id=653314392,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
@@ -236,17 +236,17 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshonematerial/multiple_mesh_one_material.dccmtl",
+                                    product_name="twomeshonematerial/multiple_mesh_one_material.azmtl",
                                     sub_id=-1706078587,
                                     asset_type=b"c88469cf21e741eb96fdbf14fbb05edc"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshonematerial/test_cube.cgf",
+                                    product_name="twomeshonematerial/test_cube.azmodel",
                                     sub_id=-112145915,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshonematerial/test_cylinder.cgf",
+                                    product_name="twomeshonematerial/test_cylinder.azmodel",
                                     sub_id=2087742249,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
@@ -291,12 +291,12 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name='twomeshlinkedmaterials/multiple_mesh_linked_materials.cgf',
+                                    product_name='twomeshlinkedmaterials/multiple_mesh_linked_materials.azmodel',
                                     sub_id=1259347154,
                                     asset_type=b'c2869e3bdda04e018fe36770d788866b'
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name='twomeshlinkedmaterials/multiple_mesh_linked_materials.dccmtl',
+                                    product_name='twomeshlinkedmaterials/multiple_mesh_linked_materials.azmtl',
                                     sub_id=1829742731,
                                     asset_type=b'c88469cf21e741eb96fdbf14fbb05edc'
                                 ),
@@ -343,12 +343,12 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name='onemeshmultiplematerials/single_mesh_multiple_materials.cgf',
+                                    product_name='onemeshmultiplematerials/single_mesh_multiple_materials.azmodel',
                                     sub_id=1296081148,
                                     asset_type=b'c2869e3bdda04e018fe36770d788866b'
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name='onemeshmultiplematerials/single_mesh_multiple_materials.dccmtl',
+                                    product_name='onemeshmultiplematerials/single_mesh_multiple_materials.azmtl',
                                     sub_id=-229825489,
                                     asset_type=b'c88469cf21e741eb96fdbf14fbb05edc'
                                 ),
@@ -393,7 +393,7 @@ blackbox_fbx_tests = [
                             warning_count=2,
                             products=[
                                 asset_db_utils.DBProduct(
-                                    product_name="vertexcolor/vertexcolor.cgf",
+                                    product_name="vertexcolor/vertexcolor.azmodel",
                                     sub_id=-427774918,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
@@ -442,17 +442,17 @@ blackbox_fbx_special_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshtwomaterial/multiple_mesh_multiple_material.dccmtl",
+                                    product_name="twomeshtwomaterial/multiple_mesh_multiple_material.azmtl",
                                     sub_id=-1035023097,
                                     asset_type=b"c88469cf21e741eb96fdbf14fbb05edc"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshtwomaterial/test_cube_mesh.cgf",
+                                    product_name="twomeshtwomaterial/test_cube_mesh.azmodel",
                                     sub_id=-1822360172,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshtwomaterial/test_cylinder_mesh.cgf",
+                                    product_name="twomeshtwomaterial/test_cylinder_mesh.azmodel",
                                     sub_id=-1885293549,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
@@ -487,12 +487,12 @@ blackbox_fbx_special_tests = [
                             warning_count=2,
                             products = [
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshtwomaterial/multiple_mesh_multiple_material.dccmtl",
+                                    product_name="twomeshtwomaterial/multiple_mesh_multiple_material.azmtl",
                                     sub_id=-1035023097,
                                     asset_type=b"c88469cf21e741eb96fdbf14fbb05edc"
                                 ),
                                 asset_db_utils.DBProduct(
-                                    product_name="twomeshtwomaterial/test_cube_mesh.cgf",
+                                    product_name="twomeshtwomaterial/test_cube_mesh.azmodel",
                                     sub_id=-1822360172,
                                     asset_type=b"c2869e3bdda04e018fe36770d788866b"
                                 ),
