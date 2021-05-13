@@ -27,6 +27,7 @@
 #include <Source/PythonSystemComponent.h>
 #include <Source/PythonReflectionComponent.h>
 #include <Source/PythonMarshalComponent.h>
+#include <Source/PythonSymbolsBus.h>
 
 namespace UnitTest
 {
@@ -97,6 +98,8 @@ namespace UnitTest
 
         void TearDown() override
         {
+            EditorPythonBindings::PythonSymbolEventBus::ClearQueuedEvents();
+
             AzFramework::ApplicationRequests::Bus::Handler::BusDisconnect();
 
             m_commandRegistrationBusSupression.reset();
