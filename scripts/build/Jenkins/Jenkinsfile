@@ -572,6 +572,7 @@ finally {
             )
         }
         node('controller') {
+            buildFailure = tm('${BUILD_FAILURE_ANALYZER}')
             emailRecipients = [[$class: 'RequesterRecipientProvider']]
             if (env.WATCHED_BRANCHES.tokenize(',').contains(branchName)) {
                 emailRecipients.add([$class: 'CulpritsRecipientProvider'])
