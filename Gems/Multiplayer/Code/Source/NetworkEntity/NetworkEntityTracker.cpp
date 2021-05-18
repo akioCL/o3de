@@ -10,8 +10,9 @@
 *
 */
 
-#include <Source/NetworkEntity/NetworkEntityTracker.h>
 #include <Multiplayer/NetworkEntity/NetworkEntityHandle.h>
+#include <NetworkEntity/NetworkEntityTracker.h>
+
 #include <AzCore/Console/IConsole.h>
 #include <AzCore/Console/ILogger.h>
 

@@ -13,7 +13,7 @@
 #pragma once
 
 #include <Multiplayer/ConnectionData/IConnectionData.h>
-#include <Source/NetworkEntity/EntityReplication/EntityReplicationManager.h>
+#include <NetworkEntity/EntityReplication/EntityReplicationManager.h>
 
 namespace Multiplayer
 {
@@ -56,4 +56,4 @@ namespace Multiplayer
     };
 }
 
-#include <Source/ConnectionData/ServerToClientConnectionData.inl>
+#include <ConnectionData/ServerToClientConnectionData.inl>

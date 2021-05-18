@@ -10,8 +10,9 @@
 *
 */
 
-#include <Source/NetworkInput/NetworkInputArray.h>
 #include <Multiplayer/NetworkEntity/INetworkEntityManager.h>
+#include <NetworkInput/NetworkInputArray.h>
+
 #include <AzNetworking/Serialization/ISerializer.h>
 #include <AzNetworking/Serialization/DeltaSerializer.h>
 

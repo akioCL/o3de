@@ -10,7 +10,8 @@
  *
  */
 
-#include <Source/Pipeline/NetworkSpawnableHolderComponent.h>
+#include <Pipeline/NetworkSpawnableHolderComponent.h>
+
 #include <AzCore/Serialization/SerializeContext.h>
 
 namespace Multiplayer

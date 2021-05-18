@@ -12,16 +12,17 @@
 
 #pragma once
 
-#include <AzCore/EBus/ScheduledEvent.h>
-#include <AzCore/Component/ComponentApplicationBus.h>
-#include <AzFramework/Spawnable/RootSpawnableInterface.h>
-#include <Source/NetworkEntity/NetworkEntityAuthorityTracker.h>
-#include <Source/NetworkEntity/NetworkEntityTracker.h>
-#include <Source/NetworkEntity/NetworkSpawnableLibrary.h>
 #include <Multiplayer/Components/MultiplayerComponentRegistry.h>
 #include <Multiplayer/EntityDomains/IEntityDomain.h>
 #include <Multiplayer/NetworkEntity/INetworkEntityManager.h>
 #include <Multiplayer/NetworkEntity/NetworkEntityRpcMessage.h>
+#include <NetworkEntity/NetworkEntityAuthorityTracker.h>
+#include <NetworkEntity/NetworkEntityTracker.h>
+#include <NetworkEntity/NetworkSpawnableLibrary.h>
+
+#include <AzCore/EBus/ScheduledEvent.h>
+#include <AzCore/Component/ComponentApplicationBus.h>
+#include <AzFramework/Spawnable/RootSpawnableInterface.h>
 
 namespace Multiplayer
 {

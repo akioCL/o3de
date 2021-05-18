@@ -10,12 +10,13 @@
 *
 */
 
-#include <Source/ReplicationWindows/ServerToClientReplicationWindow.h>
 #include <Multiplayer/Components/NetBindComponent.h>
-#include <AzFramework/Visibility/IVisibilitySystem.h>
+#include <ReplicationWindows/ServerToClientReplicationWindow.h>
+
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Console/ILogger.h>
 #include <AzCore/std/sort.h>
+#include <AzFramework/Visibility/IVisibilitySystem.h>
 
 namespace Multiplayer
 {

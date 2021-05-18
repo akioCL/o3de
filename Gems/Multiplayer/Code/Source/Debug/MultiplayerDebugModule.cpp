@@ -10,9 +10,9 @@
 *
 */
 
-#include <Source/Multiplayer_precompiled.h>
-#include <Source/Debug/MultiplayerDebugModule.h>
-#include <Source/Debug/MultiplayerDebugSystemComponent.h>
+#include <Multiplayer_precompiled.h>
+#include <Debug/MultiplayerDebugModule.h>
+#include <Debug/MultiplayerDebugSystemComponent.h>
 
 namespace Multiplayer
 {

@@ -12,11 +12,12 @@
 
 #pragma once
 
+#include <NetworkEntity/NetworkEntityTracker.h>
+
 #include <AzCore/EBus/Event.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <AzNetworking/DataStructures/TimeoutQueue.h>
-#include <Source/NetworkEntity/NetworkEntityTracker.h>
 
 namespace Multiplayer
 {

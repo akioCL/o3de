@@ -10,7 +10,8 @@
  *
  */
 
-#include <Source/Pipeline/NetBindMarkerComponent.h>
+#include <Pipeline/NetBindMarkerComponent.h>
+
 #include <AzCore/Serialization/SerializeContext.h>
 
 namespace Multiplayer

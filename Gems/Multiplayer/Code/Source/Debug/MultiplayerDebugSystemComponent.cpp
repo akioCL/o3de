@@ -10,7 +10,7 @@
 *
 */
 
-#include <Source/Debug/MultiplayerDebugSystemComponent.h>
+#include <Debug/MultiplayerDebugSystemComponent.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Interface/Interface.h>
 #include <Multiplayer/IMultiplayer.h>

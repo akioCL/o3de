@@ -10,11 +10,6 @@
 *
 */
 
-#include <Source/NetworkEntity/EntityReplication/EntityReplicationManager.h>
-#include <Source/NetworkEntity/EntityReplication/EntityReplicator.h>
-#include <Source/NetworkEntity/EntityReplication/PropertyPublisher.h>
-#include <Source/NetworkEntity/EntityReplication/PropertySubscriber.h>
-#include <Source/AutoGen/Multiplayer.AutoPackets.h>
 #include <Multiplayer/IMultiplayer.h>
 #include <Multiplayer/Components/NetBindComponent.h>
 #include <Multiplayer/EntityDomains/IEntityDomain.h>
@@ -22,6 +17,12 @@
 #include <Multiplayer/NetworkEntity/NetworkEntityUpdateMessage.h>
 #include <Multiplayer/NetworkEntity/NetworkEntityRpcMessage.h>
 #include <Multiplayer/ReplicationWindows/IReplicationWindow.h>
+#include <NetworkEntity/EntityReplication/EntityReplicationManager.h>
+#include <NetworkEntity/EntityReplication/EntityReplicator.h>
+#include <NetworkEntity/EntityReplication/PropertyPublisher.h>
+#include <NetworkEntity/EntityReplication/PropertySubscriber.h>
+#include <Source/AutoGen/Multiplayer.AutoPackets.h>
+
 #include <AzNetworking/ConnectionLayer/IConnection.h>
 #include <AzNetworking/ConnectionLayer/IConnectionListener.h>
 #include <AzNetworking/PacketLayer/IPacketHeader.h>

@@ -12,21 +12,22 @@
 
 #pragma once
 
-#include <Source/NetworkEntity/EntityReplication/EntityReplicator.h>
 #include <Multiplayer/Components/NetBindComponent.h>
 #include <Multiplayer/EntityDomains/IEntityDomain.h>
 #include <Multiplayer/NetworkEntity/INetworkEntityManager.h>
 #include <Multiplayer/NetworkEntity/NetworkEntityHandle.h>
 #include <Multiplayer/ReplicationWindows/IReplicationWindow.h>
-#include <AzNetworking/DataStructures/TimeoutQueue.h>
-#include <AzNetworking/PacketLayer/IPacketHeader.h>
+#include <NetworkEntity/EntityReplication/EntityReplicator.h>
+#include <Source/AutoGen/Multiplayer.AutoPackets.h>
+
 #include <AzCore/std/containers/map.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/containers/deque.h>
 #include <AzCore/std/limits.h>
 #include <AzCore/EBus/Event.h>
 #include <AzCore/EBus/ScheduledEvent.h>
-#include <Source/AutoGen/Multiplayer.AutoPackets.h>
+#include <AzNetworking/DataStructures/TimeoutQueue.h>
+#include <AzNetworking/PacketLayer/IPacketHeader.h>
 
 namespace AzNetworking
 {

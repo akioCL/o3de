@@ -10,7 +10,8 @@
 *
 */
 
-#include <Source/NetworkEntity/EntityReplication/PropertyPublisher.h>
+#include <NetworkEntity/EntityReplication/PropertyPublisher.h>
+
 #include <AzNetworking/ConnectionLayer/IConnection.h>
 #include <AzCore/Console/IConsole.h>
 #include <AzCore/Console/ILogger.h>

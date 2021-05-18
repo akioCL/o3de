@@ -10,7 +10,7 @@
 *
 */
 
-#include <Source/ConnectionData/ServerToClientConnectionData.h>
+#include <ConnectionData/ServerToClientConnectionData.h>
 
 namespace Multiplayer
 {

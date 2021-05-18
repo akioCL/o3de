@@ -10,8 +10,9 @@
 *
 */
 
-#include <Source/NetworkInput/NetworkInputMigrationVector.h>
 #include <Multiplayer/IMultiplayer.h>
+#include <NetworkInput/NetworkInputMigrationVector.h>
+
 #include <AzNetworking/Serialization/ISerializer.h>
 
 namespace Multiplayer

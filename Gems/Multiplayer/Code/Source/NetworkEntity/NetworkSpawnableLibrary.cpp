@@ -10,10 +10,11 @@
  *
  */
 
-#include <Source/NetworkEntity/NetworkSpawnableLibrary.h>
+#include <NetworkEntity/NetworkSpawnableLibrary.h>
+
 #include <AzCore/Asset/AssetManagerBus.h>
-#include <AzFramework/Spawnable/Spawnable.h>
 #include <AzCore/StringFunc/StringFunc.h>
+#include <AzFramework/Spawnable/Spawnable.h>
 
 namespace Multiplayer
 {

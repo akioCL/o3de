@@ -10,7 +10,7 @@
 *
 */
 
-#include <Source/EntityDomains/FullOwnershipEntityDomain.h>
+#include <EntityDomains/FullOwnershipEntityDomain.h>
 
 namespace Multiplayer 
 {

@@ -10,17 +10,17 @@
 *
 */
 
-#include <Source/NetworkEntity/EntityReplication/EntityReplicator.h>
-#include <Source/NetworkEntity/EntityReplication/EntityReplicationManager.h>
-#include <Source/NetworkEntity/EntityReplication/PropertyPublisher.h>
-#include <Source/NetworkEntity/EntityReplication/PropertySubscriber.h>
-#include <Source/NetworkEntity/NetworkEntityAuthorityTracker.h>
-#include <Source/NetworkEntity/NetworkEntityTracker.h>
-#include <Source/AutoGen/Multiplayer.AutoPackets.h>
 #include <Multiplayer/IMultiplayer.h>
 #include <Multiplayer/Components/NetBindComponent.h>
 #include <Multiplayer/Components/NetworkTransformComponent.h>
 #include <Multiplayer/NetworkEntity/NetworkEntityRpcMessage.h>
+#include <NetworkEntity/EntityReplication/EntityReplicator.h>
+#include <NetworkEntity/EntityReplication/EntityReplicationManager.h>
+#include <NetworkEntity/EntityReplication/PropertyPublisher.h>
+#include <NetworkEntity/EntityReplication/PropertySubscriber.h>
+#include <NetworkEntity/NetworkEntityAuthorityTracker.h>
+#include <NetworkEntity/NetworkEntityTracker.h>
+#include <Source/AutoGen/Multiplayer.AutoPackets.h>
 
 #include <AzNetworking/PacketLayer/IPacket.h>
 #include <AzNetworking/Serialization/ISerializer.h>

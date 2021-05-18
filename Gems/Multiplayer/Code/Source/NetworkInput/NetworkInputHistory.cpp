@@ -10,7 +10,7 @@
 *
 */
 
-#include <Source/NetworkInput/NetworkInputHistory.h>
+#include <NetworkInput/NetworkInputHistory.h>
 
 namespace Multiplayer
 {

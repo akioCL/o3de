@@ -10,13 +10,13 @@
 *
 */
 
-#include <Source/Multiplayer_precompiled.h>
-#include <Source/MultiplayerGem.h>
-#include <Source/MultiplayerSystemComponent.h>
-#include <Source/AutoGen/AutoComponentTypes.h>
-#include <Source/Pipeline/NetBindMarkerComponent.h>
-#include <Source/Pipeline/NetworkSpawnableHolderComponent.h>
 #include <Multiplayer/Components/NetBindComponent.h>
+#include <Multiplayer_precompiled.h>
+#include <MultiplayerGem.h>
+#include <MultiplayerSystemComponent.h>
+#include <Pipeline/NetBindMarkerComponent.h>
+#include <Pipeline/NetworkSpawnableHolderComponent.h>
+#include <Source/AutoGen/AutoComponentTypes.h>
 #include <AzNetworking/Framework/NetworkingSystemComponent.h>
 
 namespace Multiplayer

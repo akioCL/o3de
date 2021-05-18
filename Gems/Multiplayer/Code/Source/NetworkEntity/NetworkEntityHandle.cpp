@@ -14,7 +14,8 @@
 #include <Multiplayer/Components/MultiplayerController.h>
 #include <Multiplayer/Components/MultiplayerComponent.h>
 #include <Multiplayer/Components/NetBindComponent.h>
-#include <Source/NetworkEntity/NetworkEntityTracker.h>
+#include <NetworkEntity/NetworkEntityTracker.h>
+
 #include <AzCore/Console/IConsole.h>
 #include <AzCore/Console/ILogger.h>
 
