@@ -137,12 +137,16 @@ namespace AzFramework::ProjectManager
             }
             AZ::IO::FixedMaxPath pythonPath = engineRootPath / "python";
             pythonPath /= AZ_TRAIT_AZFRAMEWORK_PYTHON_SHELL;
-            auto cmdPath = AZ::IO::FixedMaxPathString::format("%s %s%s --executable_path=%s --parent_pid=%" PRIu32, pythonPath.Native().c_str(),
-                debugOption.c_str(), (projectManagerPath / projectsScript).c_str(), executablePath.c_str(), AZ::Platform::GetCurrentProcessId());
 
             AzFramework::ProcessLauncher::ProcessLaunchInfo processLaunchInfo;
+            auto& params = AZStd::get<AZStd::vector<AZStd::string>>(processLaunchInfo.m_commandlineParameters);
+            params.emplace_back(AZStd::string(pythonPath.Native().c_str()));
+            params.emplace_back(AZStd::string::format("%s%s", debugOption.c_str(), (projectManagerPath / projectsScript).c_str()));
+            params.emplace_back(AZStd::string("--executable_path"));
+            params.emplace_back(AZStd::string(executablePath.c_str()));
+            params.emplace_back(AZStd::string("--parent_pid"));
+            params.emplace_back(AZStd::string::format("%" PRIu32, AZ::Platform::GetCurrentProcessId()));
 
-            processLaunchInfo.m_commandlineParameters = cmdPath;
             processLaunchInfo.m_showWindow = false;
             launchSuccess = AzFramework::ProcessLauncher::LaunchUnwatchedProcess(processLaunchInfo);
         }
