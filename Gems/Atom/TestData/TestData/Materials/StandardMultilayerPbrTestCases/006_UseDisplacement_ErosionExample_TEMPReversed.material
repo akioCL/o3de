@@ -1,0 +1,48 @@
+{
+    "description": "",
+    "materialType": "Materials/Types/StandardMultilayerPBR.materialtype",
+    "parentMaterial": "",
+    "propertyLayoutVersion": 3,
+    "properties": {
+        "blend": {
+            "blendSource": "Displacement_With_BlendMaskTexture",
+            "displacementBlendDistance": 0.011749999597668648,
+            "enableLayer2": true,
+            "textureMap": "TestData/Textures/BrickWall_layers.png"
+        },
+        "layer1_baseColor": {
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Color.jpg"
+        },
+        "layer1_normal": {
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Normal.jpg"
+        },
+        "layer1_occlusion": {
+            "diffuseTextureMap": "TestData/Textures/cc0/Ground033_1K_AmbientOcclusion.jpg"
+        },
+        "layer1_parallax": {
+            "factor": 0.013000000268220902,
+            "offset": -0.019999999552965165,
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Displacement.jpg"
+        },
+        "layer1_roughness": {
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Roughness.jpg"
+        },
+        "layer2_baseColor": {
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_bc.png"
+        },
+        "layer2_normal": {
+            "flipY": true,
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_normal.png"
+        },
+        "layer2_parallax": {
+            "factor": 0.01600000075995922,
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_disp.png"
+        },
+        "layer2_roughness": {
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_roughness.png"
+        },
+        "parallax": {
+            "enable": true
+        }
+    }
+}

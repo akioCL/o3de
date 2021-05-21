@@ -1,0 +1,68 @@
+{
+    "description": "",
+    "materialType": "Materials/Types/StandardMultilayerPBR.materialtype",
+    "parentMaterial": "",
+    "propertyLayoutVersion": 3,
+    "properties": {
+        "blend": {
+            "blendSource": "Displacement_With_BlendMaskTexture",
+            "displacementBlendDistance": 0.007770000025629997,
+            "displacementBlendMode2": "Lower",
+            "displacementBlendMode3": "Lower",
+            "displacementBlendOffset": 0.006000000052154064,
+            "enableLayer2": true,
+            "enableLayer3": true,
+            "textureMap": "TestData/Textures/BrickWall2_layers.png"
+        },
+        "layer1_baseColor": {
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_bc.png"
+        },
+        "layer1_normal": {
+            "flipY": true,
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_normal.png"
+        },
+        "layer1_parallax": {
+            "factor": 0.012000000104308129,
+            "offset": -0.0020000000949949028,
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_disp.png"
+        },
+        "layer1_roughness": {
+            "textureMap": "TestData/Textures/TextureHaven/4k_castle_brick_02_red/4k_castle_brick_02_red_roughness.png"
+        },
+        "layer2_baseColor": {
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Color.jpg"
+        },
+        "layer2_normal": {
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Normal.jpg"
+        },
+        "layer2_occlusion": {
+            "diffuseTextureMap": "TestData/Textures/cc0/Ground033_1K_AmbientOcclusion.jpg"
+        },
+        "layer2_parallax": {
+            "factor": 0.007000000216066837,
+            "offset": -0.024000000208616258,
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Displacement.jpg"
+        },
+        "layer2_roughness": {
+            "textureMap": "TestData/Textures/cc0/Ground033_1K_Roughness.jpg"
+        },
+        "layer3_baseColor": {
+            "textureMap": "TestData/Textures/cc0/Concrete019_1K_Color.jpg"
+        },
+        "layer3_normal": {
+            "textureMap": "TestData/Textures/cc0/Concrete019_1K_Normal.jpg"
+        },
+        "layer3_parallax": {
+            "factor": 0.029999999329447748,
+            "offset": -0.024000000208616258,
+            "textureMap": "TestData/Textures/cc0/Concrete019_1K_Displacement.jpg",
+            "useTexture": false
+        },
+        "layer3_roughness": {
+            "textureMap": "TestData/Textures/cc0/Concrete019_1K_Roughness.jpg"
+        },
+        "parallax": {
+            "enable": true
+        }
+    }
+}
