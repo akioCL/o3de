@@ -47,7 +47,7 @@ namespace AssetProcessor
         if (!AZ::Utils::LoadObjectFromBufferInPlace(data.data(), data.length(), netResponse))
         {
             AZ_Error("Builder", false, "Failed to deserialize processJobs response");
-            return BuilderRunJobOutcome::FailedToDecodeResponse;;
+            return BuilderRunJobOutcome::FailedToDecodeResponse;
         }
 
         if (!netResponse.m_response.Succeeded() || s_createRequestFileForSuccessfulJob)

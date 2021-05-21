@@ -106,7 +106,7 @@ namespace AssetProcessor
         bool Start();
 
         //! Sets the connection id and signals that the builder has connected
-        void SetConnection(AZ::u32 connId);;
+        void SetConnection(AZ::u32 connId);
 
         AZStd::vector<AZStd::string> BuildParams(const char* task, const char* moduleFilePath, const AZStd::string& builderGuid, const AZStd::string& jobDescriptionFile, const AZStd::string& jobResponseFile) const;
         AZStd::unique_ptr<AzFramework::ProcessWatcher> LaunchProcess(const char* fullExePath, const AZStd::vector<AZStd::string>& params) const;

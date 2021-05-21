@@ -195,7 +195,7 @@ namespace AssetProcessor
         ApplicationServerBus::BroadcastResult(portNumber, &ApplicationServerBus::Events::GetServerListeningPort);
 
         AZStd::vector<AZStd::string> params;
-        params.emplace_back(AZStd::string::format(R"(-task="%s")", task));;
+        params.emplace_back(AZStd::string::format(R"(-task="%s")", task));
         params.emplace_back(AZStd::string::format(R"(-id="%s")", builderGuid.c_str()));
         params.emplace_back(AZStd::string::format(R"(-project-name="%s")", gameName.toUtf8().constData()));
         params.emplace_back(AZStd::string::format(R"(-project-cache-path="%s")", projectCacheRoot.absolutePath().toUtf8().constData()));
