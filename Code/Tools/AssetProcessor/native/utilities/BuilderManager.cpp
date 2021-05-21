@@ -211,8 +211,8 @@ namespace AssetProcessor
 
         if (!jobDescriptionFile.empty() && !jobResponseFile.empty())
         {
-            params.emplace_back(AZStd::string::format(R"(-input="%s")", jobDescriptionFile));
-            params.emplace_back(AZStd::string::format(R"(-output="%s")", jobResponseFile));
+            params.emplace_back(AZStd::string::format(R"(-input="%s")", jobDescriptionFile.c_str()));
+            params.emplace_back(AZStd::string::format(R"(-output="%s")", jobResponseFile.c_str()));
         }
 
         return params;
