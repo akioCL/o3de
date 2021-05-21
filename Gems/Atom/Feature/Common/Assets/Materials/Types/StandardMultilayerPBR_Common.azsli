@@ -56,6 +56,9 @@ ShaderResourceGroup MaterialSrg : SRG_PerMaterial
     // displacement adjustments feel more natural if they don't impact the blend distance.
     float m_displacementBlendDistance;
 
+    // When displacement-based blending is used, this will offset the point at which one layer is considered higher than another
+    float m_displacementBlendOffset;
+
     // Auto-generate material SRG fields for common inputs for each layer
     DEFINE_LAYER_SRG_INPUTS(m_layer1_)
     DEFINE_LAYER_SRG_INPUTS(m_layer2_)
@@ -110,6 +113,10 @@ option DebugDrawMode o_debugDrawMode;
 
 enum class LayerBlendSource { BlendMaskTexture, BlendMaskVertexColors, Displacement, Displacement_With_BlendMaskTexture, Displacement_With_BlendMaskVertexColors, Fallback };
 option LayerBlendSource o_layerBlendSource;
+
+enum class DisplacementBlendMode { Raise, Lower };
+option DisplacementBlendMode o_layer2_displacementBlendMode;
+option DisplacementBlendMode o_layer3_displacementBlendMode; 
 
 // Indicates whether the vertex input struct's "m_optional_blendMask" is bound. If false, it is not safe to read from m_optional_blendMask.
 // This option gets set automatically by the system at runtime; there is a soft naming convention that associates it with m_optional_blendMask.
@@ -216,10 +223,70 @@ float3 GetApplicableBlendMaskValues(LayerBlendSource blendSource, float2 blendMa
 float GetSubMinDisplacement()
 {
     return MaterialSrg::m_displacementMin - 0.001;
-    //return MaterialSrg::m_displacementMin - max(MaterialSrg::m_displacementBlendDistance, 0.001);
 }
 
-float3 ApplyBlendMaskToDepthValues(float3 blendMaskValues, float3 layerDepthValues, float zeroMaskDisplacement);
+struct DisplacementBlendResult
+{
+    float m_blendWeight;   //!< The blend weight that should be used for this layer, relative to the lower layers
+    float m_surfaceHeight; //!< The final calculated surface height of this layer
+};
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// TODO next for erosion:
+// - make the blend offset and blend distance be per-layer
+// - throughly test with layer 3
+// - make sure blend offset works with Raise mode
+// - have one sample that combines two different Lowers
+// - have one sample that combines one Lower and one Raise.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//! Calculate a blend weight based on displacement values
+DisplacementBlendResult CalcDisplacementBlendWeight(float prevLayerHeight, float currentLayerHeight, DisplacementBlendMode displacementBlendMode, float layerDepthBlendDistance, float layerDepthBlendOffset)
+{
+    DisplacementBlendResult result;
+    result.m_blendWeight = 0.0f;
+    result.m_surfaceHeight = 0.0f;
+
+    float farthestVisibleHeight = 0.0;
+
+    currentLayerHeight += layerDepthBlendOffset;
+
+    switch(displacementBlendMode)
+    {
+        case DisplacementBlendMode::Raise:
+            result.m_surfaceHeight = max(currentLayerHeight, prevLayerHeight);
+            farthestVisibleHeight = result.m_surfaceHeight - layerDepthBlendDistance;
+            break;
+        case DisplacementBlendMode::Lower:
+            result.m_surfaceHeight = min(currentLayerHeight, prevLayerHeight);
+            farthestVisibleHeight = result.m_surfaceHeight + layerDepthBlendDistance;
+            break;
+    }
+    
+    if(layerDepthBlendDistance < 0.0001)
+    {
+        result.m_blendWeight = (currentLayerHeight == result.m_surfaceHeight ? 1.0 : 0.0);
+    }
+    else
+    {
+        switch(displacementBlendMode)
+        {
+            case DisplacementBlendMode::Raise:
+                // This lets the current layer properties bleed through when it is "hidden" below the surface
+                result.m_blendWeight = smoothstep(farthestVisibleHeight, result.m_surfaceHeight, currentLayerHeight);
+                break;
+            case DisplacementBlendMode::Lower:
+                // This lets the previous layer properties bleed through when it is "hidden" above the eroded surface
+                result.m_blendWeight = smoothstep(result.m_surfaceHeight, farthestVisibleHeight, prevLayerHeight);
+                break;
+        }
+    }
+
+    return result;
+}
+
 
 //! Return the final blend weights to be used for rendering, based on the available data and configuration.
 //! @param blendSource - indicates where to get the blend mask from
@@ -233,9 +300,9 @@ float3 ApplyBlendMaskToDepthValues(float3 blendMaskValues, float3 layerDepthValu
 //!         layer1 = r
 //!         layer2 = g
 //!         layer3 = b
-float3 GetBlendWeights(LayerBlendSource blendSource, float3 blendMaskValues, float3 layerDepthValues, float layerDepthBlendDistance)
+float3 GetBlendWeights(LayerBlendSource blendSource, float3 blendMaskValues, float3 layerDepthValues, float layerDepthBlendDistance, float layerDepthBlendOffset)
 {
-    float3 blendWeights;
+    float3 blendWeights = float3(1,0,0);
     
     if(o_layer2_enabled || o_layer3_enabled)
     {
@@ -243,41 +310,23 @@ float3 GetBlendWeights(LayerBlendSource blendSource, float3 blendMaskValues, flo
            LayerBlendSource::Displacement_With_BlendMaskTexture == blendSource || 
            LayerBlendSource::Displacement_With_BlendMaskVertexColors == blendSource)
         {
-            // Calculate the blend weights based on displacement values...
-
             // The inputs are depth values, but we change them to height values to make the code a bit more intuitive.
             float3 layerHeightValues = -layerDepthValues;
 
-            float highestPoint = layerHeightValues.x;
+            float prevLayerHeight = layerHeightValues.r;
+
             if(o_layer2_enabled)
             {
-                highestPoint = max(highestPoint, layerHeightValues.y);
+                DisplacementBlendResult blendResult = CalcDisplacementBlendWeight(prevLayerHeight, layerHeightValues.g, o_layer2_displacementBlendMode, layerDepthBlendDistance, layerDepthBlendOffset);
+                blendWeights.y = blendResult.m_blendWeight;
+                prevLayerHeight = blendResult.m_surfaceHeight;
             }
+            
             if(o_layer3_enabled)
             {
-                highestPoint = max(highestPoint, layerHeightValues.z);
-            }
-            
-            if(layerDepthBlendDistance > 0.0001)
-            {
-                float lowestVisiblePoint = highestPoint - layerDepthBlendDistance;
-                blendWeights = smoothstep(lowestVisiblePoint, highestPoint, layerHeightValues);
-            
-                if(!o_layer2_enabled)
-                {
-                    blendWeights.y = 0.0;
-                }
-            
-                if(!o_layer3_enabled)
-                {
-                    blendWeights.z = 0.0;
-                }
-            }
-            else
-            {
-                blendWeights = float3(layerHeightValues.x >= highestPoint ? 1.0 : 0.0,
-                                        layerHeightValues.y >= highestPoint && o_layer2_enabled ? 1.0 : 0.0,
-                                        layerHeightValues.z >= highestPoint && o_layer3_enabled ? 1.0 : 0.0);
+                DisplacementBlendResult blendResult = CalcDisplacementBlendWeight(prevLayerHeight, layerHeightValues.b, o_layer3_displacementBlendMode, layerDepthBlendDistance, layerDepthBlendOffset);
+                blendWeights.z = blendResult.m_blendWeight;
+                prevLayerHeight = blendResult.m_surfaceHeight;
             }
             
             // Calculate blend weights such that multiplying and adding them with layer data is equivalent
@@ -285,7 +334,7 @@ float3 GetBlendWeights(LayerBlendSource blendSource, float3 blendMaskValues, flo
             //     final = lerp(final, layer1, blendWeights.r)
             //     final = lerp(final, layer2, blendWeights.g)
             //     final = lerp(final, layer3, blendWeights.b)
-
+            
             blendWeights.y = (1 - blendWeights.z) * blendWeights.y;
             blendWeights.x = 1 - blendWeights.y - blendWeights.z;
         }
@@ -303,15 +352,12 @@ float3 GetBlendWeights(LayerBlendSource blendSource, float3 blendMaskValues, flo
         }
 
     }
-    else
-    {
-        blendWeights = float3(1,0,0);
-    }
 
     return blendWeights;
 }
 
 float3 GetLayerDepthValues(float2 uv, float2 uv_ddx, float2 uv_ddy);
+float3 ApplyBlendMaskToDepthValues(float3 blendMaskValues, float3 layerDepthValues, float zeroMaskLowerDisplacement, float zeroMaskUpperDisplacement);
 
 //! Return the final blend weights to be used for rendering, based on the available data and configuration.
 //! Note this will sample the displacement maps in the case of LayerBlendSource::Displacement. If you have already
@@ -336,11 +382,15 @@ float3 GetBlendWeights(LayerBlendSource blendSource, float2 uv, float3 blendMask
         {
             // Unlike the GetDepth() callback used for parallax, we don't just shift the values toward GetSubMinDisplacement(),
             // we shift extra to ensure that completely masked-out layers are not blended onto upper layers.
-            layerDepthValues = ApplyBlendMaskToDepthValues(blendMaskValues, layerDepthValues, GetSubMinDisplacement() - MaterialSrg::m_displacementBlendDistance);
+            float zeroMaskLowerDisplacement = GetSubMinDisplacement() - MaterialSrg::m_displacementBlendDistance;
+            
+            float zeroMaskUpperDisplacement = MaterialSrg::m_displacementMax + MaterialSrg::m_displacementBlendOffset;
+
+            layerDepthValues = ApplyBlendMaskToDepthValues(blendMaskValues, layerDepthValues, zeroMaskLowerDisplacement, zeroMaskUpperDisplacement);
         }
     }
     
-    return GetBlendWeights(blendSource, blendMaskValues, layerDepthValues, MaterialSrg::m_displacementBlendDistance);
+    return GetBlendWeights(blendSource, blendMaskValues, layerDepthValues, MaterialSrg::m_displacementBlendDistance, MaterialSrg::m_displacementBlendOffset);
 }
 
 float BlendLayers(float layer1, float layer2, float layer3, float3 blendWeights)
@@ -433,30 +483,52 @@ float3 GetLayerDepthValues(float2 uv, float2 uv_ddx, float2 uv_ddy)
     return layerDepthValues;
 }
 
+//! Utility for ApplyBlendMaskToDepthValues() below. 
+//! Returns the total offset that should be applied to a layer, to make the surface disappear beyond all other layers.
+//! @param heightmapFactor  scale factor for the total size of the heightmap
+//! @param heightmapOffset  the offset of the heightmap from the mesh surface
+//! @param zeroMaskUpperDisplacement  see ApplyBlendMaskToDepthValues()
+//! @param displacementBlendMode  indicates which displacement blend mode this layer is using
+//! @return the total offset for masking, positive values are up, negative values are down.
+float CalcDisplacementMaskFalloffRange(float heightmapFactor, float heightmapOffset, float zeroMaskLowerDisplacement, float zeroMaskUpperDisplacement, DisplacementBlendMode displacementBlendMode)
+{
+    float falloffRange = 0;
+
+    switch(displacementBlendMode)
+    {
+        case DisplacementBlendMode::Raise:
+            // When the layer is raising the displacement, we lower it to hide it.
+            falloffRange = zeroMaskLowerDisplacement - heightmapOffset;
+            break;
+        case DisplacementBlendMode::Lower:
+            falloffRange = zeroMaskUpperDisplacement - (heightmapOffset - heightmapFactor);
+            break;
+    }
+
+    return falloffRange;
+}
 
 //! Uses a layer blend mask to further displace each layer's surface so that it disappears beyond the other surfaces.
 //! Note the blend mask does not apply to the first layer, it is the implicit base layer. Layers 2 and 3 are masked by the r and g channels of the mask.
 //! @param blendMaskValues layer mask values as returned by GetApplicableBlendMaskValues()
 //! @param layerDepthValues layer depth values as returned by GetLayerDepthValues()
-//! @param zeroMaskDisplacement the target displacement value that corresponds to a mask value of 0
+//! @param zeroMaskLowerDisplacement the target displacement value that corresponds to a mask value of 0, when lowering the depth values
+//! @param zeroMaskUpperDisplacement the target displacement value that corresponds to a mask value of 0, when raising the depth values
 //! @return new layer depth values that have been adjusted according to the layerMaskValues
-float3 ApplyBlendMaskToDepthValues(float3 blendMaskValues, float3 layerDepthValues, float zeroMaskDisplacement)
+float3 ApplyBlendMaskToDepthValues(float3 blendMaskValues, float3 layerDepthValues, float zeroMaskLowerDisplacement, float zeroMaskUpperDisplacement)
 {
-    if(o_layer2_enabled || o_layer3_enabled)
-    {        
-        // We add to the depth value rather than lerp toward m_displacementMin to avoid squashing the topology, but instead lower it out of sight.
+    // We add to the depth value rather than lerp toward m_displacementMin to avoid squashing the topology, but instead lower it out of sight.
 
-        if(o_layer2_enabled)
-        {
-            float dropoffRange = MaterialSrg::m_layer2_m_depthOffset - zeroMaskDisplacement;
-            layerDepthValues.g += dropoffRange * (1-blendMaskValues.r);
-        }
+    if(o_layer2_enabled)
+    {
+        float falloffRange = CalcDisplacementMaskFalloffRange(MaterialSrg::m_layer2_m_depthFactor, MaterialSrg::m_layer2_m_depthOffset, zeroMaskLowerDisplacement, zeroMaskUpperDisplacement, o_layer2_displacementBlendMode);
+        layerDepthValues.g -= falloffRange * (1-blendMaskValues.r);
+    }
         
-        if(o_layer3_enabled)
-        {
-            float dropoffRange = MaterialSrg::m_layer3_m_depthOffset - zeroMaskDisplacement;
-            layerDepthValues.b += dropoffRange * (1-blendMaskValues.g);
-        }
+    if(o_layer3_enabled)
+    {
+        float falloffRange = CalcDisplacementMaskFalloffRange(MaterialSrg::m_layer3_m_depthFactor, MaterialSrg::m_layer3_m_depthOffset, zeroMaskLowerDisplacement, zeroMaskUpperDisplacement, o_layer3_displacementBlendMode);
+        layerDepthValues.b -= falloffRange * (1-blendMaskValues.g);
     }
 
     return layerDepthValues;
@@ -480,17 +552,21 @@ DepthResult GetDepth(float2 uv, float2 uv_ddx, float2 uv_ddy)
 
     if(useBlendMask)
     {
-        // Regarding GetSubMinDisplacement(), when a mask of 0 pushes the surface all the way to the bottom, we want that 
+        // When a mask of 0 pushes the surface all the way to the bottom, we want that 
         // to go a little below the min so it will disappear if there is something else right at the min.
-        
-        layerDepthValues = ApplyBlendMaskToDepthValues(blendMaskValues, layerDepthValues, GetSubMinDisplacement());
+        float zeroMaskLowerDisplacement = GetSubMinDisplacement();
+
+        float zeroMaskUpperDisplacement = MaterialSrg::m_displacementMax;
+
+        layerDepthValues = ApplyBlendMaskToDepthValues(blendMaskValues, layerDepthValues, zeroMaskLowerDisplacement, zeroMaskUpperDisplacement);
     }
     
     // When blending the depth together, we don't use MaterialSrg::m_displacementBlendDistance. The intention is that m_displacementBlendDistance
     // is for transitioning the appearance of the surface itself, but we still want a distinct change in the heightmap. If someday we want to 
     // support smoothly blending the depth as well, there is a bit more work to do to get it to play nice with the blend mask code in GetLayerDepthValues().
     float layerDepthBlendDistance = 0.0f;
-    float3 blendWeightValues = GetBlendWeights(blendSource, blendMaskValues, layerDepthValues, layerDepthBlendDistance);
+    float layerDepthBlendOffset = 0.0f;
+    float3 blendWeightValues = GetBlendWeights(blendSource, blendMaskValues, layerDepthValues, layerDepthBlendDistance, layerDepthBlendOffset);
     
     float depth = BlendLayers(layerDepthValues.r, layerDepthValues.g, layerDepthValues.b, blendWeightValues);
 

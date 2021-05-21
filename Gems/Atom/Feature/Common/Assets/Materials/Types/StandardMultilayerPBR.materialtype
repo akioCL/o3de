@@ -341,6 +341,30 @@
                     }
                 },
                 {
+                    "id": "displacementBlendMode2",
+                    "displayName": "Blend Mode 2",
+                    "description": "Selects which mode to use when blending layer 2 with the other layers.",
+                    "type": "Enum",
+                    "enumValues": [ "Raise", "Lower" ],
+                    "defaultValue": "Raise",
+                    "connection": {
+                        "type": "ShaderOption",
+                        "id": "o_layer2_displacementBlendMode"
+                    }
+                },
+                {
+                    "id": "displacementBlendMode3",
+                    "displayName": "Blend Mode 3",
+                    "description": "Selects which mode to use when blending layer 3 with the other layers.",
+                    "type": "Enum",
+                    "enumValues": [ "Raise", "Lower" ],
+                    "defaultValue": "Raise",
+                    "connection": {
+                        "type": "ShaderOption",
+                        "id": "o_layer3_displacementBlendMode"
+                    }
+                },
+                {
                     "id": "displacementBlendDistance",
                     "displayName": "Blend Distance",
                     "description": "Adjusts how smoothly to transition between layers when displacement blending is enabled.",
@@ -352,6 +376,20 @@
                     "connection": {
                         "type": "ShaderInput",
                         "id": "m_displacementBlendDistance"
+                    }
+                },
+                {
+                    "id": "displacementBlendOffset",
+                    "displayName": "Blend Offset",
+                    "description": "Offset the transition between layers when displacement blending is enabled.",
+                    "type": "Float",
+                    "defaultValue": 0.0,
+                    "softMin": -0.1,
+                    "softMax": 0.1,
+                    "step": 0.001,
+                    "connection": {
+                        "type": "ShaderInput",
+                        "id": "m_displacementBlendOffset"
                     }
                 },
                 {

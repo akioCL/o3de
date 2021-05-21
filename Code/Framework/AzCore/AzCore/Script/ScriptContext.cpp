@@ -5888,7 +5888,6 @@ LUA_API const Node* lua_getDummyNode()
         else
         {
             lua_pop(m_impl->m_lua, 1);
-            AZ_Warning("Script", false, "%s is not a function!", functionName);
         }
         return false;
     }
