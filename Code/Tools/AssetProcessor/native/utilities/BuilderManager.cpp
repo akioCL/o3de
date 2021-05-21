@@ -14,6 +14,7 @@
 #include <AzCore/std/smart_ptr/make_shared.h>
 
 #include <AzFramework/API/ApplicationAPI.h>
+#include <AzFramework/StringFunc/StringFunc.h>
 #include <native/connection/connectionManager.h>
 #include <native/connection/connection.h>
 #include <native/utilities/AssetBuilderInfo.h>
@@ -201,7 +202,7 @@ namespace AssetProcessor
         params.emplace_back(AZStd::string::format(R"(-project-cache-path="%s")", projectCacheRoot.absolutePath().toUtf8().constData()));
         params.emplace_back(AZStd::string::format(R"(-project-path="%s")", projectPath.toUtf8().constData()));
         params.emplace_back(AZStd::string::format(R"(-engine-path="%s")", engineRoot.absolutePath().toUtf8().constData()));
-        params.emplace_back(AZStd::string::format("-port=%s", AZStd::to_string(portNumber)));
+        params.emplace_back(AZStd::string::format("-port=%d", portNumber));
 
         if (moduleFilePath && moduleFilePath[0])
         {
