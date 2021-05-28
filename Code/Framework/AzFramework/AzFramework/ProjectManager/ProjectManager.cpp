@@ -46,7 +46,6 @@ namespace AzFramework::ProjectManager
             // Store the Command line to the Setting Registry
             AZ::SettingsRegistryImpl settingsRegistry;
             AZ::SettingsRegistryMergeUtils::StoreCommandLineToRegistry(settingsRegistry, commandLine);
-            AZ::SettingsRegistryMergeUtils::MergeSettingsToRegistry_Bootstrap(settingsRegistry);
             AZ::SettingsRegistryMergeUtils::MergeSettingsToRegistry_O3deUserRegistry(settingsRegistry, AZ_TRAIT_OS_PLATFORM_CODENAME, {});
             // Retrieve Command Line from Settings Registry, it may have been updated by the call to FindEngineRoot()
             // in MergeSettingstoRegistry_ConfigFile
@@ -99,55 +98,21 @@ namespace AzFramework::ProjectManager
             AZ::AllocatorInstance<AZ::SystemAllocator>::Create();
         }
         {
-            const char projectsScript[] = "projects.py";
+            AZStd::string filename = "o3de";
+            AZ::IO::FixedMaxPath executablePath = AZ::Utils::GetExecutableDirectory();
+            executablePath /= filename + AZ_TRAIT_OS_EXECUTABLE_EXTENSION;
 
-            AZ_Warning("ProjectManager", false, "No project provided - launching project selector.");
-
-            if (engineRootPath.empty())
+            if (!AZ::IO::SystemFile::Exists(executablePath.c_str()))
             {
-                AZ_Error("ProjectManager", false, "Couldn't find engine root");
+                AZ_Error("ProjectManager", false, "%s not found", executablePath.c_str());
                 return false;
             }
-            auto projectManagerPath = engineRootPath / "scripts" / "project_manager";
-
-            if (!AZ::IO::SystemFile::Exists((projectManagerPath / projectsScript).c_str()))
-            {
-                AZ_Error("ProjectManager", false, "%s not found at %s!", projectsScript, projectManagerPath.c_str());
-                return false;
-            }
-            AZ::IO::FixedMaxPathString executablePath;
-            AZ::Utils::GetExecutablePathReturnType result = AZ::Utils::GetExecutablePath(executablePath.data(), executablePath.capacity());
-            if (result.m_pathStored != AZ::Utils::ExecutablePathResult::Success)
-            {
-                AZ_Error("ProjectManager", false, "Could not determine executable path!");
-                return false;
-            }
-            AZ::IO::FixedMaxPath parentPath(executablePath.c_str());
-            auto exeFolder = parentPath.ParentPath();
-            AZStd::fixed_string<8> debugOption;
-            auto lastSep = exeFolder.Native().find_last_of(AZ_CORRECT_FILESYSTEM_SEPARATOR);
-            if (lastSep != AZStd::string_view::npos)
-            {
-                exeFolder = exeFolder.Native().substr(lastSep + 1);
-            }
-            if (exeFolder == "debug")
-            {
-                // We need to use the debug version of the python interpreter to load up our debug version of our libraries which work with the debug version of QT living in this folder
-                debugOption = "debug ";
-            }
-            AZ::IO::FixedMaxPath pythonPath = engineRootPath / "python";
-            pythonPath /= AZ_TRAIT_AZFRAMEWORK_PYTHON_SHELL;
 
             AzFramework::ProcessLauncher::ProcessLaunchInfo processLaunchInfo;
-            auto& params = AZStd::get<AZStd::vector<AZStd::string>>(processLaunchInfo.m_commandlineParameters);
-            params.emplace_back(AZStd::string(pythonPath.Native().c_str()));
-            params.emplace_back(AZStd::string::format("%s%s", debugOption.c_str(), (projectManagerPath / projectsScript).c_str()));
-            params.emplace_back(AZStd::string("--executable_path"));
-            params.emplace_back(AZStd::string(executablePath.c_str()));
-            params.emplace_back(AZStd::string("--parent_pid"));
-            params.emplace_back(AZStd::string::format("%" PRIu32, AZ::Platform::GetCurrentProcessId()));
-
+            auto& params = AZStd::get<AZStd::string>(processLaunchInfo.m_commandlineParameters);
+            params = AZStd::string(executablePath.c_str());
             processLaunchInfo.m_showWindow = false;
+
             launchSuccess = AzFramework::ProcessLauncher::LaunchUnwatchedProcess(processLaunchInfo);
         }
         if (ownsSystemAllocator)

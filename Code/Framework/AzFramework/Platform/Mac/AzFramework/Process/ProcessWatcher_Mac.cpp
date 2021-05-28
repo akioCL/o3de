@@ -228,6 +228,7 @@ namespace AzFramework
                     if (currentChar == '"')
                     {
                         inQuotes = !inQuotes;
+                        outputString.push_back(currentChar);
                     }
                     else if ((currentChar == ' ') && (!inQuotes))
                     {
