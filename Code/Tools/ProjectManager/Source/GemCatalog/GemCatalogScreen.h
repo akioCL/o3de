@@ -13,9 +13,11 @@
 
 #if !defined(Q_MOC_RUN)
 #include <ScreenWidget.h>
+#include <GemCatalog/GemFilterWidget.h>
 #include <GemCatalog/GemListView.h>
 #include <GemCatalog/GemInspector.h>
 #include <GemCatalog/GemModel.h>
+#include <GemCatalog/GemSortFilterProxyModel.h>
 #endif
 
 namespace O3DE::ProjectManager
@@ -29,11 +31,17 @@ namespace O3DE::ProjectManager
         ProjectManagerScreen GetScreenEnum() override;
         QString GetNextButtonText() override;
 
+        void ReinitForProject(const QString& projectPath, bool isNewProject);
+        void EnableDisableGemsForProject(const QString& projectPath);
+
     private:
-        QVector<GemInfo> GenerateTestData();
+        void FillModel(const QString& projectPath, bool isNewProject);
 
         GemListView* m_gemListView = nullptr;
         GemInspector* m_gemInspector = nullptr;
         GemModel* m_gemModel = nullptr;
+        GemSortFilterProxyModel* m_proxModel = nullptr;
+        QVBoxLayout* m_filterWidgetLayout = nullptr;
+        GemFilterWidget* m_filterWidget = nullptr;
     };
 } // namespace O3DE::ProjectManager

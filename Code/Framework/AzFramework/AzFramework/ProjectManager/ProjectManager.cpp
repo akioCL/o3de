@@ -78,7 +78,7 @@ namespace AzFramework::ProjectManager
                 projectJsonPath.c_str());
         }
 
-        if (LaunchProjectManager(engineRootPath))
+        if (LaunchProjectManager())
         {
             AZ_TracePrintf("ProjectManager", "Project Manager launched successfully, requesting exit.");
             return ProjectPathCheckResult::ProjectManagerLaunched;
@@ -87,7 +87,7 @@ namespace AzFramework::ProjectManager
         return ProjectPathCheckResult::ProjectManagerLaunchFailed;
     }
 
-    bool LaunchProjectManager([[maybe_unused]] const AZ::IO::FixedMaxPath& engineRootPath)
+    bool LaunchProjectManager(const AZStd::string& commandLineArgs)
     {
         bool launchSuccess = false;
 #if (AZ_TRAIT_AZFRAMEWORK_USE_PROJECT_MANAGER)
@@ -109,10 +109,7 @@ namespace AzFramework::ProjectManager
             }
 
             AzFramework::ProcessLauncher::ProcessLaunchInfo processLaunchInfo;
-            auto& params = AZStd::get<AZStd::string>(processLaunchInfo.m_commandlineParameters);
-            params = AZStd::string(executablePath.c_str());
-            processLaunchInfo.m_showWindow = false;
-
+            processLaunchInfo.m_commandlineParameters = executablePath.String() + commandLineArgs;
             launchSuccess = AzFramework::ProcessLauncher::LaunchUnwatchedProcess(processLaunchInfo);
         }
         if (ownsSystemAllocator)

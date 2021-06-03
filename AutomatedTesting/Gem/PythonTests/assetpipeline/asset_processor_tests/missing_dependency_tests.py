@@ -75,6 +75,15 @@ class TestsMissingDependencies_WindowsAndMac(object):
     def do_missing_dependency_test(self, source_product, expected_dependencies,
                                    dsp_param,
                                    platforms=None, max_iterations=0):
+        """
+        Test Steps:
+        1. Determine what platforms to run against
+        2. Process assets for that platform
+        3. Determine the missing dependency params to set
+        4. Set the max iteration param
+        5. Run missing dependency scanner against target platforms and search params based on test data
+        6. Validate missing dependencies against test data
+        """
 
         platforms = platforms or ASSET_PROCESSOR_PLATFORM_MAP[self._workspace.asset_processor_platform]
         if not isinstance(platforms, list):
@@ -103,7 +112,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_ValidUUIDNotDependency_ReportsMissingDependency(self):
-        """Tests that a valid UUID referenced in a file will report any missing dependencies"""
+        """
+        Tests that a valid UUID referenced in a file will report any missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to the txt file with missing dependencies
         expected_product = f"testassets\\validuuidsnotdependency.txt"
@@ -131,7 +147,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_InvalidUUIDsNotDependencies_NoReportedMessage(self):
-        """Tests that invalid UUIDs do not count as missing dependencies"""
+        """
+        Tests that invalid UUIDs do not count as missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
         # Relative path to the txt file with invalid UUIDs
         expected_product = f"testassets\\invaliduuidnoreport.txt"
         expected_dependencies = []  # No expected missing dependencies
@@ -143,7 +166,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_ValidAssetIdsNotDependencies_ReportsMissingDependency(self):
-        """Tests that valid asset IDs but not dependencies, show missing dependencies"""
+        """
+        Tests that valid asset IDs but not dependencies, show missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to the txt file with valid asset ids but not dependencies
         expected_product = f"testassets\\validassetidnotdependency.txt"
@@ -163,7 +193,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_InvalidAssetsIDNotDependencies_NoReportedMessage(self):
-        """Tests that invalid asset IDs do not count as missing dependencies"""
+        """
+        Tests that invalid asset IDs do not count as missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to the txt file with invalid asset IDs
         expected_product = f"testassets\\invalidassetidnoreport.txt"
@@ -178,7 +215,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     # fmt:off
     def test_WindowsAndMac_ValidSourcePathsNotDependencies_ReportsMissingDependencies(self):
         # fmt:on
-        """Tests that valid source paths can translate to missing dependencies"""
+        """
+        Tests that valid source paths can translate to missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to the txt file with missing dependencies as source paths
         expected_product = f"testassets\\relativesourcepathsnotdependencies.txt"
@@ -205,7 +249,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_InvalidARelativePathsNotDependencies_NoReportedMessage(self):
-        """Tests that invalid relative paths do not resolve to missing dependencies"""
+        """
+        Tests that invalid relative paths do not resolve to missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to the txt file with invalid relative paths
         expected_product = f"testassets\\invalidrelativepathsnoreport.txt"
@@ -220,7 +271,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     # fmt:off
     def test_WindowsAndMac_ValidProductPathsNotDependencies_ReportsMissingDependencies(self):
         # fmt:on
-        """Tests that valid product paths can resolve to missing dependencies"""
+        """
+        Tests that valid product paths can resolve to missing dependencies
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         self._asset_processor.add_source_folder_assets(f"Gems\\LyShineExamples\\Assets\\UI\\Fonts\\LyShineExamples")
         self._asset_processor.add_scan_folder(f"Gems\\LyShineExamples\\Assets")
@@ -255,7 +313,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_WildcardScan_FindsAllExpectedFiles(self):
-        """Tests that the wildcard scanning will pick up multiple files"""
+        """
+        Tests that the wildcard scanning will pick up multiple files
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         helper = self._missing_dep_helper
 
@@ -286,6 +351,11 @@ class TestsMissingDependencies_WindowsAndMac(object):
         For these references that are valid, all but one have available, matching dependencies. This test is
         primarily meant to verify that the missing dependency reporter checks the product dependency table before
         emitting missing dependencies.
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
         """
         # Relative path to target test file
         expected_product = f"testassets\\dependencyscannerasset.dynamicslice"
@@ -300,7 +370,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_ReferencesSelfPath_NoReportedMessage(self):
-        """Tests that a file that references itself via relative path does not report itself as a missing dependency"""
+        """
+        Tests that a file that references itself via relative path does not report itself as a missing dependency
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
         # Relative path to file that references itself via relative path
         expected_product = f"testassets\\selfreferencepath.txt"
         expected_dependencies = []
@@ -312,7 +389,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_ReferencesSelfUUID_NoReportedMessage(self):
-        """Tests that a file that references itself via its UUID does not report itself as a missing dependency"""
+        """
+        Tests that a file that references itself via its UUID does not report itself as a missing dependency
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to file that references itself via its UUID
         expected_product = f"testassets\\selfreferenceuuid.txt"
@@ -325,7 +409,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     @pytest.mark.assetpipeline
     @pytest.mark.test_case_id("C17226567")
     def test_WindowsAndMac_ReferencesSelfAssetID_NoReportedMessage(self):
-        """Tests that a file that references itself via its Asset ID does not report itself as a missing dependency"""
+        """
+        Tests that a file that references itself via its Asset ID does not report itself as a missing dependency
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to file that references itself via its Asset ID
         expected_product = f"testassets\\selfreferenceassetid.txt"
@@ -342,6 +433,11 @@ class TestsMissingDependencies_WindowsAndMac(object):
         Tests that the scan limit fails to find a missing dependency that is out of reach.
         The max iteration count is set to just under where a valid missing dependency is on a line in the file,
         so this will not report any missing dependencies.
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
         """
 
         # Relative path to file that has a missing dependency at 31 iterations deep
@@ -359,7 +455,13 @@ class TestsMissingDependencies_WindowsAndMac(object):
         Tests that the scan limit succeeds in finding a missing dependency that is barely in reach.
         In the previous test, the scanner was set to stop recursion just before a missing dependency was found.
         This test runs with the recursion limit set deep enough to actually find the missing dependency.
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
         """
+
         # Relative path to file that has a missing dependency at 31 iterations deep
         expected_product = f"testassets\\maxiteration31deep.txt"
 
@@ -378,7 +480,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     # fmt:off
     def test_WindowsAndMac_PotentialMatchesLongerThanUUIDString_OnlyReportsCorrectLengthUUIDs(self):
         # fmt:on
-        """Tests that dependency references that are longer than expected are ignored"""
+        """
+        Tests that dependency references that are longer than expected are ignored
+
+        Test Steps:
+        1. Set the expected product
+        2. Set the expected missing dependencies
+        3. Execute test
+        """
 
         # Relative path to text file with varying length UUID references
         expected_product = f"testassets\\onlymatchescorrectlengthuuids.txt"
@@ -403,7 +512,14 @@ class TestsMissingDependencies_WindowsAndMac(object):
     def test_WindowsAndMac_MissingDependencyScanner_GradImageSuccess(
             self, ap_setup_fixture
     ):
-        """Tests the Missing Dependency Scanner can scan gradimage files"""
+        """
+        Tests the Missing Dependency Scanner can scan gradimage files
+
+        Test Steps:
+        1. Create temporary testing environment
+        2. Run the move dependency scanner against the gradimage
+        2. Validate that the expected product files and and expected depdencies match
+        """
 
         env = ap_setup_fixture
         helper = self._missing_dep_helper

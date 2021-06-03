@@ -13,30 +13,44 @@
 
 #if !defined(Q_MOC_RUN)
 #include <ScreenWidget.h>
+#include <ProjectInfo.h>
+#include <GemCatalog/GemCatalogScreen.h>
 #endif
 
-QT_FORWARD_DECLARE_CLASS(QIcon)
+QT_FORWARD_DECLARE_CLASS(QStackedWidget)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
+QT_FORWARD_DECLARE_CLASS(QLabel)
 
 namespace O3DE::ProjectManager
 {
-    class FirstTimeUseScreen
+    QT_FORWARD_DECLARE_CLASS(ScreenHeader)
+
+    class CreateProjectCtrl
         : public ScreenWidget
     {
     public:
-        explicit FirstTimeUseScreen(QWidget* parent = nullptr);
-        ~FirstTimeUseScreen() = default;
+        explicit CreateProjectCtrl(QWidget* parent = nullptr);
+        ~CreateProjectCtrl() = default;
         ProjectManagerScreen GetScreenEnum() override;
+        void NotifyCurrentScreen() override;
 
     protected slots:
-        void HandleNewProjectButton();
-        void HandleAddProjectButton();
+        void HandleBackButton();
+        void HandleNextButton();
 
     private:
-        QPushButton* CreateLargeBoxButton(const QIcon& icon, const QString& text, QWidget* parent = nullptr);
+        void Update();
 
-        QPushButton* m_createProjectButton;
-        QPushButton* m_addProjectButton;
+        QStackedWidget* m_stack;
+        ScreenHeader* m_header;
+
+        QPushButton* m_backButton;
+        QPushButton* m_nextButton;
+
+        QString m_projectTemplatePath;
+        ProjectInfo m_projectInfo;
+
+        GemCatalogScreen* m_gemCatalog = nullptr;
     };
 
 } // namespace O3DE::ProjectManager

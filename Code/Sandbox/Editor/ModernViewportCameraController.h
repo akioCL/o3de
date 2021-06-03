@@ -12,17 +12,16 @@
 
 #pragma once
 
-#include <ModernViewportCameraControllerRequestBus.h>
-
 #include <Atom/RPI.Public/ViewportContext.h>
+#include <AtomToolsFramework/Viewport/ModularViewportCameraControllerRequestBus.h>
 #include <AzFramework/Entity/EntityDebugDisplayBus.h>
 #include <AzFramework/Viewport/CameraInput.h>
 #include <AzFramework/Viewport/MultiViewportController.h>
 
-namespace SandboxEditor
+namespace AtomToolsFramework
 {
     class ModernViewportCameraControllerInstance;
-    class ModernViewportCameraController
+    class ModularViewportCameraController
         : public AzFramework::MultiViewportController<
               ModernViewportCameraControllerInstance, AzFramework::ViewportControllerPriority::DispatchToAllPriorities>
     {
@@ -39,20 +38,21 @@ namespace SandboxEditor
     };
 
     class ModernViewportCameraControllerInstance final
-        : public AzFramework::MultiViewportControllerInstanceInterface<ModernViewportCameraController>,
-          public ModernViewportCameraControllerRequestBus::Handler,
+        : public AzFramework::MultiViewportControllerInstanceInterface<ModularViewportCameraController>,
+          public ModularViewportCameraControllerRequestBus::Handler,
           private AzFramework::ViewportDebugDisplayEventBus::Handler
     {
     public:
-        explicit ModernViewportCameraControllerInstance(AzFramework::ViewportId viewportId, ModernViewportCameraController* controller);
+        explicit ModernViewportCameraControllerInstance(AzFramework::ViewportId viewportId, ModularViewportCameraController* controller);
         ~ModernViewportCameraControllerInstance() override;
 
         // MultiViewportControllerInstanceInterface overrides ...
         bool HandleInputChannelEvent(const AzFramework::ViewportControllerInputEvent& event) override;
         void UpdateViewport(const AzFramework::ViewportControllerUpdateEvent& event) override;
 
-        // ModernViewportCameraControllerRequestBus overrides ...
-        void InterpolateToTransform(const AZ::Transform& worldFromLocal) override;
+        // ModularViewportCameraControllerRequestBus overrides ...
+        void InterpolateToTransform(const AZ::Transform& worldFromLocal, float lookAtDistance) override;
+        AZStd::optional<AZ::Vector3> LookAtAfterInterpolation() const override;
 
     private:
         // AzFramework::ViewportDebugDisplayEventBus overrides ...
@@ -72,8 +72,10 @@ namespace SandboxEditor
         AZ::Transform m_transformEnd = AZ::Transform::CreateIdentity();
         float m_animationT = 0.0f;
         CameraMode m_cameraMode = CameraMode::Control;
+        AZStd::optional<AZ::Vector3> m_lookAtAfterInterpolation; //!< The look at point after an interpolation has finished.
+                                                                 //!< Will be cleared when the view changes (camera looks away).
         bool m_updatingTransform = false;
 
         AZ::RPI::ViewportContext::MatrixChangedEvent::Handler m_cameraViewMatrixChangeHandler;
     };
-} // namespace SandboxEditor
+} // namespace AtomToolsFramework

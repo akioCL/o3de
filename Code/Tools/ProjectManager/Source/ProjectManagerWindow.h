@@ -17,6 +17,7 @@
 #include <ScreensCtrl.h>
 
 #include <PythonBindings.h>
+#include <ScreenDefs.h>
 #endif
 
 namespace Ui
@@ -32,7 +33,8 @@ namespace O3DE::ProjectManager
         Q_OBJECT
 
     public:
-        explicit ProjectManagerWindow(QWidget* parent, const AZ::IO::PathView& engineRootPath);
+        explicit ProjectManagerWindow(QWidget* parent, const AZ::IO::PathView& engineRootPath, const AZ::IO::PathView& projectPath,
+            ProjectManagerScreen startScreen = ProjectManagerScreen::Projects);
         ~ProjectManagerWindow();
 
     protected slots:

@@ -32,6 +32,10 @@ set(FILES
     Source/PythonBindingsInterface.h
     Source/ProjectInfo.h
     Source/ProjectInfo.cpp
+    Source/ProjectUtils.h
+    Source/ProjectUtils.cpp
+    Source/UpdateProjectSettingsScreen.h
+    Source/UpdateProjectSettingsScreen.cpp
     Source/NewProjectSettingsScreen.h
     Source/NewProjectSettingsScreen.cpp
     Source/ProjectSettingsCtrl.h
@@ -41,7 +45,6 @@ set(FILES
     Source/ProjectsHomeScreen.ui
     Source/ProjectSettingsScreen.h
     Source/ProjectSettingsScreen.cpp
-    Source/ProjectSettingsScreen.ui
     Source/EngineSettingsScreen.h
     Source/EngineSettingsScreen.cpp
     Source/EngineSettingsScreen.ui

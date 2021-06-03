@@ -49,7 +49,7 @@ namespace AzFramework
         TextVerticalAlignment m_vAlign = TextVerticalAlignment::Top; //!< Vertical text alignment
         bool m_monospace = false; //!< disable character proportional spacing
         bool m_depthTest = false; //!< Test character against the depth buffer
-        bool m_virtual800x600ScreenSize = true; //!< Text placement and size are scaled relative to a virtual 800x600 resolution
+        bool m_virtual800x600ScreenSize = false; //!< Text placement and size are scaled relative to a virtual 800x600 resolution
         bool m_scaleWithWindow = false; //!< Font gets bigger as the window gets bigger
         bool m_multiline = true; //!< text respects ascii newline characters
     };
