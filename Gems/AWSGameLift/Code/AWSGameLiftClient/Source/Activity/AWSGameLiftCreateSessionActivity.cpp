@@ -11,6 +11,7 @@
  */
 
 #include <Activity/AWSGameLiftCreateSessionActivity.h>
+#include <AWSGameLiftSessionConstants.h>
 
 namespace AWSGameLift
 {
@@ -23,36 +24,37 @@ namespace AWSGameLift
             request.SetCreatorId(createSessionRequest.m_creatorId.c_str());
             request.SetName(createSessionRequest.m_sessionName.c_str());
             request.SetMaximumPlayerSessionCount(createSessionRequest.m_maxPlayer);
-            for (auto iter = createSessionRequest.m_sessionProperties.begin(); iter != createSessionRequest.m_sessionProperties.end();
-                 iter++)
+            request.SetAliasId(createSessionRequest.m_aliasId.c_str());
+            request.SetFleetId(createSessionRequest.m_fleetId.c_str());
+            request.SetIdempotencyToken(createSessionRequest.m_idempotencyToken.c_str());
+
+            for (auto iter = createSessionRequest.m_sessionProperties.begin(); iter != createSessionRequest.m_sessionProperties.end(); iter++)
             {
                 Aws::GameLift::Model::GameProperty sessionProperty;
                 sessionProperty.SetKey(iter->first.c_str());
                 sessionProperty.SetValue(iter->second.c_str());
                 request.AddGameProperties(sessionProperty);
             }
-            request.SetAliasId(createSessionRequest.m_aliasId.c_str());
-            request.SetFleetId(createSessionRequest.m_fleetId.c_str());
-            request.SetIdempotencyToken(createSessionRequest.m_idempotencyToken.c_str());
+
             return request;
         }
 
         AZStd::string CreateSession(
             const Aws::GameLift::GameLiftClient& gameliftClient,
-            const AWSGameLiftCreateSessionRequest& createSessionRequest,
-            const AWSErrorCallback& errorCallback)
+            const AWSGameLiftCreateSessionRequest& createSessionRequest)
         {
+            AZStd::string result = "";
             Aws::GameLift::Model::CreateGameSessionRequest request = BuildAWSGameLiftCreateGameSessionRequest(createSessionRequest);
             auto createSessionOutcome = gameliftClient.CreateGameSession(request);
 
-            AZStd::string result = "";
             if (createSessionOutcome.IsSuccess())
             {
                 result = AZStd::string(createSessionOutcome.GetResult().GetGameSession().GetGameSessionId().c_str());
             }
             else
             {
-                errorCallback(createSessionOutcome.GetError());
+                AZ_Error(AWSGameLiftCreateSessionActivityName, false, AWSGameLiftErrorMessageTemplate,
+                    createSessionOutcome.GetError().GetExceptionName().c_str(), createSessionOutcome.GetError().GetMessage().c_str());
             }
             return result;
         }
@@ -60,8 +62,19 @@ namespace AWSGameLift
         bool ValidateCreateSessionRequest(const AzFramework::CreateSessionRequest& createSessionRequest)
         {
             auto gameliftCreateSessionRequest = azrtti_cast<const AWSGameLiftCreateSessionRequest*>(&createSessionRequest);
-            return gameliftCreateSessionRequest && gameliftCreateSessionRequest->m_maxPlayer >= 0 &&
-                (!gameliftCreateSessionRequest->m_aliasId.empty() || !gameliftCreateSessionRequest->m_fleetId.empty());
+
+            if (gameliftCreateSessionRequest &&
+                gameliftCreateSessionRequest->m_maxPlayer >= 0 &&
+                (!gameliftCreateSessionRequest->m_aliasId.empty() || !gameliftCreateSessionRequest->m_fleetId.empty()))
+            {
+                return true;
+            }
+            else
+            {
+                AZ_Error(AWSGameLiftCreateSessionActivityName, false, AWSGameLiftCreateSessionRequestInvalidErrorMessage);
+
+                return false;
+            }
         }
     } // namespace CreateSessionActivity
 } // namespace AWSGameLift

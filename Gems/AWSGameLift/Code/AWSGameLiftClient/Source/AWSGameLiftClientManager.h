@@ -13,9 +13,8 @@
 #pragma once
 
 #include <AzCore/RTTI/BehaviorContext.h>
-#include <AzCore/std/smart_ptr/unique_ptr.h>
-#include <Request/AWSGameLiftCreateSessionRequest.h>
-#include <Request/AWSGameLiftJoinSessionRequest.h>
+#include <AzCore/std/smart_ptr/shared_ptr.h>
+#include <AzFramework/Session/ISessionRequests.h>
 #include <Request/IAWSGameLiftRequests.h>
 
 namespace Aws
@@ -90,21 +89,12 @@ namespace AWSGameLift
     {
     public:
         static constexpr const char AWSGameLiftClientManagerName[] = "AWSGameLiftClientManager";
-        static constexpr const char AWSGameLiftClientErrorMessageTemplate[] =
-            "Exception: %s, Message: %s";
         static constexpr const char AWSGameLiftClientRegionMissingErrorMessage[] =
             "Missing AWS region for GameLift client.";
         static constexpr const char AWSGameLiftClientCredentialMissingErrorMessage[] =
             "Missing AWS credential for GameLift client.";
         static constexpr const char AWSGameLiftClientMissingErrorMessage[] =
             "GameLift client is not configured yet.";
-
-        static constexpr const char AWSGameLiftCreateSessionRequestInvalidErrorMessage[] =
-            "Invalid GameLift CreateSession request.";
-        static constexpr const char AWSGameLiftJoinSessionRequestInvalidErrorMessage[] =
-            "Invalid GameLift JoinSession request.";
-        static constexpr const char AWSGameLiftJoinSessionMissingRequestHandlerErrorMessage[] =
-            "Missing GameLift JoinSession request handler, please make sure Multiplayer Gem is enabled and registered as handler.";
 
         AWSGameLiftClientManager();
         virtual ~AWSGameLiftClientManager() = default;
@@ -129,9 +119,10 @@ namespace AWSGameLift
         void LeaveSession() override;
 
     protected:
-        void SetGameLiftClient(AZStd::unique_ptr<Aws::GameLift::GameLiftClient> gameliftClient);
+        // Use for automation tests only to inject mock objects. 
+        void SetGameLiftClient(AZStd::shared_ptr<Aws::GameLift::GameLiftClient> gameliftClient);
 
     private:
-        AZStd::unique_ptr<Aws::GameLift::GameLiftClient> m_gameliftClient;
+        AZStd::shared_ptr<Aws::GameLift::GameLiftClient> m_gameliftClient;
     };
 } // namespace AWSGameLift
