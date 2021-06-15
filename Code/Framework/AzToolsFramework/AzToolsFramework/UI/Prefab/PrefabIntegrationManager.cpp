@@ -176,6 +176,25 @@ namespace AzToolsFramework
                     instantiateAction, &QAction::triggered, instantiateAction, [this] { ContextMenu_InstantiatePrefab(); });
             }
 
+            // Prefab Dependency Viewer
+            {
+                if (selectedEntities.size() == 1)
+                {
+                    AZ::EntityId selectedEntity = selectedEntities[0];
+
+                    QAction* dependencyViewerAction = menu->addAction(QObject::tr("View Dependencies"));
+                    // Need to make the reciever Prefab instance on which the user clicked on
+                    QObject::connect(
+                        dependencyViewerAction, &QAction::triggered, dependencyViewerAction, [this, selectedEntity]
+                        {
+                            AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", typeid(this).name());
+                            AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", selectedEntity.ToString().c_str());
+                            AZ_TracePrintf("Prefab Dependency Viewer", "%d\n", s_prefabPublicInterface->IsInstanceContainerEntity(selectedEntity));
+                            AZ_TracePrintf("Prefab Dependency Viewer", "%s\n",
+                                s_prefabPublicInterface->GetOwningInstancePrefabPath(selectedEntity).c_str());
+                        });
+                }
+            }
             menu->addSeparator();
 
             bool itemWasShown = false;
