@@ -21,7 +21,6 @@
 #include <AzToolsFramework/Manipulators/BrushManipulator.h>
 #include <AzToolsFramework/Manipulators/LinearManipulator.h>
 #include <AzToolsFramework/Manipulators/LineSegmentSelectionManipulator.h>
-#include <AzToolsFramework/Manipulators/LinearManipulator.h>
 #include <AzToolsFramework/Manipulators/ManipulatorManager.h>
 #include <AzToolsFramework/Manipulators/PlanarManipulator.h>
 #include <AzToolsFramework/Manipulators/SplineSelectionManipulator.h>
@@ -778,7 +777,10 @@ namespace AzToolsFramework
     }
 
     AZStd::unique_ptr<ManipulatorViewCircle> CreateManipulatorViewCircle(
-        const AngularManipulator& angularManipulator, const AZ::Color& color, const float radius, const float width,
+        const AngularManipulator& angularManipulator,
+        const AZ::Color& color,
+        const float radius,
+        const float width,
         const ManipulatorViewCircle::DrawCircleFunc drawFunc)
     {
         AZStd::unique_ptr<ManipulatorViewCircle> viewCircle = AZStd::make_unique<ManipulatorViewCircle>();
