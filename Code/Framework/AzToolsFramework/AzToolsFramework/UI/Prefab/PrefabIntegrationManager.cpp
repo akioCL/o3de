@@ -29,6 +29,8 @@
 #include <AzToolsFramework/UI/EditorEntityUi/EditorEntityUiInterface.h>
 #include <AzToolsFramework/UI/Prefab/PrefabIntegrationInterface.h>
 
+#include <AzToolsFramework/Prefab/Instance/InstanceEntityMapperInterface.h>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -45,6 +47,7 @@ namespace AzToolsFramework
         PrefabPublicInterface* PrefabIntegrationManager::s_prefabPublicInterface = nullptr;
         PrefabEditInterface* PrefabIntegrationManager::s_prefabEditInterface = nullptr;
         PrefabLoaderInterface* PrefabIntegrationManager::s_prefabLoaderInterface = nullptr;
+        InstanceEntityMapperInterface* PrefabIntegrationManager::s_prefabEntityMapperInterface = nullptr;
 
         const AZStd::string PrefabIntegrationManager::s_prefabFileExtension = ".prefab";
 
@@ -87,6 +90,13 @@ namespace AzToolsFramework
             if (s_prefabLoaderInterface == nullptr)
             {
                 AZ_Assert(false, "Prefab - could not get PrefabLoaderInterface on PrefabIntegrationManager construction.");
+                return;
+            }
+
+            s_prefabEntityMapperInterface = AZ::Interface<InstanceEntityMapperInterface>::Get();
+            if (nullptr == s_prefabEntityMapperInterface)
+            {
+                AZ_Assert(false, "Prefab - could not get PrefabEntityMapperInterface on PrefabIntegrationManager construction");
                 return;
             }
 
@@ -183,15 +193,27 @@ namespace AzToolsFramework
                     AZ::EntityId selectedEntity = selectedEntities[0];
 
                     QAction* dependencyViewerAction = menu->addAction(QObject::tr("View Dependencies"));
+                    InstanceOptionalReference optionalReference = s_prefabEntityMapperInterface->FindOwningInstance(selectedEntity);
+
+                    if (AZStd::nullopt == optionalReference || !optionalReference.has_value())
+                    {
+                        AZ_Assert(false, "Prefab - Couldn't retrieve the owning Prefab Instance of the corresponding ContainerEntity");
+                        return;
+                    }
+
+                    Instance& prefabInstance = optionalReference.value().get();
                     // Need to make the reciever Prefab instance on which the user clicked on
                     QObject::connect(
-                        dependencyViewerAction, &QAction::triggered, dependencyViewerAction, [this, selectedEntity]
+                        dependencyViewerAction, &QAction::triggered, dependencyViewerAction, [this, &prefabInstance, selectedEntity]
                         {
                             AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", typeid(this).name());
-                            AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", selectedEntity.ToString().c_str());
-                            AZ_TracePrintf("Prefab Dependency Viewer", "%d\n", s_prefabPublicInterface->IsInstanceContainerEntity(selectedEntity));
-                            AZ_TracePrintf("Prefab Dependency Viewer", "%s\n",
+                            AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", typeid(prefabInstance).name());
+                            AZ_TracePrintf(
+                                "Prefab Dependency Viewer", "%s\n",
                                 s_prefabPublicInterface->GetOwningInstancePrefabPath(selectedEntity).c_str());
+                            AZ_TracePrintf(
+                                    "Prefab Dependency Viewer", "%s\n",
+                                prefabInstance.GetAbsoluteInstanceAliasPath().c_str());
                         });
                 }
             }

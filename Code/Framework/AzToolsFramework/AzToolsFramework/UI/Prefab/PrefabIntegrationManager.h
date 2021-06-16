@@ -24,6 +24,7 @@
 #include <AzToolsFramework/UI/Prefab/PrefabIntegrationBus.h>
 #include <AzToolsFramework/UI/Prefab/PrefabIntegrationInterface.h>
 #include <AzToolsFramework/UI/Prefab/PrefabUiHandler.h>
+#include <AzToolsFramework/Prefab/Instance/InstanceEntityMapperInterface.h>
 
 namespace AzToolsFramework
 {
@@ -134,6 +135,7 @@ namespace AzToolsFramework
             static PrefabPublicInterface* s_prefabPublicInterface;
             static PrefabEditInterface* s_prefabEditInterface;
             static PrefabLoaderInterface* s_prefabLoaderInterface;
+            static InstanceEntityMapperInterface* s_prefabEntityMapperInterface;
         };
     }
 }
