@@ -54,6 +54,7 @@ namespace AzToolsFramework
             , public AssetBrowser::AssetBrowserSourceDropBus::Handler
             , public PrefabInstanceContainerNotificationBus::Handler
             , public PrefabIntegrationInterface
+            , private AzToolsFramework::EditorEvents::Bus::Handler
         {
         public:
             AZ_CLASS_ALLOCATOR(PrefabIntegrationManager, AZ::SystemAllocator, 0);
@@ -77,6 +78,8 @@ namespace AzToolsFramework
 
             // PrefabIntegrationInterface...
             AZ::EntityId CreateNewEntityAtPosition(const AZ::Vector3& position, AZ::EntityId parentId) override;
+
+            void NotifyRegisterViews() override;
 
         private:
             // Manages the Edit Mode UI for prefabs

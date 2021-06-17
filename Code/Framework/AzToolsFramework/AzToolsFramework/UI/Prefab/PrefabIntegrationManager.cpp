@@ -106,8 +106,7 @@ namespace AzToolsFramework
             PrefabInstanceContainerNotificationBus::Handler::BusConnect();
             AZ::Interface<PrefabIntegrationInterface>::Register(this);
             AssetBrowser::AssetBrowserSourceDropBus::Handler::BusConnect(s_prefabFileExtension);
-            AzToolsFramework::RegisterViewPane<PrefabDependencyViewerWidget>(
-                                "Prefab Dependency Viewer", "Tools", ViewPaneOptions()); // Refactor later on
+            AzToolsFramework::EditorEvents::Bus::Handler::BusConnect();
         }
 
         PrefabIntegrationManager::~PrefabIntegrationManager()
@@ -219,17 +218,20 @@ namespace AzToolsFramework
                                     "Prefab Dependency Viewer", "%s\n",
                                 prefabInstance.GetAbsoluteInstanceAliasPath().c_str());
 
-                            AZStd::vector<AZ::Entity> entities;
+                            AzToolsFramework::OpenViewPane("Prefab Dependency Viewer");
 
-                            
-                            // AzToolsFramework::OpenViewPane("Prefab Dependency Viewer");
+                            /* AZStd::vector<AZ::Entity&> entities;
                             prefabInstance.GetEntities(
-                                [&entities](AZ::Entity& entity)
+                                [&entities](AZStd::unique_ptr<AZ::Entity>& entity)
                                 {
-                                    entities.push_back(entity);
+                                    //AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", typeid(entity).name());
+                                    //AZ_TracePrintf("Prefab Dependency Viewer", "%s\n", typeid(entity.get()).name());
+                                    // entities.push_back(*entity.get());
+                                    return true;
                                 });
 
                             AZ_TracePrintf("Prefab Dependency Viewer", "%d\n", entities.size());
+                            */
                         });
                 }
             }
@@ -312,6 +314,12 @@ namespace AzToolsFramework
                         });
                 }
             }
+        }
+
+        void PrefabIntegrationManager::NotifyRegisterViews()
+        {
+            AzToolsFramework::RegisterViewPane<PrefabDependencyViewerWidget>(
+                "Prefab Dependency Viewer", "Tools", ViewPaneOptions()); // Refactor later on
         }
 
         void PrefabIntegrationManager::HandleSourceFileType(AZStd::string_view sourceFilePath, AZ::EntityId parentId, AZ::Vector3 position) const
