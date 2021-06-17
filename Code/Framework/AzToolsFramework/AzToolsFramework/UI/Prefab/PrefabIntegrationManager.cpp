@@ -30,6 +30,8 @@
 #include <AzToolsFramework/UI/Prefab/PrefabIntegrationInterface.h>
 
 #include <AzToolsFramework/Prefab/Instance/InstanceEntityMapperInterface.h>
+#include <AzToolsFramework/UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewer.h>
+#include <AzToolsFramework/API/ViewPaneOptions.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -104,6 +106,8 @@ namespace AzToolsFramework
             PrefabInstanceContainerNotificationBus::Handler::BusConnect();
             AZ::Interface<PrefabIntegrationInterface>::Register(this);
             AssetBrowser::AssetBrowserSourceDropBus::Handler::BusConnect(s_prefabFileExtension);
+            AzToolsFramework::RegisterViewPane<PrefabDependencyViewerWidget>(
+                                "Prefab Dependency Viewer", "Tools", ViewPaneOptions()); // Refactor later on
         }
 
         PrefabIntegrationManager::~PrefabIntegrationManager()
@@ -214,6 +218,18 @@ namespace AzToolsFramework
                             AZ_TracePrintf(
                                     "Prefab Dependency Viewer", "%s\n",
                                 prefabInstance.GetAbsoluteInstanceAliasPath().c_str());
+
+                            AZStd::vector<AZ::Entity> entities;
+
+                            
+                            // AzToolsFramework::OpenViewPane("Prefab Dependency Viewer");
+                            prefabInstance.GetEntities(
+                                [&entities](AZ::Entity& entity)
+                                {
+                                    entities.push_back(entity);
+                                });
+
+                            AZ_TracePrintf("Prefab Dependency Viewer", "%d\n", entities.size());
                         });
                 }
             }
