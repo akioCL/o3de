@@ -244,6 +244,7 @@ CLyShine::~CLyShine()
     AzFramework::InputTextEventListener::Disconnect();
     AzFramework::InputChannelEventListener::Disconnect();
     AZ::Render::Bootstrap::NotificationBus::Handler::BusDisconnect();
+    LyShinePassDataRequestBus::Handler::BusDisconnect();
 
     UiCanvasComponent::Shutdown();
 
@@ -659,6 +660,16 @@ void CLyShine::OnBootstrapSceneReady([[maybe_unused]] AZ::RPI::Scene* bootstrapS
 {
     // Load cursor if its path was set before RPI was initialized
     LoadUiCursor();
+
+    LyShinePassDataRequestBus::Handler::BusConnect(m_uiRenderer->GetViewportContext()->GetRenderScene()->GetId());
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+LyShine::AttachmentImagesAndDependents CLyShine::GetRenderTargets()
+{
+    LyShine::AttachmentImagesAndDependents imagesAndDependents;
+    m_uiCanvasManager->GetRenderTargets(imagesAndDependents);
+    return imagesAndDependents;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

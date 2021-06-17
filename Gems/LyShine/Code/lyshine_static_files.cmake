@@ -12,6 +12,8 @@ set(FILES
     Source/LyShine.h
     Source/LyShineDebug.cpp
     Source/LyShineDebug.h
+    Source/LyShinePass.cpp
+    Source/LyShinePass.h
     Source/LyShine_precompiled.h
     Source/StringUtfUtils.h
     Source/UiImageComponent.cpp

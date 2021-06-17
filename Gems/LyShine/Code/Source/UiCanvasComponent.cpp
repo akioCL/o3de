@@ -49,6 +49,8 @@
 #include <AzFramework/Input/Devices/Mouse/InputDeviceMouse.h>
 #include <AzFramework/Input/Devices/Touch/InputDeviceTouch.h>
 
+#include <Atom/RPI.Public/Image/ImageSystemInterface.h>
+#include <Atom/RPI.Public/Image/AttachmentImagePool.h>
 
 #include "Animation/UiAnimationSystem.h"
 
@@ -63,6 +65,8 @@
 #include <LyShine/Bus/UiMaskBus.h>
 #include <LyShine/Bus/UiFaderBus.h>
 #endif
+
+#include "LyShinePassDataBus.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //! UiCanvasNotificationBus Behavior context handler class
@@ -1998,6 +2002,57 @@ void UiCanvasComponent::MarkRenderGraphDirty()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+AZ::RHI::AttachmentId UiCanvasComponent::CreateRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size)
+{
+    // Create a render target that UI elements will render to
+    AZ::RHI::ImageDescriptor imageDesc;
+    imageDesc.m_bindFlags = AZ::RHI::ImageBindFlags::Color | AZ::RHI::ImageBindFlags::ShaderReadWrite;
+    imageDesc.m_size = size;
+    imageDesc.m_format = AZ::RHI::Format::R8G8B8A8_UNORM;
+
+    AZ::Data::Instance<AZ::RPI::AttachmentImagePool> pool = AZ::RPI::ImageSystemInterface::Get()->GetSystemAttachmentPool();
+    auto attachmentImage = AZ::RPI::AttachmentImage::Create(*pool.get(), imageDesc, renderTargetName);
+    if (!attachmentImage)
+    {
+        AZ_Warning("UI", false, "Failed to create render target");
+        return AZ::RHI::AttachmentId();
+    }
+
+    m_attachmentImageMap[attachmentImage->GetAttachmentId()] = attachmentImage;
+
+    // Notify pass that it needs to rebuild
+    // LYSHINE_ATOM_TODO - preview mode is considererd in game, so this won't work for preview mode
+    UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
+    AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
+    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, ImageAttachmentsChanged);
+    
+    return attachmentImage->GetAttachmentId();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void UiCanvasComponent::DestroyRenderTarget(const AZ::RHI::AttachmentId& attachmentId)
+{
+    m_attachmentImageMap.erase(attachmentId);
+
+    // Notify pass that it needs to rebuild
+    UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
+    AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
+    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, ImageAttachmentsChanged);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AZ::Data::Instance<AZ::RPI::AttachmentImage> UiCanvasComponent::GetRenderTarget(const AZ::RHI::AttachmentId& attachmentId)
+{
+    return m_attachmentImageMap[attachmentId];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void UiCanvasComponent::ResizeRenderTarget([[maybe_unused]] const AZ::RHI::AttachmentId& attachmentId, [[maybe_unused]] AZ::RHI::Size size)
+{
+    // LYSHINE_ATOM_TODO
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void UiCanvasComponent::UpdateCanvas(float deltaTime, bool isInGame)
 {
     // Ignore update if we're not enabled
@@ -2114,6 +2169,12 @@ void UiCanvasComponent::UnscheduleElementForTransformRecompute(UiElementComponen
 void UiCanvasComponent::ScheduleElementDestroy(AZ::EntityId entityId)
 {
     m_elementsScheduledForDestroy.push_back(entityId);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void UiCanvasComponent::GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImages)
+{
+    m_renderGraph.GetRenderTargets(attachmentImages);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2518,6 +2579,7 @@ void UiCanvasComponent::Activate()
     UiCanvasComponentImplementationBus::Handler::BusConnect(m_entity->GetId());
     UiEditorCanvasBus::Handler::BusConnect(m_entity->GetId());
     UiAnimationBus::Handler::BusConnect(m_entity->GetId());
+    LyShine::RenderToTextureRequestBus::Handler::BusConnect(m_entity->GetId());
 
     // Reconnect to buses that we connect to intermittently
     // This will only happen if we have been deactivated and reactivated at runtime
@@ -2550,6 +2612,7 @@ void UiCanvasComponent::Deactivate()
     UiCanvasComponentImplementationBus::Handler::BusDisconnect();
     UiEditorCanvasBus::Handler::BusDisconnect();
     UiAnimationBus::Handler::BusDisconnect();
+    LyShine::RenderToTextureRequestBus::Handler::BusDisconnect();
 
     // disconnect from any other buses we could be connected to
     if (m_hoverInteractable.IsValid() && AZ::EntityBus::Handler::BusIsConnectedId(m_hoverInteractable))

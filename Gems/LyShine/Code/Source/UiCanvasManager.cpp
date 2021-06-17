@@ -302,6 +302,17 @@ void UiCanvasManager::OnFontTextureUpdated([[maybe_unused]] IFFont* font)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void UiCanvasManager::GetRenderTargets(LyShine::AttachmentImagesAndDependents& imagesAndDependents)
+{
+    for (auto canvas : m_loadedCanvases)
+    {
+        LyShine::AttachmentImagesAndDependents canvasTargets;
+        canvas->GetRenderTargets(canvasTargets);
+        imagesAndDependents.insert(imagesAndDependents.end(), canvasTargets.begin(), canvasTargets.end());
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void UiCanvasManager::OnCatalogAssetChanged(const AZ::Data::AssetId& assetId)
 {
     // get AssetInfo from asset id

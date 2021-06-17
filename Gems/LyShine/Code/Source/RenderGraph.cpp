@@ -11,6 +11,8 @@
 #include "UiRenderer.h"
 
 #include <Atom/RPI.Public/Image/ImageSystemInterface.h>
+#include <Atom/RHI/DrawListTagRegistry.h>
+#include <Atom/RHI/RHISystemInterface.h>
 
 #ifndef _RELEASE
 #include <AzCore/Asset/AssetManagerBus.h>
@@ -79,7 +81,7 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void PrimitiveListRenderNode::Render(UiRenderer* uiRenderer)
+    void PrimitiveListRenderNode::Render(UiRenderer* uiRenderer, AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
 #ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (masks/render targets)
         for (int i = 0; i < m_numTextures; ++i)
@@ -129,7 +131,6 @@ namespace LyShine
             return;
         }
 
-        AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw = uiRenderer->GetDynamicDrawContext();
         const UiRenderer::UiShaderData& uiShaderData = uiRenderer->GetUiShaderData();
 
         // Set render state
@@ -304,33 +305,33 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void MaskRenderNode::Render(UiRenderer* uiRenderer)
+    void MaskRenderNode::Render(UiRenderer* uiRenderer, AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
         UiRenderer::BaseState priorBaseState = uiRenderer->GetBaseState();
 
         if (m_isMaskingEnabled || m_drawBehind)
         {
-            SetupBeforeRenderingMask(uiRenderer, true, priorBaseState);
+            SetupBeforeRenderingMask(uiRenderer, dynamicDraw, true, priorBaseState);
             for (RenderNode* renderNode : m_maskRenderNodes)
             {
-                renderNode->Render(uiRenderer);
+                renderNode->Render(uiRenderer, dynamicDraw);
             }
-            SetupAfterRenderingMask(uiRenderer, true, priorBaseState);
+            SetupAfterRenderingMask(uiRenderer, dynamicDraw, true, priorBaseState);
         }
 
         for (RenderNode* renderNode : m_contentRenderNodes)
         {
-            renderNode->Render(uiRenderer);
+            renderNode->Render(uiRenderer, dynamicDraw);
         }
 
         if (m_isMaskingEnabled || m_drawInFront)
         {
-            SetupBeforeRenderingMask(uiRenderer, false, priorBaseState);
+            SetupBeforeRenderingMask(uiRenderer, dynamicDraw, false, priorBaseState);
             for (RenderNode* renderNode : m_maskRenderNodes)
             {
-                renderNode->Render(uiRenderer);
+                renderNode->Render(uiRenderer, dynamicDraw);
             }
-            SetupAfterRenderingMask(uiRenderer, false, priorBaseState);
+            SetupAfterRenderingMask(uiRenderer, dynamicDraw, false, priorBaseState);
         }
     }
 
@@ -368,7 +369,9 @@ namespace LyShine
 #endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void MaskRenderNode::SetupBeforeRenderingMask(UiRenderer* uiRenderer, bool firstPass, UiRenderer::BaseState priorBaseState)
+    void MaskRenderNode::SetupBeforeRenderingMask(UiRenderer* uiRenderer,
+        AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw,
+        bool firstPass, UiRenderer::BaseState priorBaseState)
     {
         UiRenderer::BaseState curBaseState = priorBaseState;
 
@@ -407,7 +410,6 @@ namespace LyShine
             curBaseState.m_stencilState.m_backFace = stencilOpState;
 
             // set up for stencil write
-            AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw = uiRenderer->GetDynamicDrawContext();
             dynamicDraw->SetStencilReference(uiRenderer->GetStencilRef());
             curBaseState.m_stencilState.m_enable = true;
             curBaseState.m_stencilState.m_writeMask = 0xFF;
@@ -422,7 +424,9 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void MaskRenderNode::SetupAfterRenderingMask(UiRenderer* uiRenderer, bool firstPass, UiRenderer::BaseState priorBaseState)
+    void MaskRenderNode::SetupAfterRenderingMask(UiRenderer* uiRenderer,
+        AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw,
+        bool firstPass, UiRenderer::BaseState priorBaseState)
     {
         if (m_isMaskingEnabled)
         {
@@ -440,7 +444,6 @@ namespace LyShine
                 uiRenderer->DecrementStencilRef();
             }
 
-            AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw = uiRenderer->GetDynamicDrawContext();
             dynamicDraw->SetStencilReference(uiRenderer->GetStencilRef());
 
             if (firstPass)
@@ -475,16 +478,14 @@ namespace LyShine
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     RenderTargetRenderNode::RenderTargetRenderNode(
         RenderTargetRenderNode* parentRenderTarget,
-        int renderTargetHandle,
-        SDepthTexture* renderTargetDepthSurface,
+        AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage,
         const AZ::Vector2& viewportTopLeft,
         const AZ::Vector2& viewportSize,
         const AZ::Color& clearColor,
         int nestLevel)
         : RenderNode(RenderNodeType::RenderTarget)
         , m_parentRenderTarget(parentRenderTarget)
-        , m_renderTargetHandle(renderTargetHandle)
-        , m_renderTargetDepthSurface(renderTargetDepthSurface)
+        , m_attachmentImage(attachmentImage)
         , m_viewportX(viewportTopLeft.GetX())
         , m_viewportY(viewportTopLeft.GetY())
         , m_viewportWidth(viewportSize.GetX())
@@ -506,9 +507,9 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void RenderTargetRenderNode::Render(UiRenderer* uiRenderer)
+    void RenderTargetRenderNode::Render(UiRenderer* uiRenderer, [[maybe_unused]] AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
-        if (m_renderTargetHandle <= 0)
+        if (!m_attachmentImage)
         {
             return;
         }
@@ -516,6 +517,7 @@ namespace LyShine
         ISystem* system = gEnv->pSystem;
         if (system && !gEnv->IsDedicated())
         {
+#ifdef LYSHINE_ATOM_TODO
             TransformationMatrices backupMatrices;
             gEnv->pRenderer->Set2DModeNonZeroTopLeft(m_viewportX, m_viewportY, m_viewportWidth, m_viewportHeight, backupMatrices);
  
@@ -532,23 +534,45 @@ namespace LyShine
             // we could use SetSrgbWrite to write to a linear texture here. But that gets complicated with
             // having to affect all decsendant element renders. So we just let it write srgb to the render target and
             // allow for that when we render using the render target as a source texture.
+#else
+            // Use a dedicated dynamic draw context for rendering to the texture since it can only have one draw list tag
+            if (!m_dynamicDraw)
+            {
+                auto* rhiSystem = AZ::RHI::RHISystemInterface::Get();
+                auto drawListTag = rhiSystem->GetDrawListTagRegistry()->FindTag(AZ::Name(GetRenderTargetName()));
+                m_dynamicDraw = uiRenderer->CloneDynamicDrawContextWithTag(drawListTag);
+            }
+#endif
 
             for (RenderNode* renderNode : m_childRenderNodes)
             {
-                renderNode->Render(uiRenderer);
+                renderNode->Render(uiRenderer, dynamicDraw);
             }
 
+#ifdef LYSHINE_ATOM_TODO
             gEnv->pRenderer->SetRenderTarget(0); // restore render target
 
             gEnv->pRenderer->Unset2DMode(backupMatrices);
+#endif
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     const char* RenderTargetRenderNode::GetRenderTargetName() const
     {
-        ITexture* texture = gEnv->pRenderer->EF_GetTextureByID(m_renderTargetHandle);
-        return texture->GetName();
+        return m_attachmentImage->GetRHIImage()->GetName().GetCStr();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    int RenderTargetRenderNode::GetNestLevel() const
+    {
+        return m_nestLevel;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    const AZ::Data::Instance<AZ::RPI::AttachmentImage> RenderTargetRenderNode::GetRenderTarget() const
+    {
+        return m_attachmentImage;
     }
 
 #ifndef _RELEASE
@@ -672,31 +696,29 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void RenderGraph::BeginRenderToTexture(int renderTargetHandle, SDepthTexture* renderTargetDepthSurface,
+    void RenderGraph::BeginRenderToTexture([[maybe_unused]] int renderTargetHandle, [[maybe_unused]] SDepthTexture* renderTargetDepthSurface,
+        [[maybe_unused]] const AZ::Vector2& viewportTopLeft, [[maybe_unused]] const AZ::Vector2& viewportSize, [[maybe_unused]] const AZ::Color& clearColor)
+    {
+        // LYSHINE_ATOM_TODO - this function will be removed when all IRenderer references are gone from UI components
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    void RenderGraph::BeginRenderToTexture(AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage,
         const AZ::Vector2& viewportTopLeft, const AZ::Vector2& viewportSize, const AZ::Color& clearColor)
     {
-#ifdef LYSHINE_ATOM_TODO // keeping this code for future phase (masks and render targets)
         // this uses pool allocator
         RenderTargetRenderNode* renderTargetRenderNode = new RenderTargetRenderNode(
-            m_currentRenderTarget, renderTargetHandle, renderTargetDepthSurface,
+            m_currentRenderTarget, attachmentImage,
             viewportTopLeft, viewportSize, clearColor, m_renderTargetNestLevel);
 
         m_currentRenderTarget = renderTargetRenderNode;
         m_renderNodeListStack.push(&m_currentRenderTarget->GetChildRenderNodeList());
         m_renderTargetNestLevel++;
-#else
-        AZ_UNUSED(clearColor);
-        AZ_UNUSED(viewportSize);
-        AZ_UNUSED(viewportTopLeft);
-        AZ_UNUSED(renderTargetDepthSurface);
-        AZ_UNUSED(renderTargetHandle);
-#endif
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     void RenderGraph::EndRenderToTexture()
     {
-#ifdef LYSHINE_ATOM_TODO // keeping this code for future phase (masks and render targets)
         AZ_Assert(m_currentRenderTarget, "Calling EndRenderToTexture while not defining a render target node");
         if (m_currentRenderTarget)
         {
@@ -710,7 +732,6 @@ namespace LyShine
             m_renderNodeListStack.pop();
             m_renderTargetNestLevel--;
         }
-#endif
     }
 
     void RenderGraph::AddPrimitive(
@@ -1016,9 +1037,13 @@ namespace LyShine
             }
         }
 #else
-        for (RenderNode* renderNode : m_renderTargetRenderNodes)
+        if (m_renderToRenderTargetCount < 1)
         {
-            renderNode->Render(uiRenderer);
+            for (RenderNode* renderNode : m_renderTargetRenderNodes)
+            {
+                renderNode->Render(uiRenderer, dynamicDraw);
+            }
+            m_renderToRenderTargetCount++;
         }
 #endif
 
@@ -1030,7 +1055,7 @@ namespace LyShine
 #endif
         for (RenderNode* renderNode : m_renderNodes)
         {
-            renderNode->Render(uiRenderer);
+            renderNode->Render(uiRenderer, dynamicDraw);
         }
 #ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (UI Editor)
         // end the 2D mode
@@ -1071,6 +1096,31 @@ namespace LyShine
     bool RenderGraph::IsEmpty()
     {
         return m_renderNodes.empty();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    void RenderGraph::GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImagesAndDependents)
+    {
+        for (RenderNode* renderNode : m_renderTargetRenderNodes)
+        {
+            const RenderTargetRenderNode* renderTargetRenderNode = static_cast<const RenderTargetRenderNode*>(renderNode);
+
+            if (renderTargetRenderNode->GetNestLevel() == 0)
+            {
+                LyShine::AttachmentImages attachmentImages;
+                const AZStd::vector<RenderNode*>& childNodeList = renderTargetRenderNode->GetChildRenderNodeList();
+                for (auto& childNode : childNodeList)
+                {
+                    if (childNode->GetType() == RenderNodeType::RenderTarget)
+                    {
+                        const RenderTargetRenderNode* childRenderTargetRenderNode = static_cast<const RenderTargetRenderNode*>(childNode);
+                        attachmentImages.emplace_back(childRenderTargetRenderNode->GetRenderTarget());
+                    }
+                }
+
+                attachmentImagesAndDependents.emplace_back(AttachmentImageAndDependentsPair(renderTargetRenderNode->GetRenderTarget(), attachmentImages));
+            }
+        }
     }
 
 #ifndef _RELEASE

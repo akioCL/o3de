@@ -17,6 +17,8 @@
 #include <Atom/Bootstrap/BootstrapNotificationBus.h>
 #include <Atom/RPI.Reflect/Image/Image.h>
 
+#include "LyShinePassDataBus.h"
+
 #if !defined(_RELEASE)
 #define LYSHINE_INTERNAL_UNIT_TEST
 #endif
@@ -40,6 +42,7 @@ class CLyShine
     , public AzFramework::InputTextEventListener
     , public AZ::TickBus::Handler
     , protected AZ::Render::Bootstrap::NotificationBus::Handler
+    , protected LyShinePassDataRequestBus::Handler
 {
 public:
 
@@ -113,6 +116,10 @@ public:
     // AZ::Render::Bootstrap::NotificationBus
     void OnBootstrapSceneReady(AZ::RPI::Scene* bootstrapScene) override;
     // ~AZ::Render::Bootstrap::NotificationBus
+
+    // LyShinePassDataRequestBus
+    LyShine::AttachmentImagesAndDependents GetRenderTargets() override;
+    // ~LyShinePassDataRequestBus
 
     // Get the UIRenderer for the game (which is owned by CLyShine). This is not exposed outside the gem.
     UiRenderer* GetUiRenderer();

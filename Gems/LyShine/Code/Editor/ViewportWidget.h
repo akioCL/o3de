@@ -8,6 +8,7 @@
 
 #if !defined(Q_MOC_RUN)
 #include "EditorCommon.h"
+#include "LyShinePassDataBus.h"
 
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 #include <AtomToolsFramework/Viewport/RenderViewportWidget.h>
@@ -26,6 +27,7 @@ class ViewportWidget
     : public AtomToolsFramework::RenderViewportWidget
     , private AzToolsFramework::EditorPickModeNotificationBus::Handler
     , private FontNotificationBus::Handler
+    , private LyShinePassDataRequestBus::Handler
 {
     Q_OBJECT
 
@@ -136,6 +138,10 @@ private: // member functions
     void OnFontsReloaded() override;
     void OnFontTextureUpdated(IFFont* font) override;
     // ~FontNotifications
+
+    // LyShinePassDataRequestBus
+    LyShine::AttachmentImagesAndDependents GetRenderTargets() override;
+    // ~LyShinePassDataRequestBus
 
     // AZ::TickBus::Handler
     void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;

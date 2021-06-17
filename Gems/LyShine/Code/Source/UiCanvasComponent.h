@@ -31,6 +31,8 @@
 #include "TextureAtlas/TextureAtlasBus.h"
 #include "TextureAtlas/TextureAtlasNotificationBus.h"
 
+#include "RenderToTextureBus.h"
+
 namespace AZ
 {
     class SerializeContext;
@@ -50,6 +52,7 @@ class UiCanvasComponent
     , public IUiAnimationListener
     , public UiEditorCanvasBus::Handler
     , public UiCanvasComponentImplementationBus::Handler
+    , public LyShine::RenderToTextureRequestBus::Handler
 {
 public: // constants
     static const AZ::Vector2 s_defaultCanvasSize;
@@ -236,6 +239,13 @@ public: // member functions
     void MarkRenderGraphDirty() override;
     // ~UiCanvasComponentImplementationInterface
 
+    // RenderToTextureRequests
+    AZ::RHI::AttachmentId CreateRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size) override;
+    void DestroyRenderTarget(const AZ::RHI::AttachmentId& attachmentId) override;
+    AZ::Data::Instance<AZ::RPI::AttachmentImage> GetRenderTarget(const AZ::RHI::AttachmentId& attachmentId) override;
+    void ResizeRenderTarget(const AZ::RHI::AttachmentId& attachmentId, AZ::RHI::Size size) override;
+    // ~RenderToTextureRequests
+
     void UpdateCanvas(float deltaTime, bool isInGame);
     void RenderCanvas(bool isInGame, AZ::Vector2 viewportSize, UiRenderer* uiRenderer = nullptr);
 
@@ -260,6 +270,10 @@ public: // member functions
 
     //! Queue an element to be destroyed at end of frame
     void ScheduleElementDestroy(AZ::EntityId entityId);
+
+    bool IsRenderGraphDirty() { return m_renderGraph.GetDirtyFlag(); }
+
+    void GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImages);
 
 #ifndef _RELEASE
     struct DebugInfoNumElements
@@ -601,4 +615,7 @@ private: // static data
 
     LyShine::RenderGraph m_renderGraph; //!< the render graph for rendering the canvas, can be cached between frames
     bool m_isRendering = false;
+
+    //! Map of attachments used by this canvas's elements
+    AZStd::unordered_map<AZ::RHI::AttachmentId, AZ::Data::Instance<AZ::RPI::AttachmentImage>> m_attachmentImageMap;
 };

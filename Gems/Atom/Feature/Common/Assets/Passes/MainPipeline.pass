@@ -438,13 +438,33 @@
                     ]
                 },
                 {
+                    "Name": "LyShinePass",
+                    "TemplateName": "LyShineParentTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputOutput",
+                            "AttachmentRef": {
+                                "Pass": "UIPass",
+                                "Attachment": "InputOutput"
+                            }
+                        },
+                        {
+                            "LocalSlot": "DepthInputOutput",
+                            "AttachmentRef": {
+                                "Pass": "DepthPrePass",
+                                "Attachment": "Depth"
+                            }
+                        }
+                    ]
+                },
+                {
                     "Name": "CopyToSwapChain",
                     "TemplateName": "FullscreenCopyTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "Input",
                             "AttachmentRef": {
-                                "Pass": "UIPass",
+                                "Pass": "LyShinePass",
                                 "Attachment": "InputOutput"
                             }
                         },

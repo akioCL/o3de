@@ -90,6 +90,9 @@ public: // member functions
     //! Return the dynamic draw context associated with this UI renderer
     AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> GetDynamicDrawContext();
 
+    //! Creates a dynamic draw context with a unique draw list tag. Used for rendering UI elements to a texture
+    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> CloneDynamicDrawContextWithTag(AZ::RHI::DrawListTag drawListTag);
+
     //! Return the shader data for the ui shader
     const UiShaderData& GetUiShaderData();
 
@@ -120,6 +123,9 @@ public: // member functions
     //! Decrement the current stencil reference value
     void DecrementStencilRef();
 
+    //! Return the viewport context set by the user, or the default if not set
+    AZStd::shared_ptr<AZ::RPI::ViewportContext> GetViewportContext();
+
 #ifndef _RELEASE
     //! Setup to record debug texture data before rendering
     void DebugSetRecordingOptionForTextureData(int recordingOption);
@@ -140,10 +146,10 @@ private: // member functions
     AZ::RPI::ScenePtr CreateScene(AZStd::shared_ptr<AZ::RPI::ViewportContext> viewportContext);
 
     //! Create a dynamic draw context for this renderer
-    void CreateDynamicDrawContext(AZ::RPI::ScenePtr scene, AZ::Data::Instance<AZ::RPI::Shader>);
-
-    //! Return the viewport context set by the user, or the default if not set
-    AZStd::shared_ptr<AZ::RPI::ViewportContext> GetViewportContext();
+    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> CreateDynamicDrawContext(
+        AZ::RPI::ScenePtr scene,
+        AZ::Data::Instance<AZ::RPI::Shader> uiShader,
+        AZ::RHI::DrawListTag drawListTag = AZ::RHI::DrawListTag());
 
     //! Bind the global white texture for all the texture units we use
     void BindNullTexture();
@@ -164,6 +170,8 @@ protected: // attributes
 
     // Set by user when viewport context is not the main/default viewport
     AZStd::shared_ptr<AZ::RPI::ViewportContext> m_viewportContext;
+
+    AZ::RPI::ScenePtr m_scene;
 
 #ifndef _RELEASE
     int m_debugTextureDataRecordLevel = 0;

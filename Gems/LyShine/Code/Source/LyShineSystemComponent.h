@@ -20,6 +20,10 @@
 #include <LyShine/UiComponentTypes.h>
 #include "LyShine.h"
 
+#if !defined(LYSHINE_BUILDER)
+#include <Atom/RPI.Public/Pass/PassSystemInterface.h>
+#endif
+
 namespace LyShine
 {
     // LyShine depends on the LegacyAllocator and CryStringAllocator. This will be managed
@@ -91,6 +95,9 @@ namespace LyShine
 
         void BroadcastCursorImagePathname();
 
+        // Load pass template mappings for this gem
+        void LoadPassTemplateMappings();
+
     protected:  // data
 
         CLyShine* m_pLyShine = nullptr;
@@ -103,5 +110,9 @@ namespace LyShine
 
         // We only store this in order to generate metrics on LyShine specific components
         static const AZStd::list<AZ::ComponentDescriptor*>* m_componentDescriptors;
+
+#if !defined(LYSHINE_BUILDER)
+        AZ::RPI::PassSystemInterface::OnReadyLoadTemplatesEvent::Handler m_loadTemplatesHandler;
+#endif
     };
 }

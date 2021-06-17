@@ -60,20 +60,19 @@ void UiRenderer::OnBootstrapSceneReady([[maybe_unused]] AZ::RPI::Scene* bootstra
     AZ::Data::Instance<AZ::RPI::Shader> uiShader = AZ::RPI::LoadShader(uiShaderFilepath);
 
     // Create scene to be used by the dynamic draw context
-    AZ::RPI::ScenePtr scene;
     if (m_viewportContext)
     {
         // Create a new scene based on the user specified viewport context
-        scene = CreateScene(m_viewportContext);
+        m_scene = CreateScene(m_viewportContext);
     }
     else
     {
         // No viewport context specified, use default scene
-        scene = AZ::RPI::RPISystemInterface::Get()->GetDefaultScene();
+        m_scene = AZ::RPI::RPISystemInterface::Get()->GetDefaultScene();
     }
 
     // Create a dynamic draw context for UI Canvas drawing for the scene
-    CreateDynamicDrawContext(scene, uiShader);
+    m_dynamicDraw = CreateDynamicDrawContext(m_scene, uiShader);
 
     // Cache shader data such as input indices for later use
     CacheShaderData(m_dynamicDraw);
@@ -107,21 +106,32 @@ AZ::RPI::ScenePtr UiRenderer::CreateScene(AZStd::shared_ptr<AZ::RPI::ViewportCon
     return atomScene;
 }
 
-void UiRenderer::CreateDynamicDrawContext(AZ::RPI::ScenePtr scene, AZ::Data::Instance<AZ::RPI::Shader> uiShader)
+AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> UiRenderer::CreateDynamicDrawContext(
+    AZ::RPI::ScenePtr scene,
+    AZ::Data::Instance<AZ::RPI::Shader> uiShader,
+    AZ::RHI::DrawListTag drawListTag)
 {
-    m_dynamicDraw = AZ::RPI::DynamicDrawInterface::Get()->CreateDynamicDrawContext(scene.get());
+    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw = AZ::RPI::DynamicDrawInterface::Get()->CreateDynamicDrawContext(scene.get());
 
     // Initialize the dynamic draw context
-    m_dynamicDraw->InitShader(uiShader);
-    m_dynamicDraw->InitVertexFormat(
+    dynamicDraw->InitShader(uiShader);
+    dynamicDraw->InitVertexFormat(
         { { "POSITION", AZ::RHI::Format::R32G32_FLOAT },
         { "COLOR", AZ::RHI::Format::B8G8R8A8_UNORM },
         { "TEXCOORD", AZ::RHI::Format::R32G32_FLOAT },
         { "BLENDINDICES", AZ::RHI::Format::R16G16_UINT } }
     );
-    m_dynamicDraw->AddDrawStateOptions(AZ::RPI::DynamicDrawContext::DrawStateOptions::StencilState
+    dynamicDraw->AddDrawStateOptions(AZ::RPI::DynamicDrawContext::DrawStateOptions::StencilState
         | AZ::RPI::DynamicDrawContext::DrawStateOptions::BlendMode);
-    m_dynamicDraw->EndInit();
+
+    if (drawListTag.IsValid())
+    {
+        dynamicDraw->InitDrawListTag(drawListTag);
+    }
+
+    dynamicDraw->EndInit();
+
+    return dynamicDraw;
 }
 
 AZStd::shared_ptr<AZ::RPI::ViewportContext> UiRenderer::GetViewportContext()
@@ -212,6 +222,19 @@ void UiRenderer::EndCanvasRender()
 AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> UiRenderer::GetDynamicDrawContext()
 {
     return m_dynamicDraw;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> UiRenderer::CloneDynamicDrawContextWithTag(AZ::RHI::DrawListTag drawListTag)
+{
+    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw;
+    AZ_Assert(m_dynamicDraw, "Can't clone the dynamic draw context before it was created.");
+    if (m_dynamicDraw)
+    {
+        dynamicDraw = CreateDynamicDrawContext(m_scene, m_dynamicDraw->GetShader(), drawListTag);
+    }
+
+    return dynamicDraw;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
