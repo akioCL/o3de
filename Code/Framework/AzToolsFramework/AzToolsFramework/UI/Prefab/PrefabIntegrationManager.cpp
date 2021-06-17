@@ -115,6 +115,7 @@ namespace AzToolsFramework
             AZ::Interface<PrefabIntegrationInterface>::Unregister(this);
             PrefabInstanceContainerNotificationBus::Handler::BusDisconnect();
             EditorContextMenuBus::Handler::BusDisconnect();
+            AzToolsFramework::EditorEvents::Bus::Handler::BusDisconnect();
         }
 
         void PrefabIntegrationManager::Reflect(AZ::ReflectContext* context)
