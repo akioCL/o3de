@@ -17,6 +17,7 @@
 #include <AzToolsFramework/Prefab/Instance/InstanceSerializer.h>
 #include <AzToolsFramework/Prefab/Instance/InstanceEntityIdMapper.h>
 #include <AzToolsFramework/Prefab/Instance/InstanceEntityMapperInterface.h>
+#include <AzToolsFramework/Prefab/PrefabIdTypes.h>
 #include <AzToolsFramework/Prefab/PrefabLoaderInterface.h>
 #include <AzToolsFramework/Prefab/PrefabSystemComponentInterface.h>
 
@@ -83,6 +84,15 @@ namespace AzToolsFramework
                         instances, defaultInstances, azrtti_typeid<Instance::AliasToInstanceMap>(), context);
 
                 result.Combine(resultInstances);
+            }
+
+            {
+                AZ::ScopedContextPath subPathLinkId(context, "m_linkId");
+                const LinkId* linkId = &(instance->m_linkId);
+                const LinkId* defaultLinkId = defaultInstance ? &(defaultInstance->m_linkId) : nullptr;
+
+                result = ContinueStoringToJsonObjectField(
+                    outputValue, "LinkId", linkId, defaultLinkId, azrtti_typeid<LinkId>(), context);
             }
 
             return context.Report(result,
