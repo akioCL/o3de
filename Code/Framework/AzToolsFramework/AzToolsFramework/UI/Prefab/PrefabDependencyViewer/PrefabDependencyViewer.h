@@ -11,12 +11,18 @@
  */
 
 #pragma once
+#include <AzToolsFramework/UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewerInterface.h>
+
+// #include <AzCore/std/string/string.h>
+
+#include <AzToolsFramework/Prefab/Instance/Instance.h>
 #include <QWidget>
-#include <AzCore/std/string/string.h>
 
 namespace AzToolsFramework
 {
-    class PrefabDependencyViewerWidget : public QWidget
+    class PrefabDependencyViewerWidget :
+        public QWidget//,
+        // public PrefabDependencyViewerInterface
     {
         Q_OBJECT;
 
@@ -25,6 +31,8 @@ namespace AzToolsFramework
        virtual ~PrefabDependencyViewerWidget() = default;
 
 	   void displayText();
+       // virtual void displayTree(AzToolsFramework::Prefab::Instance& prefab) override;
+
     };
 
 }; // namespace AzToolsFramework

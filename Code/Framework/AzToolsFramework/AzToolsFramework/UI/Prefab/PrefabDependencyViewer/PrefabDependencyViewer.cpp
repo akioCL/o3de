@@ -32,4 +32,14 @@ namespace AzToolsFramework
         layout->addWidget(label);
         setLayout(layout);
     }
+
+    /* void PrefabDependencyViewerWidget::displayTree(AzToolsFramework::Prefab::Instance& prefab)
+    {
+        QLabel* label = new QLabel(this);
+        QHBoxLayout* layout = new QHBoxLayout();
+
+        label->setText(prefab.GetAbsoluteInstanceAliasPath().c_str());
+        layout->addWidget(label);
+        setLayout(layout);
+    }*/
 }

@@ -31,6 +31,7 @@
 
 #include <AzToolsFramework/Prefab/Instance/InstanceEntityMapperInterface.h>
 #include <AzToolsFramework/UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewer.h>
+#include <AzToolsFramework/UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewerInterface.h>
 #include <AzToolsFramework/API/ViewPaneOptions.h>
 
 #include <QApplication>
@@ -219,7 +220,9 @@ namespace AzToolsFramework
                                     "Prefab Dependency Viewer", "%s\n",
                                 prefabInstance.GetAbsoluteInstanceAliasPath().c_str());
 
+                            
                             AzToolsFramework::OpenViewPane("Prefab Dependency Viewer");
+                            // AZ::Interface<PrefabDependencyViewerInterface>::Get()->displayTree(prefabInstance);
 
                             /* AZStd::vector<AZ::Entity&> entities;
                             prefabInstance.GetEntities(

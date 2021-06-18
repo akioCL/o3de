@@ -719,6 +719,7 @@ set(FILES
     UI/Prefab/PrefabUiHandler.cpp
     UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewer.h
     UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewer.cpp
+    UI/Prefab/PrefabDependencyViewer/PrefabDependencyViewerInterface.h
     PythonTerminal/ScriptHelpDialog.cpp
     PythonTerminal/ScriptHelpDialog.h
     PythonTerminal/ScriptHelpDialog.ui
