@@ -207,6 +207,12 @@ namespace AzToolsFramework
                 instanceValue->CopyFrom(linkDom, m_prefabDom.GetAllocator());
             }
 
+            auto linkIdIterator = output.FindMember(PrefabDomUtils::LinkIdName);
+            if (linkIdIterator != output.MemberEnd())
+            {
+                output.RemoveMember(PrefabDomUtils::LinkIdName);
+            }
+
             return true;
         }
 

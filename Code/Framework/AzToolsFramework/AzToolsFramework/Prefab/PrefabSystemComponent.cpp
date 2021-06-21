@@ -143,6 +143,13 @@ namespace AzToolsFramework
 
         void PrefabSystemComponent::PropagateTemplateChanges(TemplateId templateId, InstanceOptionalReference instanceToExclude)
         {
+            PrefabDom& templateDom = FindTemplateDom(templateId);
+            auto linkIdIter = templateDom.FindMember(PrefabDomUtils::LinkIdName);
+            if (linkIdIter != templateDom.MemberEnd())
+            {
+                templateDom.RemoveMember(PrefabDomUtils::LinkIdName);
+            }
+
             UpdatePrefabInstances(templateId, instanceToExclude);
 
             auto templateIdToLinkIdsIterator = m_templateToLinkIdsMap.find(templateId);
