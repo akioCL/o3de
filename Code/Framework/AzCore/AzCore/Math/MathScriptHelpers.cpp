@@ -7,6 +7,7 @@
  */
 
 #include <AzCore/Math/MathScriptHelpers.h>
+#include <AzCore/Serialization/SerializeSwapEndian.h>
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/Math/Vector4.h>
 #include <AzCore/Math/Quaternion.h>

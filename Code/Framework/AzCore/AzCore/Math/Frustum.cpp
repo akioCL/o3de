@@ -11,6 +11,7 @@
 #include <AzCore/Math/Matrix4x4.h>
 #include <AzCore/Math/MathUtils.h>
 #include <AzCore/Math/MathScriptHelpers.h>
+#include <AzCore/Serialization/EditContext.h>
 
 namespace AZ
 {

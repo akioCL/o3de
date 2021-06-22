@@ -481,6 +481,8 @@ set(FILES
     Serialization/EditContext.h
     Serialization/EditContext.inl
     Serialization/EditContextConstants.inl
+    Serialization/IDataSerializer.cpp
+    Serialization/IDataSerializer.h
     Serialization/IdUtils.inl
     Serialization/IdUtils.h
     Serialization/Utils.h
@@ -491,6 +493,7 @@ set(FILES
     Serialization/SerializeContext.h
     Serialization/SerializeContextEnum.cpp
     Serialization/SerializeContextEnum.inl
+    Serialization/SerializeSwapEndian.h
     Serialization/DataPatch.h
     Serialization/DataPatch.cpp
     Serialization/DataPatchBus.h

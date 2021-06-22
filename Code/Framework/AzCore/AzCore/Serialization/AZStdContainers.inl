@@ -1865,7 +1865,7 @@ namespace AZ
         // basic string serialization
         template<class T>
         class AZStdString
-            : public SerializeContext::IDataSerializer
+            : public IDataSerializer
         {
         public:
             /// Convert binary data to text
@@ -1925,7 +1925,7 @@ namespace AZ
         };
 
         class AZBinaryData
-            : public SerializeContext::IDataSerializer
+            : public IDataSerializer
         {
         public:
             size_t DataToText(IO::GenericStream& in, IO::GenericStream& out, bool isDataBigEndian /*= false*/) override

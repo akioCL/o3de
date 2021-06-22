@@ -36,10 +36,10 @@
 
 #include <AzCore/Math/Crc.h>
 #include <AzCore/IO/ByteContainerStream.h>
+#include <AzCore/Serialization/IDataSerializer.h>
+#include <AzCore/Serialization/SerializeSwapEndian.h>
 
 #define AZ_SERIALIZE_BINARY_STACK_BUFFER 4096
-
-#define AZ_SERIALIZE_SWAP_ENDIAN(_value, _isSwap)  if (_isSwap) AZStd::endian_swap(_value)
 
 namespace AZ
 {
@@ -115,13 +115,9 @@ namespace AZ
         class IObjectFactory;
         // Alias for backwards compatibility
         using IRttiHelper = AZ::IRttiHelper;
-        class IDataSerializer;
         class IDataContainer;
         class IEventHandler;
         class IDataConverter;
-
-        using IDataSerializerDeleter = AZStd::function<void(IDataSerializer* ptr)>;
-        using IDataSerializerPtr = AZStd::unique_ptr<IDataSerializer, IDataSerializerDeleter>;
 
         AZ_CLASS_ALLOCATOR(SerializeContext, SystemAllocator, 0);
         AZ_RTTI(SerializeContext, "{83482F97-84DA-4FD4-BF9E-7FE34C8E091F}", ReflectContext);
@@ -660,40 +656,6 @@ namespace AZ
             {
                 Destroy(const_cast<void*>(ptr));
             }
-        };
-
-        /**
-         * Interface for data serialization. Should be implemented for lowest level
-         * of data. Once this implementation is detected, the class will not be drilled
-         * down. We will assume this implementation covers the full class.
-         */
-        class IDataSerializer
-        {
-        public:
-            static IDataSerializerDeleter CreateDefaultDeleteDeleter();
-            static IDataSerializerDeleter CreateNoDeleteDeleter();
-
-            virtual ~IDataSerializer() {}
-
-            /// Store the class data into a stream.
-            virtual size_t  Save(const void* classPtr, IO::GenericStream& stream, bool isDataBigEndian = false) = 0;
-
-            /// Load the class data from a stream.
-            virtual bool    Load(void* classPtr, IO::GenericStream& stream, unsigned int version, bool isDataBigEndian = false) = 0;
-
-            /// Convert binary data to text.
-            virtual size_t  DataToText(IO::GenericStream& in, IO::GenericStream& out, bool isDataBigEndian /*= false*/) = 0;
-
-            /// Convert text data to binary, to support loading old version formats. We must respect text version if the text->binary format has changed!
-            virtual size_t  TextToData(const char* text, unsigned int textVersion, IO::GenericStream& stream, bool isDataBigEndian = false) = 0;
-
-            /// Compares two instances of the type.
-            /// \return true if they match.
-            /// Note: Input pointers are assumed to point to valid instances of the class.
-            virtual bool    CompareValueData(const void* lhs, const void* rhs) = 0;
-
-            /// Optional post processing of the cloned data to deal with members that are not serialize-reflected.
-            virtual void PostClone(void* /*classPtr*/) {}
         };
 
         /**

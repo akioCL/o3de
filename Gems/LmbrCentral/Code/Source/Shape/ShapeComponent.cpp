@@ -6,6 +6,7 @@
  *
  */
 
+#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <LmbrCentral/Shape/ShapeComponentBus.h>
 

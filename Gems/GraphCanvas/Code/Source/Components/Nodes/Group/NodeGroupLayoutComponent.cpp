@@ -6,7 +6,6 @@
  *
  */
 
-
 #include <functional>
 
 #include <AzCore/RTTI/TypeInfo.h>

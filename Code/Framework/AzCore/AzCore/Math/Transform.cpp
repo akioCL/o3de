@@ -13,6 +13,7 @@
 #include <AzCore/Math/Obb.h>
 #include <AzCore/Math/Vector2.h>
 #include <AzCore/Math/MathScriptHelpers.h>
+#include <AzCore/Serialization/SerializeSwapEndian.h>
 
 namespace AZ
 {

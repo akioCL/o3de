@@ -13,6 +13,7 @@
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/std/functional.h>
 #include <AzCore/std/smart_ptr/shared_ptr.h>
+#include <AzCore/Component/EntityId.h>
 
 #include <AzFramework/Physics/Collision/CollisionGroups.h>
 #include <AzFramework/Physics/Common/PhysicsTypes.h>

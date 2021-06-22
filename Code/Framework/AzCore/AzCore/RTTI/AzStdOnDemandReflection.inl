@@ -11,7 +11,6 @@
 #include <AzCore/Script/ScriptContext.h>
 #include <AzCore/Script/ScriptContextAttributes.h>
 #include <AzCore/ScriptCanvas/ScriptCanvasAttributes.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/algorithm.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzCore/std/string/conversions.h>

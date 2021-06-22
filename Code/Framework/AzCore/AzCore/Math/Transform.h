@@ -13,12 +13,12 @@
 #include <AzCore/Math/Vector4.h>
 #include <AzCore/Math/Quaternion.h>
 #include <AzCore/Math/MathUtils.h>
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Serialization/IDataSerializer.h>
 
 namespace AZ
 {
     class TransformSerializer
-        : public SerializeContext::IDataSerializer
+        : public IDataSerializer
     {
     public:
         // number of floats in the serialized representation, 4 for rotation, 1 for scale and 3 for translation

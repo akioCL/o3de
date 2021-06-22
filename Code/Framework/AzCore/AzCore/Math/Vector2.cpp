@@ -11,6 +11,8 @@
 #include <AzCore/Math/Vector4.h>
 #include <AzCore/Math/MathUtils.h>
 #include <AzCore/Math/MathScriptHelpers.h>
+#include <AzCore/Script/ScriptContext.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

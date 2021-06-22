@@ -125,7 +125,7 @@ namespace MCore
     }
 
     class StringIdPoolIndexSerializer
-        : public AZ::SerializeContext::IDataSerializer
+        : public AZ::IDataSerializer
     {
     public:
         /// Store the class data into a stream.

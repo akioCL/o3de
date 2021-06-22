@@ -33,7 +33,7 @@ namespace UiSerialize
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     class CryStringTCharSerializer
-        : public AZ::SerializeContext::IDataSerializer
+        : public AZ::IDataSerializer
     {
         /// Return the size of binary buffer necessary to store the value in binary format
         size_t  GetRequiredBinaryBufferSize(const void* classPtr) const

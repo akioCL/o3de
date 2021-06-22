@@ -11,6 +11,7 @@
 #include <AzCore/Serialization/DataOverlay.h>
 #include <AzCore/Serialization/DynamicSerializableField.h>
 #include <AzCore/Serialization/Utils.h>
+#include <AzCore/Serialization/SerializeSwapEndian.h>
 #include <AzCore/Asset/AssetSerializer.h>
 
 /// include AZStd any serializer support
@@ -40,7 +41,7 @@ namespace AZ
 
     template<class T>
     class BinaryValueSerializer
-        : public SerializeContext::IDataSerializer
+        : public IDataSerializer
     {
         /// Load the class data from a binary buffer.
         bool    Load(void* classPtr, IO::GenericStream& stream, unsigned int /*version*/, bool isDataBigEndian = false) override
@@ -345,7 +346,7 @@ namespace AZ
 
     // serializer without any data write
     class EmptySerializer
-        : public SerializeContext::IDataSerializer
+        : public IDataSerializer
     {
     public:
         /// Store the class data into a stream.
@@ -3256,20 +3257,5 @@ namespace AZ
         static SerializeContext::PerModuleGenericClassInfo s_ModuleCleanupInstance;
         return s_ModuleCleanupInstance;
     }
-
-    SerializeContext::IDataSerializerDeleter SerializeContext::IDataSerializer::CreateDefaultDeleteDeleter()
-    {
-        return [](IDataSerializer* ptr)
-        {
-            delete ptr;
-        };
-    }
-    SerializeContext::IDataSerializerDeleter SerializeContext::IDataSerializer::CreateNoDeleteDeleter()
-    {
-        return [](IDataSerializer*)
-        {
-        };
-    }
-
 
 } // namespace AZ

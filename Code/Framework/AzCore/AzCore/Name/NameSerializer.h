@@ -8,13 +8,12 @@
 
 #pragma once
 
-#include <AzCore/Name/Name.h>
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Serialization/IDataSerializer.h>
 
 namespace AZ
 {
     //! Provides flattened serialization of Name objects as a simple string.
-    class NameSerializer : public SerializeContext::IDataSerializer
+    class NameSerializer : public IDataSerializer
     {
     public:
 

@@ -57,7 +57,7 @@ namespace AZ
 
         template<class EnumType>
         class EnumSerializer
-            : public SerializeContext::IDataSerializer
+            : public IDataSerializer
         {
             static_assert(AZStd::is_enum<EnumType>::value, "Enum Serializer can only be used with enum types");
             using UnderlyingType = AZStd::RemoveEnumT<EnumType>;

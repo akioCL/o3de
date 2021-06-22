@@ -12,6 +12,8 @@
 #include <SceneAPI/SceneCore/DataTypes/MatrixType.h>
 #include <SceneAPI/SceneCore/Utilities/HashHelper.h>
 #include <cinttypes>
+#include <AzCore/std/containers/vector.h>
+#include <AzCore/std/string/string.h>
 
 namespace AZ::SceneAPI::Utilities
 {

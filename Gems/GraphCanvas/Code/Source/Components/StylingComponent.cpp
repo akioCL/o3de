@@ -6,7 +6,6 @@
  *
  */
 
-
 #include <QGraphicsItem>
 #include <QGraphicsLayoutItem>
 

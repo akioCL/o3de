@@ -9,9 +9,6 @@
 
 #include <AzCore/Math/Quaternion.h>
 #include <AzCore/Math/Vector3.h>
-#include <AzCore/Serialization/SerializeContext.h>
-#include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/std/string/string.h>

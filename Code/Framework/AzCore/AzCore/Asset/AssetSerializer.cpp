@@ -9,6 +9,7 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Asset/AssetManager.h>
 #include <AzCore/IO/SystemFile.h>
+#include <AzCore/Serialization/SerializeSwapEndian.h>
 
 namespace AZ {
     //-------------------------------------------------------------------------
