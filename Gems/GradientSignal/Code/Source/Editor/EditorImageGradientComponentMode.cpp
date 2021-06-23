@@ -20,6 +20,7 @@
 #include <AzToolsFramework/ViewportSelection/EditorSelectionUtil.h>
 #include <GradientSignal/Ebuses/GradientRequestBus.h>
 #include <GradientSignal/Ebuses/ImageGradientRequestBus.h>
+#include <LmbrCentral/Dependency/DependencyNotificationBus.h>
 
 namespace GradientSignal
 {
@@ -27,13 +28,6 @@ namespace GradientSignal
         const AZ::EntityComponentIdPair& entityComponentIdPair, AZ::Uuid componentType)
         : EditorBaseComponentMode(entityComponentIdPair, componentType)
     {
-        GradientSignal::GradientSampleParams params;
-        params.m_position = AZ::Vector3::CreateZero();
-
-        const float newValue = 1.0f;
-
-        GradientRequestBus::Event(entityComponentIdPair.GetEntityId(), &GradientRequestBus::Events::SetValue, params, newValue);
-
         const AZ::Color manipulatorColor = AZ::Color(1.0f, 0.0f, 0.0f, 1.0f);
         const float manipulatorRadius = 2.0f;
         const float manipulatorWidth = 0.05f;
@@ -55,33 +49,107 @@ namespace GradientSignal
         m_brushManipulator->Unregister();
     }
 
+    void EditorImageGradientComponentMode::HandlePaintArea(const AZ::Vector3& center)
+    {
+        if (m_isPainting)
+        {
+            auto SetValue = [this](float x, float y)
+            {
+                GradientSignal::GradientSampleParams params;
+                params.m_position = AZ::Vector3(x, y, 0.0f);
+
+                const float newValue = 1.0f;
+                GradientRequestBus::Event(GetEntityId(), &GradientRequestBus::Events::SetValue, params, newValue);
+            };
+
+            AZ::Aabb shapeBounds;
+            LmbrCentral::ShapeComponentRequestsBus::EventResult(
+                shapeBounds, GetEntityId(), &LmbrCentral::ShapeComponentRequestsBus::Events::GetEncompassingAabb);
+
+            uint32_t imageHeight = 0, imageWidth = 0;
+            ImageGradientRequestBus::EventResult(imageHeight, GetEntityId(), &ImageGradientRequestBus::Events::GetImageHeight);
+            ImageGradientRequestBus::EventResult(imageWidth, GetEntityId(), &ImageGradientRequestBus::Events::GetImageWidth);
+
+            const float xStep = shapeBounds.GetXExtent() / imageWidth;
+            const float yStep = shapeBounds.GetYExtent() / imageHeight;
+
+            const float manipulatorRadius = 2.0f;
+            const float manipulatorRadiusSq = manipulatorRadius * manipulatorRadius;
+            const float xCenter = center.GetX();
+            const float yCenter = center.GetY();
+
+            for (float y = yCenter - manipulatorRadius; y <= yCenter + manipulatorRadius; y += yStep)
+            {
+                for (float x = xCenter - manipulatorRadius; x <= xCenter + manipulatorRadius; x += xStep)
+                {
+                    const float xDiffSq = (x - xCenter) * (x - xCenter);
+                    const float yDiffSq = (y - yCenter) * (y - yCenter);
+                    if (xDiffSq + yDiffSq <= manipulatorRadiusSq)
+                    {
+                        SetValue(x, y);
+                    }
+                }
+            }
+
+            LmbrCentral::DependencyNotificationBus::Event(
+                GetEntityId(), &LmbrCentral::DependencyNotificationBus::Events::OnCompositionChanged);
+        }
+    }
+
+    bool EditorImageGradientComponentMode::HandleMouseEvent(
+        const AzToolsFramework::ViewportInteraction::MouseInteractionEvent& mouseInteraction)
+    {
+        float closestDistance = std::numeric_limits<float>::max();
+        AZ::EntityId entityIdUnderCursor;
+        const int viewportId = mouseInteraction.m_mouseInteraction.m_interactionId.m_viewportId;
+
+        auto selectionFunction = [this, &closestDistance, &entityIdUnderCursor, &mouseInteraction, &viewportId](AZ::Entity* entity)
+        {
+            if (AzToolsFramework::PickEntity(entity->GetId(), mouseInteraction.m_mouseInteraction, closestDistance, viewportId))
+            {
+                entityIdUnderCursor = entity->GetId();
+            }
+        };
+
+        AZ::ComponentApplicationBus::Broadcast(&AZ::ComponentApplicationRequests::EnumerateEntities, selectionFunction);
+
+        if (entityIdUnderCursor.IsValid())
+        {
+            AZ::Vector3 result = mouseInteraction.m_mouseInteraction.m_mousePick.m_rayOrigin +
+                mouseInteraction.m_mouseInteraction.m_mousePick.m_rayDirection * closestDistance;
+
+            AZ::Transform space = AZ::Transform::CreateTranslation(result);
+            m_brushManipulator->SetSpace(space);
+
+            HandlePaintArea(result);
+
+            return true;
+        }
+
+        return false;
+    }
+
     bool EditorImageGradientComponentMode::HandleMouseInteraction(
         const AzToolsFramework::ViewportInteraction::MouseInteractionEvent& mouseInteraction)
     {
         if (mouseInteraction.m_mouseEvent == AzToolsFramework::ViewportInteraction::MouseEvent::Move)
         {
-            float closestDistance = std::numeric_limits<float>::max();
-            AZ::EntityId entityIdUnderCursor;
-            const int viewportId = mouseInteraction.m_mouseInteraction.m_interactionId.m_viewportId;
-
-            auto selectionFunction = [this, &closestDistance, &entityIdUnderCursor, &mouseInteraction, &viewportId](AZ::Entity* entity)
+            return HandleMouseEvent(mouseInteraction);
+        }
+        else if (mouseInteraction.m_mouseEvent == AzToolsFramework::ViewportInteraction::MouseEvent::Down)
+        {
+            if (mouseInteraction.m_mouseInteraction.m_mouseButtons.Left())
             {
-                if (AzToolsFramework::PickEntity(entity->GetId(), mouseInteraction.m_mouseInteraction, closestDistance, viewportId))
-                {
-                    entityIdUnderCursor = entity->GetId();
-                }
-            };
-
-            AZ::ComponentApplicationBus::Broadcast(&AZ::ComponentApplicationRequests::EnumerateEntities, selectionFunction);
-
-            if (entityIdUnderCursor.IsValid())
+                m_isPainting = true;
+                HandleMouseEvent(mouseInteraction);
+                return true;
+            }
+        }
+        else if (mouseInteraction.m_mouseEvent == AzToolsFramework::ViewportInteraction::MouseEvent::Up)
+        {
+            if (mouseInteraction.m_mouseInteraction.m_mouseButtons.Left())
             {
-                AZ::Vector3 result = mouseInteraction.m_mouseInteraction.m_mousePick.m_rayOrigin +
-                    mouseInteraction.m_mouseInteraction.m_mousePick.m_rayDirection * closestDistance;
-
-                AZ::Transform space = AZ::Transform::CreateTranslation(result);
-                m_brushManipulator->SetSpace(space);
-
+                m_isPainting = false;
                 return true;
             }
         }
