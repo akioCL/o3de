@@ -26,8 +26,13 @@ function(ly_add_shader)
         message(FATAL_ERROR "You must provide a source AZSL file") 
     endif()
 
-    # if(EXISTS ly_add_shader_AZSL)
-    message("Fake compiling shader ${ly_add_shader_NAME}")
+    set(AZSL_path ${CMAKE_CURRENT_LIST_DIR}/${ly_add_shader_AZSL})
+
+    if(EXISTS ${AZSL_path})
+        message("Fake compiling shader ${ly_add_shader_NAME}")
+    else()
+        message(FATAL_ERROR "Shader source file ${ly_add_shader_AZSL} doesn't exist")
+    endif() 
 
 
 endfunction()
