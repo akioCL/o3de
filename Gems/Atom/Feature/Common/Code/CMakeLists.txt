@@ -5,6 +5,8 @@
 #
 #
 
+include(${CMAKE_CURRENT_LIST_DIR}/../Assets/shader_targets.cmake)
+
 ly_get_list_relative_pal_filename(pal_source_dir ${CMAKE_CURRENT_LIST_DIR}/Source/Platform/${PAL_PLATFORM_NAME})
 ly_get_list_relative_pal_filename(common_source_dir ${CMAKE_CURRENT_LIST_DIR}/Source/Platform/Common)
 

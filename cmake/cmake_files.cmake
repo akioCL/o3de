@@ -24,6 +24,7 @@ set(FILES
     LySet.cmake
     LYTestWrappers.cmake
     LYPython.cmake
+    LYShaders.cmake
     LYWrappers.cmake
     Monolithic.cmake
     OutputDirectory.cmake
