@@ -11,7 +11,7 @@
 
 ly_add_shader(
 	NAME StandardPBR_ForwardPass
-	AZSL ${CMAKE_CURRENT_LIST_DIR}/Materials/Types/StandardPBR_ForwardPass.azsl
+	AZSL Materials/Types/StandardPBR_ForwardPass.azsl 
 	ENTRY_VS StandardPbr_ForwardPassVS
 	ENTRY_PS StandardPbr_ForwardPassPS
 )
