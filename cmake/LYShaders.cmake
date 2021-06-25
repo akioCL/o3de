@@ -36,38 +36,90 @@ function(ly_add_shader)
         message(FATAL_ERROR "Shader source file ${ly_add_shader_AZSL} doesn't exist")
     endif() 
 
-    # Run the AZSL file through MCPP -----------------------------------------------------------------
+    # Run the AZSL file through MCPP & AZSLc -----------------------------------------------------------------
     set(MCPP "C:/3rdParty/packages/mcpp-2.7.2_az.1-rev1-windows/mcpp/lib/mcpp.exe")
 
     set(inc_dirs 
         ${LY_ROOT_FOLDER}/Gems/Atom/RPI/Assets/ShaderLib 
         ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/ShaderLib
         ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/ShaderResourceGroups
+        ${LY_ROOT_FOLDER}/AtomSampleViewer/ShaderLib
+        ${LY_ROOT_FOLDER}/Gems
+        ${LY_ROOT_FOLDER}/AtomSampleViewer
+        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/Materials/Types
     )
     list(TRANSFORM inc_dirs PREPEND "-I")
 
-    # The file to be outputted by MCPP (the flat azsl file)
-    set(preprocessed_shader_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.azsl.in)
+    set(RHI_names
+        Android_Vulkan
+        iOS_Metal
+        Mac_Metal
+        Mac_Null
+        Windows_DX12
+        Windows_Null
+        Windows_Vulkan
+    )
+
+    set(RHI_paths
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Android/Vulkan/AzslcHeader.azsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/iOS/Metal/AzslcHeader.azsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Mac/Metal/AzslcHeader.azsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Mac/Null/AzslcHeader.azsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/DX12/AzslcHeader.azsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/Null/AzslcHeader.azsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/Vulkan/AzslcHeader.azsli
+    )
+
+    foreach(rhi ${RHI_names})
+        list(APPEND RHI_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.${rhi}.azsl.in)
+    endforeach()
 
     # Add the target for this shader
     add_custom_target(${ly_add_shader_NAME} 
         DEPENDS
-            ${preprocessed_shader_path}
+            ${RHI_output_paths}
         SOURCES
             ${AZSL_path}
     )
 
-    # Add the command for this shader
-    add_custom_command(
-        OUTPUT 
-            ${preprocessed_shader_path}
-        COMMAND 
-            ${MCPP} ${inc_dirs} -C -w -+ ${AZSL_path} -o ${preprocessed_shader_path}
-        DEPENDS
+    list(LENGTH RHI_names len1) 
+    math(EXPR len "${len1} - 1")     
+    # For each RHI, concatenate the header RHI file to the AZSL file and run the file through MCPP
+    foreach(val RANGE ${len})
+        list(GET RHI_output_paths ${val} preprocessed_shader_path)
+        list(GET RHI_paths ${val} rhi_path)
+        list(GET RHI_names ${val} rhi_name)
+        # The file to be outputted by MCPP (the flat azsl file)
+        # set(preprocessed_shader_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.${rhi_name}.azsl.in)
+
+        set(cat_rhi_source_files
+            ${rhi_path}
             ${AZSL_path}
-        COMMAND_EXPAND_LISTS
-    )
-    
+        )
+
+        # Concatenate the files together
+        execute_process(COMMAND ${CMAKE_COMMAND} -E cat ${cat_rhi_source_files}
+	        OUTPUT_VARIABLE concat_files 
+	        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Shaders
+        )
+        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend.in "${concat_files}" )
+        configure_file(${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend.in ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend COPYONLY)
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend
+	        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/prepend/Shaders)
+        
+        set(cat_AZSL_rhi_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend)
+
+        add_custom_command(
+            OUTPUT 
+                ${preprocessed_shader_path}
+            COMMAND 
+                ${MCPP} ${inc_dirs} -C -w -+ ${cat_AZSL_rhi_path} -o ${preprocessed_shader_path}
+            DEPENDS
+                ${cat_rhi_source_files}
+            COMMAND_EXPAND_LISTS
+        )
+    endforeach()
+
     # Move the target location to inside the designated folder in IDE
     file(RELATIVE_PATH project_path ${LY_ROOT_FOLDER} ${CMAKE_CURRENT_LIST_DIR})
     set(ide_path ${project_path})
