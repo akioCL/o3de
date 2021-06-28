@@ -39,7 +39,7 @@ function(ly_add_shader)
         message(FATAL_ERROR "Shader source file ${ly_add_shader_AZSL} doesn't exist")
     endif() 
 
-    # Run the AZSL file through MCPP -----------------------------------------------------------------
+    # Set up MCPP -----------------------------------------------------------------
     get_property(inc_dirs GLOBAL PROPERTY mcpp_inc_dirs)
     if (NOT inc_dirs)
         ly_add_shader_atom_include_dirs()
@@ -69,26 +69,33 @@ function(ly_add_shader)
         list(APPEND RHI_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.${rhi}.azsl.in)
     endforeach()
 
+    # Set up AZSLc -----------------------------------------------------------------
+    set(AZSLC "C:/3rdParty/packages/azslc-1.7.21-rev1-multiplatform/azslc/bin/win_x64/Release/azslc.exe")
+    foreach(rhi ${RHI_names})
+        list(APPEND hlsl_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/azslc_outputs/${ly_add_shader_NAME}.${rhi}.hlsl)
+    endforeach()
+
     # Add the target for this shader
     add_custom_target(${ly_add_shader_NAME} 
         DEPENDS
-            ${RHI_output_paths}
+            ${hlsl_output_paths}
         SOURCES
             ${AZSL_path}
     )
 
     list(LENGTH RHI_names len1) 
     math(EXPR len "${len1} - 1")     
-    # For each RHI, concatenate the header RHI file to the AZSL file and run the file through MCPP
+    # For each RHI, concatenate the header RHI file to the AZSL file and run the file through MCPP & AZSLc
     foreach(val RANGE ${len})
         list(GET RHI_output_paths ${val} preprocessed_shader_path)
         list(GET RHI_paths ${val} rhi_path)
         list(GET RHI_names ${val} rhi_name)
+        list(GET hlsl_output_paths ${val} output_hlsl_path)
         set(cat_rhi_source_files
             ${rhi_path}
             ${AZSL_path}
         )
-
+        message(${output_hlsl_path})
         # Concatenate the files together
         execute_process(COMMAND ${CMAKE_COMMAND} -E cat ${cat_rhi_source_files}
 	        OUTPUT_VARIABLE concat_files 
@@ -103,9 +110,11 @@ function(ly_add_shader)
 
         add_custom_command(
             OUTPUT 
-                ${preprocessed_shader_path}
+                ${output_hlsl_path}
             COMMAND 
                 ${MCPP} ${inc_dirs} -C -w -+ ${cat_AZSL_rhi_path} -o ${preprocessed_shader_path}
+            COMMAND 
+                ${AZSLC} ${preprocessed_shader_path} --full -o ${output_hlsl_path}
             DEPENDS
                 ${cat_rhi_source_files}
             COMMAND_EXPAND_LISTS
