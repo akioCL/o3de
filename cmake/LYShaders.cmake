@@ -9,6 +9,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #
 
+# Include directories to be used for MCPP
+# Can be edited via
+#    ly_add_shader_include_dirs(), which takes directories and adds them
+#    ly_add_shader_atom_include_dirs(), which adds all the Atom included directories
+# set(mcpp_inc_dirs "")
+set_property(GLOBAL PROPERTY mcpp_inc_dirs)
+
 #! ly_add_shader: adds a shader to be compiled
 function(ly_add_shader)
     
@@ -28,28 +35,18 @@ function(ly_add_shader)
     endif()
 
     set(AZSL_path ${CMAKE_CURRENT_LIST_DIR}/${ly_add_shader_AZSL})
-
-    # Send a message to ensure that we are compiling this shader
-    if(EXISTS ${AZSL_path})
-        message("Fake compiling shader ${ly_add_shader_NAME}")
-    else()
+    if(NOT EXISTS ${AZSL_path})
         message(FATAL_ERROR "Shader source file ${ly_add_shader_AZSL} doesn't exist")
     endif() 
 
-    # Run the AZSL file through MCPP & AZSLc -----------------------------------------------------------------
+    # Run the AZSL file through MCPP -----------------------------------------------------------------
+    get_property(inc_dirs GLOBAL PROPERTY mcpp_inc_dirs)
+    if (NOT inc_dirs)
+        ly_add_shader_atom_include_dirs()
+        get_property(inc_dirs GLOBAL PROPERTY mcpp_inc_dirs)
+    endif()
+
     set(MCPP "C:/3rdParty/packages/mcpp-2.7.2_az.1-rev1-windows/mcpp/lib/mcpp.exe")
-
-    set(inc_dirs 
-        ${LY_ROOT_FOLDER}/Gems/Atom/RPI/Assets/ShaderLib 
-        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/ShaderLib
-        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/ShaderResourceGroups
-        ${LY_ROOT_FOLDER}/AtomSampleViewer/ShaderLib
-        ${LY_ROOT_FOLDER}/Gems
-        ${LY_ROOT_FOLDER}/AtomSampleViewer
-        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/Materials/Types
-    )
-    list(TRANSFORM inc_dirs PREPEND "-I")
-
     set(RHI_names
         Android_Vulkan
         iOS_Metal
@@ -59,7 +56,6 @@ function(ly_add_shader)
         Windows_Null
         Windows_Vulkan
     )
-
     set(RHI_paths
         ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Android/Vulkan/AzslcHeader.azsli
         ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/iOS/Metal/AzslcHeader.azsli
@@ -69,7 +65,6 @@ function(ly_add_shader)
         ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/Null/AzslcHeader.azsli
         ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/Vulkan/AzslcHeader.azsli
     )
-
     foreach(rhi ${RHI_names})
         list(APPEND RHI_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.${rhi}.azsl.in)
     endforeach()
@@ -89,9 +84,6 @@ function(ly_add_shader)
         list(GET RHI_output_paths ${val} preprocessed_shader_path)
         list(GET RHI_paths ${val} rhi_path)
         list(GET RHI_names ${val} rhi_name)
-        # The file to be outputted by MCPP (the flat azsl file)
-        # set(preprocessed_shader_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.${rhi_name}.azsl.in)
-
         set(cat_rhi_source_files
             ${rhi_path}
             ${AZSL_path}
@@ -126,5 +118,30 @@ function(ly_add_shader)
     set_target_properties(${ly_add_shader_NAME} PROPERTIES 
         FOLDER "${ide_path}"
     )
+endfunction()
 
+# Add the Atom included shader directories to inc_dirs
+function(ly_add_shader_atom_include_dirs)
+    set(atom_inc_dirs 
+        ${LY_ROOT_FOLDER}/Gems/Atom/RPI/Assets/ShaderLib 
+        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/ShaderLib
+        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/ShaderResourceGroups
+        ${LY_ROOT_FOLDER}/Gems
+        ${LY_ROOT_FOLDER}/Gems/Atom/Feature/Common/Assets/Materials/Types
+    )
+    list(TRANSFORM atom_inc_dirs PREPEND "-I")
+    get_property(temp GLOBAL PROPERTY mcpp_inc_dirs)
+    set(temp ${temp}
+        ${atom_inc_dirs})
+    set_property(GLOBAL PROPERTY mcpp_inc_dirs "${temp}")
+endfunction()
+
+# Add specific directories to inc_dirs
+function(ly_add_shader_include_dirs)
+    set(dirs ${ARGV})
+    list(TRANSFORM dirs PREPEND "-I${CMAKE_CURRENT_LIST_DIR}/") 
+    get_property(temp GLOBAL PROPERTY mcpp_inc_dirs)
+    set(temp ${temp}
+        ${dirs})
+    set_property(GLOBAL PROPERTY mcpp_inc_dirs "${temp}")
 endfunction()
