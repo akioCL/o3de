@@ -19,15 +19,6 @@
 
 namespace LyShine
 {
-    namespace
-    {
-        AZ::Name GetRenderTargetName(AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage)
-        {
-            AZ::Name renderTargetName = attachmentImage->GetRHIImage()->GetName();
-            return renderTargetName;
-        }
-    }
-
     AZ::RPI::Ptr<LyShinePass> LyShinePass::Create(const AZ::RPI::PassDescriptor& descriptor)
     {
         return aznew LyShinePass(descriptor);
@@ -43,59 +34,50 @@ namespace LyShine
         LyShinePassRequestBus::Handler::BusDisconnect();
     }
 
-    void LyShinePass::ResetRenderTargets()
-    {
-        m_renderTargets.clear();
-    }
-
-    void LyShinePass::AddRenderTarget(AZ::Name name, AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage)
-    {
-        m_renderTargets[name] = attachmentImage;
-        m_needsRebuild = true;
-    }
-
     void LyShinePass::ResetInternal()
     {
         LyShinePassRequestBus::Handler::BusDisconnect();
+
+        ParentPass::ResetInternal();
     }
 
     void LyShinePass::BuildInternal()
     {
-        RemoveChildren();
-
-        // Get the current list of render targets being used across all UI Canvases
-        LyShine::AttachmentImagesAndDependents attachmentImages;
-        LyShinePassDataRequestBus::BroadcastResult( 
-            attachmentImages,
-            &LyShinePassDataRequestBus::Events::GetRenderTargets);
-
-        AddRttChildPasses(attachmentImages);
-        AddUiCanvasChildPass(attachmentImages);
-
-        Base::BuildInternal();
-
         AZ::RPI::Scene* scene = GetScene();
-        AZ_Assert(scene, "Attempting to get LyShinePass scene before it was initialized.");
         if (scene)
         {
+            // Listen for rebuild requests
             LyShinePassRequestBus::Handler::BusConnect(scene->GetId());
+
+            RemoveChildren();
+
+            // Get the current list of render targets being drawn to across all loaded UI Canvases
+            LyShine::AttachmentImagesAndDependencies attachmentImagesAndDependencies;
+            LyShinePassDataRequestBus::EventResult(
+                attachmentImagesAndDependencies,
+                scene->GetId(),
+                &LyShinePassDataRequestBus::Events::GetRenderTargets
+            );
+
+            AddRttChildPasses(attachmentImagesAndDependencies);
+            AddUiCanvasChildPass(attachmentImagesAndDependencies);
         }
     }
 
-    void LyShinePass::ImageAttachmentsChanged()
+    void LyShinePass::RebuildRttChildren()
     {
         QueueForBuildAndInitialization();
     }
 
-    void LyShinePass::AddRttChildPasses(LyShine::AttachmentImagesAndDependents attachmentImagesAndDependents)
+    void LyShinePass::AddRttChildPasses(LyShine::AttachmentImagesAndDependencies attachmentImagesAndDependencies)
     {
-        for (const auto& attachmentImageAndDescendents : attachmentImagesAndDependents)
+        for (const auto& attachmentImageAndDependencies : attachmentImagesAndDependencies)
         {
-            AddRttChildPass(attachmentImageAndDescendents.first, attachmentImageAndDescendents.second);
+            AddRttChildPass(attachmentImageAndDependencies.first, attachmentImageAndDependencies.second);
         }
     }
 
-    void LyShinePass::AddRttChildPass(AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage, AttachmentImages dependentAttachmentImages)
+    void LyShinePass::AddRttChildPass(AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage, AttachmentImages attachmentImageDependencies)
     {
         // Add a pass that renders to the specified texture
 
@@ -129,7 +111,7 @@ namespace LyShine
 
         // Pass data
         AZStd::shared_ptr<AZ::RPI::RasterPassData> passData = AZStd::make_shared<AZ::RPI::RasterPassData>();
-        passData->m_drawListTag = GetRenderTargetName(attachmentImage);
+        passData->m_drawListTag = attachmentImage->GetRHIImage()->GetName();
         passData->m_pipelineViewTag = AZ::Name("MainCamera");
         passTemplate->m_passData = AZStd::move(passData);
 
@@ -139,16 +121,17 @@ namespace LyShine
         childDesc.m_passName = AZ::Name("RttChildPass");
 
         AZ::RPI::PassSystemInterface* passSystem = AZ::RPI::PassSystemInterface::Get();
-        AZ::RPI::Ptr<AZ::RPI::Pass> rttChildPass = passSystem->CreatePass<RttChildPass>(childDesc);
+        AZ::RPI::Ptr<RttChildPass> rttChildPass = passSystem->CreatePass<RttChildPass>(childDesc);
         AZ_Assert(rttChildPass, "[LyShinePass] Unable to create %s.", passTemplate->m_name.GetCStr());
 
-        (static_cast<RttChildPass*>(rttChildPass.get()))->m_attachmentImage = attachmentImage;
-        (static_cast<RttChildPass*>(rttChildPass.get()))->m_dependentAttachmentImages = dependentAttachmentImages;
+        // Store the info needed to attach to slots and set up frame graph dependencies
+        rttChildPass->m_attachmentImage = attachmentImage;
+        rttChildPass->m_attachmentImageDependencies = attachmentImageDependencies;
 
         AddChild(rttChildPass);
     }
 
-    void LyShinePass::AddUiCanvasChildPass(LyShine::AttachmentImagesAndDependents attachmentImagesAndDependents)
+    void LyShinePass::AddUiCanvasChildPass(LyShine::AttachmentImagesAndDependencies AttachmentImagesAndDependencies)
     {
         if (!m_uiCanvasChildPass)
         {
@@ -201,33 +184,14 @@ namespace LyShine
             AZ_Assert(m_uiCanvasChildPass, "[LyShinePass] Unable to create %s.", passTemplate->m_name.GetCStr());
         }
 
-        m_uiCanvasChildPass->m_dependentAttachmentImages.clear();
-        for (const auto& attachmentImageAndDescendents : attachmentImagesAndDependents)
+        // Store the info needed to set up frame graph dependencies
+        m_uiCanvasChildPass->m_attachmentImageDependencies.clear();
+        for (const auto& attachmentImageAndDescendents : AttachmentImagesAndDependencies)
         {
-            m_uiCanvasChildPass->m_dependentAttachmentImages.emplace_back(attachmentImageAndDescendents.first);
+            m_uiCanvasChildPass->m_attachmentImageDependencies.emplace_back(attachmentImageAndDescendents.first);
         }
 
         AddChild(m_uiCanvasChildPass);
-    }
-
-    void LyShinePass::AddAttachmentImage(const AZ::Name& attachmentImageName, uint32_t width, uint32_t height)
-    {
-        AZ::RHI::ImageDescriptor imageDesc;
-        imageDesc.m_bindFlags = AZ::RHI::ImageBindFlags::ShaderReadWrite;
-        imageDesc.m_size.m_width = width;
-        imageDesc.m_size.m_height = height;
-        imageDesc.m_format = AZ::RHI::Format::R8G8B8A8_UNORM;
-
-        AZ::Data::Instance<AZ::RPI::AttachmentImagePool> pool = AZ::RPI::ImageSystemInterface::Get()->GetSystemAttachmentPool();
-        AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage = AZ::RPI::AttachmentImage::Create(*pool.get(), imageDesc,
-            attachmentImageName);
-
-        m_attachmentImages[attachmentImageName] = attachmentImage;
-    }
-
-    void LyShinePass::RemoveAttachmentImage(const AZ::Name& attachmentName)
-    {
-        m_attachmentImages.erase(attachmentName);
     }
 
     LyShineChildBasePass::LyShineChildBasePass(const AZ::RPI::PassDescriptor& descriptor)
@@ -252,14 +216,14 @@ namespace LyShine
 
     void LyShineChildBasePass::SetupFrameGraphDependencies(AZ::RHI::FrameGraphInterface frameGraph)
     {
-        for (auto attachmentImage : m_dependentAttachmentImages)
+        AZ::RPI::RasterPass::SetupFrameGraphDependencies(frameGraph);
+
+        for (auto attachmentImage : m_attachmentImageDependencies)
         {
             frameGraph.UseAttachment(AZ::RHI::ImageScopeAttachmentDescriptor{ attachmentImage->GetAttachmentId() },
                 AZ::RHI::ScopeAttachmentAccess::Read,
                 AZ::RHI::ScopeAttachmentUsage::Shader);
         }
-
-        AZ::RPI::RasterPass::SetupFrameGraphDependencies(frameGraph);
     }
 
     AZ::RPI::Ptr<RttChildPass> RttChildPass::Create(const AZ::RPI::PassDescriptor& descriptor)

@@ -301,7 +301,7 @@ namespace LyShine
         //! Test whether the render graph contains any render nodes
         bool IsEmpty();
 
-        void GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImages);
+        void GetRenderTargets(LyShine::AttachmentImagesAndDependencies& attachmentImages);
 
 #ifndef _RELEASE
         // A debug-only function useful for debugging, not called but calls can be added during debugging

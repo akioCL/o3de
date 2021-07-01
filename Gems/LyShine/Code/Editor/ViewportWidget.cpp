@@ -892,9 +892,9 @@ void ViewportWidget::OnFontTextureUpdated([[maybe_unused]] IFFont* font)
     m_fontTextureHasChanged = true;
 }
 
-LyShine::AttachmentImagesAndDependents ViewportWidget::GetRenderTargets()
+LyShine::AttachmentImagesAndDependencies ViewportWidget::GetRenderTargets()
 {
-    LyShine::AttachmentImagesAndDependents canvasTargets;
+    LyShine::AttachmentImagesAndDependencies canvasTargets;
 
     AZ::EntityId canvasEntityId;
     UiEditorMode editorMode = m_editorWindow->GetEditorMode();

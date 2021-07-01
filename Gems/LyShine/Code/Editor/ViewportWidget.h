@@ -140,7 +140,7 @@ private: // member functions
     // ~FontNotifications
 
     // LyShinePassDataRequestBus
-    LyShine::AttachmentImagesAndDependents GetRenderTargets() override;
+    LyShine::AttachmentImagesAndDependencies GetRenderTargets() override;
     // ~LyShinePassDataRequestBus
 
     // AZ::TickBus::Handler

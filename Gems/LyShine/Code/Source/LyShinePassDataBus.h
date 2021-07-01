@@ -6,9 +6,6 @@
  */
 #pragma once
 
-#include <Atom/RPI.Public/Pass/ParentPass.h>
-#include <Atom/RPI.Public/Pass/RasterPass.h>
-#include <AtomCore/std/containers/array_view.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/std/containers/vector.h>
 
@@ -24,7 +21,7 @@ namespace LyShine
 {
     using AttachmentImages = AZStd::vector<AZ::Data::Instance<AZ::RPI::AttachmentImage>>;
     using AttachmentImageAndDependentsPair = AZStd::pair<AZ::Data::Instance<AZ::RPI::AttachmentImage>, AttachmentImages>;
-    using AttachmentImagesAndDependents = AZStd::vector<AttachmentImageAndDependentsPair>;
+    using AttachmentImagesAndDependencies = AZStd::vector<AttachmentImageAndDependentsPair>;
 }
 
 class LyShinePassRequests
@@ -36,7 +33,7 @@ public:
     using BusIdType = AZ::RPI::SceneId;
 
     //! Pass needs a rebuild
-    virtual void ImageAttachmentsChanged() = 0;
+    virtual void RebuildRttChildren() = 0;
 };
 using LyShinePassRequestBus = AZ::EBus<LyShinePassRequests>;
 
@@ -49,6 +46,6 @@ public:
     using BusIdType = AZ::RPI::SceneId;
 
     //! Get a list of render targets for this pass
-    virtual LyShine::AttachmentImagesAndDependents GetRenderTargets() = 0;
+    virtual LyShine::AttachmentImagesAndDependencies GetRenderTargets() = 0;
 };
 using LyShinePassDataRequestBus = AZ::EBus<LyShinePassDataRequests>;

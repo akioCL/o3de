@@ -32,48 +32,32 @@ namespace LyShine
         virtual ~LyShinePass();
         static AZ::RPI::Ptr<LyShinePass> Create(const AZ::RPI::PassDescriptor& descriptor);
 
-        void ResetRenderTargets();
-        void AddRenderTarget(AZ::Name name, AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage);
-
     protected:
         // Pass behavior overrides
         void ResetInternal() override;
         void BuildInternal() override;
 
         // LyShinePassRequestBus overrides
-        void ImageAttachmentsChanged() override;
+        void RebuildRttChildren() override;
 
     private:
         LyShinePass() = delete;
         explicit LyShinePass(const AZ::RPI::PassDescriptor& descriptor);
 
-        // Build the child passes
-        void AddRttChildPasses(LyShine::AttachmentImagesAndDependents attachmentImagesAndDependents);
+        // Build the render to texture child passes
+        void AddRttChildPasses(LyShine::AttachmentImagesAndDependencies AttachmentImagesAndDependencies);
 
         // Add a render to texture child pass
         void AddRttChildPass(AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage, AttachmentImages dependentAttachmentImages);
 
-        // Append the final pass to render the UI Canvas elements to the screen
-        void AddUiCanvasChildPass(LyShine::AttachmentImagesAndDependents attachmentImagesAndDependents);
+        // Append the final pass to render UI Canvas elements to the screen
+        void AddUiCanvasChildPass(LyShine::AttachmentImagesAndDependencies AttachmentImagesAndDependencies);
 
-        // Add a persistent attachment
-        void AddAttachmentImage(const AZ::Name& attachmentImageName, uint32_t width, uint32_t heigh);
-
-        // Remove a persistent attachment
-        void RemoveAttachmentImage(const AZ::Name& attachmentName);
-
-        // PassAttachment name to AttachmentImages mapping
-        AZStd::unordered_map<AZ::Name, AZ::Data::Instance<AZ::RPI::AttachmentImage>> m_attachmentImages;
-
-        // Pass to render the UI Canvas elements to the screen
+        // Pass that renders the UI Canvas elements to the screen
         AZ::RPI::Ptr<UiCanvasChildPass> m_uiCanvasChildPass;
-
-        // Current render targets to add as attachments
-        AZStd::unordered_map<AZ::Name, AZ::Data::Instance<AZ::RPI::AttachmentImage>> m_renderTargets;
-        bool m_needsRebuild = false;
     };
 
-    // Child base pass with optional attachment dependencies
+    // Child base pass with potential attachment dependencies
     class LyShineChildBasePass
         : public AZ::RPI::RasterPass
     {
@@ -92,7 +76,7 @@ namespace LyShine
         void SetupFrameGraphDependencies(AZ::RHI::FrameGraphInterface frameGraph) override;
 
         AZ::RHI::DrawListTag m_drawListTag;
-        AttachmentImages m_dependentAttachmentImages;
+        AttachmentImages m_attachmentImageDependencies;
     };
 
     // Child pass that renders UI elements to a render target

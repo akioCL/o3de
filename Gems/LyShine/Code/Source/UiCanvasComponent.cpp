@@ -2024,7 +2024,7 @@ AZ::RHI::AttachmentId UiCanvasComponent::CreateRenderTarget(const AZ::Name& rend
     // LYSHINE_ATOM_TODO - preview mode is considererd in game, so this won't work for preview mode
     UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
     AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
-    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, ImageAttachmentsChanged);
+    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, RebuildRttChildren);
     
     return attachmentImage->GetAttachmentId();
 }
@@ -2037,7 +2037,7 @@ void UiCanvasComponent::DestroyRenderTarget(const AZ::RHI::AttachmentId& attachm
     // Notify pass that it needs to rebuild
     UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
     AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
-    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, ImageAttachmentsChanged);
+    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, RebuildRttChildren);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2172,7 +2172,7 @@ void UiCanvasComponent::ScheduleElementDestroy(AZ::EntityId entityId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void UiCanvasComponent::GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImages)
+void UiCanvasComponent::GetRenderTargets(LyShine::AttachmentImagesAndDependencies& attachmentImages)
 {
     m_renderGraph.GetRenderTargets(attachmentImages);
 }

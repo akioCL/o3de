@@ -1099,7 +1099,7 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void RenderGraph::GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImagesAndDependents)
+    void RenderGraph::GetRenderTargets(LyShine::AttachmentImagesAndDependencies& AttachmentImagesAndDependencies)
     {
         for (RenderNode* renderNode : m_renderTargetRenderNodes)
         {
@@ -1118,7 +1118,7 @@ namespace LyShine
                     }
                 }
 
-                attachmentImagesAndDependents.emplace_back(AttachmentImageAndDependentsPair(renderTargetRenderNode->GetRenderTarget(), attachmentImages));
+                AttachmentImagesAndDependencies.emplace_back(AttachmentImageAndDependentsPair(renderTargetRenderNode->GetRenderTarget(), attachmentImages));
             }
         }
     }

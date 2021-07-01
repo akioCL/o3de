@@ -118,7 +118,7 @@ public:
     // ~AZ::Render::Bootstrap::NotificationBus
 
     // LyShinePassDataRequestBus
-    LyShine::AttachmentImagesAndDependents GetRenderTargets() override;
+    LyShine::AttachmentImagesAndDependencies GetRenderTargets() override;
     // ~LyShinePassDataRequestBus
 
     // Get the UIRenderer for the game (which is owned by CLyShine). This is not exposed outside the gem.

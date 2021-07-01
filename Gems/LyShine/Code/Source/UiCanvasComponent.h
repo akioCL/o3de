@@ -273,7 +273,7 @@ public: // member functions
 
     bool IsRenderGraphDirty() { return m_renderGraph.GetDirtyFlag(); }
 
-    void GetRenderTargets(LyShine::AttachmentImagesAndDependents& attachmentImages);
+    void GetRenderTargets(LyShine::AttachmentImagesAndDependencies& attachmentImages);
 
 #ifndef _RELEASE
     struct DebugInfoNumElements
