@@ -546,7 +546,7 @@ namespace LyShine
 
             for (RenderNode* renderNode : m_childRenderNodes)
             {
-                renderNode->Render(uiRenderer, dynamicDraw);
+                renderNode->Render(uiRenderer, m_dynamicDraw);
             }
 
 #ifdef LYSHINE_ATOM_TODO
