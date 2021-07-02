@@ -164,6 +164,8 @@ CLyShine::CLyShine(ISystem* system)
     AzFramework::InputTextEventListener::Connect();
     UiCursorBus::Handler::BusConnect();
     AZ::TickBus::Handler::BusConnect();
+    AZ::RPI::ViewportContextNotificationBus::Handler::BusConnect(
+        AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContextName());
     AZ::Render::Bootstrap::NotificationBus::Handler::BusConnect();
 
     // These are internal Amazon components, so register them so that we can send back their names to our metrics collection
@@ -241,6 +243,7 @@ CLyShine::~CLyShine()
 {
     UiCursorBus::Handler::BusDisconnect();
     AZ::TickBus::Handler::BusDisconnect();
+    AZ::RPI::ViewportContextNotificationBus::Handler::BusDisconnect();
     AzFramework::InputTextEventListener::Disconnect();
     AzFramework::InputChannelEventListener::Disconnect();
     AZ::Render::Bootstrap::NotificationBus::Handler::BusDisconnect();
@@ -644,15 +647,18 @@ void CLyShine::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time
 {
     // Update the loaded UI canvases
     Update(deltaTime);
-
-    // Recreate dirty render graphs and send primitive data to the dynamic draw context
-    Render();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int CLyShine::GetTickOrder()
 {
     return AZ::TICK_UI;
+}
+
+void CLyShine::OnRenderTick()
+{
+    // Recreate dirty render graphs and send primitive data to the dynamic draw context
+    Render();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

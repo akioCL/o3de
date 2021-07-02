@@ -34,6 +34,8 @@ public:
 
     //! Pass needs a rebuild
     virtual void RebuildRttChildren() = 0;
+
+    virtual AZ::RPI::Pass* GetRttPass(const AZStd::string& name) = 0;
 };
 using LyShinePassRequestBus = AZ::EBus<LyShinePassRequests>;
 

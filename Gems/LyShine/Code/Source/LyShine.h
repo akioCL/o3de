@@ -15,6 +15,7 @@
 #include <AzFramework/Input/Events/InputTextEventListener.h>
 
 #include <Atom/Bootstrap/BootstrapNotificationBus.h>
+#include <Atom/RPI.Public/ViewportContextBus.h>
 #include <Atom/RPI.Reflect/Image/Image.h>
 
 #include "LyShinePassDataBus.h"
@@ -41,6 +42,7 @@ class CLyShine
     , public AzFramework::InputChannelEventListener
     , public AzFramework::InputTextEventListener
     , public AZ::TickBus::Handler
+    , public AZ::RPI::ViewportContextNotificationBus::Handler
     , protected AZ::Render::Bootstrap::NotificationBus::Handler
     , protected LyShinePassDataRequestBus::Handler
 {
@@ -107,11 +109,14 @@ public:
     // InputTextEventListener
     bool OnInputTextEventFiltered(const AZStd::string& textUTF8) override;
     // ~InputTextEventListener
-
+    
     // TickEvents
     void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
     int GetTickOrder() override;
     // ~TickEvents
+	
+    // AZ::RPI::ViewportContextNotificationBus::Handler overrides...
+    void OnRenderTick() override;
 
     // AZ::Render::Bootstrap::NotificationBus
     void OnBootstrapSceneReady(AZ::RPI::Scene* bootstrapScene) override;

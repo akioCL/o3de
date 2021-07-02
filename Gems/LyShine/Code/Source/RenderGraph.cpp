@@ -536,11 +536,15 @@ namespace LyShine
             // allow for that when we render using the render target as a source texture.
 #else
             // Use a dedicated dynamic draw context for rendering to the texture since it can only have one draw list tag
+            auto* rhiSystem = AZ::RHI::RHISystemInterface::Get();
+            auto drawListTag = rhiSystem->GetDrawListTagRegistry()->FindTag(AZ::Name(GetRenderTargetName()));
+            if (!m_dynamicDraw && drawListTag.IsValid())
+            {                
+                m_dynamicDraw = uiRenderer->CreateDynamicDrawContextForRTT(GetRenderTargetName(), drawListTag);
+            }
             if (!m_dynamicDraw)
             {
-                auto* rhiSystem = AZ::RHI::RHISystemInterface::Get();
-                auto drawListTag = rhiSystem->GetDrawListTagRegistry()->FindTag(AZ::Name(GetRenderTargetName()));
-                m_dynamicDraw = uiRenderer->CloneDynamicDrawContextWithTag(drawListTag);
+                return;
             }
 #endif
 
@@ -1037,7 +1041,7 @@ namespace LyShine
             }
         }
 #else
-        if (m_renderToRenderTargetCount < 1)
+        if (m_renderToRenderTargetCount < 2)
         {
             for (RenderNode* renderNode : m_renderTargetRenderNodes)
             {
