@@ -61,6 +61,8 @@ namespace LyShine
 
             AddRttChildPasses(attachmentImagesAndDependencies);
             AddUiCanvasChildPass(attachmentImagesAndDependencies);
+
+            ParentPass::BuildInternal();
         }
     }
 

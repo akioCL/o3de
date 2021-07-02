@@ -540,13 +540,19 @@ namespace LyShine
             {
                 auto* rhiSystem = AZ::RHI::RHISystemInterface::Get();
                 auto drawListTag = rhiSystem->GetDrawListTagRegistry()->FindTag(AZ::Name(GetRenderTargetName()));
-                m_dynamicDraw = uiRenderer->CloneDynamicDrawContextWithTag(drawListTag);
+                if (drawListTag.IsValid()) // LYSHINE_ATOM_TODO - draw list tag is invalid the first time due to it not being registered yet
+                {
+                    m_dynamicDraw = uiRenderer->CloneDynamicDrawContextWithTag(drawListTag);
+                }
             }
 #endif
 
-            for (RenderNode* renderNode : m_childRenderNodes)
+            if (m_dynamicDraw)
             {
-                renderNode->Render(uiRenderer, m_dynamicDraw);
+                for (RenderNode* renderNode : m_childRenderNodes)
+                {
+                    renderNode->Render(uiRenderer, m_dynamicDraw);
+                }
             }
 
 #ifdef LYSHINE_ATOM_TODO
@@ -1037,7 +1043,7 @@ namespace LyShine
             }
         }
 #else
-        if (m_renderToRenderTargetCount < 1)
+        //if (m_renderToRenderTargetCount < 1) // LYSHINE_ATOM_TODO - testing by rendering to render target each frame
         {
             for (RenderNode* renderNode : m_renderTargetRenderNodes)
             {
