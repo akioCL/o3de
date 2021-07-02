@@ -1,0 +1,45 @@
+@startuml TransformComponent_MarkDirty
+
+box "Component" #LightBlue
+participant NetworkTransformComponentBase
+participant MultiplayerComponent
+end box
+
+participant TransformComponent
+
+box "Controller" #LightBlue
+participant NetworkTransformComponentController
+participant NetworkTransformComponentControllerBase
+end box
+
+-> NetworkTransformComponentBase:Activate
+NetworkTransformComponentBase -> NetworkTransformComponentController:OnActivate
+NetworkTransformComponentController -> TransformComponent:BindTransformChangedEventHandler
+note over NetworkTransformComponentController: now listening for transform\nchanges in TransformComponent
+
+...
+
+TransformComponent -> NetworkTransformComponentController:OnTransformChangedEvent
+NetworkTransformComponentController -> NetworkTransformComponentControllerBase:SetTranslation
+NetworkTransformComponentControllerBase -> MultiplayerComponent:MarkDirty
+note over MultiplayerComponent:mark translation property as dirty
+
+MultiplayerComponent -> NetBindComponent : MarkDirty
+
+NetBindComponent -> NetworkEntityManager
+note over NetworkEntityManager: sign up for the next frame update
+
+...
+
+note over MultiplayerSystemComponent:OnTick
+MultiplayerSystemComponent -> NetworkEntityManager:NotifyEntitiesChanged
+NetworkEntityManager -> NetBindComponent:NotifyLocalChanges
+
+NetBindComponent -> MultiplayerComponent:NotifyStateDeltaChanges
+MultiplayerComponent -> NetworkTransformComponentBase:NotifyStateDeltaChanges
+note over NetworkTransformComponentBase: example: if any network properties\nare Authority to Clients
+NetworkTransformComponentBase -> NetworkTransformComponentBase:NotifyChangesAuthorityToClientProperties
+
+
+
+@enduml

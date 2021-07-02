@@ -1,0 +1,15 @@
+@@startuml Server to Client replication
+
+    -> "Multiplayer\nSystem\nComponent":OnTick
+    "Multiplayer\nSystem\nComponent" -> "ServerToClient\nConnectionData":Update
+    "ServerToClient\nConnectionData" -> "Entity\nReplication\nManager":SendUpdates
+    "Entity\nReplication\nManager" -> "Entity\nReplication\nManager":SendEntityUpdates
+    "Entity\nReplication\nManager" -> "Entity\nReplicator":GenerateUpdatePacket
+    "Entity\nReplicator" -> "Property\nPublisher":UpdateSerialization
+    "Property\nPublisher" -> "Property\nPublisher":SerializeUpdateEntityRecord
+    "Property\nPublisher" -> "NetBind\nComponent"::SerializeStateDeltaMessage
+    "NetBind\nComponent" -> "NetworkTransform\nComponentBase":SerializeStateDeltaMessage
+    note right: codegen
+    "NetworkTransform\nComponentBase" -> "NetworkTransform\nComponentBase":SerializeAuthorityToClientProperties
+
+@@enduml

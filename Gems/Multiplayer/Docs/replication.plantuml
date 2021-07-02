@@ -1,0 +1,13 @@
+@@startuml Replication
+
+    -> NetworkingSystemComponent:OnTick    
+    NetworkingSystemComponent -> MultiplayerPackets:DispatchPacket
+    note right: EntityUpdates packet
+    MultiplayerPackets -> MultiplayerSystemComponent:HandleRequest
+    MultiplayerSystemComponent -> EntityReplicationManager:HandleEntityUpdateMessage
+    EntityReplicationManager -> EntityReplicationManager:HandlePropertyChangeMessage
+    EntityReplicationManager -> NetworkEntityManager:CreateEntitiesImmediate
+    NetworkEntityManager -> NetBindComponent:PreInit
+    note right: mark as Autonomous
+
+@@enduml

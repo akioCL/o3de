@@ -1,0 +1,13 @@
+@@startuml ServerToClientReplicationWindow
+
+    EventSchedulerSystemComponent -> ServerToClientReplicationWindow:UpdateWindow    
+    note over ServerToClientReplicationWindow: check for entities in the player's vicinity
+    ServerToClientReplicationWindow -> ServerToClientReplicationWindow:AddEntityToReplicationSet
+    note over ServerToClientReplicationWindow: if applicable added\nto m_replicationSet
+    EventSchedulerSystemComponent -> EntityReplicationManager:UpdateWindow
+    EntityReplicationManager -> ServerToClientReplicationWindow:GetReplicationSet
+    ServerToClientReplicationWindow -> EntityReplicationManager:m_replicationSet
+    EntityReplicationManager -> EntityReplicationManager:AddEntityReplicator
+    note over EntityReplicationManager:an entity is now registered for\nthe player's connection for replication
+
+@@enduml
