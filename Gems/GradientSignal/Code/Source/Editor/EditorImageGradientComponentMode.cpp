@@ -14,6 +14,8 @@
 #include "GradientSignal_precompiled.h"
 
 #include <AzCore/Component/TransformBus.h>
+#include <AzToolsFramework/Brushes/PaintBrushRequestBus.h>
+#include <AzToolsFramework/Brushes/PaintBrushNotificationBus.h>
 #include <AzToolsFramework/Manipulators/BrushManipulator.h>
 #include <AzToolsFramework/Manipulators/ManipulatorManager.h>
 #include <AzToolsFramework/Manipulators/ManipulatorView.h>
@@ -28,131 +30,82 @@ namespace GradientSignal
         const AZ::EntityComponentIdPair& entityComponentIdPair, AZ::Uuid componentType)
         : EditorBaseComponentMode(entityComponentIdPair, componentType)
     {
-        const AZ::Color manipulatorColor = AZ::Color(1.0f, 0.0f, 0.0f, 1.0f);
-        const float manipulatorRadius = 2.0f;
-        const float manipulatorWidth = 0.05f;
+        AzToolsFramework::PaintBrushNotificationBus::Handler::BusConnect();
 
         AZ::Transform worldFromLocal = AZ::Transform::CreateIdentity();
         AZ::TransformBus::EventResult(worldFromLocal, GetEntityId(), &AZ::TransformInterface::GetWorldTM);
 
-        m_brushManipulator = AzToolsFramework::BrushManipulator::MakeShared(worldFromLocal);
+        m_brushManipulator = AzToolsFramework::BrushManipulator::MakeShared(worldFromLocal, entityComponentIdPair);
         Refresh();
-
-        m_brushManipulator->SetView(AzToolsFramework::CreateManipulatorViewProjectedCircle(
-            *m_brushManipulator, manipulatorColor, manipulatorRadius, manipulatorWidth));
 
         m_brushManipulator->Register(AzToolsFramework::g_mainManipulatorManagerId);
     }
 
     EditorImageGradientComponentMode::~EditorImageGradientComponentMode()
     {
+        AzToolsFramework::PaintBrushNotificationBus::Handler::BusDisconnect();
         m_brushManipulator->Unregister();
-    }
-
-    void EditorImageGradientComponentMode::HandlePaintArea(const AZ::Vector3& center)
-    {
-        if (m_isPainting)
-        {
-            auto SetValue = [this](float x, float y)
-            {
-                GradientSignal::GradientSampleParams params;
-                params.m_position = AZ::Vector3(x, y, 0.0f);
-
-                const float newValue = 1.0f;
-                GradientRequestBus::Event(GetEntityId(), &GradientRequestBus::Events::SetValue, params, newValue);
-            };
-
-            AZ::Aabb shapeBounds;
-            LmbrCentral::ShapeComponentRequestsBus::EventResult(
-                shapeBounds, GetEntityId(), &LmbrCentral::ShapeComponentRequestsBus::Events::GetEncompassingAabb);
-
-            uint32_t imageHeight = 0, imageWidth = 0;
-            ImageGradientRequestBus::EventResult(imageHeight, GetEntityId(), &ImageGradientRequestBus::Events::GetImageHeight);
-            ImageGradientRequestBus::EventResult(imageWidth, GetEntityId(), &ImageGradientRequestBus::Events::GetImageWidth);
-
-            const float xStep = shapeBounds.GetXExtent() / imageWidth;
-            const float yStep = shapeBounds.GetYExtent() / imageHeight;
-
-            const float manipulatorRadius = 2.0f;
-            const float manipulatorRadiusSq = manipulatorRadius * manipulatorRadius;
-            const float xCenter = center.GetX();
-            const float yCenter = center.GetY();
-
-            for (float y = yCenter - manipulatorRadius; y <= yCenter + manipulatorRadius; y += yStep)
-            {
-                for (float x = xCenter - manipulatorRadius; x <= xCenter + manipulatorRadius; x += xStep)
-                {
-                    const float xDiffSq = (x - xCenter) * (x - xCenter);
-                    const float yDiffSq = (y - yCenter) * (y - yCenter);
-                    if (xDiffSq + yDiffSq <= manipulatorRadiusSq)
-                    {
-                        SetValue(x, y);
-                    }
-                }
-            }
-
-            LmbrCentral::DependencyNotificationBus::Event(
-                GetEntityId(), &LmbrCentral::DependencyNotificationBus::Events::OnCompositionChanged);
-        }
-    }
-
-    bool EditorImageGradientComponentMode::HandleMouseEvent(
-        const AzToolsFramework::ViewportInteraction::MouseInteractionEvent& mouseInteraction)
-    {
-        float closestDistance = std::numeric_limits<float>::max();
-        AZ::EntityId entityIdUnderCursor;
-        const int viewportId = mouseInteraction.m_mouseInteraction.m_interactionId.m_viewportId;
-
-        auto selectionFunction = [this, &closestDistance, &entityIdUnderCursor, &mouseInteraction, &viewportId](AZ::Entity* entity)
-        {
-            if (AzToolsFramework::PickEntity(entity->GetId(), mouseInteraction.m_mouseInteraction, closestDistance, viewportId))
-            {
-                entityIdUnderCursor = entity->GetId();
-            }
-        };
-
-        AZ::ComponentApplicationBus::Broadcast(&AZ::ComponentApplicationRequests::EnumerateEntities, selectionFunction);
-
-        if (entityIdUnderCursor.IsValid())
-        {
-            AZ::Vector3 result = mouseInteraction.m_mouseInteraction.m_mousePick.m_rayOrigin +
-                mouseInteraction.m_mouseInteraction.m_mousePick.m_rayDirection * closestDistance;
-
-            AZ::Transform space = AZ::Transform::CreateTranslation(result);
-            m_brushManipulator->SetSpace(space);
-
-            HandlePaintArea(result);
-
-            return true;
-        }
-
-        return false;
     }
 
     bool EditorImageGradientComponentMode::HandleMouseInteraction(
         const AzToolsFramework::ViewportInteraction::MouseInteractionEvent& mouseInteraction)
     {
-        if (mouseInteraction.m_mouseEvent == AzToolsFramework::ViewportInteraction::MouseEvent::Move)
+        bool result = false;
+
+        AzToolsFramework::PaintBrushRequestBus::EventResult(
+            result, GetEntityComponentIdPair(), &AzToolsFramework::PaintBrushRequestBus::Events::HandleMouseInteraction, mouseInteraction);
+        return result;
+    }
+
+    void EditorImageGradientComponentMode::OnRadiusChanged(float radius)
+    {
+        m_brushManipulator->SetRadius(radius);
+    }
+    
+    void EditorImageGradientComponentMode::OnWorldSpaceChanged(AZ::Transform result)
+    {
+        m_brushManipulator->SetSpace(result);
+    }
+
+    void EditorImageGradientComponentMode::OnPaint(const AZ::Aabb& dirtyArea)
+    {
+        uint32_t imageHeight = 0;
+        uint32_t imageWidth = 0;
+        ImageGradientRequestBus::EventResult(imageHeight, GetEntityId(), &ImageGradientRequestBus::Events::GetImageHeight);
+        ImageGradientRequestBus::EventResult(imageWidth, GetEntityId(), &ImageGradientRequestBus::Events::GetImageWidth);
+
+        const float xStep = dirtyArea.GetXExtent() / imageWidth;
+        const float yStep = dirtyArea.GetYExtent() / imageHeight;
+
+        const AZ::Vector3 minDistances = dirtyArea.GetMin();
+        const AZ::Vector3 maxDistances = dirtyArea.GetMax();
+
+        for (float y = minDistances.GetY(); y <= maxDistances.GetY(); y += yStep)
         {
-            return HandleMouseEvent(mouseInteraction);
-        }
-        else if (mouseInteraction.m_mouseEvent == AzToolsFramework::ViewportInteraction::MouseEvent::Down)
-        {
-            if (mouseInteraction.m_mouseInteraction.m_mouseButtons.Left())
+            for (float x = minDistances.GetX(); x <= maxDistances.GetX(); x += xStep)
             {
-                m_isPainting = true;
-                HandleMouseEvent(mouseInteraction);
-                return true;
+                float intensity = 0.0f;
+                float opacity = 0.0f;
+                bool isValid = false;
+
+                AZ::Vector3 point = AZ::Vector3(x, y, minDistances.GetZ());
+
+                AzToolsFramework::PaintBrushRequestBus::Event(
+                    GetEntityComponentIdPair(), &AzToolsFramework::PaintBrushRequestBus::Events::GetValue, point, intensity, opacity, isValid);
+                if (isValid)
+                {
+                    GradientSignal::GradientSampleParams params;
+                    params.m_position = point;
+
+                    float oldValue = 0.0f;
+                    GradientRequestBus::EventResult(oldValue, GetEntityId(), &GradientRequestBus::Events::GetValue, params);
+
+                    float newValue = opacity * intensity + (1.0f - opacity) * oldValue;
+                    GradientRequestBus::Event(GetEntityId(), &GradientRequestBus::Events::SetValue, params, newValue);
+                }
             }
         }
-        else if (mouseInteraction.m_mouseEvent == AzToolsFramework::ViewportInteraction::MouseEvent::Up)
-        {
-            if (mouseInteraction.m_mouseInteraction.m_mouseButtons.Left())
-            {
-                m_isPainting = false;
-                return true;
-            }
-        }
-        return false;
+
+        LmbrCentral::DependencyNotificationBus::Event(GetEntityId(), &LmbrCentral::DependencyNotificationBus::Events::OnCompositionChanged);
     }
 } // namespace GradientSignal

@@ -20,12 +20,12 @@
 
 namespace AzToolsFramework
 {
-    class ManipulatorView;
+    class ManipulatorViewProjectedCircle;
 
     class BrushManipulator : public BaseManipulator, public ManipulatorSpace
     {
         //! Private constructor.
-        BrushManipulator(const AZ::Transform& worldFromLocal);
+        BrushManipulator(const AZ::Transform& worldFromLocal, const AZ::EntityComponentIdPair& entityComponentIdPair);
 
     public:
         AZ_RTTI(BrushManipulator, "{0621CB58-21FD-474A-A296-5B1192E714E7}", BaseManipulator);
@@ -38,7 +38,8 @@ namespace AzToolsFramework
         ~BrushManipulator() = default;
 
         //! A Manipulator must only be created and managed through a shared_ptr.
-        static AZStd::shared_ptr<BrushManipulator> MakeShared(const AZ::Transform& worldFromLocal);
+        static AZStd::shared_ptr<BrushManipulator> MakeShared(
+            const AZ::Transform& worldFromLocal, const AZ::EntityComponentIdPair& entityComponentIdPair);
 
         //! The state of the manipulator at the start of an interaction.
         struct Start
@@ -62,7 +63,8 @@ namespace AzToolsFramework
             const ManipulatorManagerState& managerState, AzFramework::DebugDisplayRequests& debugDisplay,
             const AzFramework::CameraState& cameraState, const ViewportInteraction::MouseInteraction& mouseInteraction) override;
 
-        void SetView(AZStd::shared_ptr<ManipulatorView> view);
+        void SetView(AZStd::shared_ptr<ManipulatorViewProjectedCircle> view);
+        void SetRadius(const float radius);
 
     private:
         struct StartInternal
@@ -83,7 +85,7 @@ namespace AzToolsFramework
 
         ActionInternal m_actionInternal;
 
-        AZStd::shared_ptr<ManipulatorView> m_manipulatorView;
+        AZStd::shared_ptr<ManipulatorViewProjectedCircle> m_manipulatorView;
     };
 } // namespace AzToolsFramework
 #pragma once
