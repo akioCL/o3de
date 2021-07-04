@@ -6,6 +6,7 @@
  */
 #include "LyShine_precompiled.h"
 #include "UiRenderer.h"
+#include "LyShinePassDataBus.h"
 
 #include <Atom/RPI.Public/Image/ImageSystemInterface.h>
 #include <Atom/RPI.Public/DynamicDraw/DynamicDrawInterface.h>
@@ -225,14 +226,43 @@ AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> UiRenderer::GetDynamicDrawContext()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> UiRenderer::CloneDynamicDrawContextWithTag(AZ::RHI::DrawListTag drawListTag)
+AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> UiRenderer::CreateDynamicDrawContextForRTT(const AZStd::string& rttName, AZ::RHI::DrawListTag drawListTag)
 {
-    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw;
-    AZ_Assert(m_dynamicDraw, "Can't clone the dynamic draw context before it was created.");
-    if (m_dynamicDraw)
+    if (!drawListTag.IsValid())
     {
-        dynamicDraw = CreateDynamicDrawContext(m_scene, m_dynamicDraw->GetShader(), drawListTag);
+        return nullptr;
     }
+
+    // find the rtt pass with this draw list tag
+    AZ::RPI::Pass* rttPass = nullptr;    
+    AZ::RPI::SceneId sceneId = m_scene->GetId();
+    LyShinePassRequestBus::EventResult(rttPass, sceneId, &LyShinePassRequestBus::Events::GetRttPass, rttName);
+    AZ::RPI::RenderPass* renderPass = azrtti_cast<AZ::RPI::RenderPass*>(rttPass);
+    if (!renderPass)
+    {
+        return nullptr;
+    }
+
+    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw = AZ::RPI::DynamicDrawInterface::Get()->CreateDynamicDrawContext(m_scene.get());
+
+    // Initialize the dynamic draw context
+    dynamicDraw->InitShader(m_dynamicDraw->GetShader());
+    dynamicDraw->InitVertexFormat(
+        { { "POSITION", AZ::RHI::Format::R32G32_FLOAT },
+        { "COLOR", AZ::RHI::Format::B8G8R8A8_UNORM },
+        { "TEXCOORD", AZ::RHI::Format::R32G32_FLOAT },
+        { "BLENDINDICES", AZ::RHI::Format::R16G16_UINT } }
+    );
+    dynamicDraw->AddDrawStateOptions(AZ::RPI::DynamicDrawContext::DrawStateOptions::StencilState
+        | AZ::RPI::DynamicDrawContext::DrawStateOptions::BlendMode);
+
+    dynamicDraw->InitDrawListTag(drawListTag);
+
+    dynamicDraw->CustomizePipelineState([renderPass] (AZ::RHI::Ptr<AZ::RPI::PipelineStateForDraw> pipelineState) {
+            pipelineState->SetOutputFromPass(renderPass);
+        });
+
+    dynamicDraw->EndInit();
 
     return dynamicDraw;
 }

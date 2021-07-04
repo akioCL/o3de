@@ -64,11 +64,25 @@ namespace LyShine
 
             ParentPass::BuildInternal();
         }
+
+        Base::BuildInternal();
     }
 
     void LyShinePass::RebuildRttChildren()
     {
         QueueForBuildAndInitialization();
+    }
+
+    AZ::RPI::Pass* LyShinePass::GetRttPass(const AZStd::string& name)
+    {
+        for (auto child:m_children)
+        {
+            if (child->GetName() == AZ::Name(name))
+            {
+                return child.get();
+            }
+        }
+        return nullptr;
     }
 
     void LyShinePass::AddRttChildPasses(LyShine::AttachmentImagesAndDependencies attachmentImagesAndDependencies)
@@ -115,12 +129,14 @@ namespace LyShine
         AZStd::shared_ptr<AZ::RPI::RasterPassData> passData = AZStd::make_shared<AZ::RPI::RasterPassData>();
         passData->m_drawListTag = attachmentImage->GetRHIImage()->GetName();
         passData->m_pipelineViewTag = AZ::Name("MainCamera");
+        auto size = attachmentImage->GetRHIImage()->GetDescriptor().m_size;
+        passData->m_overrideScissor = AZ::RHI::Scissor(0, 0, size.m_width, size.m_height);
+        passData->m_overrideViewport = AZ::RHI::Viewport(0, size.m_width, 0, size.m_height);
         passTemplate->m_passData = AZStd::move(passData);
-
         // Create a pass descriptor for the new child pass
         AZ::RPI::PassDescriptor childDesc;
         childDesc.m_passTemplate = passTemplate;
-        childDesc.m_passName = AZ::Name("RttChildPass");
+        childDesc.m_passName = attachmentImage->GetAttachmentId();
 
         AZ::RPI::PassSystemInterface* passSystem = AZ::RPI::PassSystemInterface::Get();
         AZ::RPI::Ptr<RttChildPass> rttChildPass = passSystem->CreatePass<RttChildPass>(childDesc);

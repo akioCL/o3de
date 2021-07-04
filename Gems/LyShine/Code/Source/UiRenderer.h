@@ -90,8 +90,7 @@ public: // member functions
     //! Return the dynamic draw context associated with this UI renderer
     AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> GetDynamicDrawContext();
 
-    //! Creates a dynamic draw context with a unique draw list tag. Used for rendering UI elements to a texture
-    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> CloneDynamicDrawContextWithTag(AZ::RHI::DrawListTag drawListTag);
+    AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> CreateDynamicDrawContextForRTT(const AZStd::string& rttName, AZ::RHI::DrawListTag drawListTag);
 
     //! Return the shader data for the ui shader
     const UiShaderData& GetUiShaderData();

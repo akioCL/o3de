@@ -1043,7 +1043,7 @@ namespace LyShine
             }
         }
 #else
-        //if (m_renderToRenderTargetCount < 1) // LYSHINE_ATOM_TODO - testing by rendering to render target each frame
+        if (m_renderToRenderTargetCount < 2)
         {
             for (RenderNode* renderNode : m_renderTargetRenderNodes)
             {

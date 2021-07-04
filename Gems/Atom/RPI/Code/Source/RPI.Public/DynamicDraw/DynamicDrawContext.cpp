@@ -183,7 +183,12 @@ namespace AZ
             }
 
             m_pipelineState->SetOutputFromScene(m_scene, m_drawListTag);
-            m_pipelineState->Finalize();
+            auto pipelineState = m_pipelineState->Finalize();
+            if (pipelineState == nullptr)
+            {
+                AZ_Warning("RPI", false, "Failed to initialize DynamicDrawContext because RHI::PipelineState wasn't created");
+                return;
+            }
             m_initialized = true;
 
             // Acquire MultiStates from m_pipelineState
