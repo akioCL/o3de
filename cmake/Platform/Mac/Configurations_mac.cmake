@@ -16,6 +16,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
             __APPLE__
             DARWIN
         LINK_NON_STATIC
+            # This is specific to Mac's BSD linker `ld`, and causes errors if there are undefined symbols at link time
+            -Wl,-undefined,error
             -headerpad_max_install_names
             -lpthread
             -lncurses

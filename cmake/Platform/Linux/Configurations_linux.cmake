@@ -17,6 +17,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         COMPILATION
             -fPIC
             -msse4.1
+        LINK_NON_STATIC
+            # This is specific to GNU ld, the linker used on Linux, and causes errors if there are undefined symbols at
+            # link time
+            -Wl,--no-undefined
     )
     ly_set(CMAKE_CXX_EXTENSIONS OFF)
 else()
