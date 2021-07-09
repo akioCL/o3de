@@ -19,6 +19,7 @@
 #include <AzCore/RTTI/AttributeReader.h>
 #include <AzCore/std/optional.h>
 #include <AzFramework/StringFunc/StringFunc.h>
+#include <AzToolsFramework/API/EditorPythonConsoleBus.h>
 
 namespace EditorPythonBindings
 {
@@ -260,7 +261,19 @@ namespace EditorPythonBindings
 
             static void OnEventGenericHook(void* userData, const char* eventName, int eventIndex, AZ::BehaviorValueParameter* result, int numParameters, AZ::BehaviorValueParameter* parameters)
             {
-                reinterpret_cast<PythonProxyNotificationHandler*>(userData)->OnEventGenericHook(eventName, eventIndex, result, numParameters, parameters);
+                if (auto editorPythonEventsInterface = AZ::Interface<AzToolsFramework::EditorPythonEventsInterface>::Get())
+                {
+                    bool executed = editorPythonEventsInterface->TryExecuteWithLock(
+                        [userData, eventName, eventIndex, result, numParameters, parameters]()
+                        {
+                            reinterpret_cast<PythonProxyNotificationHandler*>(userData)->OnEventGenericHook(eventName, eventIndex, result, numParameters, parameters);
+                        });
+
+                    if (!executed)
+                    {
+                        AZ_Error("PythonProxyNotificationHandler", false, "OnEventGenericHook: Failed to lock GIL");
+                    }
+                }
             }
 
             void OnEventGenericHook(const char* eventName, [[maybe_unused]] int eventIndex, [[maybe_unused]] AZ::BehaviorValueParameter* result, int numParameters, AZ::BehaviorValueParameter* parameters)

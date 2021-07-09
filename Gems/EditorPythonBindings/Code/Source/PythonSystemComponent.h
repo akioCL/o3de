@@ -46,6 +46,7 @@ namespace EditorPythonBindings
         bool StopPython(bool silenceWarnings = false) override;
         void WaitForInitialization() override;
         void ExecuteWithLock(AZStd::function<void()> executionCallback) override;
+        bool TryExecuteWithLock(AZStd::function<void()> executionCallback) override;
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////

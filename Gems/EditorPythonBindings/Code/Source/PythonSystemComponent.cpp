@@ -341,6 +341,20 @@ namespace EditorPythonBindings
         executionCallback();
     }
 
+    bool PythonSystemComponent::TryExecuteWithLock(AZStd::function<void()> executionCallback)
+    {
+        if (m_lock.try_lock())
+        {
+            pybind11::gil_scoped_release release;
+            pybind11::gil_scoped_acquire acquire;
+            executionCallback();
+
+            m_lock.unlock();
+            return true;
+        }
+        return false;
+    }
+
     void PythonSystemComponent::DiscoverPythonPaths(PythonPathStack& pythonPathStack)
     {
         // the order of the Python paths is the order the Python bootstrap scripts will execute
