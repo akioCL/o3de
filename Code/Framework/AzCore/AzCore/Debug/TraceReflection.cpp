@@ -51,18 +51,23 @@ namespace AZ
                 , OnOutput
             );
 
-            void Disconnect() override {
+            // AZ::BehaviorEBusHandler overrides...
+            void Disconnect() override
+            {
                 AZ::Debug::TraceMessageBus::Handler::BusDisconnect();
                 AZ::TickBus::Handler::BusDisconnect();
             }
-            bool Connect(AZ::BehaviorValueParameter* id = nullptr) override {
+            bool Connect(AZ::BehaviorValueParameter* id = nullptr) override
+            {
                 AZ::TickBus::Handler::BusConnect();
                 return AZ::Internal::EBusConnector<AZ::Debug::TraceMessageBus::Handler>::Connect(this, id);
             }
-            bool IsConnected() override {
+            bool IsConnected() override
+            {
                 return AZ::Internal::EBusConnector<AZ::Debug::TraceMessageBus::Handler>::IsConnected(this);
             }
-            bool IsConnectedId(AZ::BehaviorValueParameter* id) override {
+            bool IsConnectedId(AZ::BehaviorValueParameter* id) override
+            {
                 return AZ::Internal::EBusConnector<AZ::Debug::TraceMessageBus::Handler>::IsConnectedId(this, id);
             }
 
@@ -108,7 +113,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, fileNameString = AZStd::string(fileName), line, funcString = AZStd::string(func), messageString = AZStd::string(message)]()
                 {
-                    CallResultReturn(false, FN_OnPreAssert, fileNameString, line, funcString, messageString);
+                    CallResultReturn(false, FN_OnPreAssert, fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
                 });
         }
 
@@ -117,7 +122,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, windowString = AZStd::string(window), fileNameString = AZStd::string(fileName), line, funcString = AZStd::string(func), messageString = AZStd::string(message)]()
                 {
-                    CallResultReturn(false, FN_OnPreError, windowString, fileNameString, line, funcString, messageString);
+                    CallResultReturn(false, FN_OnPreError, windowString.c_str(), fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
                 });
         }
 
@@ -126,7 +131,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, windowString = AZStd::string(window), fileNameString = AZStd::string(fileName), line, funcString = AZStd::string(func), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnPreWarning, windowString, fileNameString, line, funcString, messageString);
+                    return CallResultReturn(false, FN_OnPreWarning, windowString.c_str(), fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
                 });
         }
 
@@ -135,7 +140,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnAssert, messageString);
+                    return CallResultReturn(false, FN_OnAssert, messageString.c_str());
                 });
         }
 
@@ -144,7 +149,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnError, windowString, messageString);
+                    return CallResultReturn(false, FN_OnError, windowString.c_str(), messageString.c_str());
                 });
         }
 
@@ -153,7 +158,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnWarning, windowString, messageString);
+                    return CallResultReturn(false, FN_OnWarning, windowString.c_str(), messageString.c_str());
                 });
         }
 
@@ -162,7 +167,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnException, messageString);
+                    return CallResultReturn(false, FN_OnException, messageString.c_str());
                 });
         }
 
@@ -171,7 +176,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnPrintf, windowString, messageString);
+                    return CallResultReturn(false, FN_OnPrintf, windowString.c_str(), messageString.c_str());
                 });
         }
 
@@ -180,7 +185,7 @@ namespace AZ
             return QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnOutput, windowString, messageString);
+                    return CallResultReturn(false, FN_OnOutput, windowString.c_str(), messageString.c_str());
                 });
         }
 
