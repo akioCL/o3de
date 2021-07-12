@@ -457,7 +457,9 @@ void UiFaderComponent::CreateOrResizeRenderTarget(const AZ::Vector2& pixelAligne
     m_viewportTopLeft = pixelAlignedTopLeft;
     m_viewportSize = renderTargetSize;
 
-#ifdef LYSHINE_ATOM_TODO // [LYN-3359] Support RTT using Atom
+    // LYSHINE_ATOM_TODO: optimize - reuse targets
+    DestroyRenderTarget();
+
     // Check if the render target already exists
     if (m_attachmentImage)
     {
@@ -486,7 +488,6 @@ void UiFaderComponent::CreateOrResizeRenderTarget(const AZ::Vector2& pixelAligne
         }
     }
 
-#endif
     // at this point either all render targets and depth surfaces are created or none are.
     // If all succeeded then update the render target size
     if (m_attachmentImage)
@@ -503,6 +504,11 @@ void UiFaderComponent::DestroyRenderTarget()
 {
     if (m_attachmentImage)
     {
+        AZ::EntityId canvasEntityId;
+        EBUS_EVENT_ID_RESULT(canvasEntityId, GetEntityId(), UiElementBus, GetCanvasEntityId);
+        AZ::RHI::AttachmentId attachmentId = m_attachmentImage->GetAttachmentId();
+        EBUS_EVENT_ID(canvasEntityId, LyShine::RenderToTextureRequestBus, DestroyRenderTarget, attachmentId);
+
         m_attachmentImage.reset();
     }
 }
@@ -607,14 +613,13 @@ void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElem
             float desiredAlpha = renderGraph->GetAlphaFade() * m_fade;
             uint8 desiredPackedAlpha = static_cast<uint8>(desiredAlpha * 255.0f);
 
-            UCol desiredPackedColor;
-            // This is a special case. We have an input texture that already has premultiplied alpha.
-            // So we tell the shader not to premultiply the output colors and we premultiply the alpha
-            // into the vertex colors so that they are premultiplied too.
-            desiredPackedColor.r = desiredPackedColor.g = desiredPackedColor.b = desiredPackedColor.a = desiredPackedAlpha;
-            if (m_cachedPrimitive.m_vertices[0].color.dcolor != desiredPackedColor.dcolor)
+            // If the fade value has changed we need to update the alpha values in the vertex colors but we do
+            // not want to touch or recompute the RGB values
+            if (m_cachedPrimitive.m_vertices[0].color.a != desiredPackedAlpha)
             {
-                // go through the cached vertices and update the color values
+                // go through all the cached vertices and update the alpha values
+                UCol desiredPackedColor = m_cachedPrimitive.m_vertices[0].color;
+                desiredPackedColor.a = desiredPackedAlpha;
                 for (int i = 0; i < m_cachedPrimitive.m_numVertices; ++i)
                 {
                     m_cachedPrimitive.m_vertices[i].color = desiredPackedColor;
@@ -622,7 +627,6 @@ void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElem
             }
         }
 
-#ifdef LYSHINE_ATOM_TODO // [LYN-3359] Support RTT using Atom
         // Add a primitive to render a quad using the render target we have created
         {
             LyShine::RenderGraph* lyRenderGraph = dynamic_cast<LyShine::RenderGraph*>(renderGraph); // LYSHINE_ATOM_TODO - downcasting will be removed in future PR
@@ -637,7 +641,6 @@ void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElem
                 lyRenderGraph->AddPrimitiveAtom(&m_cachedPrimitive, image, isClampTextureMode, isTextureSRGB, isTexturePremultipliedAlpha, blendMode);
             }
         }
-#endif
     }
 }
 

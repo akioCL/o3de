@@ -168,19 +168,26 @@ void UiRenderer::CacheShaderData(const AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext>
         isClampIndexName);
 
     // Cache shader variants that will be used
-    // LYSHINE_ATOM_TODO - more variants will be used in future phase (masks/render target support)
-    AZ::RPI::ShaderOptionList shaderOptionsDefault;
-    shaderOptionsDefault.push_back(AZ::RPI::ShaderOption(AZ::Name("o_preMultiplyAlpha"), AZ::Name("false")));
-    shaderOptionsDefault.push_back(AZ::RPI::ShaderOption(AZ::Name("o_alphaTest"), AZ::Name("false")));
-    shaderOptionsDefault.push_back(AZ::RPI::ShaderOption(AZ::Name("o_srgbWrite"), AZ::Name("true")));
-    shaderOptionsDefault.push_back(AZ::RPI::ShaderOption(AZ::Name("o_modulate"), AZ::Name("Modulate::None")));
-    m_uiShaderData.m_shaderVariantDefault = dynamicDraw->UseShaderVariant(shaderOptionsDefault);
-    AZ::RPI::ShaderOptionList shaderOptionsAlphaTest;
-    shaderOptionsAlphaTest.push_back(AZ::RPI::ShaderOption(AZ::Name("o_preMultiplyAlpha"), AZ::Name("false")));
-    shaderOptionsAlphaTest.push_back(AZ::RPI::ShaderOption(AZ::Name("o_alphaTest"), AZ::Name("true")));
-    shaderOptionsAlphaTest.push_back(AZ::RPI::ShaderOption(AZ::Name("o_srgbWrite"), AZ::Name("true")));
-    shaderOptionsAlphaTest.push_back(AZ::RPI::ShaderOption(AZ::Name("o_modulate"), AZ::Name("Modulate::None")));
-    m_uiShaderData.m_shaderVariantAlphaTest = dynamicDraw->UseShaderVariant(shaderOptionsAlphaTest);
+    AZ::RPI::ShaderOptionList shaderOptionsTextureLinear;
+    shaderOptionsTextureLinear.push_back(AZ::RPI::ShaderOption(AZ::Name("o_alphaTest"), AZ::Name("false")));
+    shaderOptionsTextureLinear.push_back(AZ::RPI::ShaderOption(AZ::Name("o_srgbWrite"), AZ::Name("true")));
+    shaderOptionsTextureLinear.push_back(AZ::RPI::ShaderOption(AZ::Name("o_modulate"), AZ::Name("Modulate::None")));
+    m_uiShaderData.m_shaderVariantTextureLinear = dynamicDraw->UseShaderVariant(shaderOptionsTextureLinear);
+    AZ::RPI::ShaderOptionList shaderOptionsTextureSrgb;
+    shaderOptionsTextureSrgb.push_back(AZ::RPI::ShaderOption(AZ::Name("o_alphaTest"), AZ::Name("false")));
+    shaderOptionsTextureSrgb.push_back(AZ::RPI::ShaderOption(AZ::Name("o_srgbWrite"), AZ::Name("false")));
+    shaderOptionsTextureSrgb.push_back(AZ::RPI::ShaderOption(AZ::Name("o_modulate"), AZ::Name("Modulate::None")));
+    m_uiShaderData.m_shaderVariantTextureSrgb = dynamicDraw->UseShaderVariant(shaderOptionsTextureSrgb);
+    AZ::RPI::ShaderOptionList shaderVariantAlphaTestMask;
+    shaderVariantAlphaTestMask.push_back(AZ::RPI::ShaderOption(AZ::Name("o_alphaTest"), AZ::Name("true")));
+    shaderVariantAlphaTestMask.push_back(AZ::RPI::ShaderOption(AZ::Name("o_srgbWrite"), AZ::Name("false")));
+    shaderVariantAlphaTestMask.push_back(AZ::RPI::ShaderOption(AZ::Name("o_modulate"), AZ::Name("Modulate::None")));
+    m_uiShaderData.m_shaderVariantAlphaTestMask = dynamicDraw->UseShaderVariant(shaderVariantAlphaTestMask);
+    AZ::RPI::ShaderOptionList shaderVariantGradientMask;
+    shaderVariantGradientMask.push_back(AZ::RPI::ShaderOption(AZ::Name("o_alphaTest"), AZ::Name("false")));
+    shaderVariantGradientMask.push_back(AZ::RPI::ShaderOption(AZ::Name("o_srgbWrite"), AZ::Name("false")));
+    shaderVariantGradientMask.push_back(AZ::RPI::ShaderOption(AZ::Name("o_modulate"), AZ::Name("Modulate::Alpha")));
+    m_uiShaderData.m_shaderVariantGradientMask = dynamicDraw->UseShaderVariant(shaderVariantGradientMask);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -322,11 +329,27 @@ void UiRenderer::SetBaseState(BaseState state)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 AZ::RPI::ShaderVariantId UiRenderer::GetCurrentShaderVariant()
 {
-    AZ::RPI::ShaderVariantId variantId = m_uiShaderData.m_shaderVariantDefault;
+    AZ::RPI::ShaderVariantId variantId = m_uiShaderData.m_shaderVariantTextureLinear;
 
     if (m_baseState.m_useAlphaTest)
     {
-        variantId = m_uiShaderData.m_shaderVariantAlphaTest;
+        variantId = m_uiShaderData.m_shaderVariantAlphaTestMask;
+    }
+    else if (m_baseState.m_modulateAlpha)
+    {
+        variantId = m_uiShaderData.m_shaderVariantGradientMask;
+    }
+    else if (!m_baseState.m_useAlphaTest && m_baseState.m_srgbWrite)
+    {
+        variantId = m_uiShaderData.m_shaderVariantTextureLinear;
+    }
+    else if (!m_baseState.m_useAlphaTest && !m_baseState.m_srgbWrite)
+    {
+        variantId = m_uiShaderData.m_shaderVariantTextureSrgb;
+    }
+    else
+    {
+        AZ_Error(LogName, 0, "Unsupported shader variant.");
     }
 
     return variantId;

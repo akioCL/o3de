@@ -14,6 +14,8 @@
 #include <Atom/RHI/DrawListTagRegistry.h>
 #include <Atom/RHI/RHISystemInterface.h>
 
+#include <AzCore/Math/MatrixUtils.h>
+
 #ifndef _RELEASE
 #include <AzCore/Asset/AssetManagerBus.h>
 #include <AzFramework/IO/LocalFileIO.h>
@@ -81,7 +83,9 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void PrimitiveListRenderNode::Render(UiRenderer* uiRenderer, AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
+    void PrimitiveListRenderNode::Render(UiRenderer* uiRenderer
+        , const AZ::Matrix4x4& modelViewProjMat
+        , AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
 #ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (masks/render targets)
         for (int i = 0; i < m_numTextures; ++i)
@@ -131,6 +135,19 @@ namespace LyShine
             return;
         }
 
+        UiRenderer::BaseState curBaseState = uiRenderer->GetBaseState();
+        UiRenderer::BaseState prevBaseState = curBaseState;
+        if (m_isTextureSRGB)
+        {
+            curBaseState.m_srgbWrite = false;
+        }
+
+        if (m_alphaMaskType == AlphaMaskType::ModulateAlpha)
+        {
+            curBaseState.m_modulateAlpha = true;
+        }
+        uiRenderer->SetBaseState(curBaseState);
+
         const UiRenderer::UiShaderData& uiShaderData = uiRenderer->GetUiShaderData();
 
         // Set render state
@@ -169,7 +186,7 @@ namespace LyShine
         drawSrg->SetConstant(uiShaderData.m_isClampInputIndex, isClampTextureMode);
 
         // Set projection matrix
-        drawSrg->SetConstant(uiShaderData.m_viewProjInputIndex, uiRenderer->GetModelViewProjectionMatrix());
+        drawSrg->SetConstant(uiShaderData.m_viewProjInputIndex, modelViewProjMat);
 
         drawSrg->Compile();
 
@@ -182,6 +199,8 @@ namespace LyShine
         {
             dynamicDraw->DrawIndexed(primitive.m_vertices, primitive.m_numVertices, primitive.m_indices, primitive.m_numIndices, AZ::RHI::IndexFormat::Uint16, drawSrg);
         }
+
+        uiRenderer->SetBaseState(prevBaseState);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +324,9 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void MaskRenderNode::Render(UiRenderer* uiRenderer, AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
+    void MaskRenderNode::Render(UiRenderer* uiRenderer
+        , const AZ::Matrix4x4& modelViewProjMat
+        , AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
         UiRenderer::BaseState priorBaseState = uiRenderer->GetBaseState();
 
@@ -314,14 +335,14 @@ namespace LyShine
             SetupBeforeRenderingMask(uiRenderer, dynamicDraw, true, priorBaseState);
             for (RenderNode* renderNode : m_maskRenderNodes)
             {
-                renderNode->Render(uiRenderer, dynamicDraw);
+                renderNode->Render(uiRenderer, modelViewProjMat, dynamicDraw);
             }
             SetupAfterRenderingMask(uiRenderer, dynamicDraw, true, priorBaseState);
         }
 
         for (RenderNode* renderNode : m_contentRenderNodes)
         {
-            renderNode->Render(uiRenderer, dynamicDraw);
+            renderNode->Render(uiRenderer, modelViewProjMat, dynamicDraw);
         }
 
         if (m_isMaskingEnabled || m_drawInFront)
@@ -329,7 +350,7 @@ namespace LyShine
             SetupBeforeRenderingMask(uiRenderer, dynamicDraw, false, priorBaseState);
             for (RenderNode* renderNode : m_maskRenderNodes)
             {
-                renderNode->Render(uiRenderer, dynamicDraw);
+                renderNode->Render(uiRenderer, modelViewProjMat, dynamicDraw);
             }
             SetupAfterRenderingMask(uiRenderer, dynamicDraw, false, priorBaseState);
         }
@@ -493,6 +514,13 @@ namespace LyShine
         , m_clearColor(clearColor)
         , m_nestLevel(nestLevel)
     {
+        AZ::MakeOrthographicMatrixRH(m_modelViewProjMat,
+            m_viewportX,
+            m_viewportX + m_viewportWidth,
+            m_viewportY + m_viewportHeight,
+            m_viewportY,
+            0.0f,
+            1.0f);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -507,7 +535,9 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    void RenderTargetRenderNode::Render(UiRenderer* uiRenderer, [[maybe_unused]] AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
+    void RenderTargetRenderNode::Render(UiRenderer* uiRenderer
+        , [[maybe_unused]] const AZ::Matrix4x4& modelViewProjMat
+        , [[maybe_unused]] AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
         if (!m_attachmentImage)
         {
@@ -542,17 +572,26 @@ namespace LyShine
                 auto drawListTag = rhiSystem->GetDrawListTagRegistry()->FindTag(AZ::Name(GetRenderTargetName()));
                 if (drawListTag.IsValid()) // LYSHINE_ATOM_TODO - draw list tag is invalid the first time due to it not being registered yet
                 {
-                    m_dynamicDraw = uiRenderer->CloneDynamicDrawContextWithTag(drawListTag);
+                    m_dynamicDraw = uiRenderer->CreateDynamicDrawContextForRTT(GetRenderTargetName(), drawListTag);
                 }
             }
 #endif
 
             if (m_dynamicDraw)
             {
+                UiRenderer::BaseState priorBaseState = uiRenderer->GetBaseState();
+
+                UiRenderer::BaseState curBaseState = priorBaseState;
+                curBaseState.m_blendState.m_blendAlphaSource = AZ::RHI::BlendFactor::One;
+                curBaseState.m_blendState.m_blendAlphaDest = AZ::RHI::BlendFactor::AlphaSource1Inverse;
+                uiRenderer->SetBaseState(curBaseState);
+
                 for (RenderNode* renderNode : m_childRenderNodes)
                 {
-                    renderNode->Render(uiRenderer, m_dynamicDraw);
+                    renderNode->Render(uiRenderer, m_modelViewProjMat, m_dynamicDraw);
                 }
+
+                uiRenderer->SetBaseState(priorBaseState);
             }
 
 #ifdef LYSHINE_ATOM_TODO
@@ -921,6 +960,90 @@ namespace LyShine
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+    void RenderGraph::AddAlphaMaskPrimitiveAtom(IRenderer::DynUiPrimitive* primitive,
+        AZ::Data::Instance<AZ::RPI::AttachmentImage> contentAttachmentImage,
+        AZ::Data::Instance<AZ::RPI::AttachmentImage> maskAttachmentImage,
+        bool isClampTextureMode,
+        bool isTextureSRGB,
+        bool isTexturePremultipliedAlpha,
+        BlendMode blendMode)
+    {
+        AZStd::vector<RenderNode*>* renderNodeList = m_renderNodeListStack.top();
+
+        int texUnit0 = -1;
+        int texUnit1 = -1;
+        if (renderNodeList)
+        {
+            // we want to pre-multiply alpha if we are rendering to a render target AND we are not rendering from a render target
+            bool isPreMultiplyAlpha = m_renderTargetNestLevel > 0 && !isTexturePremultipliedAlpha;
+
+            // given the blend mode get the right state, the state depends on whether the shader is outputing premultiplied alpha.
+            // The shader can be outputing premultiplied alpha EITHER if the input texture is premultiplied alpha OR if the
+            // shader is doing the premultiply of the output color
+            bool isShaderOutputPremultAlpha = isPreMultiplyAlpha || isTexturePremultipliedAlpha;
+            int blendModeState = GetBlendModeState(blendMode, isShaderOutputPremultAlpha);
+            AlphaMaskType alphaMaskType = isShaderOutputPremultAlpha ? AlphaMaskType::ModulateAlphaAndColor : AlphaMaskType::ModulateAlpha;
+
+            PrimitiveListRenderNode* renderNodeToAddTo = nullptr;
+            if (!renderNodeList->empty())
+            {
+                RenderNode* lastRenderNode = renderNodeList->back();
+
+                if (lastRenderNode && lastRenderNode->GetType() == RenderNodeType::PrimitiveList)
+                {
+                    PrimitiveListRenderNode* primListRenderNode = static_cast<PrimitiveListRenderNode*>(lastRenderNode);
+
+                    // compare render state
+                    if (primListRenderNode->GetIsTextureSRGB() == isTextureSRGB &&
+                        primListRenderNode->GetBlendModeState() == blendModeState &&
+                        primListRenderNode->GetIsPremultiplyAlpha() == isPreMultiplyAlpha &&
+                        primListRenderNode->GetAlphaMaskType() == alphaMaskType &&
+                        primListRenderNode->HasSpaceToAddPrimitive(primitive))
+                    {
+                        // render state is the same - we can add the primitive to this list if the texture is in
+                        // the list or there is space for another texture
+                        texUnit0 = primListRenderNode->GetOrAddTexture(contentAttachmentImage, true);
+                        texUnit1 = primListRenderNode->GetOrAddTexture(maskAttachmentImage, true);
+
+                        if (texUnit0 != -1 && texUnit1 != -1)
+                        {
+                            renderNodeToAddTo = primListRenderNode;
+                        }
+                    }
+                }
+            }
+
+            if (!renderNodeToAddTo)
+            {
+                // We can't add this primitive to the existing render node, we need to create a new render node
+                // this uses a pool allocator for fast allocation
+                renderNodeToAddTo = new PrimitiveListRenderNode(contentAttachmentImage, maskAttachmentImage,
+                    isClampTextureMode, isTextureSRGB, isPreMultiplyAlpha, alphaMaskType, blendModeState);
+
+                renderNodeList->push_back(renderNodeToAddTo);
+                texUnit0 = 0;
+                texUnit1 = 1;
+            }
+
+            // Ensure that the vertices are referencing the right texture unit
+            // Because primitive verts are only created when a UI component changes, they have a longer
+            // lifetime than the render graph. So if not much has changed since the render graph was last built
+            // it is quite likely that the verts are already set to use the correct texture unit.
+            if (primitive->m_vertices[0].texIndex != texUnit0 || primitive->m_vertices[0].texIndex2 != texUnit1)
+            {
+                for (int i = 0; i < primitive->m_numVertices; ++i)
+                {
+                    primitive->m_vertices[i].texIndex = texUnit0;
+                    primitive->m_vertices[i].texIndex2 = texUnit1;
+                }
+            }
+
+            // add this primitive to the render node
+            renderNodeToAddTo->AddPrimitive(primitive);
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     IRenderer::DynUiPrimitive* RenderGraph::GetDynamicQuadPrimitive(const AZ::Vector2* positions, uint32 packedColor)
     {
         const int numVertsInQuad = 4;
@@ -1043,13 +1166,26 @@ namespace LyShine
             }
         }
 #else
-        if (m_renderToRenderTargetCount < 2)
+        //if (m_renderToRenderTargetCount < 2)
+        if (true)
         {
+            // Enable rendering to render target, enable rtt passes
+
             for (RenderNode* renderNode : m_renderTargetRenderNodes)
             {
-                renderNode->Render(uiRenderer, dynamicDraw);
+                renderNode->Render(uiRenderer, uiRenderer->GetModelViewProjectionMatrix(), dynamicDraw);
             }
             m_renderToRenderTargetCount++;
+        }
+        else
+        {
+#if 0
+            // Disable rendering to render target, enable rtt passes
+            for (RenderNode* renderNode : m_renderTargetRenderNodes)
+            {
+                
+            }
+#endif
         }
 #endif
 
@@ -1061,7 +1197,7 @@ namespace LyShine
 #endif
         for (RenderNode* renderNode : m_renderNodes)
         {
-            renderNode->Render(uiRenderer, dynamicDraw);
+            renderNode->Render(uiRenderer, uiRenderer->GetModelViewProjectionMatrix(), dynamicDraw);
         }
 #ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (UI Editor)
         // end the 2D mode

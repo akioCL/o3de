@@ -610,6 +610,7 @@ private: // static data
 
     LyShine::RenderGraph m_renderGraph; //!< the render graph for rendering the canvas, can be cached between frames
     bool m_isRendering = false;
+    bool m_renderInEditor = false; //!< indicates whether this canvas will render in the Editor viewport or the Game viewport
 
     //! Map of attachments used by this canvas's elements
     AZStd::unordered_map<AZ::RHI::AttachmentId, AZ::Data::Instance<AZ::RPI::AttachmentImage>> m_attachmentImageMap;

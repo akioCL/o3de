@@ -15,6 +15,9 @@
 
 #include <AzCore/Component/Component.h>
 
+#include <Atom/RPI.Public/Image/AttachmentImage.h>
+#include <AtomCore/Instance/Instance.h>
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class UiMaskComponent
     : public AZ::Component
@@ -183,15 +186,16 @@ private: // data
     //! This is generated from the entity ID and cached
     AZStd::string m_maskRenderTargetName;
 
-    //! When rendering to a texture this is the texture ID of the render target
-    int m_contentRenderTargetHandle = -1;
+    //! When rendering to a texture this is the attachment image for the render target
+    AZ::Data::Instance<AZ::RPI::AttachmentImage> m_contentAttachmentImage;
 
     //! When rendering to a texture this is our depth surface, we use the same one for rendering the mask elements
     //! and the content elements - it is cleared in between.
     SDepthTexture* m_renderTargetDepthSurface = nullptr;
     
     //! When rendering to a texture this is the texture ID of the render target
-    int m_maskRenderTargetHandle = -1;
+    //! When rendering to a texture this is the attachment image for the render target
+    AZ::Data::Instance<AZ::RPI::AttachmentImage> m_maskAttachmentImage;
 
     //! The positions used for the render to texture viewport and to render the render target to the screen
     AZ::Vector2 m_viewportTopLeft = AZ::Vector2::CreateZero();

@@ -1853,8 +1853,7 @@ AZ::RHI::AttachmentId UiCanvasComponent::CreateRenderTarget(const AZ::Name& rend
     m_attachmentImageMap[attachmentImage->GetAttachmentId()] = attachmentImage;
 
     // Notify pass that it needs to rebuild
-    // LYSHINE_ATOM_TODO - preview mode is considererd in game, so this won't work for preview mode
-    UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
+    UiRenderer* uiRenderer = m_renderInEditor ? GetUiRendererForEditor() : GetUiRendererForGame();
     AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
     EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, RebuildRttChildren);
     
@@ -1918,6 +1917,8 @@ void UiCanvasComponent::RenderCanvas(bool isInGame, AZ::Vector2 viewportSize, Ui
     {
         return;
     }
+
+    m_renderInEditor = uiRenderer ? true : false;
 
     if (!uiRenderer)
     {
@@ -2462,6 +2463,14 @@ void UiCanvasComponent::Deactivate()
     {
         DestroyRenderTarget();
     }
+
+    // Destroy owned render targets
+    m_attachmentImageMap.clear();
+
+    // Notify pass that it needs to rebuild
+    UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
+    AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
+    EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, RebuildRttChildren);
 
     delete m_layoutManager;
     m_layoutManager = nullptr;

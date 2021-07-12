@@ -33,8 +33,10 @@ public: // types
         AZ::RHI::ShaderInputConstantIndex m_viewProjInputIndex;
         AZ::RHI::ShaderInputConstantIndex m_isClampInputIndex;
 
-        AZ::RPI::ShaderVariantId m_shaderVariantDefault;
-        AZ::RPI::ShaderVariantId m_shaderVariantAlphaTest;
+        AZ::RPI::ShaderVariantId m_shaderVariantTextureLinear;
+        AZ::RPI::ShaderVariantId m_shaderVariantTextureSrgb;
+        AZ::RPI::ShaderVariantId m_shaderVariantAlphaTestMask;
+        AZ::RPI::ShaderVariantId m_shaderVariantGradientMask;
     };
 
     // Base state
@@ -53,17 +55,23 @@ public: // types
             m_blendState.m_blendSource = AZ::RHI::BlendFactor::AlphaSource;
             m_blendState.m_blendDest = AZ::RHI::BlendFactor::AlphaSourceInverse;
             m_blendState.m_blendOp = AZ::RHI::BlendOp::Add;
+            m_blendState.m_blendAlphaSource = AZ::RHI::BlendFactor::One;
+            m_blendState.m_blendAlphaDest = AZ::RHI::BlendFactor::Zero;
+            m_blendState.m_blendAlphaOp = AZ::RHI::BlendOp::Add;
 
             // Disable stencil
             m_stencilState = AZ::RHI::StencilState();
             m_stencilState.m_enable = 0;
 
             m_useAlphaTest = false;
+            m_modulateAlpha = false;
         }
 
         AZ::RHI::TargetBlendState m_blendState;
         AZ::RHI::StencilState m_stencilState;
         bool m_useAlphaTest = false;
+        bool m_modulateAlpha = false;
+        bool m_srgbWrite = true;
     };
 
 public: // member functions

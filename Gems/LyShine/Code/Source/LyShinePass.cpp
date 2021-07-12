@@ -116,6 +116,8 @@ namespace LyShine
         outSlot.m_name = AZ::Name("RenderTargetOutput");
         outSlot.m_slotType = AZ::RPI::PassSlotType::Output;
         outSlot.m_scopeAttachmentUsage = AZ::RHI::ScopeAttachmentUsage::RenderTarget;
+        outSlot.m_loadStoreAction.m_clearValue = AZ::RHI::ClearValue::CreateVector4Float(0.0f, 0.0f, 0.0f, 0.0f);
+        outSlot.m_loadStoreAction.m_loadAction = AZ::RHI::AttachmentLoadAction::Clear;
 
         // Connections
         passTemplate->m_connections.resize(1);
