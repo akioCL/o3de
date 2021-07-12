@@ -40,10 +40,6 @@
 #include "CryEdit.h"
 #include "LevelFileDialog.h"
 
-// NewsShared
-#include <NewsShared/ResourceManagement/ResourceManifest.h>     // for News::ResourceManifest
-#include <NewsShared/Qt/ArticleViewContainer.h>                 // for News::ArticleViewContainer
-
 AZ_PUSH_DISABLE_DLL_EXPORT_MEMBER_WARNING
 #include <WelcomeScreen/ui_WelcomeScreenDialog.h>
 AZ_POP_DISABLE_DLL_EXPORT_MEMBER_WARNING
@@ -74,6 +70,21 @@ WelcomeScreenDialog::WelcomeScreenDialog(QWidget* pParent)
     , m_pRecentList(nullptr)
 {
     ui->setupUi(this);
+
+    // Set the project preview image
+    QString projectPreviewPath = QDir(AZ::Utils::GetProjectPath().c_str()).filePath("preview.png");
+    QFileInfo projectPreviewPathInfo(projectPreviewPath);
+    if (!projectPreviewPathInfo.exists() || !projectPreviewPathInfo.isFile())
+    {
+        projectPreviewPath = ":/WelcomeScreenDialog/DefaultProjectImage.png";
+    }
+    ui->activeProjectIcon->setPixmap(
+        QPixmap(projectPreviewPath).scaled(
+            ui->activeProjectIcon->size(),
+            Qt::KeepAspectRatioByExpanding,
+            Qt::SmoothTransformation
+        )
+    );
 
     ui->recentLevelTable->setColumnCount(3);
     ui->recentLevelTable->setMouseTracking(true);

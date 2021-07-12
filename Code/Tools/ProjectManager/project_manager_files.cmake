@@ -39,8 +39,10 @@ set(FILES
     Source/ProjectInfo.cpp
     Source/ProjectUtils.h
     Source/ProjectUtils.cpp
-    Source/ProjectBuilder.h
-    Source/ProjectBuilder.cpp
+    Source/ProjectBuilderWorker.h
+    Source/ProjectBuilderWorker.cpp
+    Source/ProjectBuilderController.h
+    Source/ProjectBuilderController.cpp
     Source/UpdateProjectSettingsScreen.h
     Source/UpdateProjectSettingsScreen.cpp
     Source/NewProjectSettingsScreen.h
@@ -69,6 +71,8 @@ set(FILES
     Source/GemCatalog/GemCatalogHeaderWidget.cpp
     Source/GemCatalog/GemCatalogScreen.h
     Source/GemCatalog/GemCatalogScreen.cpp
+    Source/GemCatalog/GemFilterTagWidget.h
+    Source/GemCatalog/GemFilterTagWidget.cpp
     Source/GemCatalog/GemFilterWidget.h
     Source/GemCatalog/GemFilterWidget.cpp
     Source/GemCatalog/GemInfo.h

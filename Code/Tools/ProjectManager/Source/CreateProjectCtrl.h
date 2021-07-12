@@ -11,7 +11,6 @@
 #include <ProjectInfo.h>
 #endif
 
-// due to current limitations, customizing template Gems is disabled 
 #define TEMPLATE_GEM_CONFIGURATION_ENABLED
 
 QT_FORWARD_DECLARE_CLASS(QStackedWidget)
@@ -40,6 +39,7 @@ namespace O3DE::ProjectManager
 #ifdef TEMPLATE_GEM_CONFIGURATION_ENABLED
         void OnChangeScreenRequest(ProjectManagerScreen screen);
         void HandleSecondaryButton();
+        void ReinitGemCatalogForSelectedTemplate();
 #endif // TEMPLATE_GEM_CONFIGURATION_ENABLED
 
     private:

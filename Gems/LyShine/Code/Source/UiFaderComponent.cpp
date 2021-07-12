@@ -457,6 +457,7 @@ void UiFaderComponent::CreateOrResizeRenderTarget(const AZ::Vector2& pixelAligne
     m_viewportTopLeft = pixelAlignedTopLeft;
     m_viewportSize = renderTargetSize;
 
+#ifdef LYSHINE_ATOM_TODO // [LYN-3359] Support RTT using Atom
     // Check if the render target already exists
     if (m_attachmentImage)
     {
@@ -485,6 +486,7 @@ void UiFaderComponent::CreateOrResizeRenderTarget(const AZ::Vector2& pixelAligne
         }
     }
 
+#endif
     // at this point either all render targets and depth surfaces are created or none are.
     // If all succeeded then update the render target size
     if (m_attachmentImage)
@@ -620,6 +622,7 @@ void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElem
             }
         }
 
+#ifdef LYSHINE_ATOM_TODO // [LYN-3359] Support RTT using Atom
         // Add a primitive to render a quad using the render target we have created
         {
             LyShine::RenderGraph* lyRenderGraph = dynamic_cast<LyShine::RenderGraph*>(renderGraph); // LYSHINE_ATOM_TODO - downcasting will be removed in future PR
@@ -634,6 +637,7 @@ void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElem
                 lyRenderGraph->AddPrimitiveAtom(&m_cachedPrimitive, image, isClampTextureMode, isTextureSRGB, isTexturePremultipliedAlpha, blendMode);
             }
         }
+#endif
     }
 }
 
