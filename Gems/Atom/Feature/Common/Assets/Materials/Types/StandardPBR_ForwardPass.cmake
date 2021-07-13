@@ -9,10 +9,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 # 
 
-ly_add_shader(
+ly_add_shader_variant(
 	NAME StandardPBR_ForwardPass
-	AZSL Materials/Types/StandardPBR_ForwardPass.azsl 
-	SHADER_VARIANTS Materials/Types/StandardPBR_ForwardPass.cmake
+	STABLE_ID ROOT
+	OPTIONS ""
+	ROOT_FILES ${hlsl_output_paths}
+	ENTRY_VS StandardPbr_ForwardPassVS
+	ENTRY_PS StandardPbr_ForwardPassPS
+)
+
+ly_add_shader_variant(
+	NAME StandardPBR_ForwardPass
+	STABLE_ID 1
+	OPTIONS "o_directional_shadow_filtering_method=ShadowFilterMethod::None"
+	ROOT_FILES ${hlsl_output_paths}
 	ENTRY_VS StandardPbr_ForwardPassVS
 	ENTRY_PS StandardPbr_ForwardPassPS
 )

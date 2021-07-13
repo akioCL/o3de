@@ -13,7 +13,6 @@
 # Can be edited via
 #    ly_add_shader_include_dirs(), which takes directories and adds them
 #    ly_add_shader_atom_include_dirs(), which adds all the Atom included directories
-# set(mcpp_inc_dirs "")
 set_property(GLOBAL PROPERTY mcpp_inc_dirs)
 
 #! ly_add_shader: adds a shader to be compiled
@@ -21,7 +20,7 @@ function(ly_add_shader)
     
     # Parse the arguments for the function calls ------------------------------------------------------
     set(options)
-    set(oneValueArgs NAME AZSL SHADER_VARIANT_LIST ENTRY_VS ENTRY_PS)
+    set(oneValueArgs NAME AZSL SHADER_VARIANTS ENTRY_VS ENTRY_PS)
     set(multiValueArgs)
 
     cmake_parse_arguments(ly_add_shader "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -39,17 +38,10 @@ function(ly_add_shader)
         message(FATAL_ERROR "Shader source file ${ly_add_shader_AZSL} doesn't exist")
     endif() 
 
-    set(SVL_path ${CMAKE_CURRENT_LIST_DIR}/${ly_add_shader_SHADER_VARIANT_LIST})
-    if(NOT EXISTS ${SVL_path})
-        message(FATAL_ERROR "Shader variant list file ${ly_add_shader_SHADER_VARIANT_LIST} doesn't exist")
+    set(sv_path ${CMAKE_CURRENT_LIST_DIR}/${ly_add_shader_SHADER_VARIANTS})
+    if(NOT EXISTS ${sv_path})
+        message(FATAL_ERROR "Shader variants file ${sv_path} doesn't exist")
     endif()
-
-    # Parse the shadervariantlist file -----------------------------------------------------------------
-    file(READ ${SVL_path} svl_json_string)
-    string(JSON variants GET ${svl_json_string} "Variants")
-    string(JSON num_variants ERROR_VARIABLE json_error
-        LENGTH ${svl_json_string} "Variants")
-    math(EXPR variants_range "${num_variants} - 1")
 
     # Set up RHI versions -----------------------------------------------------------------
     set(RHI_names
@@ -81,18 +73,7 @@ function(ly_add_shader)
     )
     foreach(rhi ${RHI_names})
         list(APPEND RHI_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/${ly_add_shader_NAME}.${rhi}.azsl.in)
-    endforeach()
-
-    # Get the output paths for each RHI & shader variant
-    foreach(rhi ${RHI_names})
-        foreach(val RANGE ${variants_range})
-            string(JSON variant GET ${variants} "${val}")
-            string(JSON id GET ${variant} "StableId")
-            list(APPEND final_hlsl_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/final_hlsl/${ly_add_shader_NAME}-${id}.${rhi}.hlsl)
-            list(APPEND hlsl_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/azslc_outputs/${ly_add_shader_NAME}-${id}.${rhi}.hlsl)
-            list(APPEND dxc_output_e1_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/dxc_outputs/${ly_add_shader_NAME}-${id}-e1.${rhi}.dxil.bin)
-            list(APPEND dxc_output_e2_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/dxc_outputs/${ly_add_shader_NAME}-${id}-e2.${rhi}.dxil.bin)
-        endforeach()
+        list(APPEND hlsl_output_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/azslc_outputs/${ly_add_shader_NAME}.${rhi}.hlsl)
     endforeach()
 
     # Set up MCPP, AZSLc, and DXC -----------------------------------------------------------------
@@ -104,12 +85,11 @@ function(ly_add_shader)
 
     set(MCPP "C:/3rdParty/packages/mcpp-2.7.2_az.1-rev1-windows/mcpp/lib/mcpp.exe")
     set(AZSLC "C:/3rdParty/packages/azslc-1.7.21-rev1-multiplatform/azslc/bin/win_x64/Release/azslc.exe")
-    set(DXC "C:/3rdParty/packages/DirectXShaderCompilerDxc-1.6.2104-o3de-rev2-windows/DirectXShaderCompilerDxc/bin/Release/dxc.exe")
 
     # Add the target for this shader -----------------------------------------------------------------
     add_custom_target(${ly_add_shader_NAME} 
         DEPENDS
-            ${dxc_output_e2_paths}
+            ${hlsl_output_paths}
         SOURCES
             ${AZSL_path}
     )
@@ -126,74 +106,32 @@ function(ly_add_shader)
         list(GET RHI_azslc_header_paths ${val} rhi_path)
         list(GET RHI_names ${val} rhi_name)
         list(GET RHI_hlsl_header_paths ${val} rhi_hlsl_header_path)
+        list(GET hlsl_output_paths ${val} output_hlsl_path)
         set(cat_rhi_source_files
             ${rhi_path}
             ${AZSL_path}
         )
-
-        # Concatenate the RHI AZSLC header to the AZSL file
-        execute_process(COMMAND ${CMAKE_COMMAND} -E cat ${cat_rhi_source_files}
-	        OUTPUT_VARIABLE concat_files 
-	        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Shaders
-        )
-        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend.in "${concat_files}" )
-        configure_file(${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend.in ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend COPYONLY)
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend
-	        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/prepend/Shaders)
+        
         set(cat_AZSL_rhi_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/prepend/${ly_add_shader_NAME}.${rhi_name}.prepend)
 
-        # Make list of names for each supervariant for this RHI
-        foreach(num_variant RANGE ${variants_range})
-            string(JSON variant GET ${variants} "${num_variant}")
-            string(JSON shader_options GET ${variant} "Options")
-            string(JSON id GET ${variant} "StableId")
+        # Run the azsl file through MCPP and AZSLC to output the hlsl file + other outputs
+        add_custom_command(
+            OUTPUT 
+                ${output_hlsl_path}
+            COMMAND 
+                python "${LY_ROOT_FOLDER}/cmake/tools/shader_variant_tool.py" "concat" ${CMAKE_CURRENT_BINARY_DIR} ${rhi_path} ${AZSL_path} ${cat_AZSL_rhi_path}
+            COMMAND 
+                ${MCPP} ${inc_dirs} -C -w -+ ${cat_AZSL_rhi_path} -o ${preprocessed_shader_path}
+            COMMAND 
+                ${AZSLC} ${preprocessed_shader_path} --full -o ${output_hlsl_path}
+            DEPENDS
+                ${cat_rhi_source_files}
+            COMMAND_EXPAND_LISTS
+            VERBATIM
+        )
+    endforeach() 
 
-            # Parse the shader options 
-            set(shader_string)
-            string(JSON num_options ERROR_VARIABLE json_error
-                LENGTH ${variant} "Options")
-            math(EXPR options_range "${num_options} - 1")
-            foreach(num_option RANGE ${options_range})
-                string(JSON option_name MEMBER ${shader_options} ${num_option})
-                string(JSON option_value GET ${shader_options} ${option_name})
-                set(shader_string "${shader_string}${option_name}=${option_value};")
-            endforeach()
-
-            math(EXPR idx "${val} * ${num_variants} + ${num_variant}")
-            list(GET hlsl_output_paths ${idx} output_hlsl_path)
-            list(GET dxc_output_e1_paths ${idx} dxc_output_e1_path)
-            list(GET dxc_output_e2_paths ${idx} dxc_output_e2_path)
-
-            # Run the azsl file through MCPP and AZSLC to output the hlsl file + other outputs
-            add_custom_command(
-                OUTPUT 
-                    ${output_hlsl_path}
-                COMMAND 
-                    ${MCPP} ${inc_dirs} -C -w -+ ${cat_AZSL_rhi_path} -o ${preprocessed_shader_path}
-                COMMAND 
-                    ${AZSLC} ${preprocessed_shader_path} --full -o ${output_hlsl_path}
-                DEPENDS
-                    ${cat_rhi_source_files}
-                COMMAND_EXPAND_LISTS
-            )
-
-            set(final_hlsl_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/final_hlsl/${ly_add_shader_NAME}-${id}.${rhi_name}.hlsl)
-            add_custom_command( 
-                OUTPUT 
-                    ${dxc_output_e2_path}
-                COMMAND 
-                    "python" "${LY_ROOT_FOLDER}/cmake/tools/shader_variant_tool.py" "${ly_add_shader_NAME}-${id}.${rhi_name}" "${shader_string}" "${CMAKE_CURRENT_BINARY_DIR}" "${rhi_hlsl_header_path}"
-                COMMAND 
-                    ${DXC} ${final_hlsl_path} -T "ps_6_0" -E ${ly_add_shader_ENTRY_PS} -Fo ${dxc_output_e1_path}
-                COMMAND 
-                    ${DXC} ${final_hlsl_path} -T "vs_6_0" -E ${ly_add_shader_ENTRY_VS} -Fo ${dxc_output_e2_path}
-                DEPENDS 
-                    ${output_hlsl_path}
-                    "${LY_ROOT_FOLDER}/cmake/tools/shader_variant_tool.py" # need to fix this (will note rebuild for this :0)
-            )
-
-        endforeach()
-    endforeach()
+    include(${sv_path})
 
     # Move the target location to inside the designated folder in IDE
     file(RELATIVE_PATH project_path ${LY_ROOT_FOLDER} ${CMAKE_CURRENT_LIST_DIR})
@@ -227,4 +165,105 @@ function(ly_add_shader_include_dirs)
     set(temp ${temp}
         ${dirs})
     set_property(GLOBAL PROPERTY mcpp_inc_dirs "${temp}")
+endfunction()
+
+function(ly_add_shader_variant)
+    # Parse the arguments for the function calls ------------------------------------------------------
+    set(options)
+    set(oneValueArgs NAME STABLE_ID ENTRY_VS ENTRY_PS)
+    set(multiValueArgs OPTIONS ROOT_FILES)
+
+    cmake_parse_arguments(ly_add_shader_variant "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # Validate input arguments ------------------------------------------------------------------------
+    if(NOT ly_add_shader_variant_NAME)
+        message(FATAL_ERROR "You must provide a name for the target")
+    endif()
+    if(NOT ly_add_shader_variant_STABLE_ID)
+        message(FATAL_ERROR "You must provide a stable id for this varaint") 
+    endif()
+
+    if(NOT ly_add_shader_variant_OPTIONS)
+        set(ly_add_shader_variant_OPTIONS " ")
+    endif()
+
+    #[[
+    foreach(root_file ${ly_add_shader_variant_ROOT_FILES})
+        if(NOT EXISTS root_file)
+            message(FATAL_ERROR "Must have the HLSL files (run the root target first)")
+        endif() 
+    endforeach()]]
+
+    set(variant_name ${ly_add_shader_variant_NAME}-${ly_add_shader_variant_STABLE_ID})
+    set(sv_list_path ${CMAKE_CURRENT_BINARY_DIR}/Shaders/shader_variant_lists)
+    
+    execute_process(
+        COMMAND 
+            python "${LY_ROOT_FOLDER}/cmake/tools/shader_variant_tool.py" "add_json" ${ly_add_shader_variant_NAME} ${ly_add_shader_variant_STABLE_ID} ${ly_add_shader_variant_OPTIONS} ${sv_list_path})
+
+    # Set up DXC + inputs/outputs -----------------------------------------------------------------
+    set(DXC "C:/3rdParty/packages/DirectXShaderCompilerDxc-1.6.2104-o3de-rev2-windows/DirectXShaderCompilerDxc/bin/Release/dxc.exe")
+    set(RHI_names
+        Android_Vulkan
+        iOS_Metal
+        Mac_Metal
+        Mac_Null
+        Windows_DX12
+        Windows_Null
+        Windows_Vulkan
+    )
+    set(RHI_hlsl_header_paths
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Android/Vulkan/PlatformHeader.hlsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/iOS/Metal/PlatformHeader.hlsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Mac/Metal/PlatformHeader.hlsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Mac/Null/PlatformHeader.hlsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/DX12/PlatformHeader.hlsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/Null/PlatformHeader.hlsli
+        ${LY_ROOT_FOLDER}/Gems/Atom/Asset/Shader/Code/AZSL/Platform/Windows/Vulkan/PlatformHeader.hlsli
+    )
+    foreach(rhi ${RHI_names})
+        list(APPEND dxc_outputs_e1 ${CMAKE_CURRENT_BINARY_DIR}/Shaders/dxc_outputs/${variant_name}-e1.${rhi}.dxil.bin)
+        list(APPEND dxc_outputs_e2 ${CMAKE_CURRENT_BINARY_DIR}/Shaders/dxc_outputs/${variant_name}-e2.${rhi}.dxil.bin)
+        list(APPEND final_hlsl_paths ${CMAKE_CURRENT_BINARY_DIR}/Shaders/final_hlsl/${variant_name}.${rhi}.hlsl)
+    endforeach()
+
+    # Create a target for this variant
+    add_custom_target(${variant_name}
+        DEPENDS
+            ${dxc_outputs_e1}
+            ${dxc_outputs_e2}
+    )
+    add_dependencies(${variant_name} ${ly_add_shader_variant_NAME})
+
+    list(LENGTH ly_add_shader_variant_ROOT_FILES len1) 
+    math(EXPR len "${len1} - 1")
+    foreach(val RANGE ${len}) 
+        list(GET RHI_names ${val} rhi_name)
+        list(GET ly_add_shader_variant_ROOT_FILES ${val} root_hlsl_file)
+        list(GET RHI_hlsl_header_paths ${val} rhi_hlsl_header_path)
+        list(GET final_hlsl_paths ${val} final_hlsl_path)
+        list(GET dxc_outputs_e1 ${val} dxc_output_e1_path)
+        list(GET dxc_outputs_e2 ${val} dxc_output_e2_path)
+        add_custom_command( 
+            OUTPUT 
+                ${dxc_output_e1_path}
+                ${dxc_output_e2_path}
+            COMMAND 
+                "python" "${LY_ROOT_FOLDER}/cmake/tools/shader_variant_tool.py" "main" "${variant_name}.${rhi_name}" "${ly_add_shader_variant_NAME}.${rhi_name}" "${ly_add_shader_variant_OPTIONS}" "${CMAKE_CURRENT_BINARY_DIR}" "${rhi_hlsl_header_path}"
+            COMMAND 
+                ${DXC} ${final_hlsl_path} -T "ps_6_2" -E ${ly_add_shader_variant_ENTRY_PS} -Fo ${dxc_output_e1_path}
+            COMMAND 
+                ${DXC} ${final_hlsl_path} -T "vs_6_2" -E ${ly_add_shader_variant_ENTRY_VS} -Fo ${dxc_output_e2_path}
+            DEPENDS 
+                ${root_hlsl_file}
+                ${rhi_hlsl_header_path}
+        )
+    endforeach()
+
+    # Move the target location to inside the designated folder in IDE
+    file(RELATIVE_PATH project_path ${LY_ROOT_FOLDER} ${CMAKE_CURRENT_LIST_DIR})
+    set(ide_path ${project_path}/${ly_add_shader_variant_NAME})
+    set_target_properties(${variant_name} PROPERTIES 
+        FOLDER "${ide_path}"
+    )
 endfunction()
