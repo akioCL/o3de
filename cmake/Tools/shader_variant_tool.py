@@ -1,6 +1,7 @@
 import json
 import sys
 import shutil
+<<<<<<< HEAD
 import os
 
 def main(name, shader_name, str, path, rhi_header_path):
@@ -8,6 +9,15 @@ def main(name, shader_name, str, path, rhi_header_path):
     # Map each name to the type
     map = {}
     f = open(path + '/Shaders/azslc_outputs/' + shader_name + '.options.json')
+=======
+import os.path
+
+def main(name, str, path, rhi_header_path):
+
+    # Map each name to the type
+    map = {}
+    f = open(path + '/Shaders/azslc_outputs/' + name + '.options.json')
+>>>>>>> 0f57ee161a434c40a7db269ae2a67a5dcd0c3a7f
     options = json.load(f)
     for i in options["ShaderOptions"]:
         map[i["name"]] = i["values"]
@@ -23,17 +33,25 @@ def main(name, shader_name, str, path, rhi_header_path):
                 add_to_file = "\n"
                 break
                 #MAYBE instead you want this to throw an error instead
+<<<<<<< HEAD
     if not os.path.exists(path + "/Shaders/variant_headers"):
         os.mkdir(path + "/Shaders/variant_headers")
         
+=======
+
+>>>>>>> 0f57ee161a434c40a7db269ae2a67a5dcd0c3a7f
     file = open(path + "/Shaders/variant_headers/" + name + "-header.hlsl.in", "w")
     file.write(add_to_file)
     file.close()
 
+<<<<<<< HEAD
     concat_file = [rhi_header_path, path + "/Shaders/variant_headers/" + name + "-header.hlsl.in", path + '/Shaders/azslc_outputs/' + shader_name +".hlsl"]
     
     if not os.path.exists(path + "/Shaders/final_hlsl"):
         os.mkdir(path + "/Shaders/final_hlsl")
+=======
+    concat_file = [rhi_header_path, path + "/Shaders/variant_headers/" + name + "-header.hlsl.in", path + '/Shaders/azslc_outputs/' + name +".hlsl"]
+>>>>>>> 0f57ee161a434c40a7db269ae2a67a5dcd0c3a7f
 
     with open(path + "/Shaders/final_hlsl/" + name + ".hlsl", "wb") as wfd:
         for f in concat_file:
@@ -41,6 +59,7 @@ def main(name, shader_name, str, path, rhi_header_path):
                 with open(f, 'rb') as fd:
                     shutil.copyfileobj(fd, wfd)
 
+<<<<<<< HEAD
 def concat(path, file1, file2, output):
     if not os.path.exists(path + "/Shaders/prepend"):
         os.mkdir(path + "/Shaders/prepend")
@@ -88,4 +107,8 @@ def add_json(name, stable_id, options, path):
         
 if __name__ == '__main__':
     globals()[sys.argv[1]](*sys.argv[2:])
+=======
+if __name__ == '__main__':
+    main(*sys.argv[1:])
+>>>>>>> 0f57ee161a434c40a7db269ae2a67a5dcd0c3a7f
 
