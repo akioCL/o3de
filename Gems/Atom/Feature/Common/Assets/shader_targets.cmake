@@ -11,12 +11,8 @@
 
 ly_add_shader(
 	NAME StandardPBR_ForwardPass
-	AZSL Materials/Types/StandardPBR_ForwardPass.azsl 
-<<<<<<< HEAD
+	AZSL Materials/Types/StandardPBR_ForwardPass.azsl
 	SHADER_VARIANTS Materials/Types/StandardPBR_ForwardPass.cmake
-=======
-	SHADER_VARIANT_LIST Materials/Types/StandardPBR_ForwardPass.shadervariantlist 
->>>>>>> 0f57ee161a434c40a7db269ae2a67a5dcd0c3a7f
 	ENTRY_VS StandardPbr_ForwardPassVS
 	ENTRY_PS StandardPbr_ForwardPassPS
 )
