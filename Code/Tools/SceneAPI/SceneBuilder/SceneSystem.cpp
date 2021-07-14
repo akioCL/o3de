@@ -121,6 +121,7 @@ namespace AZ
 
         void SceneSystem::SwapTransformForUpAxis(DataTypes::MatrixType& inOutTransform) const
         {
+            (void)inOutTransform;
             if (m_adjustTransform)
             {
                 inOutTransform = (*m_adjustTransform * inOutTransform) * *m_adjustTransformInverse;

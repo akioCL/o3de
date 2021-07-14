@@ -122,12 +122,36 @@ namespace AZ
 
                         iteratingNode = iteratingNode->mParent;
                     }
-                    
-                    localTransform =
-                        offsets.at(AZ::GetMin(offsets.size()-1, static_cast<decltype(offsets.size())>(1)))  // parent bone offset, or if there is no parent, then current node offset
-                        * inverseOffsets.at(inverseOffsets.size() - 1) // Inverse of root bone offset
-                        * offsets.at(offsets.size() - 1) // Root bone offset
-                        * inverseOffsets.at(0); // Inverse of current node offset
+
+                    // TODO : Include all parents after the root bone here?
+
+                    /*if (inverseOffsets.size() == 1)
+                    {
+                        localTransform = inverseOffsets[0];
+                    }
+                    else*/
+                    //if (offsets.size() > 1)
+                    {
+                        localTransform = offsets.at(AZ::GetMin(
+                                             offsets.size() - 1,
+                                             static_cast<decltype(offsets.size())>(
+                                                 1))) // parent bone offset, or if there is no parent, then current node offset
+                            * inverseOffsets.at(inverseOffsets.size() - 1) // Inverse of root bone offset
+                            * offsets.at(offsets.size() - 1) // Root bone offset
+                            * inverseOffsets.at(0); // Inverse of current node offset
+                    }
+                    //else
+                    {
+                        // Do something?
+                    }
+                    /*if (inverseOffsets.size() == 1 && iteratingNode)
+                    {
+                        SceneAPI::DataTypes::MatrixType root = AssImpSDKWrapper::AssImpTypeConverter::ToTransform(iteratingNode->mTransformation);
+                        root.SetTranslation(0.0f, 0.0f, 0.0f);
+                        localTransform = localTransform * root;
+                        //localTransform = localTransform * AssImpSDKWrapper::AssImpTypeConverter::ToTransform(iteratingNode->mTransformation);
+                            //AssImpSDKWrapper::AssImpTypeConverter::ToTransform(GetConcatenatedLocalTransform(iteratingNode));
+                    }*/
                 }
                 else
                 {
