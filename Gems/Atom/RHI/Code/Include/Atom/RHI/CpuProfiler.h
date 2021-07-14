@@ -86,7 +86,7 @@ namespace AZ
             virtual void BeginContinuousCapture() = 0;
 
             //! End a continuous capture and flush the saved data. 
-            virtual void EndContinuousCapture(AZStd::vector<TimeRegionMap>& flushTarget) = 0;
+            virtual void EndContinuousCapture(AZStd::deque<TimeRegionMap>& flushTarget) = 0;
 
             virtual bool IsContinuousCaptureInProgress() const = 0;
 

@@ -112,10 +112,12 @@ namespace AZ
             void SetProfilerEnabled(bool enabled) final override;
             bool IsProfilerEnabled() const final override;
             void BeginContinuousCapture() final override;
-            void EndContinuousCapture(AZStd::vector<TimeRegionMap>& flushTarget) final override;
+            void EndContinuousCapture(AZStd::deque<TimeRegionMap>& flushTarget) final override;
             bool IsContinuousCaptureInProgress() const final override;
 
         private:
+            static constexpr u64 MaxFramesToSave = 120 * 60;  // Minute's worth of data at 120 FPS
+
             // Lazily create and register the local thread data
             void RegisterThreadStorage();
 
@@ -123,8 +125,8 @@ namespace AZ
             // On the start of each frame, this map will be updated with the last frame's profiling data. 
             TimeRegionMap m_timeRegionMap;
 
-            // Accumulated continuous capture data - this will get large very quickly
-            AZStd::vector<TimeRegionMap> m_continuousCaptureData;
+            // Accumulated continuous capture data - this will get large very quickly, adjust MaxFramesToSave to control size.
+            AZStd::deque<TimeRegionMap> m_continuousCaptureData;
 
             bool m_continuousCaptureInProgress = false;
 

@@ -143,7 +143,7 @@ namespace AZ
             static void Reflect(AZ::ReflectContext* context);
 
             CpuProfilingStatisticsSerializer() = default;
-            CpuProfilingStatisticsSerializer(const AZStd::vector<RHI::CpuProfiler::TimeRegionMap>& continuousCaptureData);
+            CpuProfilingStatisticsSerializer(const AZStd::deque<RHI::CpuProfiler::TimeRegionMap>& continuousCaptureData);
 
             AZStd::vector<CpuProfilingStatisticsSerializerEntry> m_cpuProfilingStatisticsSerializerEntries;
         };
@@ -288,7 +288,7 @@ namespace AZ
 
         // --- CpuProfilingStatisticsSerializer ---
 
-        CpuProfilingStatisticsSerializer::CpuProfilingStatisticsSerializer(const AZStd::vector<RHI::CpuProfiler::TimeRegionMap>& continuousCaptureData)
+        CpuProfilingStatisticsSerializer::CpuProfilingStatisticsSerializer(const AZStd::deque<RHI::CpuProfiler::TimeRegionMap>& continuousCaptureData)
         {
             // Create serializable entries
             for (const auto& timeRegionMap : continuousCaptureData)
@@ -549,7 +549,7 @@ namespace AZ
 
                 // Get time Cpu profiled time regions
                 const RHI::CpuProfiler::TimeRegionMap& timeRegionMap = RHI::CpuProfiler::Get()->GetTimeRegionMap();
-                const AZStd::vector singleFrameData = { timeRegionMap };
+                const AZStd::deque singleFrameData = { timeRegionMap };
 
                 CpuProfilingStatisticsSerializer serializer(singleFrameData);
                 const auto saveResult = JsonSerializationUtils::SaveObjectToFile(&serializer,
@@ -592,13 +592,9 @@ namespace AZ
 
         bool ProfilingCaptureSystemComponent::BeginContinuousCpuProfilingStatisticsCapture()
         {
-            bool wasEnabled = RHI::CpuProfiler::Get()->IsProfilerEnabled();
-            if (!wasEnabled)
-            {
-                RHI::CpuProfiler::Get()->SetProfilerEnabled(true);
-            }
+            RHI::CpuProfiler::Get()->SetProfilerEnabled(true);
 
-            // Start a continuous capture after a delay
+            // Start a continuous capture after a delay 
             const bool captureStarted = m_cpuProfilingStatisticsCapture.StartCapture([]()
             {
                 RHI::CpuProfiler::Get()->BeginContinuousCapture();
@@ -617,7 +613,7 @@ namespace AZ
         {
             auto profiler = RHI::CpuProfiler::Get();
             profiler->SetProfilerEnabled(false);
-            AZStd::vector<RHI::CpuProfiler::TimeRegionMap> savedCaptureData;
+            AZStd::deque<RHI::CpuProfiler::TimeRegionMap> savedCaptureData;
             profiler->EndContinuousCapture(savedCaptureData);
             
             JsonSerializerSettings serializationSettings;

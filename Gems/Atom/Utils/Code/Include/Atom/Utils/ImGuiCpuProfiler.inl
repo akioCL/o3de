@@ -16,6 +16,7 @@
 #include <AzCore/std/containers/set.h>
 #include <AzCore/std/sort.h>
 #include <AzCore/std/time.h>
+#include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
 
 
 namespace AZ

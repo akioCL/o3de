@@ -183,6 +183,11 @@ namespace AZ
             // Flush the last frame's data if a continuous capture is in progress
             if (m_continuousCaptureInProgress)
             {
+                // Pop the oldest element if we have hit the data cap
+                if (m_continuousCaptureData.size() > MaxFramesToSave)
+                {
+                    m_continuousCaptureData.pop_front();
+                }
                 m_continuousCaptureData.emplace_back(AZStd::move(m_timeRegionMap));
                 m_timeRegionMap.clear();
             }
@@ -220,14 +225,14 @@ namespace AZ
         void CpuProfilerImpl::BeginContinuousCapture()
         {
             AZ_Assert(!m_continuousCaptureInProgress, "Trying to start a continuous capture while one already in progress.");
-            AZ_Printf("CPU Profiler", "Continuous capture started.");
+            AZ_Printf("CPU Profiler", "Continuous capture started.\n");
             m_continuousCaptureInProgress = true;
         }
 
-        void CpuProfilerImpl::EndContinuousCapture(AZStd::vector<RHI::CpuProfiler::TimeRegionMap>& flushTarget)
+        void CpuProfilerImpl::EndContinuousCapture(AZStd::deque<RHI::CpuProfiler::TimeRegionMap>& flushTarget)
         {
             AZ_Assert(m_continuousCaptureInProgress, "Trying to end a continuous capture while none in progress.");
-            AZ_Printf("CPU Profiler", "Continuous capture ended.");
+            AZ_Printf("CPU Profiler", "Continuous capture ended.\n");
             flushTarget = AZStd::move(m_continuousCaptureData);
             m_continuousCaptureData.clear();
             m_continuousCaptureData.resize(0);
