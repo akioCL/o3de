@@ -221,16 +221,17 @@ namespace AZ
         {
             AZ_Assert(!m_continuousCaptureInProgress, "Trying to start a continuous capture while one already in progress.");
             AZ_Printf("CPU Profiler", "Continuous capture started.");
-            m_continuousCaptureData.clear();
             m_continuousCaptureInProgress = true;
         }
 
-        AZStd::vector<RHI::CpuProfiler::TimeRegionMap>&& CpuProfilerImpl::EndContinuousCapture()
+        void CpuProfilerImpl::EndContinuousCapture(AZStd::vector<RHI::CpuProfiler::TimeRegionMap>& flushTarget)
         {
             AZ_Assert(m_continuousCaptureInProgress, "Trying to end a continuous capture while none in progress.");
             AZ_Printf("CPU Profiler", "Continuous capture ended.");
+            flushTarget = AZStd::move(m_continuousCaptureData);
+            m_continuousCaptureData.clear();
+            m_continuousCaptureData.resize(0);
             m_continuousCaptureInProgress = false;
-            return AZStd::move(m_continuousCaptureData);
         }
 
         bool CpuProfilerImpl::IsContinuousCaptureInProgress() const

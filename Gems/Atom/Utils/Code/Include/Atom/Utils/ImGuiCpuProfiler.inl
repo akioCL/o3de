@@ -43,6 +43,19 @@ namespace AZ
                 AZ_Assert(ticksPerSecond >= 1000, "Error in converting ticks to ms, expected ticksPerSecond >= 1000");
                 return static_cast<float>((ticks * 1000) / (ticksPerSecond / 1000)) / 1000.0f;
             }
+
+            inline AZStd::string GetFilePath(bool isContinuousCapture)
+            {
+                AZStd::sys_time_t timeNow = AZStd::GetTimeNowSecond();
+                AZStd::string timeString;
+                AZStd::to_string(timeString, timeNow);
+                u64 currentTick = AZ::RPI::RPISystemInterface::Get()->GetCurrentTick();
+                return AZStd::string::format(
+                    "@user@/CpuProfiler/%s%s_%llu.json",
+                    isContinuousCapture ? "continuous-" : "", 
+                    timeString.c_str(),
+                    currentTick);
+            }
         } // namespace CpuProfilerImGuiHelper
 
         inline void ImGuiCpuProfiler::Draw(bool& keepDrawing, const AZ::RHI::CpuTimingStatistics& currentCpuTimingStatistics)
@@ -83,14 +96,7 @@ namespace AZ
          
             if (m_captureToFile)
             {
-                AZStd::sys_time_t timeNow = AZStd::GetTimeNowSecond();
-                AZStd::string timeString;
-                AZStd::to_string(timeString, timeNow);
-                u64 currentTick = AZ::RPI::RPISystemInterface::Get()->GetCurrentTick();
-                const AZStd::string frameDataFilePath = AZStd::string::format(
-                    "@user@/CpuProfiler/%s_%llu.json",
-                    timeString.c_str(),
-                    currentTick);
+                const AZStd::string frameDataFilePath = CpuProfilerImGuiHelper::GetFilePath(false);
                 char resolvedPath[AZ::IO::MaxPathLength];
                 AZ::IO::FileIOBase::GetInstance()->ResolvePath(frameDataFilePath.c_str(), resolvedPath, AZ::IO::MaxPathLength);
                 m_lastCapturedFilePath = resolvedPath;
@@ -125,6 +131,24 @@ namespace AZ
             if (ImGui::Button("Capture"))
             {
                 m_captureToFile = true;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("BC"))
+            {
+                AZ::Render::ProfilingCaptureRequestBus::Broadcast(
+                    &AZ::Render::ProfilingCaptureRequestBus::Events::BeginContinuousCpuProfilingStatisticsCapture);
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("EC"))
+            {
+                const AZStd::string frameDataFilePath = CpuProfilerImGuiHelper::GetFilePath(true);
+                char resolvedPath[AZ::IO::MaxPathLength];
+                AZ::IO::FileIOBase::GetInstance()->ResolvePath(frameDataFilePath.c_str(), resolvedPath, AZ::IO::MaxPathLength);
+                m_lastCapturedFilePath = resolvedPath;
+                AZ::Render::ProfilingCaptureRequestBus::Broadcast(
+                    &AZ::Render::ProfilingCaptureRequestBus::Events::EndContinuousCpuProfilingStatisticsCapture, frameDataFilePath);
             }
 
             if (!m_lastCapturedFilePath.empty())

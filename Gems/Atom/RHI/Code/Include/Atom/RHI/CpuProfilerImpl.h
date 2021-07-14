@@ -112,7 +112,7 @@ namespace AZ
             void SetProfilerEnabled(bool enabled) final override;
             bool IsProfilerEnabled() const final override;
             void BeginContinuousCapture() final override;
-            AZStd::vector<TimeRegionMap>&& EndContinuousCapture() final override;
+            void EndContinuousCapture(AZStd::vector<TimeRegionMap>& flushTarget) final override;
             bool IsContinuousCaptureInProgress() const final override;
 
         private:

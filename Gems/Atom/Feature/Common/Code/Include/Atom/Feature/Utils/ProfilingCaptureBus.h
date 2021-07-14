@@ -28,6 +28,12 @@ namespace AZ
             //! Dump the Cpu Profiling Statistics to a json file.
             virtual bool CaptureCpuProfilingStatistics(const AZStd::string& outputFilePath) = 0;
 
+            //! Begin a continuous capture.
+            virtual bool BeginContinuousCpuProfilingStatisticsCapture() = 0;
+
+            //! End a continuous capture if it is running
+            virtual bool EndContinuousCpuProfilingStatisticsCapture(const AZStd::string& outputFilePath) = 0;
+
             //! Dump the benchmark metadata to a json file.
             virtual bool CaptureBenchmarkMetadata(const AZStd::string& benchmarkName, const AZStd::string& outputFilePath) = 0;
         };

@@ -71,6 +71,8 @@ namespace AZ
             bool CapturePassPipelineStatistics(const AZStd::string& outputFilePath) override;
             bool CaptureCpuProfilingStatistics(const AZStd::string& outputFilePath) override;
             bool CaptureBenchmarkMetadata(const AZStd::string& benchmarkName, const AZStd::string& outputFilePath) override;
+            bool BeginContinuousCpuProfilingStatisticsCapture() override;
+            bool EndContinuousCpuProfilingStatisticsCapture(const AZStd::string& outputFilePath) override;
 
         private:
             void OnTick(float deltaTime, ScriptTimePoint time) override;
