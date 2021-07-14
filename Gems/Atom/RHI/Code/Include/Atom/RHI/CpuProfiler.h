@@ -82,6 +82,14 @@ namespace AZ
             //! Get the last frame's TimeRegionMap
             virtual const TimeRegionMap& GetTimeRegionMap() const = 0;
 
+            //! Begin a continuous capture of CPU Profiling data.
+            virtual void BeginContinuousCapture() = 0;
+
+            //! End a continuous capture and flush the saved data. 
+            virtual AZStd::vector<TimeRegionMap>&& EndContinuousCapture() = 0;
+
+            virtual bool IsContinuousCaptureInProgress() const = 0;
+
             //! Enable/Disable the CpuProfiler
             virtual void SetProfilerEnabled(bool enabled) = 0;
 

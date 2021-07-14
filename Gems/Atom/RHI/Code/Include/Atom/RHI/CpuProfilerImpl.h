@@ -106,11 +106,14 @@ namespace AZ
             void OnSystemTick() final override;
 
             //! CpuProfiler overrides...
-            void BeginTimeRegion(TimeRegion& timeRegion) final;
-            void EndTimeRegion() final;
-            const TimeRegionMap& GetTimeRegionMap() const final;
-            void SetProfilerEnabled(bool enabled) final;
-            bool IsProfilerEnabled() const final;
+            void BeginTimeRegion(TimeRegion& timeRegion) final override;
+            void EndTimeRegion() final override;
+            const TimeRegionMap& GetTimeRegionMap() const final override;
+            void SetProfilerEnabled(bool enabled) final override;
+            bool IsProfilerEnabled() const final override;
+            void BeginContinuousCapture() final override;
+            AZStd::vector<TimeRegionMap>&& EndContinuousCapture() final override;
+            bool IsContinuousCaptureInProgress() const final override;
 
         private:
             // Lazily create and register the local thread data
@@ -119,6 +122,11 @@ namespace AZ
             // ThreadId -> ThreadTimeRegionMap
             // On the start of each frame, this map will be updated with the last frame's profiling data. 
             TimeRegionMap m_timeRegionMap;
+
+            // Accumulated continuous capture data - this will get large very quickly
+            AZStd::vector<TimeRegionMap> m_continuousCaptureData;
+
+            bool m_continuousCaptureInProgress = false;
 
             // Set of registered threads when created
             AZStd::vector<RHI::Ptr<CpuTimingLocalStorage>, AZ::OSStdAllocator> m_registeredThreads;

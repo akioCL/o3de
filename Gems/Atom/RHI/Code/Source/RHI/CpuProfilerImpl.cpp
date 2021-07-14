@@ -179,6 +179,14 @@ namespace AZ
             {
                 return;
             }
+
+            // Flush the last frame's data if a continuous capture is in progress
+            if (m_continuousCaptureInProgress)
+            {
+                m_continuousCaptureData.emplace_back(AZStd::move(m_timeRegionMap));
+                m_timeRegionMap.clear();
+            }
+
             AZStd::unique_lock<AZStd::mutex> lock(m_threadRegisterMutex);
 
             // Iterate through all the threads, and collect the thread's cached time regions
@@ -207,6 +215,27 @@ namespace AZ
                 ms_threadLocalStorage = aznew CpuTimingLocalStorage();
                 m_registeredThreads.emplace_back(ms_threadLocalStorage);
             }
+        }
+
+        void CpuProfilerImpl::BeginContinuousCapture()
+        {
+            AZ_Assert(!m_continuousCaptureInProgress, "Trying to start a continuous capture while one already in progress.");
+            AZ_Printf("CPU Profiler", "Continuous capture started.");
+            m_continuousCaptureData.clear();
+            m_continuousCaptureInProgress = true;
+        }
+
+        AZStd::vector<RHI::CpuProfiler::TimeRegionMap>&& CpuProfilerImpl::EndContinuousCapture()
+        {
+            AZ_Assert(m_continuousCaptureInProgress, "Trying to end a continuous capture while none in progress.");
+            AZ_Printf("CPU Profiler", "Continuous capture ended.");
+            m_continuousCaptureInProgress = false;
+            return AZStd::move(m_continuousCaptureData);
+        }
+
+        bool CpuProfilerImpl::IsContinuousCaptureInProgress() const
+        {
+            return m_continuousCaptureInProgress;
         }
 
         // --- CpuTimingLocalStorage ---
