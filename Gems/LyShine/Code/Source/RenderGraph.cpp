@@ -87,49 +87,6 @@ namespace LyShine
         , const AZ::Matrix4x4& modelViewProjMat
         , AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw)
     {
-#ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (masks/render targets)
-        for (int i = 0; i < m_numTextures; ++i)
-        {
-            uiRenderer->SetTexture(m_textures[i].m_texture, i, m_textures[i].m_isClampTextureMode);
-        }
-
-        int blendModeState = m_blendModeState;
-
-        IRenderer* renderer = gEnv->pRenderer;
-        renderer->SetState(blendModeState | uiRenderer->GetBaseState());
-
-        if (m_isTextureSRGB)
-        {
-            renderer->SetSrgbWrite(false);
-        }
-
-        // We are using SetColorOp as a way to set flags for the ui.cfx shader by reusing flags
-        // that the FixedPipelineEmu.cfx shader uses. So the names colorOp and alphaOp are used
-        // just because this are the inputs to SetColorOp.
-        uint8 colorOp = m_preMultiplyAlpha ? ColorOp_PreMultiplyAlpha : ColorOp_Normal;
-        uint8 alphaOp = AlphaOp_Normal;
-        switch (m_alphaMaskType)
-        {
-        case AlphaMaskType::None:
-            alphaOp = AlphaOp_Normal;
-            break;
-        case AlphaMaskType::ModulateAlpha:
-            alphaOp = AlphaOp_ModulateAlpha;
-            break;
-        case AlphaMaskType::ModulateAlphaAndColor:
-            alphaOp = AlphaOp_ModulateAlphaAndColor;
-            break;
-        }
-        
-        renderer->SetColorOp(colorOp, alphaOp, DEF_TEXARG0, DEF_TEXARG0);
-
-        renderer->DrawDynUiPrimitiveList(m_primitives, m_totalNumVertices, m_totalNumIndices);
-
-        if (m_isTextureSRGB)
-        {
-            renderer->SetSrgbWrite(true);
-        }
-#endif
         if (!uiRenderer->IsReady())
         {
             return;
@@ -543,28 +500,10 @@ namespace LyShine
         {
             return;
         }
-
+        
         ISystem* system = gEnv->pSystem;
         if (system && !gEnv->IsDedicated())
         {
-#ifdef LYSHINE_ATOM_TODO
-            TransformationMatrices backupMatrices;
-            gEnv->pRenderer->Set2DModeNonZeroTopLeft(m_viewportX, m_viewportY, m_viewportWidth, m_viewportHeight, backupMatrices);
- 
-            // this will change the viewport
-            gEnv->pRenderer->SetRenderTarget(m_renderTargetHandle, m_renderTargetDepthSurface);
-
-            // clear the render target before rendering to it
-            // NOTE: the FRT_CLEAR_IMMEDIATE is required since we will have already set the render target
-            // In theory we could call this before setting the render target without the immediate flag
-            // but that doesn't work. Perhaps because FX_Commit is not called.
-            ColorF viewportBackgroundColor(m_clearColor.GetR(), m_clearColor.GetG(), m_clearColor.GetB(), m_clearColor.GetA());
-            gEnv->pRenderer->ClearTargetsImmediately(FRT_CLEAR, viewportBackgroundColor);
-
-            // we could use SetSrgbWrite to write to a linear texture here. But that gets complicated with
-            // having to affect all decsendant element renders. So we just let it write srgb to the render target and
-            // allow for that when we render using the render target as a source texture.
-#else
             // Use a dedicated dynamic draw context for rendering to the texture since it can only have one draw list tag
             if (!m_dynamicDraw)
             {
@@ -575,7 +514,6 @@ namespace LyShine
                     m_dynamicDraw = uiRenderer->CreateDynamicDrawContextForRTT(GetRenderTargetName(), drawListTag);
                 }
             }
-#endif
 
             if (m_dynamicDraw)
             {
@@ -593,12 +531,6 @@ namespace LyShine
 
                 uiRenderer->SetBaseState(priorBaseState);
             }
-
-#ifdef LYSHINE_ATOM_TODO
-            gEnv->pRenderer->SetRenderTarget(0); // restore render target
-
-            gEnv->pRenderer->Unset2DMode(backupMatrices);
-#endif
         }
     }
 
@@ -874,81 +806,6 @@ namespace LyShine
             ITexture* texture, ITexture* maskTexture,
             bool isClampTextureMode, bool isTextureSRGB, bool isTexturePremultipliedAlpha, BlendMode blendMode)
     {
-#ifdef LYSHINE_ATOM_TODO // keeping this code for future phase (masks and render targets)
-        AZStd::vector<RenderNode*>* renderNodeList = m_renderNodeListStack.top();
-
-        int texUnit0 = -1;
-        int texUnit1 = -1;
-        if (renderNodeList)
-        {
-            // we want to pre-multiply alpha if we are rendering to a render target AND we are not rendering from a render target
-            bool isPreMultiplyAlpha = m_renderTargetNestLevel > 0 && !isTexturePremultipliedAlpha;
-
-            // given the blend mode get the right state, the state depends on whether the shader is outputing premultiplied alpha.
-            // The shader can be outputing premultiplied alpha EITHER if the input texture is premultiplied alpha OR if the
-            // shader is doing the premultiply of the output color
-            bool isShaderOutputPremultAlpha = isPreMultiplyAlpha || isTexturePremultipliedAlpha;
-            int blendModeState = GetBlendModeState(blendMode, isShaderOutputPremultAlpha);
-            AlphaMaskType alphaMaskType = isShaderOutputPremultAlpha ? AlphaMaskType::ModulateAlphaAndColor : AlphaMaskType::ModulateAlpha;
-
-            PrimitiveListRenderNode* renderNodeToAddTo = nullptr;
-            if (!renderNodeList->empty())
-            {
-                RenderNode* lastRenderNode = renderNodeList->back();
-
-                if (lastRenderNode && lastRenderNode->GetType() == RenderNodeType::PrimitiveList)
-                {
-                    PrimitiveListRenderNode* primListRenderNode = static_cast<PrimitiveListRenderNode*>(lastRenderNode);
-
-                    // compare render state
-                    if (primListRenderNode->GetIsTextureSRGB() == isTextureSRGB &&
-                        primListRenderNode->GetBlendModeState() == blendModeState &&
-                        primListRenderNode->GetIsPremultiplyAlpha() == isPreMultiplyAlpha &&
-                        primListRenderNode->GetAlphaMaskType() == alphaMaskType &&
-                        primListRenderNode->HasSpaceToAddPrimitive(primitive))
-                    {
-                        // render state is the same - we can add the primitive to this list if the texture is in
-                        // the list or there is space for another texture
-                        texUnit0 = primListRenderNode->GetOrAddTexture(texture, true);
-                        texUnit1 = primListRenderNode->GetOrAddTexture(maskTexture, true);
-
-                        if (texUnit0 != -1 && texUnit1 != -1)
-                        {
-                            renderNodeToAddTo = primListRenderNode;
-                        }
-                    }
-                }
-            }
-
-            if (!renderNodeToAddTo)
-            {
-                // We can't add this primitive to the existing render node, we need to create a new render node
-                // this uses a pool allocator for fast allocation
-                renderNodeToAddTo = new PrimitiveListRenderNode(texture, maskTexture,
-                    isClampTextureMode, isTextureSRGB, isPreMultiplyAlpha, alphaMaskType, blendModeState);
-
-                renderNodeList->push_back(renderNodeToAddTo);
-                texUnit0 = 0;
-                texUnit1 = 1;
-            }
-
-            // Ensure that the vertices are referencing the right texture unit
-            // Because primitive verts are only created when a UI component changes, they have a longer
-            // lifetime than the render graph. So if not much has changed since the render graph was last built
-            // it is quite likely that the verts are already set to use the correct texture unit.
-            if (primitive->m_vertices[0].texIndex != texUnit0 || primitive->m_vertices[0].texIndex2 != texUnit1)
-            {
-                for (int i = 0; i < primitive->m_numVertices; ++i)
-                {
-                    primitive->m_vertices[i].texIndex = texUnit0;
-                    primitive->m_vertices[i].texIndex2 = texUnit1;
-                }
-            }
-
-            // add this primitive to the render node
-            renderNodeToAddTo->AddPrimitive(primitive);
-        }
-#else
         AZ_UNUSED(primitive);
         AZ_UNUSED(texture);
         AZ_UNUSED(maskTexture);
@@ -956,7 +813,6 @@ namespace LyShine
         AZ_UNUSED(isTextureSRGB);
         AZ_UNUSED(isTexturePremultipliedAlpha);
         AZ_UNUSED(blendMode);
-#endif
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1125,7 +981,7 @@ namespace LyShine
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     void RenderGraph::Render(UiRenderer* uiRenderer, const AZ::Vector2& viewportSize)
     {
-        // LYSHINE_ATOM_TODO - will probably need to support this when converting UI Editor to use Atom
+        // LYSHINE_ATOM_TODO - don't need this anymore
         AZ_UNUSED(viewportSize);
 
         AZ::RHI::Ptr<AZ::RPI::DynamicDrawContext> dynamicDraw = uiRenderer->GetDynamicDrawContext();
@@ -1135,42 +991,12 @@ namespace LyShine
         dynamicDraw->SetTarget0BlendState(uiRenderer->GetBaseState().m_blendState);
 
         // First render the render targets, they are sorted so that more deeply nested ones are rendered first.
-
-#ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (render targets)
         // They only need to be rendered the first time that a render graph is rendered after it has been built.
-        // Though there is a special case, if this is the first time a shader variant has been used it can miss
-        // the first render. So to be safe we only stop rendering to render targets after we have rendered to
-        // them twice with no shader compiles initiated.
-        if (m_renderToRenderTargetCount < 2)
-        {
-            for (RenderNode* renderNode : m_renderTargetRenderNodes)
-            {
-                renderNode->Render(uiRenderer);
-            }
 
-            // if the render targets render OK we don't need to render them every frame. But if a new shader
-            // variant needed to be compiled then they will not have rendered OK. So we check is there are
-            // any shaders still in the process of compiling. Because they are compiled on the render
-            // thread, we may not know until the next frame that a shader needed to be compiled. So we need
-            // the counter.
-            SShaderCacheStatistics stats;
-            gEnv->pRenderer->EF_Query(EFQ_GetShaderCacheInfo, stats);
-            bool waitingOnShadersToCompile = stats.m_nNumShaderAsyncCompiles > 0 ? true : false;
-            if (!waitingOnShadersToCompile)
-            {
-                m_renderToRenderTargetCount++;
-            }
-            else
-            {
-                m_renderToRenderTargetCount = 0;
-            }
-        }
-#else
-        //if (m_renderToRenderTargetCount < 2)
-        if (true)
+        // LY_SHINE_ATOM_TODO:
+        // Currently necessary to rtt each frame because the rtt pass is set to clear on load and disabling the pass below produces an error
+        if (true) // if (m_renderToRenderTargetCount < 1)
         {
-            // Enable rendering to render target, enable rtt passes
-
             for (RenderNode* renderNode : m_renderTargetRenderNodes)
             {
                 renderNode->Render(uiRenderer, uiRenderer->GetModelViewProjectionMatrix(), dynamicDraw);
@@ -1179,30 +1005,26 @@ namespace LyShine
         }
         else
         {
-#if 0
-            // Disable rendering to render target, enable rtt passes
-            for (RenderNode* renderNode : m_renderTargetRenderNodes)
+#ifdef LY_SHINE_ATOM_TODO
+            // Disable the rtt render passes
+            for (RenderTargetRenderNode* renderTargetRenderNode : m_renderTargetRenderNodes)
             {
-                
+                // Find the rtt pass to disable
+                AZ::RPI::Pass* rttPass = nullptr;
+                AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
+                LyShinePassRequestBus::EventResult(rttPass, sceneId, &LyShinePassRequestBus::Events::GetRttPass, renderTargetRenderNode->GetRenderTargetName());
+                if (rttPass)
+                {
+                    rttPass->SetEnabled(false);
+                }
             }
 #endif
         }
-#endif
 
-#ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (UI Editor)
-        // Set2DMode defines the viewport so we set it to canvas viewport here (the render target render nodes 
-        // above will have set the viewport as they needed).
-        TransformationMatrices backupMatrices;
-        gEnv->pRenderer->Set2DMode(static_cast<uint32>(viewportSize.GetX()), static_cast<uint32>(viewportSize.GetY()), backupMatrices);
-#endif
         for (RenderNode* renderNode : m_renderNodes)
         {
             renderNode->Render(uiRenderer, uiRenderer->GetModelViewProjectionMatrix(), dynamicDraw);
         }
-#ifdef LYSHINE_ATOM_TODO // keeping this code for reference for future phase (UI Editor)
-        // end the 2D mode
-        gEnv->pRenderer->Unset2DMode(backupMatrices);
-#endif
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

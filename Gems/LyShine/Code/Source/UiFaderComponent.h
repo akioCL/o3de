@@ -18,9 +18,6 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/Math/Color.h>
 
-#include <Atom/RPI.Public/Image/AttachmentImage.h>
-#include <AtomCore/Instance/Instance.h>
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class UiFaderComponent
     : public AZ::Component
@@ -159,7 +156,7 @@ private: // data
     AZStd::string m_renderTargetName;
 
     //! When rendering to a texture this is the attachment image for the render target
-    AZ::Data::Instance<AZ::RPI::AttachmentImage> m_attachmentImage;
+    AZ::RHI::AttachmentId m_attachmentImageId;
     
     //! The positions used for the render to texture viewport and to render the render target to the screen
     AZ::Vector2 m_viewportTopLeft;

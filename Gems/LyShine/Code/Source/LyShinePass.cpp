@@ -38,7 +38,7 @@ namespace LyShine
     {
         LyShinePassRequestBus::Handler::BusDisconnect();
 
-        ParentPass::ResetInternal();
+        Base::ResetInternal();
     }
 
     void LyShinePass::BuildInternal()
@@ -51,7 +51,7 @@ namespace LyShine
 
             RemoveChildren();
 
-            // Get the current list of render targets being drawn to across all loaded UI Canvases
+            // Get the current list of render targets being used across all loaded UI Canvases
             LyShine::AttachmentImagesAndDependencies attachmentImagesAndDependencies;
             LyShinePassDataRequestBus::EventResult(
                 attachmentImagesAndDependencies,
@@ -61,8 +61,6 @@ namespace LyShine
 
             AddRttChildPasses(attachmentImagesAndDependencies);
             AddUiCanvasChildPass(attachmentImagesAndDependencies);
-
-            ParentPass::BuildInternal();
         }
 
         Base::BuildInternal();

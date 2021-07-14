@@ -13,10 +13,9 @@ namespace LyShine
         : public AZ::ComponentBus
     {
     public:
-        virtual AZ::RHI::AttachmentId CreateRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size) = 0;
-        virtual void DestroyRenderTarget(const AZ::RHI::AttachmentId& attachmentId) = 0;
+        virtual AZ::RHI::AttachmentId UseRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size) = 0;
+        virtual void ReleaseRenderTarget(const AZ::RHI::AttachmentId& attachmentId) = 0;
         virtual AZ::Data::Instance<AZ::RPI::AttachmentImage> GetRenderTarget(const AZ::RHI::AttachmentId& attachmentId) = 0;
-        virtual void ResizeRenderTarget(const AZ::RHI::AttachmentId& attachmentId, AZ::RHI::Size size) = 0;
     };
 
     using RenderToTextureRequestBus = AZ::EBus<RenderToTextureRequests>;

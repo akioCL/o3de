@@ -1834,7 +1834,7 @@ void UiCanvasComponent::MarkRenderGraphDirty()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AZ::RHI::AttachmentId UiCanvasComponent::CreateRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size)
+AZ::RHI::AttachmentId UiCanvasComponent::UseRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size)
 {
     // Create a render target that UI elements will render to
     AZ::RHI::ImageDescriptor imageDesc;
@@ -1852,7 +1852,7 @@ AZ::RHI::AttachmentId UiCanvasComponent::CreateRenderTarget(const AZ::Name& rend
 
     m_attachmentImageMap[attachmentImage->GetAttachmentId()] = attachmentImage;
 
-    // Notify pass that it needs to rebuild
+    // Notify LyShine render pass that it needs to rebuild
     UiRenderer* uiRenderer = m_renderInEditor ? GetUiRendererForEditor() : GetUiRendererForGame();
     AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
     EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, RebuildRttChildren);
@@ -1861,11 +1861,11 @@ AZ::RHI::AttachmentId UiCanvasComponent::CreateRenderTarget(const AZ::Name& rend
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void UiCanvasComponent::DestroyRenderTarget(const AZ::RHI::AttachmentId& attachmentId)
+void UiCanvasComponent::ReleaseRenderTarget(const AZ::RHI::AttachmentId& attachmentId)
 {
     m_attachmentImageMap.erase(attachmentId);
 
-    // Notify pass that it needs to rebuild
+    // Notify LyShine render pass that it needs to rebuild
     UiRenderer* uiRenderer = m_isLoadedInGame ? GetUiRendererForGame() : GetUiRendererForEditor();
     AZ::RPI::SceneId sceneId = uiRenderer->GetViewportContext()->GetRenderScene()->GetId();
     EBUS_EVENT_ID(sceneId, LyShinePassRequestBus, RebuildRttChildren);
@@ -1875,12 +1875,6 @@ void UiCanvasComponent::DestroyRenderTarget(const AZ::RHI::AttachmentId& attachm
 AZ::Data::Instance<AZ::RPI::AttachmentImage> UiCanvasComponent::GetRenderTarget(const AZ::RHI::AttachmentId& attachmentId)
 {
     return m_attachmentImageMap[attachmentId];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void UiCanvasComponent::ResizeRenderTarget([[maybe_unused]] const AZ::RHI::AttachmentId& attachmentId, [[maybe_unused]] AZ::RHI::Size size)
-{
-    // LYSHINE_ATOM_TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

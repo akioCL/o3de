@@ -15,8 +15,8 @@
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 
-#include <Atom/RPI.Public/Image/ImageSystemInterface.h>
-#include <Atom/RPI.Public/Image/AttachmentImagePool.h>
+#include <Atom/RPI.Public/Image/AttachmentImage.h>
+#include <AtomCore/Instance/Instance.h>
 
 #include <LyShine/Bus/UiElementBus.h>
 #include <LyShine/Bus/UiRenderBus.h>
@@ -125,7 +125,7 @@ void UiFaderComponent::Render(LyShine::IRenderGraph* renderGraph, UiElementInter
         AZ::Vector2 renderTargetSize = pixelAlignedBottomRight - pixelAlignedTopLeft;
 
         bool needsResize = static_cast<int>(renderTargetSize.GetX()) != m_renderTargetWidth || static_cast<int>(renderTargetSize.GetY()) != m_renderTargetHeight;
-        if (!m_attachmentImage || needsResize)
+        if (m_attachmentImageId.IsEmpty() || needsResize)
         {
             // We delay first creation of the render target until render time since size is not known in Activate
             // We also call this if the size has changed
@@ -133,7 +133,7 @@ void UiFaderComponent::Render(LyShine::IRenderGraph* renderGraph, UiElementInter
         }
 
         // if the render target failed to be created (zero size for example) we don't render the element at all
-        if (!m_attachmentImage)
+        if (m_attachmentImageId.IsEmpty())
         {
             return;
         }
@@ -144,7 +144,7 @@ void UiFaderComponent::Render(LyShine::IRenderGraph* renderGraph, UiElementInter
     else
     {
         // destroy previous render target, if exists
-        if (m_attachmentImage)
+        if (!m_attachmentImageId.IsEmpty())
         {
             DestroyRenderTarget();
         }
@@ -457,40 +457,22 @@ void UiFaderComponent::CreateOrResizeRenderTarget(const AZ::Vector2& pixelAligne
     m_viewportTopLeft = pixelAlignedTopLeft;
     m_viewportSize = renderTargetSize;
 
-    // LYSHINE_ATOM_TODO: optimize - reuse targets
+    // LYSHINE_ATOM_TODO: optimize by reusing/resizing targets
     DestroyRenderTarget();
 
-    // Check if the render target already exists
-    if (m_attachmentImage)
+    // Create a render target that this element and its children will be rendered to
+    AZ::EntityId canvasEntityId;
+    EBUS_EVENT_ID_RESULT(canvasEntityId, GetEntityId(), UiElementBus, GetCanvasEntityId);
+    AZ::RHI::Size imageSize(renderTargetSize.GetX(), renderTargetSize.GetY(), 1);
+    EBUS_EVENT_ID_RESULT(m_attachmentImageId, canvasEntityId, LyShine::RenderToTextureRequestBus, UseRenderTarget, AZ::Name(m_renderTargetName.c_str()), imageSize);
+    if (m_attachmentImageId.IsEmpty())
     {
-#ifdef LYSHINE_ATOM_TODO
-        // Render target exists, resize it to the given size
-        if (!gEnv->pRenderer->ResizeRenderTarget(m_renderTargetHandle, static_cast<int>(renderTargetSize.GetX()), static_cast<int>(renderTargetSize.GetY())))
-        {
-            AZ_Warning("UI", false, "Failed to resize render target for UiFaderComponent");
-            DestroyRenderTarget();
-        }
-#endif
-    }
-    else
-    {
-        // Create a render target that this element and its children will be rendered to
-        AZ::EntityId canvasEntityId;
-        EBUS_EVENT_ID_RESULT(canvasEntityId, GetEntityId(), UiElementBus, GetCanvasEntityId);
-        AZ::RHI::Size imageSize(renderTargetSize.GetX(), renderTargetSize.GetY(), 1);
-        AZ::RHI::AttachmentId attachmentId;
-        EBUS_EVENT_ID_RESULT(attachmentId, canvasEntityId, LyShine::RenderToTextureRequestBus, CreateRenderTarget, AZ::Name(m_renderTargetName.c_str()), imageSize);
-        EBUS_EVENT_ID_RESULT(m_attachmentImage, canvasEntityId, LyShine::RenderToTextureRequestBus, GetRenderTarget, attachmentId);
-
-        if (!m_attachmentImage)
-        {
-            AZ_Warning("UI", false, "Failed to create render target for UiFaderComponent");
-        }
+        AZ_Warning("UI", false, "Failed to create render target for UiFaderComponent");
     }
 
     // at this point either all render targets and depth surfaces are created or none are.
     // If all succeeded then update the render target size
-    if (m_attachmentImage)
+    if (!m_attachmentImageId.IsEmpty())
     {
         m_renderTargetWidth = static_cast<int>(renderTargetSize.GetX());
         m_renderTargetHeight = static_cast<int>(renderTargetSize.GetY());
@@ -502,14 +484,12 @@ void UiFaderComponent::CreateOrResizeRenderTarget(const AZ::Vector2& pixelAligne
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void UiFaderComponent::DestroyRenderTarget()
 {
-    if (m_attachmentImage)
+    if (!m_attachmentImageId.IsEmpty())
     {
         AZ::EntityId canvasEntityId;
         EBUS_EVENT_ID_RESULT(canvasEntityId, GetEntityId(), UiElementBus, GetCanvasEntityId);
-        AZ::RHI::AttachmentId attachmentId = m_attachmentImage->GetAttachmentId();
-        EBUS_EVENT_ID(canvasEntityId, LyShine::RenderToTextureRequestBus, DestroyRenderTarget, attachmentId);
-
-        m_attachmentImage.reset();
+        EBUS_EVENT_ID(canvasEntityId, LyShine::RenderToTextureRequestBus, ReleaseRenderTarget, m_attachmentImageId);
+        m_attachmentImageId = AZ::RHI::AttachmentId{};
     }
 }
 
@@ -583,14 +563,20 @@ void UiFaderComponent::RenderStandardFader(LyShine::IRenderGraph* renderGraph, U
 void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElementInterface* elementInterface,
     UiRenderInterface* renderInterface, int numChildren, bool isInGame)
 {
+    // Get the render target
+    AZ::Data::Instance<AZ::RPI::AttachmentImage> attachmentImage;
+    AZ::EntityId canvasEntityId;
+    EBUS_EVENT_ID_RESULT(canvasEntityId, GetEntityId(), UiElementBus, GetCanvasEntityId);
+    EBUS_EVENT_ID_RESULT(attachmentImage, canvasEntityId, LyShine::RenderToTextureRequestBus, GetRenderTarget, m_attachmentImageId);
+
     // Render the element and its children to a render target
     {
         // we always clear to transparent black - the accumulation of alpha in the render target requires it
         AZ::Color clearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         // Start building the render to texture node in the render graph
-        LyShine::RenderGraph* lyRenderGraph = dynamic_cast<LyShine::RenderGraph*>(renderGraph); // LYSHINE_ATOM_TODO
-        lyRenderGraph->BeginRenderToTexture(m_attachmentImage, m_viewportTopLeft, m_viewportSize, clearColor);
+        LyShine::RenderGraph* lyRenderGraph = dynamic_cast<LyShine::RenderGraph*>(renderGraph);
+        lyRenderGraph->BeginRenderToTexture(attachmentImage, m_viewportTopLeft, m_viewportSize, clearColor);
 
         // We don't want this fader or parent faders to affect what is rendered to the render target since we will
         // apply those fades when we render from the render target.
@@ -629,11 +615,11 @@ void UiFaderComponent::RenderRttFader(LyShine::IRenderGraph* renderGraph, UiElem
 
         // Add a primitive to render a quad using the render target we have created
         {
-            LyShine::RenderGraph* lyRenderGraph = dynamic_cast<LyShine::RenderGraph*>(renderGraph); // LYSHINE_ATOM_TODO - downcasting will be removed in future PR
+            LyShine::RenderGraph* lyRenderGraph = dynamic_cast<LyShine::RenderGraph*>(renderGraph);
             if (lyRenderGraph)
             {
                 // Set the texture and other render state required
-                AZ::Data::Instance<AZ::RPI::Image> image = m_attachmentImage;
+                AZ::Data::Instance<AZ::RPI::Image> image = attachmentImage;
                 bool isClampTextureMode = true;
                 bool isTextureSRGB = true;
                 bool isTexturePremultipliedAlpha = true;

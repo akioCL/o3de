@@ -235,10 +235,9 @@ public: // member functions
     // ~UiCanvasComponentImplementationInterface
 
     // RenderToTextureRequests
-    AZ::RHI::AttachmentId CreateRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size) override;
-    void DestroyRenderTarget(const AZ::RHI::AttachmentId& attachmentId) override;
+    AZ::RHI::AttachmentId UseRenderTarget(const AZ::Name& renderTargetName, AZ::RHI::Size size) override;
+    void ReleaseRenderTarget(const AZ::RHI::AttachmentId& attachmentId) override;
     AZ::Data::Instance<AZ::RPI::AttachmentImage> GetRenderTarget(const AZ::RHI::AttachmentId& attachmentId) override;
-    void ResizeRenderTarget(const AZ::RHI::AttachmentId& attachmentId, AZ::RHI::Size size) override;
     // ~RenderToTextureRequests
 
     void UpdateCanvas(float deltaTime, bool isInGame);
