@@ -105,7 +105,7 @@ void ScriptContextDebug::DisconnectHook()
 {
     lua_sethook(m_context.NativeContext(), 0, 0, 0);
 }
-
+#pragma optimize("", off)
 //=========================================================================
 // EnumRegisteredClasses
 // [4/5/2012]
@@ -192,7 +192,7 @@ ScriptContextDebug::EnumRegisteredClasses(EnumClass enumClass, EnumMethod enumMe
                         if (strncmp(name, "__", 2) != 0)
                         {
                             const char* dbgParamInfo = NULL;
-                            lua_getupvalue(l, -1, 2);
+                            bool popDebugName = lua_getupvalue(l, -1, 2) != nullptr;
                             if (lua_isstring(l, -1))
                             {
                                 dbgParamInfo = lua_tostring(l, -1);
@@ -203,7 +203,11 @@ ScriptContextDebug::EnumRegisteredClasses(EnumClass enumClass, EnumMethod enumMe
                                 lua_pop(l, 6);
                                 return;
                             }
-                            lua_pop(l, 1); // pop the DBG name
+
+                            if (popDebugName)
+                            {
+                                lua_pop(l, 1);
+                            }
                         }
                     }
                 }
