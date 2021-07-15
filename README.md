@@ -1,9 +1,17 @@
-# Open 3D Engine
+## Updates to this readme
+July 06, 2021
+- Switch licenses to APACHE-2.0 OR MIT
 
-Open 3D Engine (O3DE) is an open-source, real-time, multi-platform 3D engine that enables developers and content creators to build AAA games, cinema-quality 3D worlds, and high-fidelity simulations without any fees or commercial obligations.
+May 14, 2021 
+- Removed instructions for the 3rdParty zip file and downloader URL. This is no longer a requirement. 
+- Updated instructions for dependencies
+- Links to full documentation
 
-## Contribute
-For information about contributing to Open 3D Engine, visit https://o3de.org/docs/contributing/
+April 7-13, 2021
+- Updates to the 3rdParty zip file
+
+March 25, 2021
+- Initial commit for instructions
 
 ## Download and Install
 
@@ -25,7 +33,22 @@ git lfs install
 ### Clone the repository 
 
 ```shell
-git clone https://github.com/o3de/o3de.git
+> git clone https://github.com/o3de/o3de.git
+Cloning into 'o3de'...
+
+# initial prompt for credentials to download the repository code
+# enter your Github username and personal access token
+
+remote: Counting objects: 29619, done.
+Receiving objects: 100% (29619/29619), 40.50 MiB | 881.00 KiB/s, done.
+Resolving deltas: 100% (8829/8829), done.
+Updating files: 100% (27037/27037), done.
+
+# second prompt for credentials when downloading LFS files
+# enter your Github username and personal access token
+
+Filtering content: 100% (3853/3853), 621.43 MiB | 881.00 KiB/s, done.
+
 ```
 
 ## Building the Engine
