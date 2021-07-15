@@ -105,7 +105,7 @@ void ScriptContextDebug::DisconnectHook()
 {
     lua_sethook(m_context.NativeContext(), 0, 0, 0);
 }
-#pragma optimize("", off)
+
 //=========================================================================
 // EnumRegisteredClasses
 // [4/5/2012]
