@@ -87,106 +87,109 @@ namespace AZ
             bool OnOutput(const char* window, const char* message) override;
 
         private:
-            template<class R, class... Args>
-            R CallResultReturn(const R& defaultReturnValue, int index, Args&&... args) const
-            {
-                R returnVal = defaultReturnValue;
-                CallResult(returnVal, index, AZStd::forward<Args>(args)...);
-                return returnVal;
-            }
-
             // AZ::TickBus::Handler overrides ...
             void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
             int GetTickOrder() override;
 
-            bool QueueMessageCall(AZStd::function<void()> messageCall);
+            void QueueMessageCall(AZStd::function<void()> messageCall);
             void FlushMessageCalls();
 
             AZStd::list<AZStd::function<void()>> m_messageCalls;
             AZStd::mutex m_lock;
+
+            const bool m_defaultReturnValue = false;
         };
 
         //////////////////////////////////////////////////////////////////////////
         // TraceMessageBusHandler Implementation
         inline bool TraceMessageBusHandler::OnPreAssert(const char* fileName, int line, const char* func, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, fileNameString = AZStd::string(fileName), line, funcString = AZStd::string(func), messageString = AZStd::string(message)]()
                 {
-                    CallResultReturn(false, FN_OnPreAssert, fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
+                    Call(FN_OnPreAssert, fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnPreError(const char* window, const char* fileName, int line, const char* func, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, windowString = AZStd::string(window), fileNameString = AZStd::string(fileName), line, funcString = AZStd::string(func), messageString = AZStd::string(message)]()
                 {
-                    CallResultReturn(false, FN_OnPreError, windowString.c_str(), fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
+                    Call(FN_OnPreError, windowString.c_str(), fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnPreWarning(const char* window, const char* fileName, int line, const char* func, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, windowString = AZStd::string(window), fileNameString = AZStd::string(fileName), line, funcString = AZStd::string(func), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnPreWarning, windowString.c_str(), fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
+                    return Call(FN_OnPreWarning, windowString.c_str(), fileNameString.c_str(), line, funcString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnAssert(const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnAssert, messageString.c_str());
+                    return Call(FN_OnAssert, messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnError(const char* window, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnError, windowString.c_str(), messageString.c_str());
+                    return Call(FN_OnError, windowString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnWarning(const char* window, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnWarning, windowString.c_str(), messageString.c_str());
+                    return Call(FN_OnWarning, windowString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnException(const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnException, messageString.c_str());
+                    return Call(FN_OnException, messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnPrintf(const char* window, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnPrintf, windowString.c_str(), messageString.c_str());
+                    return Call(FN_OnPrintf, windowString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         inline bool TraceMessageBusHandler::OnOutput(const char* window, const char* message)
         {
-            return QueueMessageCall(
+            QueueMessageCall(
                 [this, windowString = AZStd::string(window), messageString = AZStd::string(message)]()
                 {
-                    return CallResultReturn(false, FN_OnOutput, windowString.c_str(), messageString.c_str());
+                    return Call(FN_OnOutput, windowString.c_str(), messageString.c_str());
                 });
+            return m_defaultReturnValue;
         }
 
         void TraceMessageBusHandler::OnTick(
@@ -201,11 +204,10 @@ namespace AZ
             return AZ::TICK_LAST;
         }
 
-        bool TraceMessageBusHandler::QueueMessageCall(AZStd::function<void()> messageCall)
+        void TraceMessageBusHandler::QueueMessageCall(AZStd::function<void()> messageCall)
         {
             AZStd::lock_guard<decltype(m_lock)> lock(m_lock);
             m_messageCalls.push_back(messageCall);
-            return true;
         }
 
         void TraceMessageBusHandler::FlushMessageCalls()
