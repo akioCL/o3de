@@ -336,13 +336,25 @@ namespace
             PyIdleEnable(true);
         }
 
-        clock_t start = clock();
-        do
+        auto editorPythonEventsInterface = AZ::Interface<AzToolsFramework::EditorPythonEventsInterface>::Get();
+        if (editorPythonEventsInterface)
         {
-            QEventLoop loop;
-            QTimer::singleShot(timeInSec * 1000, &loop, &QEventLoop::quit);
-            loop.exec();
-        } while ((double)(clock() - start) / CLOCKS_PER_SEC < timeInSec);
+            bool executed = editorPythonEventsInterface->TryExecuteReleasingGIL([timeInSec]()
+                {
+                    clock_t start = clock();
+                    do
+                    {
+                        QEventLoop loop;
+                        QTimer::singleShot(timeInSec * 1000, &loop, &QEventLoop::quit);
+                        loop.exec();
+                    } while ((double)(clock() - start) / CLOCKS_PER_SEC < timeInSec);
+                });
+
+            if (!executed)
+            {
+                AZ_Error("CryEditPy", false, "PyIdleWait: Failed to release GIL");
+            }
+        }
 
         if (!wasIdleEnabled)
         {
@@ -377,9 +389,21 @@ namespace
             uint32 m_targetFrames = 0;
         };
 
-        QEventLoop loop;
-        Ticker ticker(&loop, frames);
-        loop.exec();
+        auto editorPythonEventsInterface = AZ::Interface<AzToolsFramework::EditorPythonEventsInterface>::Get();
+        if (editorPythonEventsInterface)
+        {
+            bool executed = editorPythonEventsInterface->TryExecuteReleasingGIL([frames]()
+                {
+                    QEventLoop loop;
+                    Ticker ticker(&loop, frames);
+                    loop.exec();
+                });
+
+            if (!executed)
+            {
+                AZ_Error("CryEditPy", false, "PyIdleWaitFrames: Failed to release GIL");
+            }
+        }
     }
 }
 

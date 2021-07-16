@@ -14,6 +14,12 @@
 #include <AzToolsFramework/API/EditorPythonRunnerRequestsBus.h>
 #include <AzCore/std/parallel/semaphore.h>
 
+namespace pybind11
+{
+    class gil_scoped_release;
+    class gil_scoped_acquire;
+}
+
 namespace EditorPythonBindings
 {
     /**
@@ -47,6 +53,7 @@ namespace EditorPythonBindings
         void WaitForInitialization() override;
         void ExecuteWithLock(AZStd::function<void()> executionCallback) override;
         bool TryExecuteWithLock(AZStd::function<void()> executionCallback) override;
+        bool TryExecuteReleasingGIL(AZStd::function<void()> executionCallback) override;
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
@@ -62,6 +69,26 @@ namespace EditorPythonBindings
         AZStd::atomic_int m_initalizeWaiterCount {0};
         AZStd::semaphore m_initalizeWaiter;
         AZStd::recursive_mutex m_lock;
+        int m_lockCounter = 0;
+
+        class ScopedLock
+        {
+        public:
+            ScopedLock(AZStd::recursive_mutex& lock, int& lockCounter, bool tryLock = false);
+            ~ScopedLock();
+
+            bool IsLocked() const;
+
+        protected:
+            void Lock();
+            void Unlock();
+
+            AZStd::recursive_mutex& m_lock;
+            int& m_lockCounter;
+            bool m_locked = false;
+            AZStd::unique_ptr<pybind11::gil_scoped_release> m_releaseGIL;
+            AZStd::unique_ptr<pybind11::gil_scoped_acquire> m_acquireGIL;
+        };
     
         enum class Result
         {

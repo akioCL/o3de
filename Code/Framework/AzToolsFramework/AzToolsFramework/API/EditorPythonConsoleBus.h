@@ -72,6 +72,8 @@ namespace AzToolsFramework
         //! Tries to acquires the Python global interpreter lock (GIL) and execute the callback.
         //! @return Whether it was able to lock the mutex.
         virtual bool TryExecuteWithLock(AZStd::function<void()> executionCallback) = 0;
+
+        virtual bool TryExecuteReleasingGIL(AZStd::function<void()> executionCallback) = 0;
     };
 
     //! A bus to handle post notifications to the console views of Python output
