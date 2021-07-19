@@ -1,24 +1,25 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of
+ * this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 #include <SceneAPI/SceneBuilder/Importers/AssImpTransformImporter.h>
 
-#include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzToolsFramework/Debug/TraceContext.h>
-#include <SceneAPI/SceneBuilder/SceneSystem.h>
-#include <SceneAPI/SceneBuilder/Importers/ImporterUtilities.h>
-#include <SceneAPI/SceneBuilder/Importers/Utilities/RenamedNodesMap.h>
-#include <SceneAPI/SceneCore/Utilities/Reporting.h>
-#include <SceneAPI/SceneData/GraphData/TransformData.h>
-#include <SceneAPI/SDKWrapper/AssImpTypeConverter.h>
 #include <SceneAPI/SDKWrapper/AssImpNodeWrapper.h>
 #include <SceneAPI/SDKWrapper/AssImpSceneWrapper.h>
-#include <assimp/scene.h>
+#include <SceneAPI/SDKWrapper/AssImpTypeConverter.h>
 #include <SceneAPI/SceneBuilder/Importers/AssImpImporterUtilities.h>
+#include <SceneAPI/SceneBuilder/Importers/ImporterUtilities.h>
+#include <SceneAPI/SceneBuilder/Importers/Utilities/RenamedNodesMap.h>
+#include <SceneAPI/SceneBuilder/SceneSystem.h>
+#include <SceneAPI/SceneCore/Utilities/Reporting.h>
+#include <SceneAPI/SceneData/GraphData/TransformData.h>
+#include <assimp/scene.h>
 
 namespace AZ
 {
@@ -41,7 +42,7 @@ namespace AZ
                     serializeContext->Class<AssImpTransformImporter, SceneCore::LoadingComponent>()->Version(1);
                 }
             }
-            
+
             void GetAllBones(const aiScene* scene, AZStd::unordered_multimap<AZStd::string, const aiBone*>& boneLookup)
             {
                 AZStd::queue<const aiNode*> queue;
@@ -97,9 +98,10 @@ namespace AZ
 
                 auto boneIterator = boneLookup.find(currentNode->mName.C_Str());
                 const bool isBone = boneIterator != boneLookup.end();
-                
+
                 DataTypes::MatrixType localTransform;
 
+#if 1 // special case bone logic
                 if (isBone)
                 {
                     AZStd::vector<DataTypes::MatrixType> offsets, inverseOffsets;
@@ -124,14 +126,15 @@ namespace AZ
                     }
 
                     // TODO : Include all parents after the root bone here?
-
-                    /*if (inverseOffsets.size() == 1)
+#if 1 // Zeroed out inverse offset
+                    if (inverseOffsets.size() == 1)
                     {
                         localTransform = inverseOffsets[0];
                     }
-                    else*/
-                    //if (offsets.size() > 1)
+                    else
+#endif
                     {
+#if 1 // Old inverse calculation
                         localTransform = offsets.at(AZ::GetMin(
                                              offsets.size() - 1,
                                              static_cast<decltype(offsets.size())>(
@@ -139,21 +142,29 @@ namespace AZ
                             * inverseOffsets.at(inverseOffsets.size() - 1) // Inverse of root bone offset
                             * offsets.at(offsets.size() - 1) // Root bone offset
                             * inverseOffsets.at(0); // Inverse of current node offset
+#else // New inverse calculation
+                        localTransform = offsets.at(1) // parent bone offset
+                            * inverseOffsets.at(inverseOffsets.size() - 1) // Inverse of root bone offset
+                            * offsets.at(offsets.size() - 1) // Root bone offset
+                            * inverseOffsets.at(0); // Inverse of current node offset
+#endif
                     }
-                    //else
+                    // else
                     {
                         // Do something?
                     }
                     /*if (inverseOffsets.size() == 1 && iteratingNode)
                     {
-                        SceneAPI::DataTypes::MatrixType root = AssImpSDKWrapper::AssImpTypeConverter::ToTransform(iteratingNode->mTransformation);
-                        root.SetTranslation(0.0f, 0.0f, 0.0f);
-                        localTransform = localTransform * root;
-                        //localTransform = localTransform * AssImpSDKWrapper::AssImpTypeConverter::ToTransform(iteratingNode->mTransformation);
+                        SceneAPI::DataTypes::MatrixType root =
+                    AssImpSDKWrapper::AssImpTypeConverter::ToTransform(iteratingNode->mTransformation); root.SetTranslation(0.0f, 0.0f,
+                    0.0f); localTransform = localTransform * root;
+                        //localTransform = localTransform *
+                    AssImpSDKWrapper::AssImpTypeConverter::ToTransform(iteratingNode->mTransformation);
                             //AssImpSDKWrapper::AssImpTypeConverter::ToTransform(GetConcatenatedLocalTransform(iteratingNode));
                     }*/
                 }
                 else
+#endif
                 {
                     localTransform = AssImpSDKWrapper::AssImpTypeConverter::ToTransform(GetConcatenatedLocalTransform(currentNode));
                 }

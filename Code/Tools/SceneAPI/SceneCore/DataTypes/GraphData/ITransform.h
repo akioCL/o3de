@@ -32,6 +32,7 @@ namespace AZ
                 void GetDebugOutput(AZ::SceneAPI::Utilities::DebugOutput& output) const override
                 {
                     output.Write("Matrix", GetMatrix());
+                    output.Write("Euler Angles", GetMatrix().GetEulerDegrees());
                 }
             };
         }  // DataTypes

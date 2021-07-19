@@ -33,6 +33,7 @@ namespace AZ
                 void GetDebugOutput(AZ::SceneAPI::Utilities::DebugOutput& output) const override
                 {
                     output.Write("WorldTransform", GetWorldTransform());
+                    output.Write("Euler Angles", GetWorldTransform().GetEulerDegrees());
                 }
             };
         } // DataTypes
