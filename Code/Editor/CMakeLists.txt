@@ -238,6 +238,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                 Legacy::CryCommon
                 AZ::AzToolsFramework
                 Legacy::EditorLib
+                Gem::EditorPythonBindings.Static
         RUNTIME_DEPENDENCIES
             Gem::LmbrCentral
     )

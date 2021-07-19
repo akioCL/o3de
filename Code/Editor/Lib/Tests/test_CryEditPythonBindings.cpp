@@ -19,6 +19,8 @@
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 #include "CryEdit.h"
 
+#include <../Source/PythonSystemComponent.h>
+
 namespace CryEditPythonBindingsUnitTests
 {
 
@@ -39,6 +41,7 @@ namespace CryEditPythonBindingsUnitTests
             // in the unit tests.
             AZ::UserSettingsComponentRequestBus::Broadcast(&AZ::UserSettingsComponentRequests::DisableSaveOnFinalize);
             m_app.RegisterComponentDescriptor(AzToolsFramework::CryEditPythonHandler::CreateDescriptor());
+            m_app.RegisterComponentDescriptor(EditorPythonBindings::PythonSystemComponent::CreateDescriptor());
         }
 
         void TearDown() override
@@ -107,6 +110,40 @@ namespace CryEditPythonBindingsUnitTests
         AZStd::array<AZ::BehaviorValueParameter, 1> args;
         args[0].Set(&framesToWait);
         behaviorContext->m_methods.find("idle_wait_frames")->second->Call(args.begin(), static_cast<unsigned int>(args.size()));
+        loop.disconnect(&timer);
+        timer.stop();
+        EXPECT_EQ(numTicks, framesToWait);
+    }
+
+    TEST_F(CryEditPythonBindingsFixture, DISABLED_CryEditPython_WithPythonSystem_IdleWaitFramesWorks)
+    {
+        AZ::Entity e;
+        e.CreateComponent<EditorPythonBindings::PythonSystemComponent>();
+        e.Init();
+        e.Activate();
+        auto editorPythonEventsInterface = AZ::Interface<AzToolsFramework::EditorPythonEventsInterface>::Get();
+        ASSERT_TRUE(editorPythonEventsInterface);
+        editorPythonEventsInterface->StartPython();
+
+        unsigned int numTicks = 0;
+        QEventLoop loop;
+        QTimer timer;
+        loop.connect(&timer, &QTimer::timeout, [&numTicks]()
+            {
+                AZ::TickBus::Broadcast(&AZ::TickEvents::OnTick, 0.01f, AZ::ScriptTimePoint(AZStd::chrono::system_clock().now()));
+                ++numTicks;
+            });
+        timer.start(100);
+
+        const unsigned int framesToWait = 5;
+        AZStd::string script = AZStd::string::format(
+            "import azlmbr.legacy.general as general\n"
+            "\n"
+            "general.idle_wait_frames(%d)\n",
+            framesToWait
+        );
+        AzToolsFramework::EditorPythonRunnerRequestBus::Broadcast(&AzToolsFramework::EditorPythonRunnerRequestBus::Events::ExecuteByString, script, false);
+
         loop.disconnect(&timer);
         timer.stop();
         EXPECT_EQ(numTicks, framesToWait);

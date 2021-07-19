@@ -336,24 +336,35 @@ namespace
             PyIdleEnable(true);
         }
 
+        auto tickFunc = [timeInSec]()
+        {
+            clock_t start = clock();
+            do
+            {
+                QEventLoop loop;
+                QTimer::singleShot(timeInSec * 1000, &loop, &QEventLoop::quit);
+                loop.exec();
+            } while ((double)(clock() - start) / CLOCKS_PER_SEC < timeInSec);
+        };
+
         auto editorPythonEventsInterface = AZ::Interface<AzToolsFramework::EditorPythonEventsInterface>::Get();
         if (editorPythonEventsInterface)
         {
-            bool executed = editorPythonEventsInterface->TryExecuteReleasingGIL([timeInSec]()
-                {
-                    clock_t start = clock();
-                    do
-                    {
-                        QEventLoop loop;
-                        QTimer::singleShot(timeInSec * 1000, &loop, &QEventLoop::quit);
-                        loop.exec();
-                    } while ((double)(clock() - start) / CLOCKS_PER_SEC < timeInSec);
-                });
-
+            // 'idle_wait' is expected to be called from python in main thread.
+            // This function will tick the engine on top of the callstack, but the python
+            // GIL has been locked at this point. To continue ticking the engine as normal
+            // and allow other calls to python bindings this will release the GIL for the
+            // duration of the wait.
+            bool executed = editorPythonEventsInterface->TryExecuteReleasingGIL(tickFunc);
             if (!executed)
             {
                 AZ_Error("CryEditPy", false, "PyIdleWait: Failed to release GIL");
             }
+        }
+        else
+        {
+            // If EditorPythonEventsInterface is not available then there is no need to protect python GIL.
+            tickFunc();
         }
 
         if (!wasIdleEnabled)
@@ -389,20 +400,31 @@ namespace
             uint32 m_targetFrames = 0;
         };
 
+        auto tickFunc = [frames]()
+        {
+            QEventLoop loop;
+            Ticker ticker(&loop, frames);
+            loop.exec();
+        };
+
         auto editorPythonEventsInterface = AZ::Interface<AzToolsFramework::EditorPythonEventsInterface>::Get();
         if (editorPythonEventsInterface)
         {
-            bool executed = editorPythonEventsInterface->TryExecuteReleasingGIL([frames]()
-                {
-                    QEventLoop loop;
-                    Ticker ticker(&loop, frames);
-                    loop.exec();
-                });
-
+            // 'idle_wait_frames' is expected to be called from python in main thread.
+            // This function will tick the engine on top of the callstack, but the python
+            // GIL has been locked at this point. To continue ticking the engine as normal
+            // and allow other calls to python bindings this will release the GIL for the
+            // duration of the wait.
+            bool executed = editorPythonEventsInterface->TryExecuteReleasingGIL(tickFunc);
             if (!executed)
             {
                 AZ_Error("CryEditPy", false, "PyIdleWaitFrames: Failed to release GIL");
             }
+        }
+        else
+        {
+            // If EditorPythonEventsInterface is not available then there is no need to protect python GIL.
+            tickFunc();
         }
     }
 }
