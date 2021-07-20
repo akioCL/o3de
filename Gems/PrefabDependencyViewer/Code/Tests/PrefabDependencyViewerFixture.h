@@ -26,7 +26,7 @@ namespace PrefabDependencyViewer
         {
             UnitTest::ScopedAllocatorSetupFixture::SetUp();
             
-            m_prefabDomsCases["emptyUnsavedJSON"] = PrefabDom();
+            m_prefabDomsCases["emptyJSON"] = PrefabDom();
             m_prefabDomsCases["emptySavedJSON"] = PrefabDom();
 
             for (AZStd::pair<AZStd::string, PrefabDom>& p : m_prefabDomsCases)
