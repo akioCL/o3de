@@ -10,8 +10,10 @@
 
 #include <AzCore/Asset/AssetCommon.h>
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/IDataSerializer.h>
 
-namespace AZ {
+namespace AZ
+{
     struct Uuid;
 
     namespace Data
@@ -69,10 +71,10 @@ namespace AZ {
     /*
      * Generic serialization descriptor for all Assets of all types.
      */
-    template<typename T>
-    struct SerializeGenericTypeInfo< Data::Asset<T> >
+    template<class ValueType>
+    struct SerializeGenericTypeInfo< AZ::Data::Asset<ValueType> >
     {
-        typedef typename Data::Asset<T> ThisType;
+        typedef typename AZ::Data::Asset<ValueType> ThisType;
 
         class Factory
             : public SerializeContext::IObjectFactory
@@ -114,7 +116,7 @@ namespace AZ {
             const Uuid& GetTemplatedTypeId(size_t element) override
             {
                 (void)element;
-                return SerializeGenericTypeInfo<T>::GetClassTypeId();
+                return SerializeGenericTypeInfo<ValueType>::GetClassTypeId();
             }
 
             const Uuid& GetSpecializedTypeId() const override
@@ -131,7 +133,7 @@ namespace AZ {
             {
                 if (serializeContext)
                 {
-                    serializeContext->RegisterGenericClassInfo(GetSpecializedTypeId(), this, &AZ::AnyTypeInfoConcept<Data::Asset<Data::AssetData>>::CreateAny);
+                    serializeContext->RegisterGenericClassInfo(GetSpecializedTypeId(), this, &AZ::AnyTypeInfoConcept<AZ::Data::Asset<AZ::Data::AssetData>>::CreateAny);
                     serializeContext->RegisterGenericClassInfo(azrtti_typeid<ThisType>(), this, &AZ::AnyTypeInfoConcept<ThisType>::CreateAny);
                 }
             }
@@ -153,11 +155,11 @@ namespace AZ {
         }
     };
 
-    //! OnDemandReflection for any generic Data::Asset<T>
+    //! OnDemandReflection for any generic AZ::Data::Asset<T>
     template<typename T>
-    struct OnDemandReflection<Data::Asset<T>>
+    struct OnDemandReflection<AZ::Data::Asset<T>>
     {
-        using DataAssetType = Data::Asset<T>;
+        using DataAssetType = AZ::Data::Asset<T>;
         static void Reflect(ReflectContext* context)
         {
             if (auto behaviorContext = azrtti_cast<BehaviorContext*>(context))

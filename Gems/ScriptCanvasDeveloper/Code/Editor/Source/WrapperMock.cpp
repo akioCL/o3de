@@ -6,8 +6,9 @@
  *
  */
 
-#include <qmenu.h>
+#include <QMenu>
 
+#include <AzCore/Serialization/SerializeContext.h>
 #include <Editor/Include/ScriptCanvas/Bus/EditorScriptCanvasBus.h>
 #include <Editor/Include/ScriptCanvas/Bus/RequestBus.h>
 #include <Editor/Nodes/NodeUtils.h>
