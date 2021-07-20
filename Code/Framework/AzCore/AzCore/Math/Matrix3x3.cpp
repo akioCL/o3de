@@ -8,6 +8,7 @@
 
 #include <AzCore/Math/Matrix3x3.h>
 #include <AzCore/Math/MathScriptHelpers.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

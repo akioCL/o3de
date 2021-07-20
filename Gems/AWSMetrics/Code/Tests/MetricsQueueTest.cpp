@@ -14,6 +14,7 @@
 #include <AzTest/AzTest.h>
 #include <AzCore/UnitTest/TestTypes.h>
 #include <AzFramework/StringFunc/StringFunc.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AWSMetrics
 {
