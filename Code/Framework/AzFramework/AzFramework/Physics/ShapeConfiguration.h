@@ -10,7 +10,9 @@
 
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/Math/Quaternion.h>
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Memory/SystemAllocator.h>
+#include <AzCore/RTTI/RTTI.h>
+#include <AzCore/Asset/AssetCommon.h>
 
 namespace Physics
 {
