@@ -40,7 +40,7 @@ namespace AzToolsFramework
     private:
         bool HandleMouseEvent(const ViewportInteraction::MouseInteractionEvent& mouseInteraction);
 
-        AZ::EntityComponentIdPair m_ownerEntity;
+        AZ::EntityComponentIdPair m_ownerEntityComponentId;
         
         bool m_isPainting = false;
 
@@ -50,8 +50,8 @@ namespace AzToolsFramework
         float m_intensity = 1.0f;
         float m_opacity = 1.0f;
 
-        AZ::u32 OnIntensityChange() const;
-        AZ::u32 OnOpacityChange() const;
-        AZ::u32 OnRadiusChange() const;
+        AZ::u32 OnIntensityChange();
+        AZ::u32 OnOpacityChange();
+        AZ::u32 OnRadiusChange();
     };
 } // namespace AzToolsFramework

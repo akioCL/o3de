@@ -63,21 +63,21 @@ namespace AzToolsFramework
         }
     }
 
-    AZ::u32 PaintBrush::OnIntensityChange() const
+    AZ::u32 PaintBrush::OnIntensityChange()
     {
-        PaintBrushNotificationBus::Broadcast(&PaintBrushNotificationBus::Events::OnIntensityChanged, m_radius);
+        PaintBrushNotificationBus::Event(m_ownerEntityComponentId, &PaintBrushNotificationBus::Events::OnIntensityChanged, m_intensity);
         return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
     }
 
-    AZ::u32 PaintBrush::OnOpacityChange() const
+    AZ::u32 PaintBrush::OnOpacityChange()
     {
-        PaintBrushNotificationBus::Broadcast(&PaintBrushNotificationBus::Events::OnOpacityChanged, m_radius);
+        PaintBrushNotificationBus::Event(m_ownerEntityComponentId, &PaintBrushNotificationBus::Events::OnOpacityChanged, m_opacity);
         return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
     }
 
-    AZ::u32 PaintBrush::OnRadiusChange() const
+    AZ::u32 PaintBrush::OnRadiusChange()
     {
-        PaintBrushNotificationBus::Broadcast(&PaintBrushNotificationBus::Events::OnRadiusChanged, m_radius);
+        PaintBrushNotificationBus::Event(m_ownerEntityComponentId, &PaintBrushNotificationBus::Events::OnRadiusChanged, m_radius);
         return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
     }
 
@@ -164,12 +164,12 @@ namespace AzToolsFramework
         if (entityIdUnderCursor.IsValid())
         {
             AZ::Transform space = AZ::Transform::CreateTranslation(result);
-            PaintBrushNotificationBus::Broadcast(&PaintBrushNotificationBus::Events::OnWorldSpaceChanged, space);
+            PaintBrushNotificationBus::Event(m_ownerEntityComponentId, &PaintBrushNotificationBus::Events::OnWorldSpaceChanged, space);
 
             if (m_isPainting)
             {
-                PaintBrushNotificationBus::Broadcast(
-                    &PaintBrushNotificationBus::Events::OnPaint, AZ::Aabb::CreateCenterRadius(result, m_radius));
+                PaintBrushNotificationBus::Event(
+                    m_ownerEntityComponentId, &PaintBrushNotificationBus::Events::OnPaint, AZ::Aabb::CreateCenterRadius(result, m_radius));
             }
 
             return true;
@@ -200,6 +200,7 @@ namespace AzToolsFramework
 
     void PaintBrush::Activate(const AZ::EntityComponentIdPair& entityComponentIdPair)
     {
+        m_ownerEntityComponentId = entityComponentIdPair;
         PaintBrushRequestBus::Handler::BusConnect(entityComponentIdPair);
     }
 
