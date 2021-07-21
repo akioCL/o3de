@@ -725,7 +725,7 @@ namespace AZ
     {
         using namespace JsonSerializationResult;
 
-        SerializeContext::IRttiHelper* baseClassRtti = nullptr;
+        AZ::IRttiHelper* baseClassRtti = nullptr;
         if (baseTypeId)
         {
             const SerializeContext::ClassData* baseClassData = context.GetSerializeContext()->FindClassData(*baseTypeId);

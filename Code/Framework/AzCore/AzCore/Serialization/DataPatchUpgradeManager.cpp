@@ -89,7 +89,7 @@ namespace AZ
 
         for (auto* upgrade : upgrades)
         {
-            if (upgrade->GetUpgradeType() == AZ::SerializeContext::TYPE_UPGRADE)
+            if (upgrade->GetUpgradeType() == AZ::SerializeContext::DataPatchUpgradeType::TYPE_UPGRADE)
             {
                 AZ_Assert(addressElement.GetElementTypeId() == upgrade->GetFromType(), "Data Patch Upgrade Failure: address element type does not match the from type of the upgrade.");
                 addressElement.SetAddressClassTypeId(upgrade->GetToType());
@@ -102,7 +102,7 @@ namespace AZ
                     addressElement.SetAddressClassVersion(upgrade->ToVersion());
                 }
             }
-            else if (upgrade->GetUpgradeType() == AZ::SerializeContext::NAME_UPGRADE)
+            else if (upgrade->GetUpgradeType() == AZ::SerializeContext::DataPatchUpgradeType::NAME_UPGRADE)
             {
                 addressElement.SetPathElement(upgrade->GetNewName());
                 addressElement.SetAddressElement(AZ::u32(AZ::Crc32(upgrade->GetNewName().c_str())));
@@ -129,7 +129,7 @@ namespace AZ
         for (auto* upgrade : upgrades)
         {
             // Ignore name upgrades
-            if (upgrade->GetUpgradeType() == AZ::SerializeContext::TYPE_UPGRADE)
+            if (upgrade->GetUpgradeType() == AZ::SerializeContext::DataPatchUpgradeType::TYPE_UPGRADE)
             {
                 value = upgrade->Apply(value);
             }
@@ -153,11 +153,11 @@ namespace AZ
         auto nextUpgrade = GetNextUpgrade(typeVersion, nameVersion, currentNameCRC);
         while (nextUpgrade)
         {
-            if (nextUpgrade->GetUpgradeType() == AZ::SerializeContext::TYPE_UPGRADE)
+            if (nextUpgrade->GetUpgradeType() == AZ::SerializeContext::DataPatchUpgradeType::TYPE_UPGRADE)
             {
                 typeVersion = nextUpgrade->ToVersion();
             }
-            else if (nextUpgrade->GetUpgradeType() == AZ::SerializeContext::NAME_UPGRADE)
+            else if (nextUpgrade->GetUpgradeType() == AZ::SerializeContext::DataPatchUpgradeType::NAME_UPGRADE)
             {
                 nameVersion = nextUpgrade->ToVersion();
                 currentNameCRC = AZ::Crc32(nextUpgrade->GetNewName().c_str());
@@ -229,7 +229,7 @@ namespace AZ
                     {
                         AZ::SerializeContext::DataPatchUpgradeType upgradeType = (*possibleUpgrade)->GetUpgradeType();
                         unsigned int toVersion = (*possibleUpgrade)->ToVersion();
-                        if (upgradeType == AZ::SerializeContext::TYPE_UPGRADE && toVersion > currentTypeVersion)
+                        if (upgradeType == AZ::SerializeContext::DataPatchUpgradeType::TYPE_UPGRADE && toVersion > currentTypeVersion)
                         {
                             return (*possibleUpgrade);
                         }
@@ -270,7 +270,7 @@ namespace AZ
                     {
                         AZ::SerializeContext::DataPatchUpgradeType upgradeType = (*possibleUpgrade)->GetUpgradeType();
                         unsigned int toVersion = (*possibleUpgrade)->ToVersion();
-                        if (upgradeType == AZ::SerializeContext::NAME_UPGRADE && toVersion > currentNameVersion)
+                        if (upgradeType == AZ::SerializeContext::DataPatchUpgradeType::NAME_UPGRADE && toVersion > currentNameVersion)
                         {
                             return (*possibleUpgrade);
                         }

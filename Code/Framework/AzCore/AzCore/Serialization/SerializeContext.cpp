@@ -2113,160 +2113,173 @@ namespace AZ
         }
     }
 
-    AZ::SerializeContext::DataPatchUpgrade::DataPatchUpgrade(AZStd::string_view fieldName, unsigned int fromVersion, unsigned int toVersion)
-        : m_targetFieldName(fieldName)
-        , m_targetFieldCRC(m_targetFieldName.data(), m_targetFieldName.size(), true)
-        , m_fromVersion(fromVersion)
-        , m_toVersion(toVersion)
-    {}
-
-    bool AZ::SerializeContext::DataPatchUpgrade::operator==(const DataPatchUpgrade& RHS) const
+    namespace Serialize
     {
-        return m_upgradeType == RHS.m_upgradeType
-            && m_targetFieldCRC == RHS.m_targetFieldCRC
-            && m_fromVersion == RHS.m_fromVersion
-            && m_toVersion == RHS.m_toVersion;
-    }
-
-    bool AZ::SerializeContext::DataPatchUpgrade::operator<(const DataPatchUpgrade& RHS) const
-    {
-        if (m_fromVersion < RHS.m_fromVersion)
+        ClassBuilder::ClassBuilder(SerializeContext* context, const UuidToClassMap::iterator& classMapIter)
+            : m_context(context)
+            , m_classData(classMapIter)
         {
-            return true;
-        }
-
-        if (m_fromVersion > RHS.m_fromVersion)
-        {
-            return false;
-        }
-
-        // We sort on to version in reverse order
-        if (m_toVersion > RHS.m_toVersion)
-        {
-            return true;
-        }
-
-        if (m_toVersion < RHS.m_toVersion)
-        {
-            return false;
-        }
-
-        // When versions are equal, upgrades are prioritized by type in the
-        // order in which they appear in the DataPatchUpgradeType enum.
-        return m_upgradeType < RHS.m_upgradeType;
-    }
-
-    unsigned int AZ::SerializeContext::DataPatchUpgrade::FromVersion() const
-    {
-        return m_fromVersion;
-    }
-
-    unsigned int AZ::SerializeContext::DataPatchUpgrade::ToVersion() const
-    {
-        return m_toVersion;
-    }
-
-    const AZStd::string& AZ::SerializeContext::DataPatchUpgrade::GetFieldName() const
-    {
-        return m_targetFieldName;
-    }
-
-    AZ::Crc32 AZ::SerializeContext::DataPatchUpgrade::GetFieldCRC() const
-    {
-        return m_targetFieldCRC;
-    }
-
-    AZ::SerializeContext::DataPatchUpgradeType AZ::SerializeContext::DataPatchUpgrade::GetUpgradeType() const
-    {
-        return m_upgradeType;
-    }
-
-    AZ::SerializeContext::DataPatchUpgradeHandler::~DataPatchUpgradeHandler()
-    {
-        for (auto fieldUpgrades : m_upgrades)
-        {
-            for (auto versionUpgrades : fieldUpgrades.second)
+            if (!context->IsRemovingReflection())
             {
-                for (auto* upgrade : versionUpgrades.second)
+                m_currentAttributes = &classMapIter->second.m_attributes;
+            }
+        }
+
+        DataPatchUpgrade::DataPatchUpgrade(AZStd::string_view fieldName, unsigned int fromVersion, unsigned int toVersion)
+            : m_targetFieldName(fieldName)
+            , m_targetFieldCRC(m_targetFieldName.data(), m_targetFieldName.size(), true)
+            , m_fromVersion(fromVersion)
+            , m_toVersion(toVersion)
+        {}
+
+        bool DataPatchUpgrade::operator==(const DataPatchUpgrade& RHS) const
+        {
+            return m_upgradeType == RHS.m_upgradeType
+                && m_targetFieldCRC == RHS.m_targetFieldCRC
+                && m_fromVersion == RHS.m_fromVersion
+                && m_toVersion == RHS.m_toVersion;
+        }
+
+        bool DataPatchUpgrade::operator<(const DataPatchUpgrade& RHS) const
+        {
+            if (m_fromVersion < RHS.m_fromVersion)
+            {
+                return true;
+            }
+
+            if (m_fromVersion > RHS.m_fromVersion)
+            {
+                return false;
+            }
+
+            // We sort on to version in reverse order
+            if (m_toVersion > RHS.m_toVersion)
+            {
+                return true;
+            }
+
+            if (m_toVersion < RHS.m_toVersion)
+            {
+                return false;
+            }
+
+            // When versions are equal, upgrades are prioritized by type in the
+            // order in which they appear in the DataPatchUpgradeType enum.
+            return m_upgradeType < RHS.m_upgradeType;
+        }
+
+        unsigned int DataPatchUpgrade::FromVersion() const
+        {
+            return m_fromVersion;
+        }
+
+        unsigned int DataPatchUpgrade::ToVersion() const
+        {
+            return m_toVersion;
+        }
+
+        const AZStd::string& DataPatchUpgrade::GetFieldName() const
+        {
+            return m_targetFieldName;
+        }
+
+        AZ::Crc32 DataPatchUpgrade::GetFieldCRC() const
+        {
+            return m_targetFieldCRC;
+        }
+
+        DataPatchUpgradeType DataPatchUpgrade::GetUpgradeType() const
+        {
+            return m_upgradeType;
+        }
+
+        DataPatchUpgradeHandler::~DataPatchUpgradeHandler()
+        {
+            for (auto fieldUpgrades : m_upgrades)
+            {
+                for (auto versionUpgrades : fieldUpgrades.second)
                 {
-                    delete upgrade;
+                    for (auto* upgrade : versionUpgrades.second)
+                    {
+                        delete upgrade;
+                    }
                 }
             }
         }
-    }           
-    
-    void AZ::SerializeContext::DataPatchUpgradeHandler::AddFieldUpgrade(DataPatchUpgrade* upgrade)
-    {
-        // Find the field
-        auto fieldUpgrades = m_upgrades.find(upgrade->GetFieldCRC());
 
-        // If we don't have any upgrades for the field, add this item.
-        if (fieldUpgrades == m_upgrades.end())
+        void DataPatchUpgradeHandler::AddFieldUpgrade(DataPatchUpgrade* upgrade)
         {
-            m_upgrades[upgrade->GetFieldCRC()][upgrade->FromVersion()].insert(upgrade);
-        }
-        else
-        {
-            auto versionUpgrades = fieldUpgrades->second.find(upgrade->FromVersion());
-            if (versionUpgrades == fieldUpgrades->second.end())
+            // Find the field
+            auto fieldUpgrades = m_upgrades.find(upgrade->GetFieldCRC());
+
+            // If we don't have any upgrades for the field, add this item.
+            if (fieldUpgrades == m_upgrades.end())
             {
-                fieldUpgrades->second[upgrade->FromVersion()].insert(upgrade);
+                m_upgrades[upgrade->GetFieldCRC()][upgrade->FromVersion()].insert(upgrade);
             }
             else
             {
-                for (auto* existingUpgrade : versionUpgrades->second)
+                auto versionUpgrades = fieldUpgrades->second.find(upgrade->FromVersion());
+                if (versionUpgrades == fieldUpgrades->second.end())
                 {
-                    if (*existingUpgrade == *upgrade)
-                    {
-                        AZ_Assert(false, "Duplicate upgrade to field %s from version %u to version %u", upgrade->GetFieldName().c_str(), upgrade->FromVersion(), upgrade->ToVersion());
-
-                        // In a failure case, delete the upgrade as we've assumed control of it.
-                        delete upgrade;
-                        return;
-                    }
+                    fieldUpgrades->second[upgrade->FromVersion()].insert(upgrade);
                 }
+                else
+                {
+                    for (auto* existingUpgrade : versionUpgrades->second)
+                    {
+                        if (*existingUpgrade == *upgrade)
+                        {
+                            AZ_Assert(false, "Duplicate upgrade to field %s from version %u to version %u", upgrade->GetFieldName().c_str(), upgrade->FromVersion(), upgrade->ToVersion());
 
-                m_upgrades[upgrade->GetFieldCRC()][upgrade->FromVersion()].insert(upgrade);
+                            // In a failure case, delete the upgrade as we've assumed control of it.
+                            delete upgrade;
+                            return;
+                        }
+                    }
+
+                    m_upgrades[upgrade->GetFieldCRC()][upgrade->FromVersion()].insert(upgrade);
+                }
             }
         }
-    }
 
-    const AZ::SerializeContext::DataPatchFieldUpgrades& AZ::SerializeContext::DataPatchUpgradeHandler::GetUpgrades() const
-    {
-        return m_upgrades;
-    }
-
-    bool AZ::SerializeContext::DataPatchNameUpgrade::operator<(const DataPatchUpgrade& RHS) const
-    {
-        // If the right side is also a Field Name Upgrade, forward this to the
-        // appropriate equivalence operator.
-        return DataPatchUpgrade::operator<(RHS);
-    }
-
-    bool AZ::SerializeContext::DataPatchNameUpgrade::operator<(const DataPatchNameUpgrade& RHS) const
-    {
-        // The default operator is fine for name upgrades
-        return DataPatchUpgrade::operator<(RHS);
-    }
-
-    void AZ::SerializeContext::DataPatchNameUpgrade::Apply(AZ::SerializeContext& context, SerializeContext::DataElementNode& node) const
-    {
-        AZ_UNUSED(context);
-
-        int targetElementIndex = node.FindElement(m_targetFieldCRC);
-
-        AZ_Assert(targetElementIndex >= 0, "Invalid node. Field %s is not a valid element of class %s (Version %u). Check your reflection function.", m_targetFieldName.c_str(), node.GetNameString(), node.GetVersion());
-
-        if (targetElementIndex >= 0)
+        const DataPatchFieldUpgrades& DataPatchUpgradeHandler::GetUpgrades() const
         {
-            auto& targetElement = node.GetSubElement(targetElementIndex);
-            targetElement.SetName(m_newNodeName.c_str());
+            return m_upgrades;
         }
-    }
 
-    AZStd::string AZ::SerializeContext::DataPatchNameUpgrade::GetNewName() const
-    {
-        return m_newNodeName;
+        bool DataPatchNameUpgrade::operator<(const DataPatchUpgrade& RHS) const
+        {
+            // If the right side is also a Field Name Upgrade, forward this to the
+            // appropriate equivalence operator.
+            return DataPatchUpgrade::operator<(RHS);
+        }
+
+        bool DataPatchNameUpgrade::operator<(const DataPatchNameUpgrade& RHS) const
+        {
+            // The default operator is fine for name upgrades
+            return DataPatchUpgrade::operator<(RHS);
+        }
+
+        void DataPatchNameUpgrade::Apply(AZ::SerializeContext& context, SerializeContext::DataElementNode& node) const
+        {
+            AZ_UNUSED(context);
+
+            int targetElementIndex = node.FindElement(m_targetFieldCRC);
+
+            AZ_Assert(targetElementIndex >= 0, "Invalid node. Field %s is not a valid element of class %s (Version %u). Check your reflection function.", m_targetFieldName.c_str(), node.GetNameString(), node.GetVersion());
+
+            if (targetElementIndex >= 0)
+            {
+                auto& targetElement = node.GetSubElement(targetElementIndex);
+                targetElement.SetName(m_newNodeName.c_str());
+            }
+        }
+
+        AZStd::string DataPatchNameUpgrade::GetNewName() const
+        {
+            return m_newNodeName;
+        }
     }
 
     //=========================================================================

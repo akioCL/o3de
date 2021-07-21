@@ -126,13 +126,13 @@ namespace AZ
     }
 
     template<typename EnumType>
-    SerializeContext::EnumBuilder SerializeContext::Enum()
+    Serialize::EnumBuilder SerializeContext::Enum()
     {
         return Enum<EnumType>(&Serialize::StaticInstance<Serialize::InstanceFactory<EnumType>>::s_instance);
     }
 
     template<typename EnumType>
-    SerializeContext::EnumBuilder SerializeContext::Enum(IObjectFactory* factory)
+    Serialize::EnumBuilder SerializeContext::Enum(IObjectFactory* factory)
     {
         static_assert(AZStd::is_enum<EnumType>::value, "SerializeContext::Enum only supports a C++ enum type");
         using UnderlyingType = std::underlying_type_t<EnumType>;
@@ -141,8 +141,12 @@ namespace AZ
         const char* name = AzTypeInfo<EnumType>::Name();
         const AZ::TypeId& underlyingTypeId = AzTypeInfo<UnderlyingType>::Uuid();
 
-        AZ_Assert(!enumTypeId.IsNull(), "Enum Type has invalid AZ::TypeId. Has it been specialized with AZ_TYPE_INFO_INTERNAL_SPECIALIZE macro?");
-        AZ_Assert(!underlyingTypeId.IsNull(), "Underlying Type of enum has invalid AZ::TypeId. Has it been specialized with AZ_TYPE_INFO_INTERNAL_SPECIALIZE macro?");
+        AZ_Assert(
+            !enumTypeId.IsNull(),
+            "Enum Type has invalid AZ::TypeId. Has it been specialized with AZ_TYPE_INFO_INTERNAL_SPECIALIZE macro?");
+        AZ_Assert(
+            !underlyingTypeId.IsNull(),
+            "Underlying Type of enum has invalid AZ::TypeId. Has it been specialized with AZ_TYPE_INFO_INTERNAL_SPECIALIZE macro?");
 
         auto enumTypeIter = m_uuidMap.find(enumTypeId);
         if (IsRemovingReflection())
@@ -150,7 +154,7 @@ namespace AZ
             if (enumTypeIter != m_uuidMap.end())
             {
                 RemoveClassData(&enumTypeIter->second);
-                
+
                 auto classNameRange = m_classNameToUuid.equal_range(Crc32(name));
                 for (auto classNameRangeIter = classNameRange.first; classNameRangeIter != classNameRange.second;)
                 {
@@ -169,20 +173,25 @@ namespace AZ
         }
         else
         {
-            AZ_Error("Serialization", enumTypeIter == m_uuidMap.end(), "Type '%s' with TypeId %s is already registered with SerializeContext."
+            AZ_Error(
+                "Serialization", enumTypeIter == m_uuidMap.end(),
+                "Type '%s' with TypeId %s is already registered with SerializeContext."
                 " Enum type '%s' could not be registered due to a duplicate typeid.",
                 enumTypeIter->second.m_name, underlyingTypeId.ToString<AZStd::string>().data(), name);
             if (enumTypeIter == m_uuidMap.end())
             {
-                typename UuidToClassMap::pair_iter_bool enumTypeInsertIter = m_uuidMap.emplace(enumTypeId, ClassData::Create<EnumType>(name, enumTypeId, factory));
+                typename UuidToClassMap::pair_iter_bool enumTypeInsertIter =
+                    m_uuidMap.emplace(enumTypeId, ClassData::Create<EnumType>(name, enumTypeId, factory));
                 ClassData& enumClassData = enumTypeInsertIter.first->second;
-                enumClassData.m_serializer = IDataSerializerPtr{ new SerializeContextEnumInternal::EnumSerializer<EnumType>(), IDataSerializer::CreateDefaultDeleteDeleter() };
+                enumClassData.m_serializer = IDataSerializerPtr{ new SerializeContextEnumInternal::EnumSerializer<EnumType>(),
+                                                                    IDataSerializer::CreateDefaultDeleteDeleter() };
 
                 m_classNameToUuid.emplace(Crc32(name), enumTypeId);
                 m_uuidAnyCreationMap.emplace(enumTypeId, &AnyTypeInfoConcept<EnumType>::CreateAny);
-                
+
                 // Store the underlying type as an attribute within the ClassData
-                enumClassData.m_attributes.emplace_back(Serialize::Attributes::EnumUnderlyingType, aznew AZ::AttributeContainerType<AZ::TypeId>(underlyingTypeId));
+                enumClassData.m_attributes.emplace_back(
+                    Serialize::Attributes::EnumUnderlyingType, aznew AZ::AttributeContainerType<AZ::TypeId>(underlyingTypeId));
                 enumTypeIter = enumTypeInsertIter.first;
                 return EnumBuilder(this, enumTypeIter);
             }
@@ -191,58 +200,65 @@ namespace AZ
         return EnumBuilder(this, m_uuidMap.end());
     }
 
-    template<class EnumType>
-    auto SerializeContext::EnumBuilder::Value(const char* name, EnumType value) -> EnumBuilder*
+    namespace Serialize
     {
-        static_assert(AZStd::is_enum<EnumType>::value, "EnumBuilder::Value function can only accept enumeration values");
-
-        if (m_context->IsRemovingReflection())
+        template<class EnumType>
+        auto EnumBuilder::Value(const char* name, EnumType value) -> EnumBuilder*
         {
-            return this; // we have already removed the class data for this class
+            static_assert(AZStd::is_enum<EnumType>::value, "EnumBuilder::Value function can only accept enumeration values");
+
+            if (m_context->IsRemovingReflection())
+            {
+                return this; // we have already removed the class data for this class
+            }
+
+            AZ_Assert(
+                m_classData->second.m_typeId == AzTypeInfo<EnumType>::Uuid(),
+                "Enum Value '%s' must be a member of enum type %s."
+                " The supplied type is %s",
+                name, m_classData->second.m_name, AzTypeInfo<EnumType>::Name());
+
+            AZStd::unique_ptr<SerializeContextEnumInternal::EnumConstantBase> enumConstantPtr =
+                AZStd::make_unique<SerializeContextEnumInternal::EnumConstant<EnumType>>(AZStd::string_view(name), value);
+            Attribute(Serialize::Attributes::EnumValueKey, AZStd::move(enumConstantPtr));
+
+            return this;
         }
 
-        AZ_Assert(m_classData->second.m_typeId == AzTypeInfo<EnumType>::Uuid(), "Enum Value '%s' must be a member of enum type %s."
-            " The supplied type is %s", name, m_classData->second.m_name, AzTypeInfo<EnumType>::Name());
-
-        AZStd::unique_ptr<SerializeContextEnumInternal::EnumConstantBase> enumConstantPtr = AZStd::make_unique<SerializeContextEnumInternal::EnumConstant<EnumType>>(AZStd::string_view(name), value);
-        Attribute(Serialize::Attributes::EnumValueKey, AZStd::move(enumConstantPtr));
-
-        return this;
-    }
-
-    template<typename SerializerImplementation>
-    auto SerializeContext::EnumBuilder::Serializer() -> EnumBuilder*
-    {
-        return Serializer({ new SerializerImplementation, IDataSerializer::CreateDefaultDeleteDeleter() });
-    }
-
-    template<typename EventHandlerImplementation>
-    auto SerializeContext::EnumBuilder::EventHandler() -> EnumBuilder*
-    {
-        return EventHandler(&Serialize::StaticInstance<EventHandlerImplementation>::s_instance);
-    }
-
-    template<typename DataContainerType>
-    auto SerializeContext::EnumBuilder::DataContainer() -> EnumBuilder*
-    {
-        return DataContainer(&Serialize::StaticInstance<DataContainerType>::s_instance);
-    }
-
-    template<class T>
-    auto SerializeContext::EnumBuilder::Attribute(Crc32 idCrc, T&& value) -> EnumBuilder*
-    {
-        if (m_context->IsRemovingReflection())
+        template<typename SerializerImplementation>
+        auto EnumBuilder::Serializer() -> EnumBuilder*
         {
-            return this; // we have already removed the class data for this class
+            return Serializer({ new SerializerImplementation, IDataSerializer::CreateDefaultDeleteDeleter() });
         }
 
-        using ContainerType = AttributeContainerType<AZStd::decay_t<T>>;
-
-        AZ_Error("Serialization", m_currentAttributes, "Current data type doesn't support attributes!");
-        if (m_currentAttributes)
+        template<typename EventHandlerImplementation>
+        auto EnumBuilder::EventHandler() -> EnumBuilder*
         {
-            m_currentAttributes->emplace_back(idCrc, aznew ContainerType(AZStd::forward<T>(value)));
+            return EventHandler(&Serialize::StaticInstance<EventHandlerImplementation>::s_instance);
         }
-        return this;
+
+        template<typename DataContainerType>
+        auto EnumBuilder::DataContainer() -> EnumBuilder*
+        {
+            return DataContainer(&Serialize::StaticInstance<DataContainerType>::s_instance);
+        }
+
+        template<class T>
+        auto EnumBuilder::Attribute(Crc32 idCrc, T&& value) -> EnumBuilder*
+        {
+            if (m_context->IsRemovingReflection())
+            {
+                return this; // we have already removed the class data for this class
+            }
+
+            using ContainerType = AttributeContainerType<AZStd::decay_t<T>>;
+
+            AZ_Error("Serialization", m_currentAttributes, "Current data type doesn't support attributes!");
+            if (m_currentAttributes)
+            {
+                m_currentAttributes->emplace_back(idCrc, aznew ContainerType(AZStd::forward<T>(value)));
+            }
+            return this;
+        }
     }
 }
