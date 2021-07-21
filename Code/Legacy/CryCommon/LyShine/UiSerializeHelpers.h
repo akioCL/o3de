@@ -11,7 +11,6 @@
 #include <AzCore/Math/Vector2.h>
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/Math/Color.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Math/Sfmt.h>
 #include <AzCore/Component/Entity.h>
 

@@ -485,6 +485,7 @@ set(FILES
     Serialization/IDataSerializer.h
     Serialization/IdUtils.inl
     Serialization/IdUtils.h
+    Serialization/IObjectFactory.h
     Serialization/Utils.h
     Serialization/SerializationUtils.cpp
     Serialization/ObjectStream.cpp
@@ -493,6 +494,7 @@ set(FILES
     Serialization/SerializeContext.h
     Serialization/SerializeContextEnum.cpp
     Serialization/SerializeContextEnum.inl
+    Serialization/SerializeFriend.h
     Serialization/SerializeSwapEndian.h
     Serialization/DataPatch.h
     Serialization/DataPatch.cpp

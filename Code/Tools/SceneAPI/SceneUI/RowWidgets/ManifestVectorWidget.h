@@ -27,7 +27,7 @@ namespace AzToolsFramework
     class ReflectedPropertyEditor;
     class InstanceDataNode;
 }
-namespace SerializeContext
+namespace Serialization
 {
     class IObjectFactory;
 }

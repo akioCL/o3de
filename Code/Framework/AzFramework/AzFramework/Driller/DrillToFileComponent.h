@@ -12,7 +12,6 @@
 #include <AzCore/Driller/Driller.h>
 #include <AzCore/Driller/DefaultStringPool.h>
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/deque.h>
 #include <AzCore/std/parallel/condition_variable.h>
 

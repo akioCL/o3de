@@ -10,7 +10,6 @@
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/RTTI/ReflectContext.h>
 #include <AzCore/std/string/string_view.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Component/EntityId.h>
 #include <Vegetation/Ebuses/DescriptorNotificationBus.h>

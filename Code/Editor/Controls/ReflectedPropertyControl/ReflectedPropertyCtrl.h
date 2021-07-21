@@ -12,7 +12,6 @@
 
 #if !defined(Q_MOC_RUN)
 #include <AzToolsFramework/UI/PropertyEditor/PropertyEditorAPI.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include "Include/EditorCoreAPI.h"
 #include "ReflectedPropertyItem.h"
@@ -26,7 +25,13 @@ class QVBoxLayout;
 class PropertyCard;
 class QScrollArea;
 
-namespace AzToolsFramework {
+namespace AZ
+{
+    class SerializeContext;
+}
+
+namespace AzToolsFramework 
+{
     class ReflectedPropertyEditor;
     class PropertyRowWidget;
     class ComponentEditorHeader;

@@ -18,7 +18,6 @@
 #include <AzCore/Memory/MemoryDriller.h>
 #include <AzCore/Memory/AllocationRecords.h>
 #include <AzCore/RTTI/ReflectionManager.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Name/NameDictionary.h>
 #include <AzCore/Component/TickBus.h>
 

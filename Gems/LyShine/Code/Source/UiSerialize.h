@@ -8,7 +8,6 @@
 #pragma once
 
 #include <LyShine/IDraw2d.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <LyShine/Bus/UiTransform2dBus.h>
 #include <LyShine/Bus/UiLayoutBus.h>
 

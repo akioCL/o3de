@@ -509,7 +509,7 @@ namespace AZ
 
             VariantSerializationInternal::AZStdVariantContainer<Types...> m_variantContainer;
             SerializeContext::ClassData m_classData;
-            Serialize::InstanceFactory<VariantType> m_variantInstanceFactory;
+            Serialization::InstanceFactory<VariantType> m_variantInstanceFactory;
             VariantDataConverter m_dataConverter;
         };
 

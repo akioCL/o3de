@@ -8,12 +8,15 @@
 #pragma once
 
 #include "Include/IPreferencesPage.h"
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/Math/Color.h>
 #include <QIcon>
 
+namespace AZ
+{
+    class SerializeContext;
+}
 
 class CEditorPreferencesPage_ViewportGeneral
     : public IPreferencesPage

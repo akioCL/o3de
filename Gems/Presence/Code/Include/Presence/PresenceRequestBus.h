@@ -11,7 +11,6 @@
 #include <AzCore/std/string/string.h>
 #include <AzCore/EBus/EBus.h>
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
 #include <AzCore/RTTI/BehaviorContext.h>

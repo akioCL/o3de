@@ -11,7 +11,6 @@
 #include <AzCore/RTTI/TypeInfo.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/std/functional.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
 
 namespace AZ

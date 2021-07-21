@@ -6,7 +6,6 @@
  *
  */
 #pragma once
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace PhysX
 {

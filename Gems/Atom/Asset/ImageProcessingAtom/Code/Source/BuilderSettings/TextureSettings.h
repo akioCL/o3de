@@ -9,7 +9,6 @@
 #pragma once
 
 #include <BuilderSettings/ImageProcessingDefines.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/RTTI/ReflectContext.h>
 #include <AzCore/Serialization/DataPatch.h>
 

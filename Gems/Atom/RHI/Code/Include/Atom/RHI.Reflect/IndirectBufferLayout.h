@@ -12,6 +12,7 @@
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/Utils/TypeHash.h>
+#include <AzCore/std/containers/unordered_map.h>
 #include <AtomCore/std/containers/array_view.h>
 
 namespace AZ

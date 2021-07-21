@@ -10,7 +10,6 @@
 #include "EditorEntitySortBus.h"
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
 #include <AzToolsFramework/Entity/EditorEntityContextBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AzToolsFramework
 {

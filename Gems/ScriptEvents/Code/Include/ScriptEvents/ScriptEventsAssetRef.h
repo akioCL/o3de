@@ -14,7 +14,6 @@
 #include <AzCore/Script/ScriptContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/ObjectStream.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <AzFramework/Asset/SimpleAsset.h>
 

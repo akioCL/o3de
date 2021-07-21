@@ -12,7 +12,6 @@
 #include <AzCore/std/containers/unordered_map.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include "MultiThreadManager.h"
 
 namespace AZ

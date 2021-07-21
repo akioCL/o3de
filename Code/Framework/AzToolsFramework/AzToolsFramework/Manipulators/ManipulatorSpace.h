@@ -7,6 +7,10 @@
  */
 
 #pragma once
+
+#include <AzCore/RTTI/RTTI.h>
+#include <AzCore/Memory/Memory.h>
+#include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Math/Transform.h>
 
 namespace AZ

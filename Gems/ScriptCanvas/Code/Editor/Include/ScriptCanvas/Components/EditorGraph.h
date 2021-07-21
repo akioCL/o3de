@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzCore/std/containers/unordered_map.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <ScriptCanvas/Core/Graph.h>
 #include <ScriptCanvas/Bus/GraphBus.h>
 #include <ScriptCanvas/Bus/NodeIdPair.h>

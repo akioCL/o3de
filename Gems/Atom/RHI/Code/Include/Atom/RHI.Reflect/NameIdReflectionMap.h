@@ -10,7 +10,6 @@
 
 #include <Atom/RHI.Reflect/Handle.h>
 #include <AzCore/Name/Name.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/algorithm.h>
 #include <AzCore/std/sort.h>
 

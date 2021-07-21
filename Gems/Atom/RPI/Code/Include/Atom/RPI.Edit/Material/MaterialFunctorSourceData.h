@@ -10,7 +10,6 @@
 
 #include <AzCore/Asset/AssetCommon.h>
 #include <AzCore/std/smart_ptr/intrusive_base.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <Atom/RPI.Reflect/Base.h>
 #include <Atom/RPI.Reflect/Shader/ShaderOptionTypes.h>
 #include <Atom/RPI.Reflect/Material/MaterialPropertyDescriptor.h>

@@ -19,7 +19,6 @@
 #include <LyShine/UiComponentTypes.h>
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <LmbrCentral/Rendering/MaterialAsset.h>
 #include <IRenderer.h>

@@ -15,7 +15,6 @@
 #include <LyShine/UiComponentTypes.h>
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Math/Vector2.h>
 
 #include <UiLayoutHelpers.h>

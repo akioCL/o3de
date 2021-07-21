@@ -9,8 +9,8 @@
 
 #include <Atom/RHI.Reflect/Base.h>
 #include <AtomCore/std/containers/array_view.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/smart_ptr/intrusive_base.h>
+#include <AzCore/Serialization/SerializeFriend.h>
 
 namespace AZ
 {

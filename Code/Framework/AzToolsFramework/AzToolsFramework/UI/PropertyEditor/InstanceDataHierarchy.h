@@ -8,7 +8,6 @@
 #ifndef PROPERTY_EDITOR_INSTANCE_DATA_HIERARCHY_H
 #define PROPERTY_EDITOR_INSTANCE_DATA_HIERARCHY_H
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>

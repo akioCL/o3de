@@ -17,7 +17,6 @@
 #include <LyShine/Bus/UiTransformBus.h>
 #include <LyShine/UiComponentTypes.h>
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Math/Vector3.h>
 
 #include <LmbrCentral/Rendering/MaterialAsset.h>

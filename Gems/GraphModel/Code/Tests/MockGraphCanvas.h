@@ -11,7 +11,6 @@
 // AZ ...
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/EBus/EBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 // Graph Canvas ...
 #include <GraphCanvas/Components/Nodes/NodeBus.h>

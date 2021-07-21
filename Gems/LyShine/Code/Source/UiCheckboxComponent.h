@@ -13,7 +13,6 @@
 #include <LyShine/Bus/UiInteractableBus.h>
 #include <LyShine/UiComponentTypes.h>
 
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <LmbrCentral/Rendering/MaterialAsset.h>
 

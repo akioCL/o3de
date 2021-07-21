@@ -38,6 +38,7 @@
 #include <AzCore/IO/ByteContainerStream.h>
 #include <AzCore/Serialization/IDataSerializer.h>
 #include <AzCore/Serialization/SerializeSwapEndian.h>
+#include <AzCore/Serialization/IObjectFactory.h>
 
 #define AZ_SERIALIZE_BINARY_STACK_BUFFER 4096
 
@@ -66,7 +67,7 @@ namespace AZ
     template<typename ContainerType, typename T>
     AttributePtr CreateModuleAttribute(T&& attrValue);
 
-    namespace Serialize
+    namespace Serialization
     {
         /**
         * Template to hold a single global instance of a particular type. Keep in mind that this is not DLL safe
@@ -494,26 +495,6 @@ namespace AZ
         };
 
         /**
-         * Interface for creating and destroying object from the serializer.
-         */
-        class IObjectFactory
-        {
-        public:
-
-            virtual ~IObjectFactory() {}
-
-            /// Called to create an instance of an object.
-            virtual void* Create(const char* name) = 0;
-
-            /// Called to destroy an instance of an object
-            virtual void  Destroy(void* ptr) = 0;
-            void Destroy(const void* ptr)
-            {
-                Destroy(const_cast<void*>(ptr));
-            }
-        };
-
-        /**
          * Interface for a data container. This might be an AZStd container or just a class with
          * elements defined in some template manner (usually with templates :) )
          */
@@ -919,7 +900,7 @@ namespace AZ
             template<typename SerializerImplementation>
             ClassBuilder* Serializer()
             {
-                return Serializer(&Serialize::StaticInstance<SerializerImplementation>::s_instance);
+                return Serializer(&Serialization::StaticInstance<SerializerImplementation>::s_instance);
             }
 
             /// For class type that are empty, we want the serializer to create on load, but have no child elements.
@@ -936,7 +917,7 @@ namespace AZ
             template<typename EventHandlerImplementation>
             ClassBuilder* EventHandler()
             {
-                return EventHandler(&Serialize::StaticInstance<EventHandlerImplementation>::s_instance);
+                return EventHandler(&Serialization::StaticInstance<EventHandlerImplementation>::s_instance);
             }
 
             /// Adds a DataContainer structure for manipulating contained data in custom ways
@@ -946,7 +927,7 @@ namespace AZ
             template<typename DataContainerType>
             ClassBuilder* DataContainer()
             {
-                return DataContainer(&Serialize::StaticInstance<DataContainerType>::s_instance);
+                return DataContainer(&Serialization::StaticInstance<DataContainerType>::s_instance);
             }
 
             /**
@@ -1073,35 +1054,35 @@ namespace AZ
     public:
         /// @cond EXCLUDE_DOCS
         friend class EditContext;
-        friend class Serialize::ClassBuilder;
+        friend class Serialization::ClassBuilder;
         /// @endcond
 
         // Previously these types were inside the class, but that prevents forward declaration, so they were moved to the
         // Serialize namespace and reused here to maintain backwards compatibility
-        using ClassBuilder = AZ::Serialize::ClassBuilder;
-        using IObjectFactory = AZ::Serialize::IObjectFactory;
-        using EnumBuilder = AZ::Serialize::EnumBuilder;
-        using VersionConverter = AZ::Serialize::VersionConverter;
-        using ClassData = AZ::Serialize::ClassData;
-        using ClassElement = AZ::Serialize::ClassElement;
-        using ErrorHandler = AZ::Serialize::ErrorHandler;
-        using EnumerateInstanceCallContext = AZ::Serialize::EnumerateInstanceCallContext;
-        using BeginElemEnumCB = AZ::Serialize::BeginElemEnumCB;
-        using EndElemEnumCB = AZ::Serialize::EndElemEnumCB;
-        using UuidToClassMap = AZ::Serialize::UuidToClassMap;
-        using IDataContainer = AZ::Serialize::IDataContainer;
-        using DataElement = AZ::Serialize::DataElement;
-        using IEventHandler = AZ::Serialize::IEventHandler;
-        using DataElementNode = AZ::Serialize::DataElementNode;
-        static constexpr unsigned int VersionClassDeprecated = AZ::Serialize::VersionClassDeprecated;
-        using ClassPersistentId = AZ::Serialize::ClassPersistentId;
-        using ClassDoSave = AZ::Serialize::ClassDoSave;
-        using DbgStackEntry = AZ::Serialize::DbgStackEntry;
-        using DataPatchFieldUpgrades = AZ::Serialize::DataPatchFieldUpgrades;
-        using DataPatchUpgrade = AZ::Serialize::DataPatchUpgrade;
-        using DataPatchUpgradeMap = AZ::Serialize::DataPatchUpgradeMap;
-        using DataPatchUpgradeType = AZ::Serialize::DataPatchUpgradeType;
-        using IDataConverter = AZ::Serialize::IDataConverter;
+        using ClassBuilder = AZ::Serialization::ClassBuilder;
+        using IObjectFactory = AZ::Serialization::IObjectFactory;
+        using EnumBuilder = AZ::Serialization::EnumBuilder;
+        using VersionConverter = AZ::Serialization::VersionConverter;
+        using ClassData = AZ::Serialization::ClassData;
+        using ClassElement = AZ::Serialization::ClassElement;
+        using ErrorHandler = AZ::Serialization::ErrorHandler;
+        using EnumerateInstanceCallContext = AZ::Serialization::EnumerateInstanceCallContext;
+        using BeginElemEnumCB = AZ::Serialization::BeginElemEnumCB;
+        using EndElemEnumCB = AZ::Serialization::EndElemEnumCB;
+        using UuidToClassMap = AZ::Serialization::UuidToClassMap;
+        using IDataContainer = AZ::Serialization::IDataContainer;
+        using DataElement = AZ::Serialization::DataElement;
+        using IEventHandler = AZ::Serialization::IEventHandler;
+        using DataElementNode = AZ::Serialization::DataElementNode;
+        static constexpr unsigned int VersionClassDeprecated = AZ::Serialization::VersionClassDeprecated;
+        using ClassPersistentId = AZ::Serialization::ClassPersistentId;
+        using ClassDoSave = AZ::Serialization::ClassDoSave;
+        using DbgStackEntry = AZ::Serialization::DbgStackEntry;
+        using DataPatchFieldUpgrades = AZ::Serialization::DataPatchFieldUpgrades;
+        using DataPatchUpgrade = AZ::Serialization::DataPatchUpgrade;
+        using DataPatchUpgradeMap = AZ::Serialization::DataPatchUpgradeMap;
+        using DataPatchUpgradeType = AZ::Serialization::DataPatchUpgradeType;
+        using IDataConverter = AZ::Serialization::IDataConverter;
 
         /**
          * Helper for directly comparing two instances of a given type.
@@ -1661,7 +1642,7 @@ namespace AZ
     ///////////////////////////////////////////////////////////////////////////
     // Implementations
     //
-    namespace Serialize
+    namespace Serialization
     {
         /// Default instance factory to create/destroy a classes (when a factory is not provided)
         template<class T, bool U = HasAZClassAllocator<T>::value, bool A = AZStd::is_abstract<T>::value >
@@ -1855,7 +1836,7 @@ namespace AZ
     SerializeContext::ClassBuilder
     SerializeContext::Class()
     {
-        return Class<T, TBaseClasses...>(&Serialize::StaticInstance<Serialize::InstanceFactory<T> >::s_instance);
+        return Class<T, TBaseClasses...>(&Serialization::StaticInstance<Serialization::InstanceFactory<T> >::s_instance);
     }
 
     //=========================================================================
@@ -2088,7 +2069,7 @@ namespace AZ
         return this;
     }
 
-    namespace Serialize
+    namespace Serialization
     {
         //=========================================================================
         // DataElementNode::GetData
@@ -2498,13 +2479,6 @@ namespace AZ
         return AttributePtr{ static_cast<ContainerType*>(rawMemory), AZStd::move(attributeDeleter), AZStdIAllocator(&moduleAllocator) };
     }
 }   // namespace AZ
-
-// Put this macro on your class to allow serialization with a private default constructor.
-#define AZ_SERIALIZE_FRIEND() \
-    template <typename, typename> \
-    friend struct AZ::AnyTypeInfoConcept; \
-    template <typename, bool, bool> \
-    friend struct AZ::Serialize::InstanceFactory;
 
 /// include AZStd containers generics
 #include <AzCore/Serialization/AZStdContainers.inl>

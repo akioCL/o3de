@@ -12,7 +12,6 @@
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Script/ScriptContextAttributes.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/any.h>
 #include <AzCore/std/parallel/atomic.h>
 #include <ScriptCanvas/Data/Data.h>
@@ -109,7 +108,7 @@ namespace ScriptCanvas
         AZStd::any m_object;
 
         // it is very important to track these from the moment they are created...
-        friend struct AZ::Serialize::InstanceFactory<BehaviorContextObject, true, false>;
+        friend struct AZ::Serialization::InstanceFactory<BehaviorContextObject, true, false>;
         friend struct AZ::AnyTypeInfoConcept<BehaviorContextObject, void>;
         //...so don't use the ctors, use the Create functions...
         //...the friend declarations are here for compatibility with the serialization system only

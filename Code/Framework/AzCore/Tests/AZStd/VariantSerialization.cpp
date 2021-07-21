@@ -12,6 +12,7 @@
 #include <AzCore/std/containers/variant.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Serialization/Utils.h>
+#include <AzCore/Memory/PoolAllocator.h>
 
 namespace UnitTest
 {

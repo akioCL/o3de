@@ -10,7 +10,6 @@
 
 #include "ValueParameter.h"
 #include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace EMotionFX
 {

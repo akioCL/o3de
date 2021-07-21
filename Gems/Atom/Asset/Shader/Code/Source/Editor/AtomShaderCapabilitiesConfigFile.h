@@ -10,7 +10,6 @@
 
 #include <AzCore/Preprocessor/Enum.h>
 #include <AzCore/RTTI/ReflectContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/DataPatch.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/std/containers/unordered_map.h>

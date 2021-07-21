@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <LmbrCentral/Dependency/DependencyMonitor.h>
 #include <GradientSignal/GradientSampler.h>
 #include <GradientSignal/SmoothStep.h>

@@ -9,6 +9,7 @@
 #include <AzCore/JSON/writer.h>
 #include <AzCore/JSON/prettywriter.h>
 #include <AzCore/std/iterator.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace JsonSerializationTests
 {

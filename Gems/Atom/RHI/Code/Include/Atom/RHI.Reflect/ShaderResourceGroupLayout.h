@@ -13,7 +13,6 @@
 #include <AtomCore/std/containers/array_view.h>
 #include <AzCore/std/smart_ptr/intrusive_base.h>
 #include <AzCore/Outcome/Outcome.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Utils/TypeHash.h>
 
 namespace AZ

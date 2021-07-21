@@ -19,7 +19,6 @@
 #include <AzCore/Outcome/Outcome.h>
 #include <AzCore/IO/Path/Path.h>
 #include <AzCore/IO/SystemFile.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/RTTI/ReflectionManager.h>
 #include <AzCore/Settings/CommandLine.h>
 #include <AzCore/Settings/SettingsRegistry.h>
@@ -28,6 +27,7 @@
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzCore/std/string/conversions.h>
 #include <AzCore/std/string/osstring.h>
+#include <AzCore/Serialization/IObjectFactory.h>
 
 namespace AZ
 {
@@ -93,7 +93,7 @@ namespace AZ
          *       Use the OSAllocator only.
          */
         struct Descriptor
-            : public SerializeContext::IObjectFactory
+            : public Serialization::IObjectFactory
         {
             AZ_TYPE_INFO(ComponentApplication::Descriptor, "{70277A3E-2AF5-4309-9BBF-6161AFBDE792}");
             AZ_CLASS_ALLOCATOR(ComponentApplication::Descriptor, SystemAllocator, 0);

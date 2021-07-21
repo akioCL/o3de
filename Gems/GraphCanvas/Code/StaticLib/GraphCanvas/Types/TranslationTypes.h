@@ -10,7 +10,6 @@
 
 #include <QCoreApplication>
 
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace GraphCanvas
 {

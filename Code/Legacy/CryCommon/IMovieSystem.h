@@ -15,7 +15,6 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/Math/Crc.h>
 #include <AzCore/Math/Quaternion.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <Range.h>
 #include <AnimKey.h>
@@ -325,13 +324,7 @@ struct IAnimTrack
     AZ_RTTI(IAnimTrack, "{AA0D5170-FB28-426F-BA13-7EFF6BB3AC67}");
     AZ_CLASS_ALLOCATOR(IAnimTrack, AZ::SystemAllocator, 0);
 
-    static void Reflect(AZ::ReflectContext* context)
-    {
-        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
-        {
-            serializeContext->Class<IAnimTrack>();
-        }
-    }
+    static void Reflect(AZ::ReflectContext* context);
 
     //! Flags that can be set on animation track.
     enum EAnimTrackFlags
@@ -601,13 +594,7 @@ public:
     AZ_RTTI(IAnimNode, "{0A096354-7F26-4B18-B8C0-8F10A3E0440A}");
     AZ_CLASS_ALLOCATOR(IAnimNode, AZ::SystemAllocator, 0);
 
-    static void Reflect(AZ::ReflectContext* context)
-    {
-        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
-        {
-            serializeContext->Class<IAnimNode>();
-        }
-    }
+    static void Reflect(AZ::ReflectContext* context);
 
     //////////////////////////////////////////////////////////////////////////
     // Supported params.
@@ -933,13 +920,7 @@ struct IAnimSequence
 
     static const int kSequenceVersion = 5;
 
-    static void Reflect(AZ::ReflectContext* context)
-    {
-        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
-        {
-            serializeContext->Class<IAnimSequence>();
-        }
-    }
+    static void Reflect(AZ::ReflectContext* context);
 
     //! Flags used for SetFlags(),GetFlags(),SetParentFlags(),GetParentFlags() methods.
     enum EAnimSequenceFlags

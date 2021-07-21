@@ -15,7 +15,6 @@
 #define CRYINCLUDE_CRYMOVIE_2DSPLINE_H
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <ISplines.h>
 
 namespace spline

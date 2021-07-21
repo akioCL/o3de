@@ -11,6 +11,7 @@
 #include <AzCore/PlatformIncl.h>
 #include <AzCore/Module/ModuleManagerBus.h>
 #include <AzCore/Memory/AllocationRecords.h>
+#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/UnitTest/TestTypes.h>
 #include "ModuleTestBus.h"
 

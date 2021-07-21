@@ -554,7 +554,7 @@ namespace UiSerialize
         if (serializeContext)
         {
             serializeContext->Class<CryStringT<char> >()->
-                Serializer(&AZ::Serialize::StaticInstance<CryStringTCharSerializer>::s_instance);
+                Serializer(&AZ::Serialization::StaticInstance<CryStringTCharSerializer>::s_instance);
 
             serializeContext->Class<AnimationData>()
                 ->Version(1)

@@ -14,7 +14,6 @@
 
 #include <AzToolsFramework/UI/SearchWidget/SearchCriteriaWidget.hxx>
 #include <AzToolsFramework/UI/SearchWidget/SearchWidgetTypes.hxx>
-#include <AzCore/Serialization/SerializeContext.h>
 #include "ComponentDataModel.h"
 #endif
 

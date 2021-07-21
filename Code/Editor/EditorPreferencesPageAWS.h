@@ -8,10 +8,14 @@
 #pragma once
 
 #include "Include/IPreferencesPage.h"
-#include <AzCore/Serialization/SerializeContext.h>
-#include <AzCore/Settings/SettingsRegistryImpl.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <QIcon>
+
+namespace AZ
+{
+    class SettingsRegistryImpl;
+    class SerializeContext;
+}
 
 class CEditorPreferencesPage_AWS
     : public IPreferencesPage

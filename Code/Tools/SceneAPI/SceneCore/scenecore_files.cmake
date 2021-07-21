@@ -12,6 +12,7 @@ set(FILES
     SceneBuilderDependencyBus.h
     SceneCoreStandaloneAllocator.h
     SceneCoreStandaloneAllocator.cpp
+    DataTypes/IManifestObject.cpp
     DataTypes/IManifestObject.h
     DataTypes/IGraphObject.h
     DataTypes/DataTypeUtilities.h
@@ -68,10 +69,8 @@ set(FILES
     Containers/Scene.h
     Containers/Scene.cpp
     Containers/SceneGraph.h
-    Containers/SceneGraph.inl
     Containers/SceneGraph.cpp
     Containers/SceneManifest.h
-    Containers/SceneManifest.inl
     Containers/SceneManifest.cpp
     Containers/Views/View.h
     Containers/Views/View.inl

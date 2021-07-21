@@ -8,7 +8,6 @@
  *
  */
 
-#include <stdint.h>
 #include <AzCore/std/hash.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/containers/unordered_map.h>
@@ -281,5 +280,3 @@ namespace AZ
     AZ_TYPE_INFO_SPECIALIZE(AZ::SceneAPI::Containers::SceneGraph::Name, "{4077AC3C-B301-4F5A-BEA7-54D6511AEC2E}");
 
 } // AZ
-
-#include <SceneAPI/SceneCore/Containers/SceneGraph.inl>

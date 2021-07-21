@@ -10,7 +10,6 @@
 
 #include <AzCore/Math/Color.h>
 #include <AzCore/RTTI/RTTI.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 
 #include <LmbrCentral/Shape/SplineComponentBus.h>

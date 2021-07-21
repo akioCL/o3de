@@ -10,7 +10,6 @@
 #include <AzCore/base.h>
 #include <AzCore/Math/Crc.h>
 #include <AzCore/std/string/string.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/typetraits/function_traits.h>
 #include <AzCore/Preprocessor/CodeGenBoilerplate.h>
 

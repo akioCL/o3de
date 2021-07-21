@@ -126,13 +126,13 @@ namespace AZ
     }
 
     template<typename EnumType>
-    Serialize::EnumBuilder SerializeContext::Enum()
+    Serialization::EnumBuilder SerializeContext::Enum()
     {
-        return Enum<EnumType>(&Serialize::StaticInstance<Serialize::InstanceFactory<EnumType>>::s_instance);
+        return Enum<EnumType>(&Serialization::StaticInstance<Serialization::InstanceFactory<EnumType>>::s_instance);
     }
 
     template<typename EnumType>
-    Serialize::EnumBuilder SerializeContext::Enum(IObjectFactory* factory)
+    Serialization::EnumBuilder SerializeContext::Enum(IObjectFactory* factory)
     {
         static_assert(AZStd::is_enum<EnumType>::value, "SerializeContext::Enum only supports a C++ enum type");
         using UnderlyingType = std::underlying_type_t<EnumType>;
@@ -191,7 +191,7 @@ namespace AZ
 
                 // Store the underlying type as an attribute within the ClassData
                 enumClassData.m_attributes.emplace_back(
-                    Serialize::Attributes::EnumUnderlyingType, aznew AZ::AttributeContainerType<AZ::TypeId>(underlyingTypeId));
+                    Serialization::Attributes::EnumUnderlyingType, aznew AZ::AttributeContainerType<AZ::TypeId>(underlyingTypeId));
                 enumTypeIter = enumTypeInsertIter.first;
                 return EnumBuilder(this, enumTypeIter);
             }
@@ -200,7 +200,7 @@ namespace AZ
         return EnumBuilder(this, m_uuidMap.end());
     }
 
-    namespace Serialize
+    namespace Serialization
     {
         template<class EnumType>
         auto EnumBuilder::Value(const char* name, EnumType value) -> EnumBuilder*
@@ -220,7 +220,7 @@ namespace AZ
 
             AZStd::unique_ptr<SerializeContextEnumInternal::EnumConstantBase> enumConstantPtr =
                 AZStd::make_unique<SerializeContextEnumInternal::EnumConstant<EnumType>>(AZStd::string_view(name), value);
-            Attribute(Serialize::Attributes::EnumValueKey, AZStd::move(enumConstantPtr));
+            Attribute(Serialization::Attributes::EnumValueKey, AZStd::move(enumConstantPtr));
 
             return this;
         }
@@ -234,13 +234,13 @@ namespace AZ
         template<typename EventHandlerImplementation>
         auto EnumBuilder::EventHandler() -> EnumBuilder*
         {
-            return EventHandler(&Serialize::StaticInstance<EventHandlerImplementation>::s_instance);
+            return EventHandler(&Serialization::StaticInstance<EventHandlerImplementation>::s_instance);
         }
 
         template<typename DataContainerType>
         auto EnumBuilder::DataContainer() -> EnumBuilder*
         {
-            return DataContainer(&Serialize::StaticInstance<DataContainerType>::s_instance);
+            return DataContainer(&Serialization::StaticInstance<DataContainerType>::s_instance);
         }
 
         template<class T>

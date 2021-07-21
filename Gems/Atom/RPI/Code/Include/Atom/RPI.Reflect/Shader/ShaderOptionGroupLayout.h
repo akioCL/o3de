@@ -15,8 +15,8 @@
 
 #include <AzCore/std/smart_ptr/intrusive_base.h>
 #include <AzCore/Memory/PoolAllocator.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Utils/TypeHash.h>
+#include <AzCore/Serialization/SerializeFriend.h>
 
 namespace AZ
 {

@@ -11,7 +11,6 @@
 
 
 #include <ISplines.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace UiSpline
 {

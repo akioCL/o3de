@@ -25,6 +25,7 @@ set(FILES
     AzToolsFrameworkModule.h
     AzToolsFrameworkModule.cpp
     API/ToolsApplicationAPI.h
+    API/EditorAssetSystemAPI.cpp
     API/EditorAssetSystemAPI.h
     API/AssetDatabaseBus.h
     API/ComponentEntityObjectBus.h

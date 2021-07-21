@@ -10,7 +10,6 @@
 
 #include <AzCore/JSON/document.h>
 #include <AzCore/Math/Uuid.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/std/string/string_view.h>

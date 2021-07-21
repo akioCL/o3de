@@ -11,7 +11,6 @@
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/RTTI/TypeInfo.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/string/string.h>
 
 namespace GraphModelIntegration

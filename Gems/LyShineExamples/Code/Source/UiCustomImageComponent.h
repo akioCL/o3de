@@ -16,7 +16,6 @@
 #include <LyShineExamples/UiCustomImageBus.h>
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Math/Vector2.h>
 
 #include <LmbrCentral/Rendering/MaterialAsset.h>

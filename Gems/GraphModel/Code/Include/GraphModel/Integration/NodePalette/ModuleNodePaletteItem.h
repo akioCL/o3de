@@ -8,7 +8,6 @@
 #pragma once
 
 // AZ
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzFramework/StringFunc/StringFunc.h>
 

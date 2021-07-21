@@ -13,7 +13,6 @@
 #include <AtomCore/std/containers/array_view.h>
 
 #include <AzCore/Name/Name.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/fixed_vector.h>
 #include <AzCore/std/containers/unordered_map.h>
 

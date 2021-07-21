@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzCore/RTTI/TypeInfo.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <LyShine/Bus/Tools/UiSystemToolsBus.h>
 #include <AzCore/Script/ScriptAsset.h>

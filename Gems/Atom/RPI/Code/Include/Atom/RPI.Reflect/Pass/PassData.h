@@ -8,7 +8,6 @@
 #pragma once
 
 #include <Atom/RHI.Reflect/ShaderDataMappings.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

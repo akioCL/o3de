@@ -8,7 +8,6 @@
 #ifndef AZCORE_DATA_OVERLAY_INSTANCE_MSGS_H
 #define AZCORE_DATA_OVERLAY_INSTANCE_MSGS_H
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/DataOverlay.h>
 #include <AzCore/EBus/EBus.h>
 

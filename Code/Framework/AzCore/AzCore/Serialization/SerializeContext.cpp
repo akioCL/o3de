@@ -1725,7 +1725,7 @@ namespace AZ
         {
             return this; // we have already removed the class data.
         }
-        m_classData->second.m_serializer = IDataSerializerPtr(&Serialize::StaticInstance<EmptySerializer>::s_instance, IDataSerializer::CreateNoDeleteDeleter());
+        m_classData->second.m_serializer = IDataSerializerPtr(&Serialization::StaticInstance<EmptySerializer>::s_instance, IDataSerializer::CreateNoDeleteDeleter());
         return this;
     }
 
@@ -2113,7 +2113,7 @@ namespace AZ
         }
     }
 
-    namespace Serialize
+    namespace Serialization
     {
         ClassBuilder::ClassBuilder(SerializeContext* context, const UuidToClassMap::iterator& classMapIter)
             : m_context(context)

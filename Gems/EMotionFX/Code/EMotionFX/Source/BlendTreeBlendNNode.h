@@ -12,7 +12,6 @@
 #include "AnimGraphNode.h"
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/utils.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace EMotionFX
 {

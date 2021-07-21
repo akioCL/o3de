@@ -235,7 +235,7 @@ namespace AZ
     {
         using namespace AZ::JsonSerializationResult;
 
-        AZ::AttributeReader attributeReader(nullptr, AZ::FindAttribute(AZ::Serialize::Attributes::EnumUnderlyingType, classData.m_attributes));
+        AZ::AttributeReader attributeReader(nullptr, AZ::FindAttribute(AZ::Serialization::Attributes::EnumUnderlyingType, classData.m_attributes));
         AZ::TypeId underlyingTypeId = AZ::TypeId::CreateNull();
         if (!attributeReader.Read<AZ::TypeId>(underlyingTypeId))
         {
@@ -395,7 +395,7 @@ namespace AZ
 
         for (const AttributeSharedPair& enumAttributePair : classData.m_attributes)
         {
-            if (enumAttributePair.first != Serialize::Attributes::EnumValueKey)
+            if (enumAttributePair.first != Serialization::Attributes::EnumValueKey)
             {
                 continue;
             }
@@ -494,7 +494,7 @@ namespace AZ
         bool first = true;
         for (const AZ::AttributeSharedPair& enumAttributePair : attributes)
         {
-            if (enumAttributePair.first != AZ::Serialize::Attributes::EnumValueKey)
+            if (enumAttributePair.first != AZ::Serialization::Attributes::EnumValueKey)
             {
                 continue;
             }

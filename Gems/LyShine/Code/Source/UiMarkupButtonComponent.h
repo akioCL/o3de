@@ -17,7 +17,6 @@
 // Only needed for internal unit-testing
 #include <LyShine.h>
 
-#include <AzCore/Serialization/SerializeContext.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class UiMarkupButtonComponent

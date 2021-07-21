@@ -9,7 +9,6 @@
 #pragma once
 
 #include <ScriptEvents/Internal/VersionedProperty.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <ScriptEvents/ScriptEventTypes.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/std/string/regex.h>

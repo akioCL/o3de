@@ -14,7 +14,6 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/IO/SystemFile.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Driller/DrillerConsoleAPI.h>
 #include <AzFramework/TargetManagement/TargetManagementAPI.h>
 

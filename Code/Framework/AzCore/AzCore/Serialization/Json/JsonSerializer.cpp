@@ -7,6 +7,7 @@
  */
 
 #include <AzCore/RTTI/AttributeReader.h>
+#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/Json/JsonSerializer.h>
 #include <AzCore/Serialization/Json/BaseJsonSerializer.h>
 #include <AzCore/Serialization/Json/JsonSerialization.h>
@@ -40,7 +41,7 @@ namespace AZ
             return serializer->Store(output, object, defaultObject, typeId, context);
         }
 
-        const SerializeContext::ClassData* classData = context.GetSerializeContext()->FindClassData(typeId);
+        const Serialization::ClassData* classData = context.GetSerializeContext()->FindClassData(typeId);
         if (!classData)
         {
             return context.Report(Tasks::RetrieveInfo, Outcomes::Unknown,
@@ -273,7 +274,7 @@ namespace AZ
     {
         using namespace JsonSerializationResult;
 
-        AZ::AttributeReader attributeReader(nullptr, AZ::FindAttribute(AZ::Serialize::Attributes::EnumUnderlyingType, classData.m_attributes));
+        AZ::AttributeReader attributeReader(nullptr, AZ::FindAttribute(AZ::Serialization::Attributes::EnumUnderlyingType, classData.m_attributes));
         AZ::TypeId underlyingTypeId = AZ::TypeId::CreateNull();
         if (!attributeReader.Read<AZ::TypeId>(underlyingTypeId))
         {
@@ -383,7 +384,7 @@ namespace AZ
         AZStd::set<AZStd::reference_wrapper<EnumConstantBase>, EnumUnsignedCompare> enumConstantSet;
         for (const AZ::AttributeSharedPair& enumAttributePair : classData.m_attributes)
         {
-            if (enumAttributePair.first == AZ::Serialize::Attributes::EnumValueKey)
+            if (enumAttributePair.first == AZ::Serialization::Attributes::EnumValueKey)
             {
                 auto enumConstantAttribute = azrtti_cast<AZ::AttributeData<EnumConstantBasePtr>*>(enumAttributePair.second.get());
                 if (!enumConstantAttribute)

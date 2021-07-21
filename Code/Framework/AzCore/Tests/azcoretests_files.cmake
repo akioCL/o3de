@@ -57,6 +57,7 @@ set(FILES
     Script.cpp
     ScriptMath.cpp
     Serialization.cpp
+    SerializeContextFixture.cpp
     SerializeContextFixture.h
     Slice.cpp
     State.cpp

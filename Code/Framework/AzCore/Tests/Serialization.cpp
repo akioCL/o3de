@@ -7849,7 +7849,7 @@ namespace UnitTest
         const AZ::SerializeContext::ClassData* enumClassData = m_serializeContext->FindClassData(azrtti_typeid<TestUnscopedSerializationEnum>());
         ASSERT_NE(nullptr, enumClassData);
         AZ::TypeId underlyingTypeId = AZ::TypeId::CreateNull();
-        AttributeReader attrReader(nullptr, enumClassData->FindAttribute(AZ::Serialize::Attributes::EnumUnderlyingType));
+        AttributeReader attrReader(nullptr, enumClassData->FindAttribute(AZ::Serialization::Attributes::EnumUnderlyingType));
         EXPECT_TRUE(attrReader.Read<AZ::TypeId>(underlyingTypeId));
         EXPECT_EQ(azrtti_typeid<int32_t>(), underlyingTypeId);
 
@@ -7892,7 +7892,7 @@ namespace UnitTest
         enumConstants.reserve(4);
         for (const AZ::AttributeSharedPair& attrPair : enumClassData->m_attributes)
         {
-            if (attrPair.first == AZ::Serialize::Attributes::EnumValueKey)
+            if (attrPair.first == AZ::Serialization::Attributes::EnumValueKey)
             {
                 auto enumConstantAttribute{ azrtti_cast<AZ::AttributeData<EnumConstantBasePtr>*>(attrPair.second.get()) };
                 ASSERT_NE(nullptr, enumConstantAttribute);

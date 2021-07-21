@@ -14,7 +14,7 @@
 #include <AzCore/std/containers/array.h>
 #include <AzCore/std/string/string_view.h>
 #include <AzCore/std/containers/vector.h>
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Serialization/SerializeFriend.h>
 
 namespace AZ
 {

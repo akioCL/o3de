@@ -10,7 +10,6 @@
 #include <Atom/RHI.Reflect/Null/Base.h>
 #include <Atom/RHI.Reflect/ShaderStageFunction.h>
 #include <AzCore/Memory/SystemAllocator.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

@@ -8,27 +8,36 @@
  *
  */
 
-#include <stdint.h>
 #include <AzCore/JSON/rapidjson.h>
 #include <AzCore/JSON/document.h>
+#include <AzCore/RTTI/RTTI.h>
 #include <AzCore/Memory/Memory.h>
-#include <AzCore/Outcome/Outcome.h>
-#include <AzCore/std/containers/vector.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <AzCore/std/smart_ptr/shared_ptr.h>
-#include <AzCore/std/utils.h>
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/std/string/string.h>
+#include <AzCore/Outcome/Outcome.h>
 #include <SceneAPI/SceneCore/SceneCoreConfiguration.h>
 #include <SceneAPI/SceneCore/Containers/Views/View.h>
 #include <SceneAPI/SceneCore/Containers/Views/ConvertIterator.h>
-#include <SceneAPI/SceneCore/DataTypes/IManifestObject.h>
 
 namespace AZ
 {
     class JsonRegistrationContext;
+    class ReflectContext;
+    class SerializeContext;
+
+    namespace Serialization
+    {
+        class DataElementNode;
+    }
 
     namespace SceneAPI
     {
+        namespace DataTypes
+        {
+            class IManifestObject;
+        }
+
         namespace Containers
         {
             // Scene manifests hold arbitrary meta data about a scene in a dictionary-like fashion.
@@ -94,7 +103,7 @@ namespace AZ
                     JsonRegistrationContext* registrationContext = nullptr, bool loadXml = false);
 
                 static void Reflect(ReflectContext* context);
-                static bool VersionConverter(SerializeContext& context, SerializeContext::DataElementNode& node);
+                static bool VersionConverter(SerializeContext& context, Serialization::DataElementNode& node);
 
             protected:
                 AZ::Outcome<rapidjson::Document, AZStd::string> SaveToJsonDocument(SerializeContext* context = nullptr, JsonRegistrationContext* registrationContext = nullptr);
@@ -112,4 +121,3 @@ namespace AZ
     } // SceneAPI
 } // AZ
 
-#include <SceneAPI/SceneCore/Containers/SceneManifest.inl>

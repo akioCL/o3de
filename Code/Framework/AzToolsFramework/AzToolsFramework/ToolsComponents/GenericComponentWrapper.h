@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/Slice/SliceBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Entity/EntityDebugDisplayBus.h>
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
 

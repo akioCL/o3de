@@ -10,7 +10,6 @@
 
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace LmbrCentral
 {

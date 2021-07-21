@@ -12,7 +12,6 @@
 #include <AzCore/RTTI/TypeInfo.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/Memory/SystemAllocator.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 
 namespace ScriptCanvas

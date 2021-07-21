@@ -13,7 +13,6 @@
 
 #include <AzCore/EBus/EBus.h>
 #include <AzCore/Memory/SystemAllocator.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/Utils.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/functional.h>

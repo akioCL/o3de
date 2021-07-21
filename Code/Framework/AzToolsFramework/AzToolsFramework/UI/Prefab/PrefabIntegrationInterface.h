@@ -10,7 +10,6 @@
 
 #include <AzCore/Interface/Interface.h>
 #include <AzCore/Math/Vector3.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AzToolsFramework
 {

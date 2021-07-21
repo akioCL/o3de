@@ -15,7 +15,6 @@
 #include <AzCore/Memory/MemoryComponent.h>
 #include <AzCore/Memory/MemoryDriller.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/UnitTest/TestTypes.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 #include <AzCore/std/containers/vector.h>

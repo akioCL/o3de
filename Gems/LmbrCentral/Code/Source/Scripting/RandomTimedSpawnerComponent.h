@@ -9,7 +9,6 @@
 
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/TickBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Slice/SliceAsset.h>
 

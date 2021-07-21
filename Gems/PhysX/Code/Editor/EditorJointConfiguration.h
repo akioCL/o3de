@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/Component/EntityId.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <Source/JointComponent.h>
 

@@ -14,7 +14,6 @@
 #include <LyShine/Bus/UiInitializationBus.h>
 #include <LyShine/UiComponentTypes.h>
 
-#include <AzCore/Serialization/SerializeContext.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class UiRadioButtonGroupComponent

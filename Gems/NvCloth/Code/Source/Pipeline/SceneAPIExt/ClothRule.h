@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/Memory/Memory.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <SceneAPI/SceneCore/DataTypes/Rules/IClothRule.h>
 #include <SceneAPI/SceneCore/DataTypes/GraphData/IMeshVertexColorData.h>
 

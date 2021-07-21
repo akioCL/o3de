@@ -9,7 +9,6 @@
 
 #include "EditorComponentBase.h"
 #include "EditorInspectorComponentBus.h"
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AzToolsFramework
 {
@@ -27,7 +26,7 @@ namespace AzToolsFramework
             static void Reflect(AZ::ReflectContext* context);
             static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& services);
             static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& services);
-            static bool SerializationConverter(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement);
+            static bool SerializationConverter(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement);
             
             ~EditorInspectorComponent();
 

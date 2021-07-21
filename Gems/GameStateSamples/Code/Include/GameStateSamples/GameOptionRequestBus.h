@@ -9,7 +9,6 @@
 
 #include <AzCore/EBus/EBus.h>
 #include <AzCore/Memory/SystemAllocator.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/smart_ptr/shared_ptr.h>
 
 #include <LmbrCentral/Audio/AudioSystemComponentBus.h>

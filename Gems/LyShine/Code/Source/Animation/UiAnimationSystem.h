@@ -10,7 +10,6 @@
 #pragma once
 
 #include <LyShine/Animation/IUiAnimation.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 struct PlayingUIAnimSequence
 {

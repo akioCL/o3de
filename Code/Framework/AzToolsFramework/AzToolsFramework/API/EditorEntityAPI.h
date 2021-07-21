@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/Interface/Interface.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AzToolsFramework
 {

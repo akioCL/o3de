@@ -7,17 +7,25 @@
  */
 
 #include <AzFramework/Physics/ShapeConfiguration.h>
-#include <AzCore/Serialization/SerializeContext.h>
+
+
+namespace AZ
+{
+    namespace Serialization
+    {
+        class DataElementNode;
+    }
+}
 
 namespace Physics
 {
     namespace ClassConverters
     {
-        bool RagdollNodeConfigConverter(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement);
-        bool RagdollConfigConverter(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement);
-        bool MaterialLibraryAssetConverter(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement);
-        bool ColliderConfigurationConverter(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement);
-        bool MaterialSelectionConverter(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement);
+        bool RagdollNodeConfigConverter(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement);
+        bool RagdollConfigConverter(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement);
+        bool MaterialLibraryAssetConverter(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement);
+        bool ColliderConfigurationConverter(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement);
+        bool MaterialSelectionConverter(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement);
         
     } // namespace ClassConverters
 } // namespace Physics

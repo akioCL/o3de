@@ -10,7 +10,6 @@
 
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Debug/Profiler.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/functional.h>
 #include <AzCore/Serialization/IdUtils.h>
 

@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <GraphCanvas/Components/Nodes/NodeBus.h>
 

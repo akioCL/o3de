@@ -12,7 +12,15 @@
 #ifdef IMGUI_ENABLED
 #include "ImGuiBus.h"
 #include <AzCore/std/containers/map.h>
-#include <AzCore/Serialization/SerializeContext.h>
+
+namespace AZ
+{
+    namespace Serialization
+    {
+        class ClassData;
+        struct ClassElement;
+    }
+}
 
 namespace ImGui
 {
@@ -100,7 +108,7 @@ namespace ImGui
 
         // Update Helper Functions for Entity and Component Views
         bool ImGuiUpdate_DrawEntityView(const AZ::EntityId &ent);
-        void ImGuiUpdate_DrawComponent(void *instance, const AZ::SerializeContext::ClassData *classData, const AZ::SerializeContext::ClassElement *classElement);
+        void ImGuiUpdate_DrawComponent(void *instance, const AZ::Serialization::ClassData *classData, const AZ::Serialization::ClassElement *classElement);
         bool ImGuiUpdate_DrawComponentView(const ImGui::ImGuiEntComponentId &entCom);   
 
         // Update Helper Functions for the menu bar

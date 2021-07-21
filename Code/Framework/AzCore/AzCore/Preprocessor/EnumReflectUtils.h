@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzCore/Preprocessor/Enum.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/std/string/fixed_string.h>
 

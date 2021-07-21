@@ -10,8 +10,8 @@
 
 namespace AZ
 {
-    const Crc32 Serialize::Attributes::EnumValueKey(AZ_CRC("EnumValue", 0xe4f32eed));
-    const Crc32 Serialize::Attributes::EnumUnderlyingType(AZ_CRC("EnumUnderlyingType", 0x8c461f93));
+    const Crc32 Serialization::Attributes::EnumValueKey(AZ_CRC("EnumValue", 0xe4f32eed));
+    const Crc32 Serialization::Attributes::EnumUnderlyingType(AZ_CRC("EnumUnderlyingType", 0x8c461f93));
 
     SerializeContext::EnumBuilder::EnumBuilder(SerializeContext* context, const typename SerializeContext::UuidToClassMap::iterator& classMapIter)
         : m_context(context)

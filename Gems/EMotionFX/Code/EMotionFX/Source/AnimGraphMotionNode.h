@@ -12,7 +12,6 @@
 #include "AnimGraphNode.h"
 #include "AnimGraphNodeData.h"
 #include "PlayBackInfo.h"
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace EMotionFX
 {

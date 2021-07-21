@@ -90,9 +90,9 @@ namespace AZ
         };
 
         /**
-         * Class data is assigned to every Serialize::Class. Don't confuse m_elements with
+         * Class data is assigned to every Serialization::Class. Don't confuse m_elements with
          * ElementData. Elements contains class Elements (like groups, etc.) while the ElementData
-         * contains attributes related to ehe SerializeContext::ClassBuilder::Field.
+         * contains attributes related to ehe Serialization::ClassBuilder::Field.
          */
         struct ClassData
         {

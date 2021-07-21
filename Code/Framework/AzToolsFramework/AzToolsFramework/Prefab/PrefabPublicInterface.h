@@ -9,9 +9,11 @@
 #pragma once
 
 #include <AzCore/Interface/Interface.h>
+#include <AzCore/RTTI/RTTI.h>
 #include <AzCore/IO/Path/Path.h>
 #include <AzCore/Math/Vector3.h>
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/std/containers/vector.h>
+#include <AzCore/Outcome/Outcome.h>
 
 namespace AzToolsFramework
 {

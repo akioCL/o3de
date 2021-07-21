@@ -10,7 +10,6 @@
 
 #include <AzCore/Component/Component.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <SceneAPI/SceneCore/Components/SceneSystemComponent.h>
 #include <Config/SceneProcessingConfigBus.h>
 #include <Config/SettingsObjects/SoftNameSetting.h>

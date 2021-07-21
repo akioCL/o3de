@@ -9,7 +9,6 @@
 #pragma once
 
 // AZ
-#include <AzCore/Serialization/SerializeContext.h>
 
 // Graph Canvas
 #include <GraphCanvas/Components/GridBus.h>

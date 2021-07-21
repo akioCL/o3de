@@ -21,7 +21,6 @@
 #include <LyShine/UiAssetTypes.h>
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/set.h>
 
 #include <Atom/RPI.Reflect/Image/Image.h>

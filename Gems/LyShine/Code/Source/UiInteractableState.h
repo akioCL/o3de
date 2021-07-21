@@ -13,7 +13,6 @@
 #include <LyShine/IDraw2d.h>
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/RTTI/ReflectContext.h>
 

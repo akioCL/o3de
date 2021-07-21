@@ -26,6 +26,7 @@ set(FILES
     ILog.h
     IMaterial.h
     IMiniLog.h
+    IMovieSystem.cpp
     IMovieSystem.h
     IPhysics.h
     IPostEffectGroup.h

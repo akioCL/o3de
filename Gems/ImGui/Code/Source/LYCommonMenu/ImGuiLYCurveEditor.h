@@ -12,7 +12,6 @@
 #ifdef IMGUI_ENABLED
 #include "ImGuiLYCurveEditorBus.h"
 #include <AzCore/std/containers/map.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace ImGui
 {

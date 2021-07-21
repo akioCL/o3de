@@ -11,7 +11,6 @@
 #include <AzCore/Asset/AssetManager.h>
 #include <AzCore/Asset/AssetTypeInfoBus.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
 
 namespace Blast

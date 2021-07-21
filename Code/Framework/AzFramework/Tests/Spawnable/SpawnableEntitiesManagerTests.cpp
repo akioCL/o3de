@@ -8,6 +8,7 @@
 
 #include <AzCore/UnitTest/TestTypes.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
+#include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Application/Application.h>
 #include <AzFramework/Spawnable/SpawnableAssetHandler.h>
 #include <AzFramework/Spawnable/SpawnableEntitiesManager.h>

@@ -11,7 +11,6 @@
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/Component/EntityId.h>
 #include <Maestro/Bus/SequenceAgentComponentBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace Maestro
 {

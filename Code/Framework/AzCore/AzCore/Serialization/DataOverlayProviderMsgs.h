@@ -9,7 +9,6 @@
 #define AZCORE_DATA_OVERLAY_PROVIDER_MSGS_H
 
 #include <AzCore/Serialization/DataOverlay.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/EBus/EBus.h>
 
 namespace AZ

@@ -10,7 +10,6 @@
 #include <AzCore/Math/Uuid.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/EBus/EBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Component/ComponentBus.h>
 #include "PropertyEditorAPI_Internals.h"
 

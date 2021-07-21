@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/unordered_map.h>
 
 namespace AzToolsFramework

@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/EBus/EBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/Outcome/Outcome.h>
 #include <AzCore/Math/Crc.h>
@@ -206,32 +205,7 @@ namespace AzToolsFramework
                 return crc;
             }
 
-            static void Reflect(AZ::ReflectContext* context)
-            {
-                AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context);
-                if (serialize)
-                {
-                    serialize->Class<JobInfo>()
-                        ->Version(4)
-                        ->Field("sourceFile", &JobInfo::m_sourceFile)
-                        ->Field("platform", &JobInfo::m_platform)
-                        ->Field("builderUuid", &JobInfo::m_builderGuid)
-                        ->Field("jobKey", &JobInfo::m_jobKey)
-                        ->Field("jobRunKey", &JobInfo::m_jobRunKey)
-                        ->Field("status", &JobInfo::m_status)
-                        ->Field("firstFailLogTime", &JobInfo::m_firstFailLogTime)
-                        ->Field("firstFailLogFile", &JobInfo::m_firstFailLogFile)
-                        ->Field("lastFailLogTime", &JobInfo::m_lastFailLogTime)
-                        ->Field("lastFailLogFile", &JobInfo::m_lastFailLogFile)
-                        ->Field("lastLogTime", &JobInfo::m_lastLogTime)
-                        ->Field("lastLogFile", &JobInfo::m_lastLogFile)
-                        ->Field("jobID", &JobInfo::m_jobID)
-                        ->Field("watchFolder", &JobInfo::m_watchFolder)
-                        ->Field("errorCount", &JobInfo::m_errorCount)
-                        ->Field("warningCount", &JobInfo::m_warningCount)
-                        ;
-                }
-            }
+            static void Reflect(AZ::ReflectContext* context);
 
             //! the file from which this job was originally spawned.  Is just the relative source file name ("whatever/something.tif", not an absolute path)
             AZStd::string m_sourceFile;

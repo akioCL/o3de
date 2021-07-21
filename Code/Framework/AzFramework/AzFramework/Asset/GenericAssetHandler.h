@@ -13,7 +13,6 @@
 #include <AzCore/Asset/AssetCommon.h>
 #include <AzCore/Asset/AssetManager.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/Utils.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/IO/GenericStreams.h>

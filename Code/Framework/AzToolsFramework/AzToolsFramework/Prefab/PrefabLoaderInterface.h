@@ -10,7 +10,6 @@
 
 #include <AzCore/Interface/Interface.h>
 #include <AzCore/IO/Path/Path.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/Prefab/PrefabIdTypes.h>
 
 namespace AzToolsFramework

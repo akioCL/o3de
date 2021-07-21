@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/Math/Spline.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <PhysX/ForceRegionComponentBus.h>
 #include <AzCore/Math/Aabb.h>
 

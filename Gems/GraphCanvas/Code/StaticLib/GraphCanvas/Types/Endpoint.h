@@ -10,7 +10,6 @@
 
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/std/hash.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 
 namespace GraphCanvas

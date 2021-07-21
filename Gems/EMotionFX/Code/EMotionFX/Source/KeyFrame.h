@@ -10,7 +10,6 @@
 
 // include core system
 #include <AzCore/RTTI/TypeInfo.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include "EMotionFXConfig.h"
 
 

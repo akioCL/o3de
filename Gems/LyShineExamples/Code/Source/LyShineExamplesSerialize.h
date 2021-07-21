@@ -8,7 +8,6 @@
 #pragma once
 
 #include <LyShine/IDraw2d.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 namespace LyShineExamplesSerialize
 {

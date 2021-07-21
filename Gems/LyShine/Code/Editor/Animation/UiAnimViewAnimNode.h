@@ -12,7 +12,6 @@
 #include "UiAnimViewNode.h"
 #include "UiAnimViewTrack.h"
 #include <LyShine/Bus/UiElementBus.h>
-#include <AzCore/Serialization/SerializeContext.h>
 
 class CUiAnimViewAnimNode;
 class CEntityObject;

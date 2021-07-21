@@ -9,7 +9,6 @@
 #pragma once
 
 #include <AzCore/Asset/AssetCommon.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/array.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzFramework/Asset/AssetRegistry.h>

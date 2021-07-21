@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/smart_ptr/shared_ptr.h>
 #include <SceneAPI/SceneCore/DataTypes/Rules/IRule.h>

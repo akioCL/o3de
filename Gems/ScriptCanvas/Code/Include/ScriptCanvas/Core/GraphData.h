@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <ScriptCanvas/Core/Endpoint.h>
 #include <ScriptEvents/ScriptEventsAsset.h>

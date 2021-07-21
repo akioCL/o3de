@@ -8,7 +8,6 @@
 
 set(FILES
     ../../../SceneCore/Containers/SceneManifest.h
-    ../../../SceneCore/Containers/SceneManifest.inl
     ../../../SceneCore/Containers/SceneManifest.cpp
     ../../../SceneCore/Events/AssetImportRequest.cpp
     ../../../SceneCore/Events/AssetImportRequest.h

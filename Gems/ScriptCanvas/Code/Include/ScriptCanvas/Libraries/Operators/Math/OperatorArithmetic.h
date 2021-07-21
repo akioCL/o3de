@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 
 #include <ScriptCanvas/Libraries/Operators/Operator.h>
 #include <ScriptCanvas/Data/Data.h>

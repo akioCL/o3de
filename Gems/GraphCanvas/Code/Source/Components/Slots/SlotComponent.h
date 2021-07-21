@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzCore/Component/Entity.h>
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/string/string.h>
 
 #include <GraphCanvas/Components/SceneBus.h>

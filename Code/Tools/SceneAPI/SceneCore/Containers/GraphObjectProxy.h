@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <SceneAPI/SceneCore/DataTypes/IGraphObject.h>
 
 namespace AZ
