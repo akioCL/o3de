@@ -155,7 +155,7 @@ namespace ScriptCanvas
         "Function",
         "Function",
     };
-
+#pragma optimize("", off)
 
     void GraphVariable::Reflect(AZ::ReflectContext* context)
     {
@@ -185,20 +185,6 @@ namespace ScriptCanvas
 
             if (auto editContext = serializeContext->GetEditContext())
             {
-                auto propertyChoices = [] {
-                    AZStd::vector< AZStd::pair<VariableFlags::InitialValueSource, AZStd::string>> choices;
-                    choices.emplace_back(AZStd::make_pair(VariableFlags::InitialValueSource::Graph, s_InitialValueSourceNames[0]));
-                    choices.emplace_back(AZStd::make_pair(VariableFlags::InitialValueSource::Component, s_InitialValueSourceNames[1]));
-                    return choices;
-                };
-
-                auto scopeChoices = [] {
-                    AZStd::vector< AZStd::pair<VariableFlags::Scope, AZStd::string>> choices;
-                    choices.emplace_back(AZStd::make_pair(VariableFlags::Scope::Graph, s_ScopeNames[0]));
-                    choices.emplace_back(AZStd::make_pair(VariableFlags::Scope::Function, s_ScopeNames[1]));
-                    return choices;
-                };
-
                 editContext->Class<GraphVariable>("Variable", "Represents a Variable field within a Script Canvas Graph")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::Visibility, &GraphVariable::GetVisibility)
@@ -207,7 +193,7 @@ namespace ScriptCanvas
                     ->Attribute(AZ::Edit::Attributes::DescriptionTextOverride, &GraphVariable::GetDescriptionOverride)
 
                     ->DataElement(AZ::Edit::UIHandlers::ComboBox, &GraphVariable::m_InitialValueSource, "Initial Value Source", "Variables can get their values from within the graph or through component properties.")
-                    ->Attribute(AZ::Edit::Attributes::GenericValueList, propertyChoices)
+                    ->Attribute(AZ::Edit::Attributes::GenericValueList, &GraphVariable::GetPropertyChoices)
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, &GraphVariable::OnInitialValueSourceChanged)
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, AZ::Edit::PropertyRefreshLevels::AttributesAndValues)
                     ->Attribute(AZ::Edit::Attributes::Visibility, &GraphVariable::GetInputControlVisibility)
@@ -218,7 +204,7 @@ namespace ScriptCanvas
 
                     ->DataElement(AZ::Edit::UIHandlers::ComboBox, &GraphVariable::m_scope, "Scope", "Controls the scope of this variable. i.e. If this is exposed as input to this script, or output from this script, or if the variable is just locally scoped.")
                     ->Attribute(AZ::Edit::Attributes::Visibility, &GraphVariable::GetScopeControlVisibility)
-                    ->Attribute(AZ::Edit::Attributes::GenericValueList, scopeChoices)
+                    ->Attribute(AZ::Edit::Attributes::GenericValueList, &GraphVariable::GetScopeChoices)
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, &GraphVariable::OnScopeTypedChanged)
 
                     ->DataElement(AZ::Edit::UIHandlers::Default, &GraphVariable::m_networkProperties, "Network Properties", "Enables whether or not this value should be network synchronized")
