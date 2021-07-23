@@ -313,5 +313,10 @@ namespace AZ
                 }
             }
         }
+    
+        float Device::GetMainDisplayRefreshRate()
+        {
+            return 0;
+        }
     }
 }

@@ -74,6 +74,8 @@ namespace AzFramework
         //! to a "standard" value of 96, the default for Windows in a DPI unaware setting. This can
         //! be used to scale user interface elements to ensure legibility on high density displays.
         virtual float GetDpiScaleFactor() const = 0;
+        
+        virtual uint32_t GetSyncInterval() const = 0;
     };
     using WindowRequestBus = AZ::EBus<WindowRequests>;
 

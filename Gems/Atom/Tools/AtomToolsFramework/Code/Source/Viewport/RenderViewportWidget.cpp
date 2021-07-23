@@ -191,6 +191,7 @@ namespace AtomToolsFramework
     void RenderViewportWidget::OnTick([[maybe_unused]]float deltaTime, AZ::ScriptTimePoint time)
     {
         m_time = time;
+        float refreshRate = AZ::RHI::RHISystemInterface::Get()->GetMainDisplayRefreshRate();
         m_controllerList->UpdateViewport({GetId(), AzFramework::FloatSeconds(deltaTime), m_time});
     }
 
@@ -464,5 +465,10 @@ namespace AtomToolsFramework
     float RenderViewportWidget::GetDpiScaleFactor() const
     {
         return aznumeric_cast<float>(devicePixelRatioF());
+    }
+
+    uint32_t RenderViewportWidget::GetSyncInterval() const
+    {
+        return 1;        
     }
 } //namespace AtomToolsFramework

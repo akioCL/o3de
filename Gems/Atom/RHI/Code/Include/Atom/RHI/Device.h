@@ -140,6 +140,8 @@ namespace AZ
             //! Get the memory requirements for allocating a buffer resource.
             virtual ResourceMemoryRequirements GetResourceMemoryRequirements(const BufferDescriptor& descriptor) = 0;
 
+            virtual float GetMainDisplayRefreshRate();
+            
         protected:
             DeviceFeatures m_features;
             DeviceLimits m_limits;
