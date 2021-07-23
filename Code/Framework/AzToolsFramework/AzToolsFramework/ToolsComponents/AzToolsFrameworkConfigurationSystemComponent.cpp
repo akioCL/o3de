@@ -73,7 +73,7 @@ namespace AzToolsFramework
                     if (editorEntityContext != nullptr)
                     {
                         [[maybe_unused]] bool contextAdded =
-                            editorScene.GetValue()->SetSubsystem<AzFramework::EntityContext::SceneStorageType&>(editorEntityContext);
+                            editorScene.GetValue()->SetSubsystem<AzFramework::SceneStorageType&>(editorEntityContext);
                         AZ_Assert(contextAdded, "Unable to add editor entity context to scene.");
                     }
                 }

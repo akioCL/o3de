@@ -43,7 +43,7 @@ namespace AzFramework
         AZStd::shared_ptr<Scene> result;
         sceneSystem->IterateActiveScenes([&result, &contextId](const AZStd::shared_ptr<Scene>& scene)
             {
-                EntityContext** entityContext = scene->FindSubsystemInScene<EntityContext::SceneStorageType>();
+                EntityContext** entityContext = scene->FindSubsystemInScene<SceneStorageType>();
                 if (entityContext && (*entityContext)->GetContextId() == contextId)
                 {
                     result = scene;

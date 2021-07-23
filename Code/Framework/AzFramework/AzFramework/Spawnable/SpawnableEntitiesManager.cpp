@@ -223,12 +223,15 @@ namespace AzFramework
         return queue.m_delayed.empty() ? CommandQueueStatus::NoCommandsLeft : CommandQueueStatus::HasCommandsLeft;
     }
 
-    AZStd::pair<uint64_t, void*> SpawnableEntitiesManager::CreateTicket(AZ::Data::Asset<Spawnable>&& spawnable)
+    AZStd::pair<uint64_t, void*> SpawnableEntitiesManager::CreateTicket(
+        AZ::Data::Asset<Spawnable>&& spawnable, SceneStorageType sceneStorageType)
     {
         static AZStd::atomic_uint64_t idCounter { 1 };
 
         auto result = aznew Ticket();
         result->m_spawnable = AZStd::move(spawnable);
+        result->m_sceneStorageType = sceneStorageType;
+
         return AZStd::make_pair<EntitySpawnTicket::Id, void*>(idCounter++, result);
     }
 
@@ -339,7 +342,8 @@ namespace AzFramework
             // Add to the game context, now the entities are active
             for (auto it = ticket.m_spawnedEntities.begin() + spawnedEntitiesInitialCount; it != ticket.m_spawnedEntities.end(); ++it)
             {
-                GameEntityContextRequestBus::Broadcast(&GameEntityContextRequestBus::Events::AddGameEntity, *it);
+                ticket.m_sceneStorageType->AddEntity(*it);
+                //GameEntityContextRequestBus::Broadcast(&GameEntityContextRequestBus::Events::AddGameEntity, *it);
             }
 
             // Let other systems know about newly spawned entities for any post-processing after adding to the scene/game context.
@@ -420,7 +424,8 @@ namespace AzFramework
             // Add to the game context, now the entities are active
             for (auto it = ticket.m_spawnedEntities.begin() + spawnedEntitiesInitialCount; it != ticket.m_spawnedEntities.end(); ++it)
             {
-                GameEntityContextRequestBus::Broadcast(&GameEntityContextRequestBus::Events::AddGameEntity, *it);
+                ticket.m_sceneStorageType->AddEntity(*it);
+                //GameEntityContextRequestBus::Broadcast(&GameEntityContextRequestBus::Events::AddGameEntity, *it);
             }
 
             if (request.m_completionCallback)
@@ -447,8 +452,10 @@ namespace AzFramework
             {
                 if (entity != nullptr)
                 {
-                    GameEntityContextRequestBus::Broadcast(
-                        &GameEntityContextRequestBus::Events::DestroyGameEntityAndDescendants, entity->GetId());
+                    SpawnableStorageType spawnableStorageType = static_cast<SpawnableStorageType>(ticket.m_sceneStorageType);
+                    spawnableStorageType->DestroyGameEntity(entity->GetId());
+                    //GameEntityContextRequestBus::Broadcast(
+                      //  &GameEntityContextRequestBus::Events::DestroyGameEntityAndDescendants, entity->GetId());
                 }
             }
 
@@ -482,8 +489,10 @@ namespace AzFramework
             {
                 if (entity != nullptr)
                 {
-                    GameEntityContextRequestBus::Broadcast(
-                        &GameEntityContextRequestBus::Events::DestroyGameEntityAndDescendants, entity->GetId());
+                    SpawnableStorageType spawnableStorageType = static_cast<SpawnableStorageType>(ticket.m_sceneStorageType);
+                    spawnableStorageType->DestroyGameEntity(entity->GetId());
+                    //GameEntityContextRequestBus::Broadcast(
+                      //  &GameEntityContextRequestBus::Events::DestroyGameEntityAndDescendants, entity->GetId());
                 }
             }
 
@@ -636,8 +645,10 @@ namespace AzFramework
             {
                 if (entity != nullptr)
                 {
-                    GameEntityContextRequestBus::Broadcast(
-                        &GameEntityContextRequestBus::Events::DestroyGameEntityAndDescendants, entity->GetId());
+                    SpawnableStorageType spawnableStorageType = static_cast<SpawnableStorageType>(request.m_ticket->m_sceneStorageType);
+                    spawnableStorageType->DestroyGameEntity(entity->GetId());
+                    //GameEntityContextRequestBus::Broadcast(
+                    //    &GameEntityContextRequestBus::Events::DestroyGameEntityAndDescendants, entity->GetId());
                 }
             }
             delete request.m_ticket;

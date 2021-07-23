@@ -100,6 +100,7 @@ namespace AzFramework
             AZStd::vector<AZ::Entity*> m_spawnedEntities;
             AZStd::vector<size_t> m_spawnedEntityIndices;
             AZ::Data::Asset<Spawnable> m_spawnable;
+            SceneStorageType m_sceneStorageType;
             uint32_t m_nextRequestId{ 0 }; //!< Next id for this ticket.
             uint32_t m_currentRequestId { 0 }; //!< The id for the command that should be executed.
             bool m_loadAll{ true };
@@ -188,7 +189,8 @@ namespace AzFramework
 
         template<typename T>
         void QueueRequest(EntitySpawnTicket& ticket, SpawnablePriority priority, T&& request);
-        AZStd::pair<EntitySpawnTicket::Id, void*> CreateTicket(AZ::Data::Asset<Spawnable>&& spawnable) override;
+        AZStd::pair<EntitySpawnTicket::Id, void*> CreateTicket(
+            AZ::Data::Asset<Spawnable>&& spawnable, SceneStorageType sceneStorageType = nullptr) override;
         void DestroyTicket(void* ticket) override;
 
         CommandQueueStatus ProcessQueue(Queue& queue);

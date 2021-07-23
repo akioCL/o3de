@@ -12,6 +12,7 @@
 #include <AzCore/Interface/Interface.h>
 #include <AzCore/RTTI/TypeSafeIntegral.h>
 #include <AzCore/std/functional.h>
+#include <AzFramework/Entity/GameEntityContextComponent.h>
 #include <AzFramework/Spawnable/Spawnable.h>
 
 namespace AZ
@@ -23,6 +24,8 @@ namespace AZ
 namespace AzFramework
 {
     AZ_TYPE_SAFE_INTEGRAL(SpawnablePriority, uint8_t);
+
+    using SpawnableStorageType = GameEntityContextComponent*;
 
     inline static constexpr SpawnablePriority SpawnablePriority_Highest  { 0 };
     inline static constexpr SpawnablePriority SpawnablePriority_High     { 32 };
@@ -145,7 +148,7 @@ namespace AzFramework
         EntitySpawnTicket() = default;
         EntitySpawnTicket(const EntitySpawnTicket&) = delete;
         EntitySpawnTicket(EntitySpawnTicket&& rhs);
-        explicit EntitySpawnTicket(AZ::Data::Asset<Spawnable> spawnable);
+        explicit EntitySpawnTicket(AZ::Data::Asset<Spawnable> spawnable, SceneStorageType sceneStorageType = nullptr);
         ~EntitySpawnTicket();
 
         EntitySpawnTicket& operator=(const EntitySpawnTicket&) = delete;
@@ -321,7 +324,8 @@ namespace AzFramework
         virtual void Barrier(EntitySpawnTicket& ticket, BarrierCallback completionCallback, BarrierOptionalArgs optionalArgs = {}) = 0;
 
     protected:
-        [[nodiscard]] virtual AZStd::pair<EntitySpawnTicket::Id, void*> CreateTicket(AZ::Data::Asset<Spawnable>&& spawnable) = 0;
+        [[nodiscard]] virtual AZStd::pair<EntitySpawnTicket::Id, void*> CreateTicket(
+            AZ::Data::Asset<Spawnable>&& spawnable, SceneStorageType sceneStorageType = nullptr) = 0;
         virtual void DestroyTicket(void* ticket) = 0;
 
         template<typename T>

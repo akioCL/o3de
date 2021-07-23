@@ -6,6 +6,7 @@
  *
  */
 
+#include <AzFramework/Scene/SceneSystemInterface.h>
 #include <AzFramework/Spawnable/SpawnableEntitiesInterface.h>
 
 namespace AzFramework
@@ -231,13 +232,40 @@ namespace AzFramework
         rhs.m_payload = nullptr;
     }
 
-    EntitySpawnTicket::EntitySpawnTicket(AZ::Data::Asset<Spawnable> spawnable)
+    EntitySpawnTicket::EntitySpawnTicket(AZ::Data::Asset<Spawnable> spawnable, SceneStorageType sceneStorageType)
     {
         auto manager = SpawnableEntitiesInterface::Get();
         AZ_Assert(manager, "Attempting to create an entity spawn ticket while the SpawnableEntitiesInterface has no implementation.");
-        AZStd::pair<EntitySpawnTicket::Id, void*> result = manager->CreateTicket(AZStd::move(spawnable));
-        m_id = result.first;
-        m_payload = result.second;
+        bool isSceneStorageTypePresent = (sceneStorageType != nullptr);
+        if (!sceneStorageType)
+        {
+            auto sceneSystem = AzFramework::SceneSystemInterface::Get();
+            AZ_Assert(sceneSystem, "Unable to create a ticket. A scene system couldn't be found.");
+            if (sceneSystem)
+            {
+                AZStd::shared_ptr<AzFramework::Scene> mainScene = sceneSystem->GetScene(AzFramework::Scene::MainSceneName);
+                AZ_Assert(sceneSystem, "Unable to create a ticket. The main scene in scene system couldn't be found.");
+                if (mainScene)
+                {
+                    SceneStorageType* defaultSceneStorageType = mainScene->FindSubsystem<AzFramework::SceneStorageType>();
+                    AZ_Assert(
+                        defaultSceneStorageType && *defaultSceneStorageType,
+                        "Unable to create a ticket. A scene storage type was not found in the main scene.");
+                    if (defaultSceneStorageType && *defaultSceneStorageType)
+                    {
+                        sceneStorageType = *defaultSceneStorageType;
+                        isSceneStorageTypePresent = true;
+                    }
+                }
+            }
+        }
+
+        if (isSceneStorageTypePresent)
+        {
+            AZStd::pair<EntitySpawnTicket::Id, void*> result = manager->CreateTicket(AZStd::move(spawnable), sceneStorageType);
+            m_id = result.first;
+            m_payload = result.second;
+        }
     }
 
     EntitySpawnTicket::~EntitySpawnTicket()

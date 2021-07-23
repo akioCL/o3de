@@ -26,6 +26,9 @@ namespace AzFramework
 {
     class Scene;
 
+    /// The type used to store entity in AzFramework::Scene.
+    using SceneStorageType = EntityContext*;
+
     /**
      * Provides services for a group of entities under the umbrella of a given context.
      *
@@ -45,9 +48,6 @@ namespace AzFramework
     {
     public:
         AZ_TYPE_INFO(EntityContext, "{4F98A6B9-C7B5-450E-8A8A-30EEFC411EF5}");
-
-        /// The type used to store entity in AzFramework::Scene.
-        using SceneStorageType = EntityContext*;
 
         EntityContext(AZ::SerializeContext* serializeContext = nullptr);
         EntityContext(const EntityContextId& contextId, AZ::SerializeContext* serializeContext = nullptr);

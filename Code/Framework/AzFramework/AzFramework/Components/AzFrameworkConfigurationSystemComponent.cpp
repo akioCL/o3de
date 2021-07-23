@@ -55,7 +55,7 @@ namespace AzFramework
             GameEntityContextRequestBus::BroadcastResult(gameEntityContext, &GameEntityContextRequests::GetGameEntityContextInstance);
             if (gameEntityContext != nullptr)
             {
-                [[maybe_unused]] bool result = scene->SetSubsystem<EntityContext::SceneStorageType&>(gameEntityContext);
+                [[maybe_unused]] bool result = scene->SetSubsystem<SceneStorageType&>(gameEntityContext);
                 AZ_Assert(result, "Unable to register main entity context with the main scene.");
             }
             else
