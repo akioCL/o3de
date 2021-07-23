@@ -996,6 +996,9 @@ class TestsAssetBundlerBatch_WindowsAndMac(object):
             if args[1] == "4":
                 # If pattern comparison, append a few extra arguments
                 cmd.extend(["--filePatternType=0", "--filePattern=*.dat"])
+            if workspace.project:
+                cmd.append(f'--project-path={workspace.project}')
+
             subprocess.check_call(cmd)
             assert os.path.exists(rule_file), f"Rule file {args[0]} was not created at location: {rule_file}"
 
