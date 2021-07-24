@@ -959,6 +959,9 @@ class TestsAssetBundlerBatch_WindowsAndMac(object):
                 # Build execution command
                 cmd = generate_compare_command(platform_arg)
 
+                if workspace.project:
+                    cmd.append(f'--project-path={workspace.project}')
+                
                 # Execute command
                 subprocess.check_call(cmd)
 
