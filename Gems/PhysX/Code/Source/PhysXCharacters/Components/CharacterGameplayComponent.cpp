@@ -106,11 +106,11 @@ namespace PhysX
             return true;
         }
 
-        physx::PxControllerState state;
-        pxController->getState(state);
-        return
-            state.touchedActor != nullptr ||
-            (state.collisionFlags & physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
+        auto boxRequest = AzPhysics::OverlapRequestHelpers::CreateBoxOverlapRequest(AZ::Vector3(0.2f, 0.2f, 0.01f), AZ::Transform::CreateTranslation(character->GetBasePosition()));
+        auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+        auto sceneHandle = sceneInterface->GetSceneHandle(AzPhysics::DefaultPhysicsSceneName);
+        AzPhysics::SceneQueryHits results = sceneInterface->QueryScene(sceneHandle, &boxRequest);
+        return !results.m_hits.empty();
     }
 
     float CharacterGameplayComponent::GetGravityMultiplier() const
@@ -212,7 +212,7 @@ namespace PhysX
     // CharacterGameplayComponent
     void CharacterGameplayComponent::ApplyGravity(float deltaTime)
     {
-        if (IsOnGround())
+        if (m_fallingVelocity.Dot(m_gravity) >= 0.0f && IsOnGround())
         {
             m_fallingVelocity = AZ::Vector3::CreateZero();
             return;
