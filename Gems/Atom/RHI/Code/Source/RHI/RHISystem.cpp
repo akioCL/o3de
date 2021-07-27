@@ -301,7 +301,7 @@ namespace AZ
             m_frameScheduler.QueueRayTracingShaderTableForBuild(rayTracingShaderTable);
         }
     
-        float RHISystem::GetMainDisplayRefreshRate()
+        uint32_t RHISystem::GetMainDisplayRefreshRate()
         {
             return m_device->GetMainDisplayRefreshRate();
         }

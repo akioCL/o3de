@@ -314,7 +314,7 @@ namespace AZ
             }
         }
     
-        float Device::GetMainDisplayRefreshRate()
+        uint32_t Device::GetMainDisplayRefreshRate()
         {
             return 0;
         }
