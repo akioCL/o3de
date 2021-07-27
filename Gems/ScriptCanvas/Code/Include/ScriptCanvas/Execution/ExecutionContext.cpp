@@ -47,7 +47,18 @@ namespace ScriptCanvas
 
         const void* ActivationData::GetVariableSource(size_t index, size_t& overrideIndexTracker) const
         {
-            if (variableOverrides.m_variableIndices[index])
+            // HACK: adding check to make this not crash, investigate why it arrives at this stage
+            // Now it will show the following error, but it won't crash.
+            //
+            //[Error] (Script) - ?:-1: attempt to index a nil value
+            //   ----------START STACK TRACE----------
+            //   = [C](-1) : __index
+            //   = ? (-1) : ?
+            //
+            //   ----------END STACK TRACE----------
+            //
+            if (index < variableOverrides.m_variableIndices.size() && // <-- HACK line added
+                variableOverrides.m_variableIndices[index])
             {
                 return AZStd::any_cast<void>(&variableOverrides.m_variables[overrideIndexTracker++].value);
             }
