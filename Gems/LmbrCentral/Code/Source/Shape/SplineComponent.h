@@ -71,6 +71,9 @@ namespace LmbrCentral
         AZ::SplinePtr GetSpline() override;
         void ChangeSplineType(AZ::u64 splineType) override;
         void SetClosed(bool closed) override;
+        AZ::Vector3 GetPosition(float t) override;
+        AZ::Vector3 GetNormal(float t) override;
+        AZ::Vector3 GetForward(float t) override;
 
         // SplineComponentRequestBus/VertexContainerInterface
         bool GetVertex(size_t index, AZ::Vector3& vertex) const override;

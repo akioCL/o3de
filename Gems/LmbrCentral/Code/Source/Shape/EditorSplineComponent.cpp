@@ -387,6 +387,21 @@ namespace LmbrCentral
         m_splineCommon.ChangeSplineType(splineType);
     }
 
+    AZ::Vector3 EditorSplineComponent::GetPosition(float t)
+    {
+        return m_splineCommon.m_spline->GetPosition(m_splineCommon.m_spline->GetAddressByFraction(t));
+    }
+
+    AZ::Vector3 EditorSplineComponent::GetNormal(float t)
+    {
+        return m_splineCommon.m_spline->GetNormal(m_splineCommon.m_spline->GetAddressByFraction(t));
+    }
+
+    AZ::Vector3 EditorSplineComponent::GetForward(float t)
+    {
+        return m_splineCommon.m_spline->GetTangent(m_splineCommon.m_spline->GetAddressByFraction(t));
+    }
+
     void EditorSplineComponent::SetClosed(const bool closed)
     {
         m_splineCommon.m_spline->SetClosed(closed);
