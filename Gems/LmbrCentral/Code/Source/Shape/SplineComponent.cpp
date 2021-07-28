@@ -182,7 +182,7 @@ namespace LmbrCentral
                 Handler<BehaviorSplineComponentNotificationBusHandler>();
 
             behaviorContext->EBus<SplineComponentRequestBus>("SplineComponentRequestBus")
-                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
                 ->Attribute(AZ::Edit::Attributes::Category, "Shape")
                 ->Attribute(AZ::Script::Attributes::Module, "shape")
                 ->Event("GetSpline", &SplineComponentRequestBus::Events::GetSpline)
@@ -191,7 +191,11 @@ namespace LmbrCentral
                 ->Event("UpdateVertex", &SplineComponentRequestBus::Events::UpdateVertex)
                 ->Event("InsertVertex", &SplineComponentRequestBus::Events::InsertVertex)
                 ->Event("RemoveVertex", &SplineComponentRequestBus::Events::RemoveVertex)
-                ->Event("ClearVertices", &SplineComponentRequestBus::Events::ClearVertices);
+                ->Event("ClearVertices", &SplineComponentRequestBus::Events::ClearVertices)
+                ->Event("GetPosition", &SplineComponentRequestBus::Events::GetPosition)
+                ->Event("GetNormal", &SplineComponentRequestBus::Events::GetNormal)
+                ->Event("GetForward", &SplineComponentRequestBus::Events::GetForward)
+                ;
         }
     }
 
@@ -289,6 +293,21 @@ namespace LmbrCentral
     void SplineComponent::ChangeSplineType(AZ::u64 splineType)
     {
         m_splineCommon.ChangeSplineType(splineType);
+    }
+
+    AZ::Vector3 SplineComponent::GetPosition(float t)
+    {
+        return m_splineCommon.m_spline->GetPosition(m_splineCommon.m_spline->GetAddressByFraction(t));
+    }
+
+    AZ::Vector3 SplineComponent::GetNormal(float t)
+    {
+        return m_splineCommon.m_spline->GetNormal(m_splineCommon.m_spline->GetAddressByFraction(t));
+    }
+
+    AZ::Vector3 SplineComponent::GetForward(float t)
+    {
+        return m_splineCommon.m_spline->GetTangent(m_splineCommon.m_spline->GetAddressByFraction(t));
     }
 
     bool SplineComponent::UpdateVertex(size_t index, const AZ::Vector3& vertex)

@@ -28,6 +28,15 @@ namespace LmbrCentral
         /// Set whether the spline should form a closed loop or not.
         virtual void SetClosed(bool closed) = 0;
 
+        /// Retrieves the position at the normalized value of t [0-1], 0 being the start of the spline, 1 being the end
+        virtual AZ::Vector3 GetPosition(float t) = 0;
+
+        /// Retrieves the spline's normal at the value of t [0-1], 0 being the start of the spline, 1 being the end
+        virtual AZ::Vector3 GetNormal(float t) = 0;
+
+        /// Retrieves the spline's forward vector at the value of t [0-1], 0 being the start of the spline, 1 being the end
+        virtual AZ::Vector3 GetForward(float t) = 0;
+
     protected:
         ~SplineComponentRequests() = default;
     };
