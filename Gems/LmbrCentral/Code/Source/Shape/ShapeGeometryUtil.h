@@ -11,6 +11,7 @@
 #include <AzCore/Math/Vector2.h>
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/std/containers/vector.h>
+#include <LmbrCentral/Shape/ShapeComponentMeshDataBus.h>
 
 namespace AzFramework
 {
@@ -21,14 +22,6 @@ namespace LmbrCentral
 {
     struct ShapeDrawParams;
 
-    /// Buffers used for rendering Shapes.
-    /// Generated from shape properties.
-    struct ShapeMesh
-    {
-        AZStd::vector<AZ::Vector3> m_vertexBuffer; ///< Vertices of the shape.
-        AZStd::vector<AZ::u32> m_indexBuffer; ///< Indices of the shape.
-        AZStd::vector<AZ::Vector3> m_lineBuffer; ///< Lines of the shape.
-    };
 
     /// Writes 3 indices (1 tri) to the buffer and returns a pointer to the next index.
     AZ::u32* WriteTriangle(AZ::u32 a, AZ::u32 b, AZ::u32 c, AZ::u32* indices);

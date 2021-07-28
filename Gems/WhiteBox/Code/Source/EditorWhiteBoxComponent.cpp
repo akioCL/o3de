@@ -35,6 +35,8 @@
 #include <QMessageBox>
 #include <WhiteBox/EditorWhiteBoxColliderBus.h>
 #include <WhiteBox/WhiteBoxBus.h>
+#include <WhiteBox/WhiteBoxToolApi.h>
+#include <LmbrCentral/Shape/ShapeComponentMeshDataBus.h>
 
 // developer debug properties for the White Box mesh to globally enable/disable
 AZ_CVAR(bool, cl_whiteBoxDebugVertexHandles, false, nullptr, AZ::ConsoleFunctorFlags::Null, "Display vertex handles");
@@ -126,13 +128,71 @@ namespace WhiteBox
             m_editorMeshAsset->Reset();
         }
 
-        AzToolsFramework::EditorPythonRunnerRequestBus::Broadcast(
-            &AzToolsFramework::EditorPythonRunnerRequestBus::Events::ExecuteByFilenameWithArgs,
-            "@devroot@/Gems/WhiteBox/Editor/Scripts/default_shapes.py", scriptArgs);
+        if (m_defaultShape == DefaultShapeType::ShapeComponent)
+        {
+            CreateFromShapeComponent();
+        }
+        else
+        {
+            LmbrCentral::ShapeComponentMeshDataNotificationBus::Handler::BusDisconnect();
+
+            AzToolsFramework::EditorPythonRunnerRequestBus::Broadcast(
+                &AzToolsFramework::EditorPythonRunnerRequestBus::Events::ExecuteByFilenameWithArgs,
+                "@devroot@/Gems/WhiteBox/Editor/Scripts/default_shapes.py", scriptArgs);
+        }
 
         EditorWhiteBoxComponentNotificationBus::Event(
             AZ::EntityComponentIdPair(GetEntityId(), GetId()),
             &EditorWhiteBoxComponentNotificationBus::Events::OnDefaultShapeTypeChanged, m_defaultShape);
+    }
+
+    void EditorWhiteBoxComponent::CreateFromShapeComponent()
+    {
+        using namespace AZ;
+        using namespace Api;
+
+        const LmbrCentral::ShapeMesh* shapeMeshPtr = nullptr;
+        LmbrCentral::ShapeComponentMeshDataRequestBus::EventResult(
+            shapeMeshPtr, GetEntityId(), &LmbrCentral::ShapeComponentMeshDataRequestBus::Events::GetShapeMesh);
+
+        WhiteBoxMesh* whiteboxMesh = GetWhiteBoxMesh();
+        Clear(*whiteboxMesh);
+        AZStd::vector<VertexHandle> vertexHandles;
+
+        if (shapeMeshPtr)
+        {
+            const AZStd::vector<Vector3>& positions = shapeMeshPtr->m_vertexBuffer;
+            vertexHandles.reserve(positions.size());
+
+            for (const Vector3& position : positions)
+            {
+                vertexHandles.push_back(AddVertex(*whiteboxMesh, position));
+            }
+
+            const AZStd::vector<u32>& indices = shapeMeshPtr->m_indexBuffer;
+            AZ_Assert(indices.size() % 3 == 0, "All shape index buffers should have a multiple of 3 indices");
+            for (size_t i = 0; i < indices.size(); i+=3)
+            {
+                AddFace(*whiteboxMesh, vertexHandles[indices[i]], vertexHandles[indices[i + 1]], vertexHandles[indices[i + 2]]);
+            }
+            
+            CalculateNormals(*whiteboxMesh);
+            CalculatePlanarUVs(*whiteboxMesh);
+            RebuildWhiteBox();
+            WriteAssetToComponent();
+        }
+
+        LmbrCentral::ShapeComponentMeshDataNotificationBus::Handler::BusConnect(GetEntityId());
+    }
+
+    void EditorWhiteBoxComponent::OnShapeMeshDataChanged()
+    {
+        AZ_Assert(
+            m_defaultShape == DefaultShapeType::ShapeComponent,
+            "The EditorWhiteboxComponent should only be handling ShapeComponentNotificationsBus events if it using ShapeComponent as the "
+            "default shape");
+
+        CreateFromShapeComponent();
     }
 
     bool EditorWhiteBoxVersionConverter(
@@ -207,6 +267,7 @@ namespace WhiteBox
                     ->EnumAttribute(DefaultShapeType::Cylinder, "Cylinder")
                     ->EnumAttribute(DefaultShapeType::Sphere, "Sphere")
                     ->EnumAttribute(DefaultShapeType::Asset, "Mesh Asset")
+                    ->EnumAttribute(DefaultShapeType::ShapeComponent, "Shape Component")
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorWhiteBoxComponent::OnDefaultShapeChange)
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, AZ_CRC("RefreshEntireTree", 0xefbc823c))
                     ->DataElement(
@@ -317,10 +378,17 @@ namespace WhiteBox
         {
             ShowRenderMesh();
         }
+
+        if (m_defaultShape == DefaultShapeType::ShapeComponent)
+        {
+            LmbrCentral::ShapeComponentMeshDataNotificationBus::Handler::BusConnect(GetEntityId());
+            CreateFromShapeComponent();
+        }
     }
 
     void EditorWhiteBoxComponent::Deactivate()
     {
+        LmbrCentral::ShapeComponentMeshDataNotificationBus::Handler::BusDisconnect();
         AzToolsFramework::EditorVisibilityNotificationBus::Handler::BusDisconnect();
         AzToolsFramework::EditorComponentSelectionRequestsBus::Handler::BusDisconnect();
         AzFramework::EntityDebugDisplayEventBus::Handler::BusDisconnect();

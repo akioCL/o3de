@@ -75,6 +75,7 @@ namespace LmbrCentral
         m_tubeShape.Activate(GetEntityId());
         AzFramework::EntityDebugDisplayEventBus::Handler::BusConnect(GetEntityId());
         EditorTubeShapeComponentRequestBus::Handler::BusConnect(GetEntityId());
+        ShapeComponentMeshDataRequestBus::Handler::BusConnect(GetEntityId());
 
         // connect the ComponentMode delegate to this entity/component id pair
         m_componentModeDelegate.Connect<EditorTubeShapeComponent>(AZ::EntityComponentIdPair(GetEntityId(), GetId()), this);
@@ -111,6 +112,7 @@ namespace LmbrCentral
     {
         m_componentModeDelegate.Disconnect();
 
+        ShapeComponentMeshDataRequestBus::Handler::BusDisconnect();
         EditorTubeShapeComponentRequestBus::Handler::BusDisconnect();
         AzFramework::EntityDebugDisplayEventBus::Handler::BusDisconnect();
         m_tubeShape.Deactivate();
@@ -133,6 +135,8 @@ namespace LmbrCentral
             m_tubeShape.GetSpline(), m_tubeShape.GetRadiusAttribute(), m_tubeShape.GetRadius(),
             endSegments, m_tubeShapeMeshConfig.m_sides, m_tubeShapeMesh.m_vertexBuffer,
             m_tubeShapeMesh.m_indexBuffer, m_tubeShapeMesh.m_lineBuffer);
+
+        ShapeComponentMeshDataNotificationBus::Event(GetEntityId(), &ShapeComponentMeshDataNotificationBus::Events::OnShapeMeshDataChanged);
     }
 
     void EditorTubeShapeComponent::DisplayEntityViewport(
@@ -159,6 +163,11 @@ namespace LmbrCentral
     void EditorTubeShapeComponent::OnSplineChanged()
     {
         GenerateVertices();
+    }
+
+    const ShapeMesh* EditorTubeShapeComponent::GetShapeMesh() const
+    {
+        return &m_tubeShapeMesh;
     }
 
     void EditorTubeShapeComponent::OnAttributeAdded([[maybe_unused]] size_t index)

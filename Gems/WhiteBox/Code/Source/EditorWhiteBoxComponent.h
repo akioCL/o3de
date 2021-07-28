@@ -23,6 +23,7 @@
 #include <AzToolsFramework/ToolsComponents/EditorVisibilityBus.h>
 #include <WhiteBox/EditorWhiteBoxComponentBus.h>
 #include <WhiteBox/WhiteBoxToolApi.h>
+#include <LmbrCentral/Shape/ShapeComponentMeshDataBus.h>
 
 namespace WhiteBox
 {
@@ -39,6 +40,7 @@ namespace WhiteBox
         , private AZ::TransformNotificationBus::Handler
         , private AzFramework::EntityDebugDisplayEventBus::Handler
         , private AzToolsFramework::EditorVisibilityNotificationBus::Handler
+        , private LmbrCentral::ShapeComponentMeshDataNotificationBus::Handler
     {
     public:
         AZ_EDITOR_COMPONENT(EditorWhiteBoxComponent, "{C9F2D913-E275-49BB-AB4F-2D221C16170A}", EditorComponentBase);
@@ -103,6 +105,9 @@ namespace WhiteBox
         // EditorWhiteBoxComponentNotificationBus overrides ...
         void OnWhiteBoxMeshModified() override;
 
+        // LmbrCentral::ShapeComponentMeshDataNotificationBus overrides ...
+        void OnShapeMeshDataChanged() override;
+
         void ShowRenderMesh();
         void HideRenderMesh();
         void RebuildRenderMesh();
@@ -112,6 +117,7 @@ namespace WhiteBox
         void OnDefaultShapeChange();
         void OnMaterialChange();
         AZ::Crc32 AssetVisibility() const;
+        void CreateFromShapeComponent();
 
         using ComponentModeDelegate = AzToolsFramework::ComponentModeFramework::ComponentModeDelegate;
         ComponentModeDelegate m_componentModeDelegate; //!< Responsible for detecting ComponentMode activation

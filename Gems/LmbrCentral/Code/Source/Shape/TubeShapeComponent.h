@@ -41,6 +41,7 @@ namespace LmbrCentral
     class TubeShapeDebugDisplayComponent
         : public EntityDebugDisplayComponent
         , public ShapeComponentNotificationsBus::Handler
+        , public ShapeComponentMeshDataRequestBus::Handler
     {
     public:
         AZ_COMPONENT(TubeShapeDebugDisplayComponent, "{FC8D0C5A-FEED-4C79-A4C6-E18A966EE8CE}", EntityDebugDisplayComponent)
@@ -56,6 +57,9 @@ namespace LmbrCentral
 
         // EntityDebugDisplayComponent
         void Draw(AzFramework::DebugDisplayRequests& debugDisplay) override;
+
+        // ShapeComponentMeshDataRequestBus overrides
+        const ShapeMesh* GetShapeMesh() const override;
 
     private:
         AZ_DISABLE_COPY_MOVE(TubeShapeDebugDisplayComponent)

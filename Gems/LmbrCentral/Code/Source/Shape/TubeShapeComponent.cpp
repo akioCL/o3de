@@ -97,12 +97,14 @@ namespace LmbrCentral
         TubeShapeComponentRequestsBus::EventResult(m_radius, GetEntityId(), &TubeShapeComponentRequests::GetRadius);
         TubeShapeComponentRequestsBus::EventResult(m_radiusAttribute, GetEntityId(), &TubeShapeComponentRequests::GetRadiusAttribute);
         ShapeComponentNotificationsBus::Handler::BusConnect(GetEntityId());
+        ShapeComponentMeshDataRequestBus::Handler::BusConnect(GetEntityId());
 
         GenerateVertices();
     }
 
     void TubeShapeDebugDisplayComponent::Deactivate()
     {
+        ShapeComponentMeshDataRequestBus::Handler::BusDisconnect();
         ShapeComponentNotificationsBus::Handler::BusDisconnect();
         EntityDebugDisplayComponent::Deactivate();
     }
@@ -128,5 +130,10 @@ namespace LmbrCentral
             m_spline, m_radiusAttribute, m_radius, m_tubeShapeMeshConfig.m_endSegments,
             m_tubeShapeMeshConfig.m_sides, m_tubeShapeMesh.m_vertexBuffer,
             m_tubeShapeMesh.m_indexBuffer, m_tubeShapeMesh.m_lineBuffer);
+    }
+
+    const ShapeMesh* TubeShapeDebugDisplayComponent::GetShapeMesh() const
+    {
+        return &m_tubeShapeMesh;
     }
 } // namespace LmbrCentral

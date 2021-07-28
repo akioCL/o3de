@@ -48,6 +48,7 @@ set(FILES
     include/LmbrCentral/Scripting/TagComponentBus.h
     include/LmbrCentral/Shape/EditorShapeComponentBus.h
     include/LmbrCentral/Shape/ShapeComponentBus.h
+    include/LmbrCentral/Shape/ShapeComponentMeshDataBus.h
     include/LmbrCentral/Shape/SphereShapeComponentBus.h
     include/LmbrCentral/Shape/BoxShapeComponentBus.h
     include/LmbrCentral/Shape/CylinderShapeComponentBus.h

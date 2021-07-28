@@ -18,6 +18,7 @@ namespace WhiteBox
         Icosahedron,
         Cylinder,
         Sphere,
-        Asset
+        Asset,
+        ShapeComponent
     };
 } // namespace WhiteBox

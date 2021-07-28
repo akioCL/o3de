@@ -15,12 +15,14 @@
 #include <AzToolsFramework/ComponentMode/ComponentModeDelegate.h>
 #include <LmbrCentral/Shape/SplineComponentBus.h>
 #include <LmbrCentral/Shape/EditorTubeShapeComponentBus.h>
+#include <LmbrCentral/Shape/ShapeComponentMeshDataBus.h>
 
 namespace LmbrCentral
 {
     /// Editor representation of a tube shape.
     class EditorTubeShapeComponent
         : public EditorBaseShapeComponent
+        , public ShapeComponentMeshDataRequestBus::Handler
         , private AzFramework::EntityDebugDisplayEventBus::Handler
         , private SplineComponentNotificationBus::Handler
         , private SplineAttributeNotificationBus::Handler
@@ -40,6 +42,8 @@ namespace LmbrCentral
         // EditorComponentBase
         void BuildGameEntity(AZ::Entity* gameEntity) override;
 
+        // ShapeComponentMeshDataRequestBus overrides
+        const ShapeMesh* GetShapeMesh() const override;
     protected:
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
         {
