@@ -2655,6 +2655,7 @@ namespace WhiteBox
             if (hasUVs)
             {
                 AZ_Assert(vertexHandles.size() == uvs.size(), "InitializeFromIndexedMesh - UVs exist, but do not match the position count.");
+                whiteBox.mesh.request_vertex_texcoords2D();
             }
             else
             {
@@ -2671,8 +2672,7 @@ namespace WhiteBox
                 }
                 if (hasUVs)
                 {
-                    Mesh::TexCoord2D uv = uvs[i];
-                    whiteBox.mesh.set_texcoord2D(vh, uv);
+                    whiteBox.mesh.set_texcoord2D(vh, uvs[i]);
                 }
             }
 

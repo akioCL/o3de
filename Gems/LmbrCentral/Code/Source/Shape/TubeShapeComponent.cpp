@@ -129,7 +129,7 @@ namespace LmbrCentral
         GenerateTubeMesh(
             m_spline, m_radiusAttribute, m_radius, m_tubeShapeMeshConfig.m_endSegments,
             m_tubeShapeMeshConfig.m_sides, m_tubeShapeMesh.m_vertexBuffer,
-            m_tubeShapeMesh.m_indexBuffer, m_tubeShapeMesh.m_lineBuffer, m_tubeShapeMesh.m_normalBuffer);
+            m_tubeShapeMesh.m_indexBuffer, m_tubeShapeMesh.m_lineBuffer, m_tubeShapeMesh.m_normalBuffer, m_tubeShapeMesh.m_uvBuffer);
     }
 
     const ShapeMesh* TubeShapeDebugDisplayComponent::GetShapeMesh() const

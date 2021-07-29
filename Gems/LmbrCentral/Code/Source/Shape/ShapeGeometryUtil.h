@@ -52,24 +52,26 @@ namespace LmbrCentral
             AZ::u32 sides, AZ::u32 segments, AZ::u32 capSegments, AZ::u32* indices);
 
         /// Generate verts to be used when drawing triangles for the start cap.
-        AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSolidStartCap(
+        AZStd::tuple<AZ::Vector3*, AZ::Vector3*, AZ::Vector2*> GenerateSolidStartCap(
             const AZ::Vector3& localPosition, const AZ::Vector3& direction,
-            const AZ::Vector3& side, float radius, AZ::u32 sides, AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals);
+            const AZ::Vector3& side, float radius, AZ::u32 sides, AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals, AZ::Vector2* uvs);
 
         /// Generate verts to be used when drawing triangles for the end cap.
-        AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSolidEndCap(
+        AZStd::tuple<AZ::Vector3*, AZ::Vector3*, AZ::Vector2*> GenerateSolidEndCap(
             const AZ::Vector3& localPosition, const AZ::Vector3& direction,
-            const AZ::Vector3& side, float radius, AZ::u32 sides, AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals);
+            const AZ::Vector3& side, float radius, AZ::u32 sides, AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals, AZ::Vector2* uvs);
 
         /// Generate vertices to be used for a loop of a segment along a tube or capsule (for use with index buffer).
-        AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSegmentVertices(
+        AZStd::tuple<AZ::Vector3*, AZ::Vector3*, AZ::Vector2*> GenerateSegmentVertices(
             const AZ::Vector3& point,
             const AZ::Vector3& axis,
             const AZ::Vector3& normal,
             float radius,
             AZ::u32 sides,
+            float distance,
             AZ::Vector3* vertices,
-            AZ::Vector3* normals);
+            AZ::Vector3* normals,
+            AZ::Vector2* uvs);
 
         /// Generate a circle/loop for a given segment along the capsule/tube - Produces a series of begin/end
         /// line segments to draw in DrawLines.
