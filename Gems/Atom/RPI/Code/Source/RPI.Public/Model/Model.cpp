@@ -1,14 +1,10 @@
 /*
-* All or portions of this file Copyright (c) Amazon.com, Inc. or its affiliates or
-* its licensors.
-*
-* For complete copyright and license terms please see the LICENSE at the root of this
-* distribution (the "License"). All use of this software is governed by the License,
-* or, if provided, by the license below or the license accompanying this file. Do not
-* remove or modify any license notices. This file is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*
-*/
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
 
 #include <Atom/RPI.Public/Model/Model.h>
 
@@ -61,8 +57,6 @@ namespace AZ
         RHI::ResultCode Model::Init(ModelAsset& modelAsset)
         {
             AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
-
-            m_aabb = modelAsset.GetAabb();
 
             m_lods.resize(modelAsset.GetLodAssets().size());
 
@@ -127,11 +121,6 @@ namespace AZ
             return m_isUploadPending;
         }
 
-        const AZ::Aabb& Model::GetAabb() const
-        {
-            return m_aabb;
-        }
-
         const Data::Asset<ModelAsset>& Model::GetModelAsset() const
         {
             return m_modelAsset;
@@ -140,9 +129,16 @@ namespace AZ
         bool Model::LocalRayIntersection(const AZ::Vector3& rayStart, const AZ::Vector3& rayDir, float& distanceNormalized, AZ::Vector3& normal) const
         {
             AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
+            
+            if (!GetModelAsset())
+            {
+                AZ_Assert(false, "Invalid Model - not created from a ModelAsset?");
+                return false;
+            }
+            
             float start;
             float end;
-            const int result = Intersect::IntersectRayAABB2(rayStart, rayDir.GetReciprocal(), m_aabb, start, end);
+            const int result = Intersect::IntersectRayAABB2(rayStart, rayDir.GetReciprocal(), GetModelAsset()->GetAabb(), start, end);
             if (Intersect::ISECT_RAY_AABB_NONE != result)
             {
                 if (ModelAsset* modelAssetPtr = m_modelAsset.Get())
@@ -151,7 +147,9 @@ namespace AZ
                     AZ::Debug::Timer timer;
                     timer.Stamp();
 #endif
-                    const bool hit = modelAssetPtr->LocalRayIntersectionAgainstModel(rayStart, rayDir, distanceNormalized, normal);
+                    constexpr bool AllowBruteForce = false;
+                    const bool hit = modelAssetPtr->LocalRayIntersectionAgainstModel(
+                        rayStart, rayDir, AllowBruteForce, distanceNormalized, normal);
 #if defined(AZ_RPI_PROFILE_RAYCASTING_AGAINST_MODELS)
                     if (hit)
                     {
