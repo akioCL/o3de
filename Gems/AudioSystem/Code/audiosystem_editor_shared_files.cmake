@@ -8,4 +8,5 @@
 
 set(FILES
     Source/AudioSystemModule.cpp
+    Source/Editor/AudioResourceSelectors.cpp
 )
