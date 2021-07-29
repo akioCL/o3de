@@ -20,6 +20,7 @@
 #include <PhysX/Debug/PhysXDebugConfiguration.h>
 #include <PhysX/MathConversion.h>
 #include <PhysXCharacters/API/CharacterController.h>
+#include <AzFramework/Physics/Components/SimulatedBodyComponentBus.h>
 #include <Source/Collision.h>
 #include <Source/Shape.h>
 
@@ -131,6 +132,24 @@ namespace PhysX
 
     void CharacterControllerCallbackManager::onShapeHit(const physx::PxControllerShapeHit& hit)
     {
+        // HACK
+        const PhysX::ActorData* actorData = reinterpret_cast<const PhysX::ActorData*>(hit.controller->getUserData());
+        if (actorData)
+        {
+            AZ::EntityId entity = actorData->GetEntityId();
+            AzPhysics::SimulatedBody* body;
+            AzPhysics::SimulatedBodyComponentRequestsBus::BroadcastResult(
+                body,
+                &AzPhysics::SimulatedBodyComponentRequests::GetSimulatedBody
+            );
+            AzPhysics::CollisionEvent evt;
+            evt.m_body1 = body;
+            evt.m_body2 = actorData->GetSimulatedBody();
+            evt.m_type = AzPhysics::CollisionEvent::Type::Begin;
+            body->ProcessCollisionEvent(evt);
+        }
+        // HACK
+
         if (m_onShapeHit)
         {
             m_onShapeHit(hit);
@@ -267,6 +286,7 @@ namespace PhysX
         m_actorUserData = PhysX::ActorData(m_pxController->getActor());
         m_actorUserData.SetCharacter(this);
         m_actorUserData.SetEntityId(characterConfig.m_entityId);
+        m_pxController->setUserData(&m_actorUserData);
     }
 
     void CharacterController::SetMinimumMovementDistance(float distance)
