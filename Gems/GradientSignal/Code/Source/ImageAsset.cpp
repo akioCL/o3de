@@ -268,6 +268,11 @@ namespace GradientSignal
         return true;
     }
 
+    void ImageAsset::UpdateStatusToReady()
+    {
+        m_status = AZ::Data::AssetData::AssetStatus::Ready;
+    }
+
     float GetValueFromImageAsset(const AZ::Data::Asset<ImageAsset>& imageAsset, const AZ::Vector3& uvw, float tilingX, float tilingY, float defaultValue)
     {
         AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::Entity);
