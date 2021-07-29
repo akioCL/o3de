@@ -14,6 +14,7 @@
 #include <Rendering/WhiteBoxRenderMeshInterface.h>
 
 #include <Atom/Feature/Mesh/MeshFeatureProcessorInterface.h>
+#include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Name/Name.h>
 
@@ -29,10 +30,15 @@ namespace WhiteBox
     class WhiteBoxMeshAtomData;
 
     //! A concrete implementation of RenderMeshInterface to support Atom rendering for the White Box Tool.
-    class AtomRenderMesh : public RenderMeshInterface
+    class AtomRenderMesh
+        : public RenderMeshInterface
+        , private AZ::Render::MaterialReceiverRequestBus::Handler
+        , private AZ::Render::MaterialComponentNotificationBus::Handler
     {
     public:
         AZ_RTTI(AtomRenderMesh, "{1F48D2F5-037C-400B-977C-7C0C9A34B84C}", RenderMeshInterface);
+ 
+        ~AtomRenderMesh();
 
         // RenderMeshInterface ...
         void BuildMesh(
@@ -43,6 +49,13 @@ namespace WhiteBox
         void SetVisiblity(bool visibility) override;
 
     private:
+        // MaterialReceiverRequestBus::Handler overrides ...
+        AZ::Render::MaterialAssignmentMap GetMaterialAssignments() const override;
+        AZStd::unordered_set<AZ::Name> GetModelUvNames() const override;
+
+        // MaterialComponentNotificationBus::Handler overrides ...
+        void OnMaterialsUpdated(const AZ::Render::MaterialAssignmentMap& materials) override;
+        
         //! Creates an attribute buffer in the slot dictated by AttributeTypeT.
         template<AttributeType AttributeTypeT, typename VertexStreamDataType>
         void CreateAttributeBuffer(const AZStd::vector<VertexStreamDataType>& data)

@@ -19,11 +19,17 @@
 #include <Atom/RPI.Reflect/Model/ModelAssetCreator.h>
 #include <Atom/RPI.Reflect/Model/ModelLodAssetCreator.h>
 #include <Atom/RPI.Reflect/ResourcePoolAssetCreator.h>
-#include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
+#include <Atom/Feature/Material/MaterialAssignment.h>
 #include <AzCore/Math/PackedVector3.h>
 
 namespace WhiteBox
 {
+    AtomRenderMesh::~AtomRenderMesh()
+    {
+        AZ::Render::MaterialReceiverRequestBus::Handler::BusDisconnect();
+        AZ::Render::MaterialComponentNotificationBus::Handler::BusDisconnect();
+    }
+
     bool AtomRenderMesh::AreAttributesValid() const
     {
         bool attributesAreValid = true;
@@ -215,6 +221,9 @@ namespace WhiteBox
     void AtomRenderMesh::BuildMesh(
         const WhiteBoxRenderData& renderData, const AZ::Transform& worldFromLocal, AZ::EntityId entityId)
     {
+        AZ::Render::MaterialReceiverRequestBus::Handler::BusConnect(entityId);
+        AZ::Render::MaterialComponentNotificationBus::Handler::BusConnect(entityId);
+
         const WhiteBoxFaces culledFaceList = BuildCulledWhiteBoxFaces(renderData.m_faces);
         const WhiteBoxMeshAtomData meshData(culledFaceList);
 
@@ -286,5 +295,23 @@ namespace WhiteBox
         // TODO: LYN-788
         // hide: m_meshFeatureProcessor->ReleaseMesh(m_meshHandle);
         // show: m_meshHandle = m_meshFeatureProcessor->AcquireMesh(m_modelAsset);
+    }
+
+    AZ::Render::MaterialAssignmentMap AtomRenderMesh::GetMaterialAssignments() const
+    {
+        return AZ::Render::GetMaterialAssignmentsFromModel(m_model);
+    }
+
+    AZStd::unordered_set<AZ::Name> AtomRenderMesh::GetModelUvNames() const
+    {
+        return m_model ? m_model->GetUvNames() : AZStd::unordered_set<AZ::Name>();
+    }
+
+    void AtomRenderMesh::OnMaterialsUpdated([[maybe_unused]] const AZ::Render::MaterialAssignmentMap& materials)
+    {
+        if (m_meshFeatureProcessor)
+        {
+            m_meshFeatureProcessor->SetMaterialAssignmentMap(m_meshHandle, materials);
+        }
     }
 } // namespace WhiteBox

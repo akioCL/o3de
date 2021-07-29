@@ -304,12 +304,14 @@ namespace WhiteBox
     void EditorWhiteBoxComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
     {
         provided.push_back(AZ_CRC_CE("WhiteBoxService"));
+        provided.push_back(AZ_CRC("MaterialReceiverService", 0x0d1a6a74));
     }
 
     void EditorWhiteBoxComponent::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
     {
         incompatible.push_back(AZ_CRC_CE("NonUniformScaleService"));
         incompatible.push_back(AZ_CRC_CE("MeshService"));
+        incompatible.push_back(AZ_CRC("MaterialReceiverService", 0x0d1a6a74));
     }
 
     EditorWhiteBoxComponent::EditorWhiteBoxComponent() = default;
