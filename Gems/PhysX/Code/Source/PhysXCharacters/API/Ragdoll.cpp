@@ -231,10 +231,13 @@ namespace PhysX
             return;
         }
 
-        if (auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get())
+        if (!m_sceneStartSimHandler.IsConnected())
         {
-            AZStd::scoped_lock lock(m_sceneEventMutex);
-            sceneInterface->RegisterSceneSimulationStartHandler(m_sceneOwner, m_sceneStartSimHandler);
+            if (auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get())
+            {
+                AZStd::scoped_lock lock(m_sceneEventMutex);
+                sceneInterface->RegisterSceneSimulationStartHandler(m_sceneOwner, m_sceneStartSimHandler);
+            }
         }
 
         m_queuedInitialState = initialState;
