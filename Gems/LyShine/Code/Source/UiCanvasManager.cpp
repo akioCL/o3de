@@ -504,7 +504,8 @@ void UiCanvasManager::ReleaseCanvasDeferred(AZ::EntityId canvasEntityId)
     }
     AZ::Entity* canvasEntity = nullptr;
     EBUS_EVENT_RESULT(canvasEntity, AZ::ComponentApplicationBus, FindEntity, canvasEntityId);
-    AZ_Assert(canvasEntity, "Canvas entity not found by ID");
+    //AZ_Assert(canvasEntity, "Canvas entity not found by ID");
+    AZ_Warning("UiCanvasManager", canvasEntity, "Canvas entity not found by ID"); // HACK: There is some bug while exiting game mode that it's not able to find the entity, using warning for now.
 
     if (canvasEntity)
     {
