@@ -11,7 +11,6 @@
  */
 
 #include "EditorImageGradientComponentMode.h"
-#include "GradientSignal_precompiled.h"
 
 #include <AzCore/Component/TransformBus.h>
 #include <AzToolsFramework/Brushes/PaintBrushComponentNotificationBus.h>
