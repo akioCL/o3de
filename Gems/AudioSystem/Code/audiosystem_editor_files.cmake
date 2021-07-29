@@ -39,7 +39,6 @@ set(FILES
     Source/Editor/AudioControlsEditorWindow.cpp
     Source/Editor/AudioControlsLoader.cpp
     Source/Editor/AudioControlsWriter.cpp
-    Source/Editor/AudioResourceSelectors.cpp
     Source/Editor/AudioSystemPanel.cpp
     Source/Editor/ImplementationManager.cpp
     Source/Editor/InspectorPanel.cpp
