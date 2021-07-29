@@ -2597,6 +2597,32 @@ namespace WhiteBox
             return polygonHandle;
         }
 
+        PolygonHandles InitializeFromIndexedMesh(
+            WhiteBoxMesh& whiteBox, const AZStd::vector<uint32_t>& indices, const AZStd::vector<AZ::Vector3>& positions)
+        {
+            // Create a handle for each position
+            AZStd::vector<VertexHandle> vertexHandles;
+            vertexHandles.reserve(positions.size());
+            for (const AZ::Vector3& position : positions)
+            {
+                vertexHandles.push_back(AddVertex(whiteBox, position));
+            }
+
+            // Create a polygon for each indexed triangle
+            AZ_Assert(indices.size() % 3 == 0, "All shape index buffers should have a multiple of 3 indices");
+            PolygonHandles polygons;
+            polygons.reserve(indices.size() / 3);
+            for (size_t i = 0; i < indices.size(); i += 3)
+            {
+                polygons.push_back(AddTriPolygon(whiteBox, vertexHandles[indices[i]], vertexHandles[indices[i + 1]], vertexHandles[indices[i + 2]]));
+            }
+
+            // Auto-generate normals and uvs
+            CalculateNormals(whiteBox);
+            CalculatePlanarUVs(whiteBox);
+            return polygons;
+        }
+
         void SetVertexPosition(WhiteBoxMesh& whiteBox, const VertexHandle vertexHandle, const AZ::Vector3& position)
         {
             WHITEBOX_LOG(

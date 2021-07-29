@@ -161,23 +161,7 @@ namespace WhiteBox
 
         if (shapeMeshPtr)
         {
-            const AZStd::vector<Vector3>& positions = shapeMeshPtr->m_vertexBuffer;
-            vertexHandles.reserve(positions.size());
-
-            for (const Vector3& position : positions)
-            {
-                vertexHandles.push_back(AddVertex(*whiteboxMesh, position));
-            }
-
-            const AZStd::vector<u32>& indices = shapeMeshPtr->m_indexBuffer;
-            AZ_Assert(indices.size() % 3 == 0, "All shape index buffers should have a multiple of 3 indices");
-            for (size_t i = 0; i < indices.size(); i+=3)
-            {
-                AddFace(*whiteboxMesh, vertexHandles[indices[i]], vertexHandles[indices[i + 1]], vertexHandles[indices[i + 2]]);
-            }
-            
-            CalculateNormals(*whiteboxMesh);
-            CalculatePlanarUVs(*whiteboxMesh);
+            InitializeFromIndexedMesh(*whiteboxMesh, shapeMeshPtr->m_indexBuffer, shapeMeshPtr->m_vertexBuffer);
             RebuildWhiteBox();
             WriteAssetToComponent();
         }

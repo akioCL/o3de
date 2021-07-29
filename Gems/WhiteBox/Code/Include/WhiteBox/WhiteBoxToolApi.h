@@ -561,6 +561,10 @@ namespace WhiteBox
         //! @note A polygon will be created for the triangle (it is currently only 1 sided, CCW winding order).
         //! @return The polygon handle that was added.
         PolygonHandle InitializeAsUnitTriangle(WhiteBoxMesh& whiteBox);
+        //! Accepts a created but uninitialized white box and index/vertex buffers and generates a whitebox mesh
+        //! @note A polygon will be created for each triangle
+        //! @return A vector of the polygon handles that were added
+        PolygonHandles InitializeFromIndexedMesh(WhiteBoxMesh& whiteBox, const AZStd::vector<uint32_t>& indices, const AZStd::vector<AZ::Vector3>& positions);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
