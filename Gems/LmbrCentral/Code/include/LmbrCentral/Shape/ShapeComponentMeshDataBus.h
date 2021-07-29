@@ -19,6 +19,8 @@ namespace LmbrCentral
         AZStd::vector<AZ::Vector3> m_vertexBuffer; ///< Vertices of the shape.
         AZStd::vector<AZ::u32> m_indexBuffer; ///< Indices of the shape.
         AZStd::vector<AZ::Vector3> m_lineBuffer; ///< Lines of the shape.
+        AZStd::vector<AZ::Vector3> m_normalBuffer; ///< Optional normals of the shape.
+        AZStd::vector<AZ::Vector2> m_uvBuffer; ///< Optional uvs of the shape
     };
 
     /// Notifications sent by components that create meshes from shapes.

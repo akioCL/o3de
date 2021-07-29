@@ -1837,6 +1837,20 @@ namespace WhiteBox
             return whiteBox.mesh.point(om_vh(vertexHandle));
         }
 
+        AZ::Vector3 VertexNormal(const WhiteBoxMesh& whiteBox, const VertexHandle vertexHandle)
+        {
+            if (whiteBox.mesh.has_vertex_normals())
+            {
+                return whiteBox.mesh.normal(om_vh(vertexHandle));
+            }
+            return AZ::Vector3::CreateZero();
+        }
+
+        bool HasVertexNormals(const WhiteBoxMesh& whiteBox)
+        {
+            return whiteBox.mesh.has_vertex_normals();
+        }
+
         AZStd::vector<AZ::Vector3> VertexPositions(const WhiteBoxMesh& whiteBox, const VertexHandles& vertexHandles)
         {
             AZStd::vector<AZ::Vector3> positions;
@@ -2598,7 +2612,11 @@ namespace WhiteBox
         }
 
         PolygonHandles InitializeFromIndexedMesh(
-            WhiteBoxMesh& whiteBox, const AZStd::vector<uint32_t>& indices, const AZStd::vector<AZ::Vector3>& positions)
+            WhiteBoxMesh& whiteBox,
+            const AZStd::vector<uint32_t>& indices,
+            const AZStd::vector<AZ::Vector3>& positions,
+            const AZStd::vector<AZ::Vector3>& normals,
+            const AZStd::vector<AZ::Vector2>& uvs)
         {
             // Create a handle for each position
             AZStd::vector<VertexHandle> vertexHandles;
@@ -2609,7 +2627,7 @@ namespace WhiteBox
             }
 
             // Create a polygon for each indexed triangle
-            AZ_Assert(indices.size() % 3 == 0, "All shape index buffers should have a multiple of 3 indices");
+            AZ_Assert(indices.size() % 3 == 0, "InitializeFromIndexedMesh - All shape index buffers should have a multiple of 3 indices");
             PolygonHandles polygons;
             polygons.reserve(indices.size() / 3);
             for (size_t i = 0; i < indices.size(); i += 3)
@@ -2617,9 +2635,47 @@ namespace WhiteBox
                 polygons.push_back(AddTriPolygon(whiteBox, vertexHandles[indices[i]], vertexHandles[indices[i + 1]], vertexHandles[indices[i + 2]]));
             }
 
-            // Auto-generate normals and uvs
-            CalculateNormals(whiteBox);
-            CalculatePlanarUVs(whiteBox);
+            // Generate normals if they were not passed in
+            const bool hasNormals = !normals.empty();
+            if (hasNormals)
+            {
+                AZ_Assert(
+                    vertexHandles.size() == normals.size(),
+                    "InitializeFromIndexedMesh - Normals exist, but do not match the position count.");
+                whiteBox.mesh.request_vertex_normals();
+                whiteBox.mesh.release_face_normals();
+            }
+            else
+            {
+                CalculateNormals(whiteBox);
+            }
+
+            // Generate uvs if they were not passed in
+            const bool hasUVs = !uvs.empty();
+            if (hasUVs)
+            {
+                AZ_Assert(vertexHandles.size() == uvs.size(), "InitializeFromIndexedMesh - UVs exist, but do not match the position count.");
+            }
+            else
+            {
+                CalculatePlanarUVs(whiteBox);
+            }
+
+            // Copy normals/uvs to the whiteBox if they were passed in
+            for (size_t i = 0; i < vertexHandles.size(); ++i)
+            {
+                Mesh::VertexHandle vh = om_vh(vertexHandles[i]);
+                if (hasNormals)
+                {
+                    whiteBox.mesh.set_normal(vh, normals[i]);
+                }
+                if (hasUVs)
+                {
+                    Mesh::TexCoord2D uv = uvs[i];
+                    whiteBox.mesh.set_texcoord2D(vh, uv);
+                }
+            }
+
             return polygons;
         }
 

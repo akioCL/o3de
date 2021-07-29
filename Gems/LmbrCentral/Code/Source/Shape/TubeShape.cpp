@@ -275,7 +275,7 @@ namespace LmbrCentral
     /// Generates all vertex positions. Assumes the vertex pointer is valid
     static void GenerateSolidTubeMeshVertices(
         const AZ::SplinePtr& spline, const SplineAttribute<float>& variableRadius,
-        const float radius, const AZ::u32 sides, const AZ::u32 capSegments, AZ::Vector3* vertices)
+        const float radius, const AZ::u32 sides, const AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals)
     {
         // start cap
         auto address = spline->GetAddressByFraction(0.0f);
@@ -283,12 +283,12 @@ namespace LmbrCentral
         AZ::Vector3 previousTangent = spline->GetTangent(address);
         if (capSegments > 0)
         {
-            vertices = CapsuleTubeUtil::GenerateSolidStartCap(
+            AZStd::tie(vertices, normals) = CapsuleTubeUtil::GenerateSolidStartCap(
                 spline->GetPosition(address),
                 previousTangent,
                 normal,
                 radius + variableRadius.GetElementInterpolated(address, Lerpf),
-                sides, capSegments, vertices);
+                sides, capSegments, vertices, normals);
         }
 
         // middle segments (body)
@@ -302,12 +302,12 @@ namespace LmbrCentral
                 const AZ::Vector3 currentTangent = spline->GetTangent(address);
                 normal = CalculateNormal(normal, previousTangent, currentTangent);
 
-                vertices = CapsuleTubeUtil::GenerateSegmentVertices(
+                AZStd::tie(vertices, normals) = CapsuleTubeUtil::GenerateSegmentVertices(
                     spline->GetPosition(address),
                     currentTangent,
                     normal,
                     radius + variableRadius.GetElementInterpolated(address, Lerpf),
-                    sides, vertices);
+                    sides, vertices, normals);
 
                 address.m_segmentFraction += stepDelta;
                 previousTangent = currentTangent;
@@ -325,7 +325,7 @@ namespace LmbrCentral
                 spline->GetTangent(endAddress),
                 normal,
                 radius + variableRadius.GetElementInterpolated(endAddress, Lerpf),
-                sides, capSegments, vertices);
+                sides, capSegments, vertices, normals);
         }
     }
 
@@ -344,7 +344,7 @@ namespace LmbrCentral
         const AZ::SplinePtr& spline, const SplineAttribute<float>& variableRadius,
         const float radius, const AZ::u32 capSegments, const AZ::u32 sides,
         AZStd::vector<AZ::Vector3>& vertexBufferOut,
-        AZStd::vector<AZ::u32>& indexBufferOut)
+        AZStd::vector<AZ::u32>& indexBufferOut, AZStd::vector<AZ::Vector3>& normalBufferOut)
     {
         const size_t segmentCount = spline->GetSegmentCount();
         if (segmentCount == 0)
@@ -363,10 +363,11 @@ namespace LmbrCentral
 
         vertexBufferOut.resize(numVerts);
         indexBufferOut.resize(numTriangles * 3);
+        normalBufferOut.resize(numVerts);
 
         GenerateSolidTubeMeshVertices(
             spline, variableRadius, radius,
-            sides, capSegments, &vertexBufferOut[0]);
+            sides, capSegments, &vertexBufferOut[0], &normalBufferOut[0]);
 
         CapsuleTubeUtil::GenerateSolidMeshIndices(
             sides, segments, capSegments, &indexBufferOut[0]);
@@ -522,12 +523,12 @@ namespace LmbrCentral
         const AZ::SplinePtr& spline, const SplineAttribute<float>& variableRadius,
         const float radius, const AZ::u32 capSegments, const AZ::u32 sides,
         AZStd::vector<AZ::Vector3>& vertexBufferOut, AZStd::vector<AZ::u32>& indexBufferOut,
-        AZStd::vector<AZ::Vector3>& lineBufferOut)
+        AZStd::vector<AZ::Vector3>& lineBufferOut, AZStd::vector<AZ::Vector3>& normalBufferOut)
     {
         GenerateSolidTubeMesh(
             spline, variableRadius, radius,
             capSegments, sides, vertexBufferOut,
-            indexBufferOut);
+            indexBufferOut, normalBufferOut);
 
         GenerateWireTubeMesh(
             spline, variableRadius, radius,

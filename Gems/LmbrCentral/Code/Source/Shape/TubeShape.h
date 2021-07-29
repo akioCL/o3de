@@ -80,7 +80,7 @@ namespace LmbrCentral
     void GenerateTubeMesh(
         const AZ::SplinePtr& spline, const SplineAttribute<float>& variableRadius,
         float radius, AZ::u32 capSegments, AZ::u32 sides, AZStd::vector<AZ::Vector3>& vertexBufferOut,
-        AZStd::vector<AZ::u32>& indexBufferOut, AZStd::vector<AZ::Vector3>& lineBufferOut);
+        AZStd::vector<AZ::u32>& indexBufferOut, AZStd::vector<AZ::Vector3>& lineBufferOut, AZStd::vector<AZ::Vector3>& normalBufferOut);
 
     /// Configuration for how TubeShape debug drawing should appear (tesselation parameters etc).
     struct TubeShapeMeshConfig

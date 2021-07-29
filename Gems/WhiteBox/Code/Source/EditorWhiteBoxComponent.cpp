@@ -78,10 +78,12 @@ namespace WhiteBox
                 const auto vh = Api::HalfedgeVertexHandleAtTip(whiteBox, in);
                 out.m_position = Api::VertexPosition(whiteBox, vh);
                 out.m_uv = Api::HalfedgeUV(whiteBox, in);
+                out.m_normal = Api::VertexNormal(whiteBox, vh);
             };
 
             WhiteBoxFace face;
             face.m_normal = Api::FaceNormal(whiteBox, faceHandle);
+            face.m_hasVertexNormals = Api::HasVertexNormals(whiteBox);
             const auto faceHalfedgeHandles = Api::FaceHalfedgeHandles(whiteBox, faceHandle);
 
             copyVertex(faceHalfedgeHandles[0], face.m_v1);
@@ -161,7 +163,7 @@ namespace WhiteBox
 
         if (shapeMeshPtr)
         {
-            InitializeFromIndexedMesh(*whiteboxMesh, shapeMeshPtr->m_indexBuffer, shapeMeshPtr->m_vertexBuffer);
+            InitializeFromIndexedMesh(*whiteboxMesh, shapeMeshPtr->m_indexBuffer, shapeMeshPtr->m_vertexBuffer, shapeMeshPtr->m_normalBuffer, shapeMeshPtr->m_uvBuffer);
             RebuildWhiteBox();
             WriteAssetToComponent();
         }

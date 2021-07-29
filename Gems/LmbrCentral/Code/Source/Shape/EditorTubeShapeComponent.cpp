@@ -134,7 +134,7 @@ namespace LmbrCentral
         GenerateTubeMesh(
             m_tubeShape.GetSpline(), m_tubeShape.GetRadiusAttribute(), m_tubeShape.GetRadius(),
             endSegments, m_tubeShapeMeshConfig.m_sides, m_tubeShapeMesh.m_vertexBuffer,
-            m_tubeShapeMesh.m_indexBuffer, m_tubeShapeMesh.m_lineBuffer);
+            m_tubeShapeMesh.m_indexBuffer, m_tubeShapeMesh.m_lineBuffer, m_tubeShapeMesh.m_normalBuffer);
 
         ShapeComponentMeshDataNotificationBus::Event(GetEntityId(), &ShapeComponentMeshDataNotificationBus::Events::OnShapeMeshDataChanged);
     }

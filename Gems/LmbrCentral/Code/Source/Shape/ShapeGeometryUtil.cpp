@@ -282,58 +282,64 @@ namespace LmbrCentral
         /// Generate verts to be used when drawing triangles for cap (top vertex is ommitted and is
         /// added in concrete Start/End cap because of ordering - StartCap must at top vertex first,
         /// EndCap must add bottom vertex last.
-        static AZ::Vector3* GenerateSolidCap(
+        static AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSolidCap(
             const AZ::Vector3& localPosition, const AZ::Vector3& direction,
             const AZ::Vector3& side, const float radius, const AZ::u32 sides, const AZ::u32 capSegments,
-            const float angleOffset, const float sign, AZ::Vector3* vertices)
+            const float angleOffset, const float sign, AZ::Vector3* vertices, AZ::Vector3* normals)
         {
             const float angleDelta = AZ::Constants::HalfPi / static_cast<float>(capSegments);
             float angle = 0.0f;
             for (size_t i = 1; i <= capSegments; ++i)
             {
                 const AZ::Vector3 capSegmentPosition = localPosition + direction * sign * cosf(angle - angleOffset) * radius;
-                vertices = GenerateSegmentVertices(
-                    capSegmentPosition, direction, side, sinf(angle + angleOffset) * radius, sides, vertices);
-
+                AZStd::tie(vertices, normals) = GenerateSegmentVertices(
+                    capSegmentPosition, direction, side, sinf(angle + angleOffset) * radius, sides, vertices, normals);
+                
                 angle += angleDelta;
             }
 
-            return vertices;
+            return { vertices, normals };
         }
 
-        AZ::Vector3* GenerateSolidStartCap(
+        AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSolidStartCap(
             const AZ::Vector3& localPosition, const AZ::Vector3& direction,
             const AZ::Vector3& side, const float radius, const AZ::u32 sides,
-            const AZ::u32 capSegments, AZ::Vector3* vertices)
+            const AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals)
         {
             vertices = WriteVertex( // cap end vertex
                 localPosition - direction * radius, vertices);
-            return GenerateSolidCap(  // circular segments of cap vertices
+            normals = WriteVertex(direction.GetNormalized(), normals);
+            AZStd::tie(vertices, normals) = GenerateSolidCap(  // circular segments of cap vertices
                 localPosition, direction,
-                side, radius, sides, capSegments, 0.0f, -1.0f, vertices);
+                side, radius, sides, capSegments, 0.0f, -1.0f, vertices, normals);
+            return {vertices, normals};
         }
 
-        AZ::Vector3* GenerateSolidEndCap(
+        AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSolidEndCap(
             const AZ::Vector3& localPosition, const AZ::Vector3& direction,
             const AZ::Vector3& side, const float radius, const AZ::u32 sides,
-            const AZ::u32 capSegments, AZ::Vector3* vertices)
+            const AZ::u32 capSegments, AZ::Vector3* vertices, AZ::Vector3* normals)
         {
-            vertices = GenerateSolidCap(  // circular segments of cap vertices
+            AZStd::tie(vertices, normals) = GenerateSolidCap(  // circular segments of cap vertices
                 localPosition, direction,
-                side, radius, sides, capSegments, AZ::Constants::HalfPi, 1.0f, vertices);
-            return WriteVertex( // cap end vertex
+                side, radius, sides, capSegments, AZ::Constants::HalfPi, 1.0f, vertices, normals);
+            vertices = WriteVertex( // cap end vertex
                 localPosition + direction * radius, vertices);
+            normals = WriteVertex(direction.GetNormalized(), normals);
+
+            return { vertices, normals };
         }
 
         /// Generates a single segment of vertices - Extrudes the point using the normal * radius,
         /// then rotates it around the axis 'sides' times.
-        AZ::Vector3* GenerateSegmentVertices(
+        AZStd::tuple<AZ::Vector3*, AZ::Vector3*> GenerateSegmentVertices(
             const AZ::Vector3& point,
             const AZ::Vector3& axis,
             const AZ::Vector3& normal,
             const float radius,
             const AZ::u32 sides,
-            AZ::Vector3* vertices)
+            AZ::Vector3* vertices,
+            AZ::Vector3* normals)
         {
             const auto deltaRot = AZ::Quaternion::CreateFromAxisAngle(
                 axis, AZ::Constants::TwoPi / static_cast<float>(sides));
@@ -344,9 +350,10 @@ namespace LmbrCentral
                 const auto localPosition = point + currentNormal * radius;
                 vertices = WriteVertex(localPosition, vertices);
                 currentNormal = deltaRot.TransformVector(currentNormal);
+                normals = WriteVertex(currentNormal, normals);
             }
 
-            return vertices;
+            return { vertices, normals };
         }
 
         void GenerateSolidMeshIndices(

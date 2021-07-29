@@ -420,6 +420,16 @@ namespace WhiteBox
         //! @note A valid vertex handle must be provided. This function will fail if a vertex
         //! is passed that does not exist in the mesh.
         AZ::Vector3 VertexPosition(const WhiteBoxMesh& whiteBox, VertexHandle vertexHandle);
+		
+		//! Return the vertex normal of the requested vertex handle.
+        //! @note A valid vertex handle must be provided, and the mesh must have vertex normals.
+		//! This function will fail if a vertex is passed that does not exist in the mesh.
+		//! It will return a zero vector if the mesh does not have vertex normals
+        AZ::Vector3 VertexNormal(const WhiteBoxMesh& whiteBox, VertexHandle vertexHandle);
+		
+		//! Return true if the mesh has vertex normals.
+		//! @note By default, whitbox meshes use face normals instead of vertex normals
+        bool HasVertexNormals(const WhiteBoxMesh& whiteBox);
 
         //! Return all vertex positions corresponding to the collection of vertex handles passed in.
         //! @note All vertex handles in the collection must exist in the mesh. This function will fail
@@ -564,7 +574,7 @@ namespace WhiteBox
         //! Accepts a created but uninitialized white box and index/vertex buffers and generates a whitebox mesh
         //! @note A polygon will be created for each triangle
         //! @return A vector of the polygon handles that were added
-        PolygonHandles InitializeFromIndexedMesh(WhiteBoxMesh& whiteBox, const AZStd::vector<uint32_t>& indices, const AZStd::vector<AZ::Vector3>& positions);
+        PolygonHandles InitializeFromIndexedMesh(WhiteBoxMesh& whiteBox, const AZStd::vector<uint32_t>& indices, const AZStd::vector<AZ::Vector3>& positions, const AZStd::vector<AZ::Vector3>& normals, const AZStd::vector<AZ::Vector2>& uvs);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

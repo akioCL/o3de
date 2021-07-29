@@ -29,29 +29,29 @@ namespace LmbrCentral
     static void GenerateSolidCapsuleMeshVertices(
         const float radius, const float height,
         const AZ::u32 sides, const AZ::u32 capSegments,
-        AZ::Vector3* vertices)
+        AZ::Vector3* vertices, AZ::Vector3* normals)
     {
         const float middleHeight = AZ::GetMax(height - radius * 2.0f, 0.0f);
         const float halfMiddleHeight = middleHeight * 0.5f;
 
-        vertices = CapsuleTubeUtil::GenerateSolidStartCap(
+        AZStd::tie(vertices, normals) = CapsuleTubeUtil::GenerateSolidStartCap(
             AZ::Vector3::CreateAxisZ(-halfMiddleHeight),
             AZ::Vector3::CreateAxisZ(), AZ::Vector3::CreateAxisX(),
-            radius, sides, capSegments, vertices);
+            radius, sides, capSegments, vertices, normals);
 
         AZStd::array<float, 2> endPositions = { { -halfMiddleHeight, halfMiddleHeight } };
         for (size_t i = 0; i < endPositions.size(); ++i)
         {
             const AZ::Vector3 position = AZ::Vector3::CreateAxisZ(endPositions[i]);
-            vertices = CapsuleTubeUtil::GenerateSegmentVertices(
+            AZStd::tie(vertices, normals) = CapsuleTubeUtil::GenerateSegmentVertices(
                 position, AZ::Vector3::CreateAxisZ(), AZ::Vector3::CreateAxisX(),
-                radius, sides, vertices);
+                radius, sides, vertices, normals);
         }
 
         CapsuleTubeUtil::GenerateSolidEndCap(
             AZ::Vector3::CreateAxisZ(halfMiddleHeight),
             AZ::Vector3::CreateAxisZ(), AZ::Vector3::CreateAxisX(),
-            radius, sides, capSegments, vertices);
+            radius, sides, capSegments, vertices, normals);
     }
 
     /**
@@ -60,7 +60,8 @@ namespace LmbrCentral
      */
     static void GenerateSolidCapsuleMesh(
         const float radius, const float height, const AZ::u32 sides, const AZ::u32 capSegments,
-        AZStd::vector<AZ::Vector3>& vertexBufferOut, AZStd::vector<AZ::u32>& indexBufferOut)
+        AZStd::vector<AZ::Vector3>& vertexBufferOut, AZStd::vector<AZ::Vector3>& normalBufferOut,
+        AZStd::vector<AZ::u32>& indexBufferOut)
     {
         const AZ::u32 segments = 1;
         const AZ::u32 totalSegments = segments + capSegments * 2;
@@ -69,10 +70,11 @@ namespace LmbrCentral
         const size_t numTriangles = (sides * totalSegments) * 2 + (sides * 2);
 
         vertexBufferOut.resize(numVerts);
+        normalBufferOut.resize(numVerts);
         indexBufferOut.resize(numTriangles * 3);
 
         GenerateSolidCapsuleMeshVertices(
-            radius, height, sides, capSegments, &vertexBufferOut[0]);
+            radius, height, sides, capSegments, &vertexBufferOut[0], &normalBufferOut[0]);
 
         CapsuleTubeUtil::GenerateSolidMeshIndices(
             sides, segments, capSegments, &indexBufferOut[0]);
@@ -206,8 +208,10 @@ namespace LmbrCentral
         AZStd::vector<AZ::u32>& indexBufferOut,
         AZStd::vector<AZ::Vector3>& lineBufferOut)
     {
+        // Unused by the GeometrySystem
+        AZStd::vector<AZ::Vector3> normalBufferOut;
         GenerateSolidCapsuleMesh(
-            radius, height, sides, capSegments, vertexBufferOut, indexBufferOut);
+            radius, height, sides, capSegments, vertexBufferOut, normalBufferOut, indexBufferOut);
 
         GenerateWireCapsuleMesh(
             radius, height, sides, capSegments, lineBufferOut);

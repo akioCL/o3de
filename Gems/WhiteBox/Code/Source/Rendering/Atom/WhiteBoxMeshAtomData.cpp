@@ -17,6 +17,7 @@ namespace WhiteBox
     {
         const size_t faceCount = faceData.size();
         const size_t vertCount = faceCount * 3;
+        const bool hasVertexNormals = faceData[0].m_hasVertexNormals;
 
         // mesh vertex attribute data in host memory format
         AZStd::vector<AZ::Vector3> positions(vertCount);
@@ -41,14 +42,17 @@ namespace WhiteBox
             // v1
             positions[idxFace * 3 + 0] = face.m_v1.m_position;
             uvs[idxFace * 3 + 0] = face.m_v1.m_uv;
+            normals[idxFace * 3 + 0] = face.m_v1.m_normal;
 
             // v2
             positions[idxFace * 3 + 1] = face.m_v2.m_position;
             uvs[idxFace * 3 + 1] = face.m_v2.m_uv;
+            normals[idxFace * 3 + 1] = face.m_v2.m_normal;
 
             // v3
             positions[idxFace * 3 + 2] = face.m_v3.m_position;
             uvs[idxFace * 3 + 2] = face.m_v3.m_uv;
+            normals[idxFace * 3 + 2] = face.m_v3.m_normal;
         }
 
         // calculate the basis vectors for the TBN matrices
@@ -66,7 +70,14 @@ namespace WhiteBox
 
             // populate the mesh vertex attribute data in device memory format
             m_positions[i] = AZ::PackedVector3f(positions[i]);
-            m_normals[i] = AZ::PackedVector3f(normal);
+            if (hasVertexNormals)
+            {
+                m_normals[i] = AZ::PackedVector3f(normals[i]);
+            }
+            else
+            {
+                m_normals[i] = AZ::PackedVector3f(normal);
+            }
             m_tangents[i].Set(tangent, 1.0f);
             m_bitangents[i] = AZ::PackedVector3f(bitangent);
             m_uvs[i] = {uvs[i].GetX(), uvs[i].GetY()};

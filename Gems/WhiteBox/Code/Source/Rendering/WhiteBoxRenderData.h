@@ -46,6 +46,7 @@ namespace WhiteBox
 
         AZ::Vector3 m_position;
         AZ::Vector2 m_uv;
+        AZ::Vector3 m_normal = AZ::Vector3::CreateZero();
     };
 
     //! Triangle primitive with face normals
@@ -58,6 +59,7 @@ namespace WhiteBox
         WhiteBoxVertex m_v2;
         WhiteBoxVertex m_v3;
         AZ::Vector3 m_normal;
+        bool m_hasVertexNormals;
     };
 
     //! Builds a vector of visible faces by removing the degenerate faces from the source data
