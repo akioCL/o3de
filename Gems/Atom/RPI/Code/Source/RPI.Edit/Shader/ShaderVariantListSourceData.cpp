@@ -23,6 +23,7 @@ namespace AZ
                     ->Version(1)
                     ->Field("StableId", &VariantInfo::m_stableId)
                     ->Field("Options", &VariantInfo::m_options)
+                    ->Field("File", &VariantInfo::m_file)
                     ;
 
                 serializeContext->Class<ShaderVariantListSourceData>()
@@ -40,7 +41,17 @@ namespace AZ
                     ->Attribute(AZ::Script::Attributes::Module, "shader")
                     ->Property("stableId", BehaviorValueGetter(&VariantInfo::m_stableId), BehaviorValueSetter(&VariantInfo::m_stableId))
                     ->Property("options", BehaviorValueGetter(&VariantInfo::m_options), BehaviorValueSetter(&VariantInfo::m_options))
+                    ->Property("file", BehaviorValueGetter(&VariantInfo::m_file), BehaviorValueSetter(&VariantInfo::m_file))
                     ;
+
+                behaviorContext
+                    ->Method(
+                        "SaveShaderVariantSourceData",
+                        &JsonUtils::SaveObjectToFile<
+                            AZStd::unordered_map<AZStd::string, AZStd::string>>)
+                    ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)
+                    ->Attribute(AZ::Script::Attributes::Category, "Shader")
+                    ->Attribute(AZ::Script::Attributes::Module, "shader");
 
                 behaviorContext->Class<ShaderVariantListSourceData>("ShaderVariantListSourceData")
                     ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)

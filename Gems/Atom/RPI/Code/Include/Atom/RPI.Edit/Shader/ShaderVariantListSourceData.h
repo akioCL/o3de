@@ -36,7 +36,7 @@ namespace AZ
 
                 // See ShaderVariantStableId.
                 AZ::u32 m_stableId = 0;
-
+                AZStd::string m_file = "";
                 AZStd::unordered_map<AZStd::string/*optionName*/, AZStd::string/*valueName*/> m_options;
             };
 

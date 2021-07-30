@@ -27,7 +27,6 @@ def clean_existing_shadervariantlist_files(filePaths):
 
 def main():
     print("==== Begin shader variant script ==========================================================")
-
     if len(sys.argv) != 2:
         print("The script requires a .shader file as input argument")
         return
@@ -105,6 +104,30 @@ def main():
             return
             
     progressDialog.close()
+
+    shader_name, ext = os.path.splitext(shader_file)
+    pre, ext = os.path.splitext(shaderAssetInfo.relativePath)
+    projectShaderVariantFilePath = os.path.join(azlmbr.paths.devassets, PROJECT_SHADER_VARIANTS_FOLDER, f'{pre}_Variants/{shader_name}')
+    projectShaderVariantListFilePath = os.path.join(azlmbr.paths.devassets, PROJECT_SHADER_VARIANTS_FOLDER, f'{pre}.shadervariantlist')
+    pre, ext = os.path.splitext(filename)
+    defaultShaderVariantFilePath = f'{pre}_Variants/{shader_name}'
+    defaultShaderVariantListFilePath = f'{pre}.shadervariantlist'
+
+    # clean previously generated shader variant list file so they don't clash.
+    clean_existing_shadervariantlist_files([
+        projectShaderVariantFilePath,
+        projectShaderVariantListFilePath
+    ])
+
+    if is_save_in_project_folder:
+        shaderVariantFilePath = projectShaderVariantFilePath
+        shaderVariantListFilePath = projectShaderVariantListFilePath
+    else:
+        shaderVariantFilePath = defaultShaderVariantFilePath
+        shaderVariantListFilePath = defaultShaderVariantListFilePath
+    
+    shaderVariantFilePath = shaderVariantFilePath.replace("\\", "/")
+    shaderVariantListFilePath = shaderVariantListFilePath.replace("\\", "/")
                     
     # Generate the shader variant list data by collecting shader option name-value pairs.s
     shaderVariantList = azlmbr.shader.ShaderVariantListSourceData()
@@ -114,6 +137,7 @@ def main():
     for shaderOptionGroup in shaderVariantListShaderOptionGroups:
         variantInfo = azlmbr.shader.ShaderVariantInfo()
         variantInfo.stableId = stableId
+        variantInfo.file = f'{shaderVariantFilePath}_{stableId}.o3deshaderoptions'
         options = {}
         
         shaderOptionDescriptors = shaderOptionGroup.GetShaderOptionDescriptors()
@@ -129,27 +153,12 @@ def main():
         if len(options) != 0:
             variantInfo.options = options
             shaderVariants.append(variantInfo)
+            azlmbr.shader.SaveShaderVariantSourceData(variantInfo.file, options)
             stableId += 1
                 
     shaderVariantList.shaderVariants = shaderVariants
-    
-    # clean previously generated shader variant list file so they don't clash.
-    pre, ext = os.path.splitext(shaderAssetInfo.relativePath)
-    projectShaderVariantListFilePath = os.path.join(azlmbr.paths.devassets, PROJECT_SHADER_VARIANTS_FOLDER, f'{pre}.shadervariantlist')
-    
-    pre, ext = os.path.splitext(filename)
-    defaultShaderVariantListFilePath = f'{pre}.shadervariantlist'
-    
-    clean_existing_shadervariantlist_files([
-        projectShaderVariantListFilePath
-    ])
+
     # Save the shader variant list file
-    if is_save_in_project_folder:
-        shaderVariantListFilePath = projectShaderVariantListFilePath
-    else:
-        shaderVariantListFilePath = defaultShaderVariantListFilePath
-    
-    shaderVariantListFilePath = shaderVariantListFilePath.replace("\\", "/")
     azlmbr.shader.SaveShaderVariantListSourceData(shaderVariantListFilePath, shaderVariantList)
     
     # Open the document in shader management console
