@@ -33,7 +33,8 @@ namespace WhiteBox
             serializeContext->Class<WhiteBoxVertex>()
                 ->Version(1)
                 ->Field("Position", &WhiteBoxVertex::m_position)
-                ->Field("UV", &WhiteBoxVertex::m_uv);
+                ->Field("UV", &WhiteBoxVertex::m_uv)
+                ->Field("Normal", &WhiteBoxVertex::m_normal);
         }
     }
 
@@ -48,7 +49,8 @@ namespace WhiteBox
                 ->Field("Vertex1", &WhiteBoxFace::m_v1)
                 ->Field("Vertex2", &WhiteBoxFace::m_v2)
                 ->Field("Vertex3", &WhiteBoxFace::m_v3)
-                ->Field("Normal", &WhiteBoxFace::m_normal);
+                ->Field("Normal", &WhiteBoxFace::m_normal)
+                ->Field("HasVertexNormals", &WhiteBoxFace::m_hasVertexNormals);
         }
     }
 
