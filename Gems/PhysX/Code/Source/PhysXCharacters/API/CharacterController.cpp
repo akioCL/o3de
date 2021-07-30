@@ -138,8 +138,9 @@ namespace PhysX
         {
             AZ::EntityId entity = actorData->GetEntityId();
             AzPhysics::SimulatedBody* body;
-            AzPhysics::SimulatedBodyComponentRequestsBus::BroadcastResult(
+            AzPhysics::SimulatedBodyComponentRequestsBus::EventResult(
                 body,
+                entity,
                 &AzPhysics::SimulatedBodyComponentRequests::GetSimulatedBody
             );
             AzPhysics::CollisionEvent evt;
@@ -286,6 +287,7 @@ namespace PhysX
         m_actorUserData = PhysX::ActorData(m_pxController->getActor());
         m_actorUserData.SetCharacter(this);
         m_actorUserData.SetEntityId(characterConfig.m_entityId);
+        PHYSX_SCENE_WRITE_LOCK(m_pxController->getScene());
         m_pxController->setUserData(&m_actorUserData);
     }
 
