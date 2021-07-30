@@ -70,6 +70,7 @@ namespace PhysX
         {
             if (FindSuppressedPair(actor0, actor1) == m_suppressedCollisionPairs.end())
             {
+                m_history.push_back(History{ actor0, actor1, true });
                 m_suppressedCollisionPairs.insert(CollisionActorPair(actor0, actor1));
             }
         }
@@ -85,6 +86,7 @@ namespace PhysX
             if (auto iterator = FindSuppressedPair(actor0, actor1);
                 iterator != m_suppressedCollisionPairs.end())
             {
+                m_history.push_back(History{ actor0, actor1, false });
                 m_suppressedCollisionPairs.erase(*iterator);
             }
         }

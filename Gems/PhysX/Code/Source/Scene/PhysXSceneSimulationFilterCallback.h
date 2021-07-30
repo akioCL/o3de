@@ -65,6 +65,15 @@ namespace PhysX
         };
         using CollisionPairSet = AZStd::unordered_set<CollisionActorPair, CollisionPairHasher>;
 
+        struct History
+        {
+            const physx::PxActor* m_actorA = nullptr;
+            const physx::PxActor * m_actorB = nullptr;
+            bool m_add;
+        };
+
+        AZStd::vector<History> m_history;
+
         CollisionPairSet::const_iterator FindSuppressedPair(const physx::PxActor* actor0, const physx::PxActor* actor1) const;
 
         CollisionPairSet m_suppressedCollisionPairs; //!< Actor pairs with collision suppressed.
