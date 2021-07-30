@@ -53,22 +53,14 @@ def concat(path, file1, file2, output):
 
 
 def add_json(name, stable_id, options, path):
-    opts = options.split(";")    
-    option_list = {}
-    for i in range(0, len(opts)):
-        temp = opts[i].split("=")
-        if (len(temp) == 2):
-            option_list[temp[0]] = temp[1]
-
     if not os.path.exists(path):
         os.mkdir(path)
-
-    if not os.path.isfile(path + "/" + name + ".shadervariantlist"):
-        shader = {}
-        shader["Shader"] = name
-        shader["Variants"] = []
-        with open(path + "/" + name + ".shadervariantlist", 'w') as f:
-            json.dump(shader, f)
+        
+    shader = {}
+    shader["Shader"] = name
+    shader["Variants"] = []
+    with open(path + "/" + name + ".shadervariantlist", 'w') as f:
+        json.dump(shader, f)
 
     f = open(path + "/" + name + ".shadervariantlist", "r")
     data = json.load(f)
@@ -85,7 +77,49 @@ def add_json(name, stable_id, options, path):
     f = open(path + "/" + name + ".shadervariantlist", "w")
     json.dump(data, f)
     f.close()
+
+def make_shader_json_file(name, path, AZSL, dss, vs, ps):
+    if not os.path.exists(path):
+        os.mkdir(path)
+    
+    dss = dss.replace('\"', '"')
+
+    #if not os.path.isfile(path + "/" + name + ".shader"):
+    shader = {}
+    shader["Source"] = AZSL
+    shader["Depth Stencil State"] = dss
+    shader["ProgramSettings"] = {}
+    shader["ProgramSettings"]["EntryPoints"] = []
+    shader["ProgramSettings"]["EntryPoints"].append({
+        "name": vs,
+        "type": "Vertex"
+    })
+    shader["ProgramSettings"]["EntryPoints"].append({
+        "name": ps,
+        "type": "Fragment"
+    })
+    with open(path + "/" + name + ".shader", 'w') as f:
+        json.dump(shader, f)
         
+def make_shader_variant_json_file(name, path, stable_id, options):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    opts = options.split(";")    
+    option_list = {}
+    for i in range(0, len(opts)):
+        temp = opts[i].split("=")
+        if (len(temp) == 2):
+            option_list[temp[0]] = temp[1]
+
+    shader = {}
+    shader["StableID"] = stable_id
+    shader["Options"] = option_list
+
+    with open(path + "/" + name + ".shadervariant", 'w') as f:
+        json.dump(shader, f)
+
+
 if __name__ == '__main__':
     globals()[sys.argv[1]](*sys.argv[2:])
 

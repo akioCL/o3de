@@ -13,6 +13,33 @@ ly_add_shader(
 	NAME StandardPBR_ForwardPass
 	AZSL Materials/Types/StandardPBR_ForwardPass.azsl
 	SHADER_VARIANTS Materials/Types/StandardPBR_ForwardPass.cmake
+	DEPTH_STENCIL_STATE "{
+        \"Depth\" :
+        {
+            \"Enable\" : true,
+            \"CompareFunc\" : \"GreaterEqual\"
+        },
+        \"Stencil\" :
+        {
+            \"Enable\" : true,
+            \"ReadMask\" : \"0x00\",
+            \"WriteMask\" : \"0xFF\",
+            \"FrontFace\" :
+            {
+                \"Func\" : \"Always\",
+                \"DepthFailOp\" : \"Keep\",
+                \"FailOp\" : \"Keep\",
+                \"PassOp\" : \"Replace\"
+            },
+            \"BackFace\" :
+            {
+                \"Func\" : \"Always\",
+                \"DepthFailOp\" : \"Keep\",
+                \"FailOp\" : \"Keep\",
+                \"PassOp\" : \"Replace\"
+            }
+        }
+    },"
 	ENTRY_VS StandardPbr_ForwardPassVS
 	ENTRY_PS StandardPbr_ForwardPassPS
 )

@@ -9,20 +9,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 # 
 
-ly_add_shader_variant(
+ly_add_shader_variant_list(
 	NAME StandardPBR_ForwardPass
-	STABLE_ID ROOT
-	OPTIONS ""
-	ROOT_FILES ${hlsl_output_paths}
-	ENTRY_VS StandardPbr_ForwardPassVS
-	ENTRY_PS StandardPbr_ForwardPassPS
-)
-
-ly_add_shader_variant(
-	NAME StandardPBR_ForwardPass
-	STABLE_ID 1
-	OPTIONS "o_directional_shadow_filtering_method=ShadowFilterMethod::None"
-	ROOT_FILES ${hlsl_output_paths}
+	STABLE_IDS 
+		1
+		2 
+		3 
+		4
+	OPTIONS 
+		"o_directional_shadow_filtering_method=ShadowFilterMethod::None"
+		"o_directional_shadow_filtering_method=ShadowFilterMethod::Pcf"
+		"o_directional_shadow_filtering_method=ShadowFilterMethod::Esm"
+		"o_directional_shadow_filtering_method=ShadowFilterMethod::EsmPcf"
 	ENTRY_VS StandardPbr_ForwardPassVS
 	ENTRY_PS StandardPbr_ForwardPassPS
 )
