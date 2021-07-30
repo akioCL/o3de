@@ -31,6 +31,24 @@ namespace WhiteBox
     WhiteBoxComponent::WhiteBoxComponent() = default;
     WhiteBoxComponent::~WhiteBoxComponent() = default;
 
+    void WhiteBoxComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
+    {
+        required.push_back(AZ_CRC_CE("TransformService"));
+    }
+
+    void WhiteBoxComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    {
+        provided.push_back(AZ_CRC_CE("WhiteBoxService"));
+        provided.push_back(AZ_CRC("MaterialReceiverService", 0x0d1a6a74));
+    }
+
+    void WhiteBoxComponent::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
+    {
+        incompatible.push_back(AZ_CRC_CE("NonUniformScaleService"));
+        incompatible.push_back(AZ_CRC_CE("MeshService"));
+        incompatible.push_back(AZ_CRC("MaterialReceiverService", 0x0d1a6a74));
+    }
+
     void WhiteBoxComponent::Activate()
     {
         WhiteBoxRequestBus::BroadcastResult(m_renderMesh, &WhiteBoxRequests::CreateRenderMeshInterface);
