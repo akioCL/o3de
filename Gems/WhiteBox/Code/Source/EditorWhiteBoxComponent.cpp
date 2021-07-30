@@ -77,8 +77,19 @@ namespace WhiteBox
             {
                 const auto vh = Api::HalfedgeVertexHandleAtTip(whiteBox, in);
                 out.m_position = Api::VertexPosition(whiteBox, vh);
-                out.m_uv = Api::HalfedgeUV(whiteBox, in);
-                out.m_normal = Api::VertexNormal(whiteBox, vh);
+                if(Api::HasVertexUVs(whiteBox))
+                {
+                    out.m_uv = Api::VertexUV(whiteBox, vh);
+                }
+                else
+                {
+                    out.m_uv = Api::HalfedgeUV(whiteBox, in);
+                }
+
+                if(Api::HasVertexNormals(whiteBox))
+                {
+                    out.m_normal = Api::VertexNormal(whiteBox, vh);
+                }
             };
 
             WhiteBoxFace face;

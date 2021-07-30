@@ -354,13 +354,15 @@ namespace LmbrCentral
                 axis, AZ::Constants::TwoPi / static_cast<float>(sides));
 
             auto currentNormal = normal;
-            for (size_t i = 0; i < sides; ++i)
+
+            // Duplicate a vertex at the start/end so it can have unique texture coordinates
+            for (size_t i = 0; i <= sides; ++i)
             {
                 const auto localPosition = point + currentNormal * radius;
                 vertices = WriteVertex(localPosition, vertices);
                 currentNormal = deltaRot.TransformVector(currentNormal);
                 normals = WriteVertex(currentNormal, normals);
-                uvs = WriteUv(AZ::Vector2(distance, aznumeric_cast<float>(i) / aznumeric_cast<float>(sides - 1)), uvs);
+                uvs = WriteUv(AZ::Vector2(distance, aznumeric_cast<float>(i) / aznumeric_cast<float>(sides)), uvs);
             }
 
             return { vertices, normals, uvs };
@@ -372,7 +374,7 @@ namespace LmbrCentral
         {
             const auto capSegmentTipVerts = capSegments > 0 ? 1 : 0;
             const auto totalSegments = segments + capSegments * 2;
-            const auto numVerts = sides * (totalSegments + 1) + 2 * capSegmentTipVerts;
+            const auto numVerts = (sides + 1) * (totalSegments + 1) + 2 * capSegmentTipVerts;
             const auto hasEnds = capSegments > 0;
 
             // Start Faces (start point of tube)
@@ -402,23 +404,23 @@ namespace LmbrCentral
             // 1 face per side.
             for (auto i = 0; i < totalSegments; ++i)
             {
-                for (auto j = 0; j < sides; ++j)
+                for (auto j = 0; j <= sides; ++j)
                 {
                     // 4 corners for each face
                     // a ------ d
                     // |        |
                     // |        |
                     // b ------ c
-                    AZ::u32 a = (i + 0) * sides + (j + 0) + capSegmentTipVerts;
-                    AZ::u32 b = (i + 0) * sides + (j + 1) + capSegmentTipVerts;
-                    AZ::u32 c = (i + 1) * sides + (j + 1) + capSegmentTipVerts;
-                    AZ::u32 d = (i + 1) * sides + (j + 0) + capSegmentTipVerts;
+                    AZ::u32 a = (i + 0) * (sides + 1) + (j + 0) + capSegmentTipVerts;
+                    AZ::u32 b = (i + 0) * (sides + 1) + (j + 1) + capSegmentTipVerts;
+                    AZ::u32 c = (i + 1) * (sides + 1) + (j + 1) + capSegmentTipVerts;
+                    AZ::u32 d = (i + 1) * (sides + 1) + (j + 0) + capSegmentTipVerts;
 
                     // Wraps back to beginning vertices
-                    if (j == sides - 1)
+                    if (j == sides)
                     {
-                        b -= sides;
-                        c -= sides;
+                        b -= (sides + 1);
+                        c -= (sides + 1);
                     }
 
                     indices = WriteTriangle(a, b, d, indices);

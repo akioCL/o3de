@@ -1839,16 +1839,22 @@ namespace WhiteBox
 
         AZ::Vector3 VertexNormal(const WhiteBoxMesh& whiteBox, const VertexHandle vertexHandle)
         {
-            if (whiteBox.mesh.has_vertex_normals())
-            {
-                return whiteBox.mesh.normal(om_vh(vertexHandle));
-            }
-            return AZ::Vector3::CreateZero();
+            return whiteBox.mesh.normal(om_vh(vertexHandle));
         }
 
         bool HasVertexNormals(const WhiteBoxMesh& whiteBox)
         {
             return whiteBox.mesh.has_vertex_normals();
+        }        
+
+        AZ::Vector2 VertexUV(const WhiteBoxMesh& whiteBox, const VertexHandle vertexHandle)
+        {
+            return whiteBox.mesh.texcoord2D(om_vh(vertexHandle));
+        }
+
+        bool HasVertexUVs(const WhiteBoxMesh& whiteBox)
+        {
+            return whiteBox.mesh.has_vertex_texcoords2D();
         }
 
         AZStd::vector<AZ::Vector3> VertexPositions(const WhiteBoxMesh& whiteBox, const VertexHandles& vertexHandles)
@@ -2656,6 +2662,7 @@ namespace WhiteBox
             {
                 AZ_Assert(vertexHandles.size() == uvs.size(), "InitializeFromIndexedMesh - UVs exist, but do not match the position count.");
                 whiteBox.mesh.request_vertex_texcoords2D();
+                whiteBox.mesh.release_halfedge_texcoords2D();
             }
             else
             {

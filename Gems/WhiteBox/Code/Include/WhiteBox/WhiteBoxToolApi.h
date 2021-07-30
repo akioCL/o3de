@@ -424,12 +424,19 @@ namespace WhiteBox
 		//! Return the vertex normal of the requested vertex handle.
         //! @note A valid vertex handle must be provided, and the mesh must have vertex normals.
 		//! This function will fail if a vertex is passed that does not exist in the mesh.
-		//! It will return a zero vector if the mesh does not have vertex normals
+		//! This function will fail if the mesh does not have vertex normals. Use HasVertexNormals to check
         AZ::Vector3 VertexNormal(const WhiteBoxMesh& whiteBox, VertexHandle vertexHandle);
 		
 		//! Return true if the mesh has vertex normals.
 		//! @note By default, whitbox meshes use face normals instead of vertex normals
         bool HasVertexNormals(const WhiteBoxMesh& whiteBox);
+
+        //! Return the texture coordinate (uv) associated with the given vertex handle.
+        AZ::Vector2 VertexUV(const WhiteBoxMesh& whiteBox, VertexHandle halfedgeHandle);
+
+        //! Return true if the mesh has vertex normals.
+        //! @note By default, whitbox meshes use halfedge uvs instead of vertex uvs        
+        bool HasVertexUVs(const WhiteBoxMesh& whiteBox);
 
         //! Return all vertex positions corresponding to the collection of vertex handles passed in.
         //! @note All vertex handles in the collection must exist in the mesh. This function will fail

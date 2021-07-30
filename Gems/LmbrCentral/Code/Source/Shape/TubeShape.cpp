@@ -295,6 +295,13 @@ namespace LmbrCentral
         const float stepDelta = 1.0f / static_cast<float>(spline->GetSegmentGranularity());
         const auto endIndex = address.m_segmentIndex + spline->GetSegmentCount();
 
+        // For generating texCoords, the texture will wrap all the way
+        // around the tube exactly once in the v-direction.
+        // Tile u such that a square texture will not stretch
+        float vCircumference = AZ::Constants::Pi * radius * radius;
+        // u should go from 0-1 at this distance, then repeat
+        float uTileDistance = spline->GetSplineLength() / vCircumference;
+
         while (address.m_segmentIndex < endIndex)
         {
             for (auto step = 0; step <= spline->GetSegmentGranularity(); ++step)
@@ -302,12 +309,15 @@ namespace LmbrCentral
                 const AZ::Vector3 currentTangent = spline->GetTangent(address);
                 normal = CalculateNormal(normal, previousTangent, currentTangent);
 
+                float distance = spline->GetLength(address);
+                float u = distance / uTileDistance;
+
                 AZStd::tie(vertices, normals, uvs) = CapsuleTubeUtil::GenerateSegmentVertices(
                     spline->GetPosition(address),
                     currentTangent,
                     normal,
                     radius + variableRadius.GetElementInterpolated(address, Lerpf),
-                    sides, aznumeric_cast<float>(step) / aznumeric_cast<float>(spline->GetSegmentGranularity()), vertices, normals, uvs);
+                    sides, u, vertices, normals, uvs);
 
                 address.m_segmentFraction += stepDelta;
                 previousTangent = currentTangent;
@@ -358,8 +368,8 @@ namespace LmbrCentral
         const AZ::u32 segments = segmentCount * spline->GetSegmentGranularity() + segmentCount - 1;
         const AZ::u32 totalSegments = segments + capSegments * 2;
         const AZ::u32 capSegmentTipVerts = capSegments > 0 ? 2 : 0;
-        const size_t numVerts = sides * (totalSegments + 1) + capSegmentTipVerts;
-        const size_t numTriangles = (sides * totalSegments) * 2 + (sides * capSegmentTipVerts);
+        const size_t numVerts = (sides + 1) * (totalSegments + 1) + capSegmentTipVerts;
+        const size_t numTriangles = ((sides + 1) * totalSegments) * 2 + (sides * capSegmentTipVerts);
 
         vertexBufferOut.resize(numVerts);
         normalBufferOut.resize(numVerts);
