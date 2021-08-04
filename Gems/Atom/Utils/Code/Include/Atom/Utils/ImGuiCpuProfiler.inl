@@ -18,6 +18,7 @@
 #include <AzCore/std/sort.h>
 #include <AzCore/std/time.h>
 
+#include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
 
 namespace AZ
 {
@@ -161,17 +162,17 @@ namespace AZ
                 // Draw all of the rows held in the GroupRegionMap
                 for (const auto* statistics : m_tableData)
                 {
-                    if (!m_timedRegionFilter.PassFilter(statistics->m_groupName.c_str())
-                        && !m_timedRegionFilter.PassFilter(statistics->m_regionName.c_str()))
+                    if (!m_timedRegionFilter.PassFilter(statistics->m_groupName.GetCStr())
+                        && !m_timedRegionFilter.PassFilter(statistics->m_regionName.GetCStr()))
                     {
                         continue;
                     }
 
-                    ImGui::Text(statistics->m_groupName.c_str());
+                    ImGui::Text(statistics->m_groupName.GetCStr());
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
                     ImGui::TableNextColumn();
 
-                    ImGui::Text(statistics->m_regionName.c_str());
+                    ImGui::Text(statistics->m_regionName.GetCStr());
                     ImGui::TableNextColumn();
 
                     ImGui::Text("%.2f", CpuProfilerImGuiHelper::TicksToMs(statistics->m_runningAverageTicks));
@@ -471,7 +472,7 @@ namespace AZ
                         newVisualizerData.push_back(region); // Copies
 
                         // Also update the statistical view's data
-                        const AZStd::string& groupName = region.m_groupRegionName->m_groupName;
+                        const Name& groupName = region.m_groupName;
 
                         if (!m_groupRegionMap[groupName].contains(regionName))
                         {
@@ -508,6 +509,8 @@ namespace AZ
 
         inline void ImGuiCpuProfiler::CullFrameData(const AZ::RHI::CpuTimingStatistics& currentCpuTimingStatistics)
         {
+            AZStd::string sizeString = AZStd::string::format("Culling with frame time of %lld", currentCpuTimingStatistics.m_frameToFrameTime);
+            AZ_ATOM_PROFILE_TIME_GROUP_REGION("Profiler", sizeString);
             const AZStd::sys_time_t frameToFrameTime = currentCpuTimingStatistics.m_frameToFrameTime;
             const AZStd::sys_time_t deleteBeforeTick = AZStd::GetTimeNowTicks() - frameToFrameTime * m_framesToCollect;
 
@@ -535,7 +538,7 @@ namespace AZ
         inline void ImGuiCpuProfiler::DrawBlock(const TimeRegion& block, u64 targetRow)
         {
             // Don't draw anything if the user is searching for regions and this block doesn't pass the filter
-            if (!m_visualizerHighlightFilter.PassFilter(block.m_groupRegionName->m_regionName))
+            if (!m_visualizerHighlightFilter.PassFilter(block.m_regionName.GetCStr()))
             {
                 return;
             }
@@ -560,8 +563,7 @@ namespace AZ
             const float maxCharWidth = ImGui::CalcTextSize("M").x; // M is usually the largest character in most fonts (see CSS em)
             if (regionPixelWidth > maxCharWidth) // We can draw at least one character
             {
-                const AZStd::string label =
-                    AZStd::string::format("%s/ %s", block.m_groupRegionName->m_groupName, block.m_groupRegionName->m_regionName);
+                const AZStd::string label = AZStd::string::format("%s/ %s", block.m_groupName.GetCStr(), block.m_regionName.GetCStr());
                 const float textWidth = ImGui::CalcTextSize(label.c_str()).x;
 
                 if (regionPixelWidth < textWidth) // Not enough space in the block to draw the whole name, draw clipped text.
@@ -589,15 +591,14 @@ namespace AZ
                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
                 {
                     m_enableVisualizer = false;
-                    const auto newFilter = AZStd::string(block.m_groupRegionName->m_regionName);
-                    m_timedRegionFilter = ImGuiTextFilter(newFilter.c_str());
+                    m_timedRegionFilter = ImGuiTextFilter(block.m_regionName.GetCStr());
                     m_timedRegionFilter.Build();
                 }
                 // Hovering outline
                 drawList->AddRect(startPoint, endPoint, ImGui::GetColorU32({ 1, 1, 1, 1 }), 0.0, 0, 1.5);
 
                 ImGui::BeginTooltip();
-                ImGui::Text("%s::%s", block.m_groupRegionName->m_groupName, block.m_groupRegionName->m_regionName);
+                ImGui::Text("%s/ %s", block.m_groupName.GetCStr(), block.m_regionName.GetCStr());
                 ImGui::Text("Execution time: %.3f ms", CpuProfilerImGuiHelper::TicksToMs(block.m_endTick - block.m_startTick));
                 ImGui::Text("Ticks %lld => %lld", block.m_startTick, block.m_endTick);
                 ImGui::EndTooltip();
@@ -606,8 +607,7 @@ namespace AZ
 
         inline ImU32 ImGuiCpuProfiler::GetBlockColor(const TimeRegion& block)
         {
-            // Use the GroupRegionName pointer a key into the cache, equal regions will have equal pointers
-            const GroupRegionName* key = block.m_groupRegionName;
+            const Name& key = block.m_regionName;
             if (m_regionColorMap.contains(key)) // Cache hit
             {
                 return ImGui::GetColorU32(m_regionColorMap[key]);

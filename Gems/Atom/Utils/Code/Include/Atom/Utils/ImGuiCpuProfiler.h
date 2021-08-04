@@ -34,7 +34,16 @@ namespace AZ
 
                 bool operator()(const TableRow* lhs, const TableRow* rhs)
                 {
-                    return m_ascending ? lhs->*m_memberPointer < rhs->*m_memberPointer : lhs->*m_memberPointer > rhs->*m_memberPointer;
+                    // Names delete their operator< and >, need to use their string views instead.
+                    if constexpr (AZStd::is_same_v<T, Name TableRow::*>)
+                    {
+                        return m_ascending ? (lhs->*m_memberPointer).GetStringView() < (rhs->*m_memberPointer).GetStringView()
+                                           : (lhs->*m_memberPointer).GetStringView() > (rhs->*m_memberPointer).GetStringView();
+                    }
+                    else
+                    {
+                        return m_ascending ? lhs->*m_memberPointer < rhs->*m_memberPointer : lhs->*m_memberPointer > rhs->*m_memberPointer;
+                    }
                 }
 
                 T m_memberPointer;
@@ -49,8 +58,8 @@ namespace AZ
             // Get a string of all threads that this region executed in during the last frame
             AZStd::string GetExecutingThreadsLabel() const;
                
-            AZStd::string m_groupName;
-            AZStd::string m_regionName;
+            Name m_groupName;
+            Name m_regionName;
 
             // --- Per frame statistics ---
 
@@ -79,12 +88,11 @@ namespace AZ
             : SystemTickBus::Handler
         {
             // Region Name -> statistical view row data
-            using RegionRowMap = AZStd::map<AZStd::string, TableRow>;
+            using RegionRowMap = AZStd::unordered_map<Name, TableRow>;
             // Group Name -> RegionRowMap
-            using GroupRegionMap = AZStd::map<AZStd::string, RegionRowMap>;
+            using GroupRegionMap = AZStd::unordered_map<Name, RegionRowMap>;
 
             using TimeRegion = AZ::RHI::CachedTimeRegion;
-            using GroupRegionName = AZ::RHI::CachedTimeRegion::GroupRegionName;
 
         public:
             ImGuiCpuProfiler() = default;
@@ -143,7 +151,7 @@ namespace AZ
 
             AZStd::sys_time_t GetViewportTickWidth() const;
 
-            // Gets the color for a block using the GroupRegionName as a key into the cache. 
+            // Gets the color for a block using the RegionName as a key into the cache. 
             // Generates a random ImU32 if the block does not yet have a color.
             ImU32 GetBlockColor(const TimeRegion& block);
 
@@ -165,7 +173,7 @@ namespace AZ
             AZStd::unordered_map<AZStd::thread_id, AZStd::vector<TimeRegion>> m_savedData;
 
             // Region color cache
-            AZStd::unordered_map<const GroupRegionName*, ImVec4> m_regionColorMap;
+            AZStd::unordered_map<Name, ImVec4> m_regionColorMap;
 
             // Tracks the frame boundaries
             AZStd::vector<AZStd::sys_time_t> m_frameEndTicks = { INT64_MIN };

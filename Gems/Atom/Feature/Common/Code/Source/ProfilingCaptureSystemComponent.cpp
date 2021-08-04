@@ -328,8 +328,8 @@ namespace AZ
                 return timeInNanoseconds;
             };
 
-            m_groupName = cachedTimeRegion.m_groupRegionName->m_groupName;
-            m_regionName = cachedTimeRegion.m_groupRegionName->m_regionName;
+            m_groupName = cachedTimeRegion.m_groupName;
+            m_regionName = cachedTimeRegion.m_regionName;
             m_stackDepth = cachedTimeRegion.m_stackDepth;
             m_elapsedInNanoseconds = ticksToNanoSeconds(cachedTimeRegion.m_endTick - cachedTimeRegion.m_startTick);
         }
