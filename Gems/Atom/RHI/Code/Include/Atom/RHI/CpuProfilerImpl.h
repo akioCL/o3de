@@ -76,7 +76,7 @@ namespace AZ
             AZStd::atomic_bool m_deleteFlag = false;
 
             // Keep track of the regions that have hit the size limit so we don't have to lock to check
-            AZStd::map<AZStd::string, bool> m_hitSizeLimitMap;
+            AZStd::unordered_map<Name, bool> m_hitSizeLimitMap;
         };
 
         //! CpuProfiler will keep track of the registered threads, and

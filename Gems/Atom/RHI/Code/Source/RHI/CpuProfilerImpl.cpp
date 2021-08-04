@@ -29,8 +29,8 @@ namespace AZ
 
         // --- TimeRegion ---
 
-        TimeRegion::TimeRegion(const GroupRegionName* groupRegionName) :
-            CachedTimeRegion(groupRegionName)
+        TimeRegion::TimeRegion(AZStd::string_view groupName, AZStd::string_view regionName ) :
+            CachedTimeRegion(groupName, regionName)
         {
             if (CpuProfiler::Get())
             {
@@ -53,25 +53,19 @@ namespace AZ
 
         // --- CachedTimeRegion ---
 
-        CachedTimeRegion::CachedTimeRegion(const GroupRegionName* groupRegionName)
+        CachedTimeRegion::CachedTimeRegion(AZStd::string_view groupName, AZStd::string_view regionName)
         {
-            m_groupRegionName = groupRegionName;
+            m_groupName = Name(groupName);
+            m_regionName = Name(regionName);
         }
 
-        CachedTimeRegion::CachedTimeRegion(const GroupRegionName* groupRegionName, uint16_t stackDepth, uint64_t startTick, uint64_t endTick)
+        CachedTimeRegion::CachedTimeRegion(Name groupName, Name regionName, uint16_t stackDepth, uint64_t startTick, uint64_t endTick)
         {
-            m_groupRegionName = groupRegionName;
+            m_groupName = groupName;
+            m_regionName = regionName;
             m_stackDepth = stackDepth;
             m_startTick = startTick;
             m_endTick = endTick;
-        }
-
-        // --- GroupRegionName ---
-
-        CachedTimeRegion::GroupRegionName::GroupRegionName(const char* const group, const char* const region) :
-            m_groupName(group),
-            m_regionName(region)
-        {
         }
 
         // --- CpuProfilerImpl ---
@@ -268,13 +262,13 @@ namespace AZ
             m_stackLevel--;
 
             // Add an entry to the cached region
-            AddCachedRegion(CachedTimeRegion(back->m_groupRegionName, back->m_stackDepth, back->m_startTick, back->m_endTick));
+            AddCachedRegion(CachedTimeRegion(back->m_groupName, back->m_regionName, back->m_stackDepth, back->m_startTick, back->m_endTick));
         }
 
         // Gets called when region ends and all data is set
         void CpuTimingLocalStorage::AddCachedRegion(CachedTimeRegion&& timeRegionCached)
         {
-            if (m_hitSizeLimitMap[timeRegionCached.m_groupRegionName->m_regionName])
+            if (m_hitSizeLimitMap[timeRegionCached.m_regionName])
             {
                 return;
             }
@@ -293,12 +287,12 @@ namespace AZ
                 // Add the cached regions to the map
                 for (auto& cachedTimeRegion : m_cachedTimeRegions)
                 {
-                    const AZStd::string regionName = cachedTimeRegion.m_groupRegionName->m_regionName;
+                    const Name regionName = cachedTimeRegion.m_regionName;
                     AZStd::vector<CachedTimeRegion>& regionVec = m_cachedTimeRegionMap[regionName];
                     regionVec.push_back(cachedTimeRegion);
                     if (regionVec.size() >= TimeRegionStackSize)
                     {
-                        m_hitSizeLimitMap[cachedTimeRegion.m_groupRegionName->m_regionName] = true;
+                        m_hitSizeLimitMap[cachedTimeRegion.m_regionName] = true;
                     }
                 }
 

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <AzCore/Debug/EventTrace.h>
+#include <AzCore/Name/name.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <AzCore/std/string/string.h>
@@ -20,26 +21,12 @@ namespace AZ
         //! Structure that is used to cache a timed region into the thread's local storage.
         struct CachedTimeRegion
         {
-            //! Structure that the profiling macro utilizes to create statically initialized instance to create string
-            //! literals in static memory
-            struct GroupRegionName
-            {
-                GroupRegionName() = delete;
-                GroupRegionName(const char* const group, const char* const region);
-                
-                const char* const m_groupName = nullptr;
-                const char* const m_regionName = nullptr;
-            };
-
             CachedTimeRegion() = default;
-            CachedTimeRegion(const GroupRegionName* groupRegionName);
-            CachedTimeRegion(const GroupRegionName* groupRegionName, uint16_t stackDepth, uint64_t startTick, uint64_t endTick);
+            CachedTimeRegion(AZStd::string_view groupName, AZStd::string_view regionName);
+            CachedTimeRegion(Name groupName, Name regionName, uint16_t stackDepth, uint64_t startTick, uint64_t endTick);
 
-            //! Pointer to the GroupRegionName static instance.
-            //! NOTE: When used in a separate shared library, the library mustn't be unloaded before
-            //! the CpuProfiler is shutdown.
-            const GroupRegionName* m_groupRegionName = nullptr;
-
+            Name m_groupName;
+            Name m_regionName;
             uint16_t m_stackDepth = 0u;
             AZStd::sys_time_t m_startTick = 0;
             AZStd::sys_time_t m_endTick = 0;
@@ -50,7 +37,7 @@ namespace AZ
         {
         public:
             TimeRegion() = delete;
-            TimeRegion(const GroupRegionName* groupRegionName);
+            TimeRegion(AZStd::string_view groupName, AZStd::string_view regionName);
             ~TimeRegion();
 
             //! End region
@@ -61,7 +48,7 @@ namespace AZ
         class CpuProfiler
         {
         public:
-            using ThreadTimeRegionMap = AZStd::unordered_map<AZStd::string, AZStd::vector<CachedTimeRegion>>;
+            using ThreadTimeRegionMap = AZStd::unordered_map<Name, AZStd::vector<CachedTimeRegion>>;
             using TimeRegionMap = AZStd::unordered_map<AZStd::thread_id, ThreadTimeRegionMap>;
 
             AZ_RTTI(CpuProfiler, "{127C1D0B-BE05-4E18-A8F6-24F3EED2ECA6}");
@@ -96,8 +83,7 @@ namespace AZ
 
 //! Supply a group and region to the time region
 #define AZ_ATOM_PROFILE_TIME_GROUP_REGION(groupName, regionName) \
-    static const AZ::RHI::CachedTimeRegion::GroupRegionName AZ_JOIN(groupRegionName, __LINE__)(groupName, regionName); \
-    AZ::RHI::TimeRegion AZ_JOIN(timeRegion, __LINE__)(&AZ_JOIN(groupRegionName, __LINE__));
+    AZ::RHI::TimeRegion AZ_JOIN(timeRegion, __LINE__)(groupName, regionName);
 
 //! Supply a region to the time region; "Default" will be used for the group
 #define AZ_ATOM_PROFILE_TIME_REGION(regionName) \
