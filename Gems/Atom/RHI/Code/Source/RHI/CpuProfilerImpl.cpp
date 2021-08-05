@@ -30,8 +30,8 @@ namespace AZ
 
         // --- TimeRegion ---
 
-        TimeRegion::TimeRegion(AZStd::string_view groupName, AZStd::string_view regionName)
-            : CachedTimeRegion(groupName, regionName)
+        TimeRegion::TimeRegion(AZStd::string_view groupName, AZStd::string_view regionName) :
+            CachedTimeRegion(groupName, regionName)
         {
             if (CpuProfiler::Get())
             {
@@ -71,7 +71,6 @@ namespace AZ
          
         CachedTimeRegion& CachedTimeRegion::operator=(CachedTimeRegion&& rhs) noexcept 
         {
-            AZ_Printf("CachedTimeRegion", "Move assignment");
             m_groupName = rhs.m_groupName;
             m_regionName = rhs.m_regionName;
             m_stackDepth = rhs.m_stackDepth;
