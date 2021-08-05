@@ -25,6 +25,13 @@ namespace AZ
             CachedTimeRegion(AZStd::string_view groupName, AZStd::string_view regionName);
             CachedTimeRegion(Name groupName, Name regionName, uint16_t stackDepth, uint64_t startTick, uint64_t endTick);
 
+            ~CachedTimeRegion() = default;
+            CachedTimeRegion(const CachedTimeRegion& other) = default;
+            CachedTimeRegion(CachedTimeRegion&& rhs) noexcept = default;
+            CachedTimeRegion& operator=(const CachedTimeRegion& rhs) = default;
+            CachedTimeRegion& operator=(CachedTimeRegion&& rhs) noexcept;
+
+
             Name m_groupName;
             Name m_regionName;
             uint16_t m_stackDepth = 0u;

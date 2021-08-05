@@ -13,6 +13,7 @@
 
 #include <AzCore/Debug/Timer.h>
 #include <Atom/RHI/RHIUtils.h>
+#pragma optimize("", off)
 
 namespace AZ
 {
@@ -29,8 +30,8 @@ namespace AZ
 
         // --- TimeRegion ---
 
-        TimeRegion::TimeRegion(AZStd::string_view groupName, AZStd::string_view regionName ) :
-            CachedTimeRegion(groupName, regionName)
+        TimeRegion::TimeRegion(AZStd::string_view groupName, AZStd::string_view regionName)
+            : CachedTimeRegion(groupName, regionName)
         {
             if (CpuProfiler::Get())
             {
@@ -66,6 +67,17 @@ namespace AZ
             m_stackDepth = stackDepth;
             m_startTick = startTick;
             m_endTick = endTick;
+        }
+         
+        CachedTimeRegion& CachedTimeRegion::operator=(CachedTimeRegion&& rhs) noexcept 
+        {
+            AZ_Printf("CachedTimeRegion", "Move assignment");
+            m_groupName = rhs.m_groupName;
+            m_regionName = rhs.m_regionName;
+            m_stackDepth = rhs.m_stackDepth;
+            m_startTick = rhs.m_startTick;
+            m_endTick = rhs.m_endTick;
+            return *this;
         }
 
         // --- CpuProfilerImpl ---

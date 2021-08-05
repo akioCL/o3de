@@ -19,6 +19,7 @@
 #include <AzCore/std/time.h>
 
 #include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
+#pragma optimize("", off)
 
 namespace AZ
 {
@@ -509,8 +510,8 @@ namespace AZ
 
         inline void ImGuiCpuProfiler::CullFrameData(const AZ::RHI::CpuTimingStatistics& currentCpuTimingStatistics)
         {
-            AZStd::string sizeString = AZStd::string::format("Culling with frame time of %lld", currentCpuTimingStatistics.m_frameToFrameTime);
-            AZ_ATOM_PROFILE_TIME_GROUP_REGION("Profiler", sizeString);
+            //AZStd::string sizeString = AZStd::string::format("Culling with frame time of %lld", currentCpuTimingStatistics.m_frameToFrameTime);
+            //AZ_ATOM_PROFILE_TIME_GROUP_REGION("Profiler", sizeString);
             const AZStd::sys_time_t frameToFrameTime = currentCpuTimingStatistics.m_frameToFrameTime;
             const AZStd::sys_time_t deleteBeforeTick = AZStd::GetTimeNowTicks() - frameToFrameTime * m_framesToCollect;
 
