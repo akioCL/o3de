@@ -71,8 +71,8 @@ namespace AZ
          
         CachedTimeRegion& CachedTimeRegion::operator=(CachedTimeRegion&& rhs) noexcept 
         {
-            m_groupName = rhs.m_groupName;
-            m_regionName = rhs.m_regionName;
+            AZStd::swap(m_groupName, rhs.m_groupName);
+            AZStd::swap(m_regionName, rhs.m_regionName);
             m_stackDepth = rhs.m_stackDepth;
             m_startTick = rhs.m_startTick;
             m_endTick = rhs.m_endTick;
