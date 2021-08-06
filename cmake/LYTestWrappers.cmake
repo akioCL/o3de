@@ -386,7 +386,15 @@ function(ly_add_googletest)
         endif()
 
         # If command is not supplied attempts, uses the AzTestRunner to run googletest on the supplied NAME
-        set(full_test_command $<TARGET_FILE:AZ::AzTestRunner> $<TARGET_FILE:${build_target}> AzRunUnitTests)
+        find_program(
+            cdb_executable
+            cdb
+            HINTS
+                "C:/Program Files (x86)/Windows Kits/10/Debuggers/x64"
+                "C:/Program Files/Windows Kits/10/Debuggers/x64"
+            REQUIRED
+        )
+        set(full_test_command "${cdb_executable}" -cf "${CMAKE_SOURCE_DIR}/debugscript" $<TARGET_FILE:AZ::AzTestRunner> $<TARGET_FILE:${build_target}> AzRunUnitTests)
         # Add AzTestRunner as a build dependency
         ly_add_dependencies(${build_target} AZ::AzTestRunner)
         # Start the test target params and dd the command runner command
