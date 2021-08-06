@@ -127,7 +127,6 @@ AZ_POP_DISABLE_WARNING
 
 #include "Util/AutoDirectoryRestoreFileDialog.h"
 #include "Util/EditorAutoLevelLoadTest.h"
-#include "Util/IndexedFiles.h"
 #include "AboutDialog.h"
 #include <AzToolsFramework/PythonTerminal/ScriptHelpDialog.h>
 
@@ -375,9 +374,6 @@ void CCryEditApp::RegisterActionHandlers()
     });
     ON_COMMAND(ID_MOVE_OBJECT, OnMoveObject)
     ON_COMMAND(ID_RENAME_OBJ, OnRenameObj)
-    ON_COMMAND(ID_EDITMODE_MOVE, OnEditmodeMove)
-    ON_COMMAND(ID_EDITMODE_ROTATE, OnEditmodeRotate)
-    ON_COMMAND(ID_EDITMODE_SCALE, OnEditmodeScale)
     ON_COMMAND(ID_UNDO, OnUndo)
     ON_COMMAND(ID_TOOLBAR_WIDGET_REDO, OnUndo)     // Can't use the same ID, because for the menu we can't have a QWidgetAction, while for the toolbar we want one
     ON_COMMAND(ID_IMPORT_ASSET, OnOpenAssetImporter)
@@ -1718,18 +1714,6 @@ BOOL CCryEditApp::InitInstance()
 
     if (IsInRegularEditorMode())
     {
-        CIndexedFiles::Create();
-
-        if (gEnv->pConsole->GetCVar("ed_indexfiles")->GetIVal())
-        {
-            Log("Started game resource files indexing...");
-            CIndexedFiles::StartFileIndexing();
-        }
-        else
-        {
-            Log("Game resource files indexing is disabled.");
-        }
-
         // QuickAccessBar creation should be before m_pMainWnd->SetFocus(),
         // since it receives the focus at creation time. It brakes MainFrame key accelerators.
         m_pQuickAccessBar = new CQuickAccessBar;
@@ -2166,12 +2150,6 @@ int CCryEditApp::ExitInstance(int exitCode)
         }
     }
 
-    if (IsInRegularEditorMode())
-    {
-        CIndexedFiles::AbortFileIndexing();
-        CIndexedFiles::Destroy();
-    }
-
     if (GetIEditor() && !GetIEditor()->IsInMatEditMode())
     {
         //Nobody seems to know in what case that kind of exit can happen so instrumented to see if it happens at all
@@ -2579,75 +2557,6 @@ void CCryEditApp::OnRenameObj()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
-void CCryEditApp::OnEditmodeMove()
-{
-    using namespace AzToolsFramework;
-    EditorTransformComponentSelectionRequestBus::Event(
-        GetEntityContextId(),
-        &EditorTransformComponentSelectionRequests::SetTransformMode,
-        EditorTransformComponentSelectionRequests::Mode::Translation);
-}
-
-//////////////////////////////////////////////////////////////////////////
-void CCryEditApp::OnEditmodeRotate()
-{
-    using namespace AzToolsFramework;
-    EditorTransformComponentSelectionRequestBus::Event(
-        GetEntityContextId(),
-        &EditorTransformComponentSelectionRequests::SetTransformMode,
-        EditorTransformComponentSelectionRequests::Mode::Rotation);
-}
-
-//////////////////////////////////////////////////////////////////////////
-void CCryEditApp::OnEditmodeScale()
-{
-    using namespace AzToolsFramework;
-    EditorTransformComponentSelectionRequestBus::Event(
-        GetEntityContextId(),
-        &EditorTransformComponentSelectionRequests::SetTransformMode,
-        EditorTransformComponentSelectionRequests::Mode::Scale);
-}
-
-//////////////////////////////////////////////////////////////////////////
-void CCryEditApp::OnUpdateEditmodeMove(QAction* action)
-{
-    Q_ASSERT(action->isCheckable());
-
-    AzToolsFramework::EditorTransformComponentSelectionRequests::Mode mode;
-    AzToolsFramework::EditorTransformComponentSelectionRequestBus::EventResult(
-        mode, AzToolsFramework::GetEntityContextId(),
-        &AzToolsFramework::EditorTransformComponentSelectionRequests::GetTransformMode);
-
-    action->setChecked(mode == AzToolsFramework::EditorTransformComponentSelectionRequests::Mode::Translation);
-}
-
-//////////////////////////////////////////////////////////////////////////
-void CCryEditApp::OnUpdateEditmodeRotate(QAction* action)
-{
-    Q_ASSERT(action->isCheckable());
-
-    AzToolsFramework::EditorTransformComponentSelectionRequests::Mode mode;
-    AzToolsFramework::EditorTransformComponentSelectionRequestBus::EventResult(
-        mode, AzToolsFramework::GetEntityContextId(),
-        &AzToolsFramework::EditorTransformComponentSelectionRequests::GetTransformMode);
-
-    action->setChecked(mode == AzToolsFramework::EditorTransformComponentSelectionRequests::Mode::Rotation);
-}
-
-//////////////////////////////////////////////////////////////////////////
-void CCryEditApp::OnUpdateEditmodeScale(QAction* action)
-{
-    Q_ASSERT(action->isCheckable());
-
-    AzToolsFramework::EditorTransformComponentSelectionRequests::Mode mode;
-    AzToolsFramework::EditorTransformComponentSelectionRequestBus::EventResult(
-        mode, AzToolsFramework::GetEntityContextId(),
-        &AzToolsFramework::EditorTransformComponentSelectionRequests::GetTransformMode);
-
-    action->setChecked(mode == AzToolsFramework::EditorTransformComponentSelectionRequests::Mode::Scale);
-}
-
 void CCryEditApp::OnViewSwitchToGame()
 {
     if (IsInPreviewMode())
@@ -2901,7 +2810,14 @@ void CCryEditApp::OpenProjectManager(const AZStd::string& screen)
 {
     // provide the current project path for in case we want to update the project
     AZ::IO::FixedMaxPathString projectPath = AZ::Utils::GetProjectPath();
-    const AZStd::string commandLineOptions = AZStd::string::format(" --screen %s --project-path %s", screen.c_str(), projectPath.c_str());
+#if !AZ_TRAIT_OS_PLATFORM_APPLE && !AZ_TRAIT_OS_USE_WINDOWS_FILE_PATHS
+    const char* argumentQuoteString = R"(")";
+#else
+    const char* argumentQuoteString = R"(\")";
+#endif
+    const AZStd::string commandLineOptions = AZStd::string::format(R"( --screen %s --project-path %s%s%s)",
+        screen.c_str(),
+        argumentQuoteString, projectPath.c_str(), argumentQuoteString);
     bool launchSuccess = AzFramework::ProjectManager::LaunchProjectManager(commandLineOptions);
     if (!launchSuccess)
     {
