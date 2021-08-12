@@ -126,7 +126,7 @@ namespace
     }
 
     class QVariantSerializer
-        : public AZ::IDataSerializer
+        : public AZ::Serialization::IDataSerializer
     {
         /// Store the class data into a binary buffer
         virtual size_t Save(const void* classPtr, AZ::IO::GenericStream& stream, bool isDataBigEndian /*= false*/)

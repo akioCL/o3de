@@ -62,6 +62,14 @@ namespace AZ
         struct ClassData;
     }
 
+    namespace IO
+    {
+        template<typename ContainerType>
+        class ByteContainerStream;
+
+        class GenericStream;
+    }
+
     using AttributePtr = AZStd::shared_ptr<Attribute>;
     using AttributeSharedPair = AZStd::pair<AttributeId, AttributePtr>;
     template<typename ContainerType, typename T>
@@ -441,7 +449,7 @@ namespace AZ
             ClassData(ClassData&&) = default;
             ClassData& operator=(ClassData&&) = default;
             template<class T>
-            static ClassData Create(const char* name, const Uuid& typeUuid, IObjectFactory* factory, IDataSerializer* serializer = nullptr, IDataContainer* container = nullptr);
+            static ClassData Create(const char* name, const Uuid& typeUuid, IObjectFactory* factory, Serialization::IDataSerializer* serializer = nullptr, IDataContainer* container = nullptr);
 
             bool    IsDeprecated() const { return m_version == VersionClassDeprecated; }
             void    ClearAttributes();
@@ -464,17 +472,17 @@ namespace AZ
             Uuid                m_typeId;
             unsigned int        m_version;          ///< Data version (by default 0)
             VersionConverter    m_converter;        ///< Data version converter, a static member that should not need an instance to convert it's data.
-            IObjectFactory* m_factory;          ///< Interface for object creation.
+            IObjectFactory*     m_factory;          ///< Interface for object creation.
             ClassPersistentId   m_persistentId;     ///< Function to retrieve class instance persistent Id.
             ClassDoSave         m_doSave;           ///< Function what will choose to Save or not an instance.
-            IDataSerializerPtr  m_serializer;       ///< Interface for actual data serialization. If this is not NULL m_elements must be empty.
-            IEventHandler* m_eventHandler;     ///< Optional interface for Event notification (start/stop serialization, etc.)
+            Serialization::IDataSerializerPtr  m_serializer; ///< Interface for actual data serialization. If this is not NULL m_elements must be empty.
+            IEventHandler*      m_eventHandler;     ///< Optional interface for Event notification (start/stop serialization, etc.)
 
-            IDataContainer* m_container;        ///< Interface if this class represents a data container. Data will be accessed using this interface.
-            IRttiHelper* m_azRtti;           ///< Interface used to support RTTI. Set internally based on type provided to Class<T>.
-            IDataConverter* m_dataConverter{};    ///< Interface used to convert unrelated types to elements of this class
+            IDataContainer*     m_container;        ///< Interface if this class represents a data container. Data will be accessed using this interface.
+            IRttiHelper*        m_azRtti;           ///< Interface used to support RTTI. Set internally based on type provided to Class<T>.
+            IDataConverter*     m_dataConverter{};  ///< Interface used to convert unrelated types to elements of this class
 
-            Edit::ClassData* m_editData;         ///< Edit data for the class display.
+            Edit::ClassData*    m_editData;         ///< Edit data for the class display.
             ClassElementArray   m_elements;         ///< Sub elements. If this is not empty m_serializer should be NULL (there is no point to have sub-elements, if we can serialize the entire class).
 
             // A collection of single-node upgrades to apply during serialization
@@ -891,12 +899,12 @@ namespace AZ
 
             /// For data types (usually base types) or types that we handle the full serialize, implement this interface.
             /// Takes ownership of the supplied serializer
-            ClassBuilder* Serializer(IDataSerializerPtr serializer);
+            ClassBuilder* Serializer(Serialization::IDataSerializerPtr serializer);
 
             /// For data types (usually base types) or types that we handle the full serialize, implement this interface.
-            ClassBuilder* Serializer(IDataSerializer* serializer);
+            ClassBuilder* Serializer(Serialization::IDataSerializer* serializer);
 
-            /// Helper function to create a static instance of specific serializer implementation. \ref Serializer(IDataSerializer*)
+            /// Helper function to create a static instance of specific serializer implementation. \ref Serializer(Serialization::IDataSerializer*)
             template<typename SerializerImplementation>
             ClassBuilder* Serializer()
             {
@@ -913,7 +921,7 @@ namespace AZ
              */
             ClassBuilder* EventHandler(IEventHandler* eventHandler);
 
-            /// Helper function to create a static instance of specific event handler implementation. \ref Serializer(IDataSerializer*)
+            /// Helper function to create a static instance of specific event handler implementation. \ref Serializer(Serialization::IDataSerializer*)
             template<typename EventHandlerImplementation>
             ClassBuilder* EventHandler()
             {
@@ -996,9 +1004,9 @@ namespace AZ
             auto Version(unsigned int version, VersionConverter converter = nullptr)->EnumBuilder*;
 
             //! For data types (usually base types) or types that we handle the full serialize, implement this interface.
-            auto Serializer(IDataSerializerPtr serializer)->EnumBuilder*;
+            auto Serializer(Serialization::IDataSerializerPtr serializer)->EnumBuilder*;
 
-            //! Helper function to create a static instance of specific serializer implementation. \ref Serializer(IDataSerializer*)
+            //! Helper function to create a static instance of specific serializer implementation. \ref Serializer(Serialization::IDataSerializer*)
             template<typename SerializerImplementation>
             auto Serializer()->EnumBuilder*;
 
@@ -1009,7 +1017,7 @@ namespace AZ
              */
             auto EventHandler(IEventHandler* eventHandler)->EnumBuilder*;
 
-            //! Helper function to create a static instance of specific event handler implementation. \ref Serializer(IDataSerializer*)
+            //! Helper function to create a static instance of specific event handler implementation. \ref Serializer(Serialization::IDataSerializer*)
             template<typename EventHandlerImplementation>
             auto EventHandler()->EnumBuilder*;
 
@@ -1086,7 +1094,7 @@ namespace AZ
 
         /**
          * Helper for directly comparing two instances of a given type.
-         * Intended for use in implementations of IDataSerializer::CompareValueData.
+         * Intended for use in implementations of Serialization::IDataSerializer::CompareValueData.
          */
         template<typename T>
         struct EqualityCompareHelper
@@ -2352,15 +2360,15 @@ namespace AZ
         }
 
         template<class T>
-        ClassData ClassData::Create(const char* name, const Uuid& typeUuid, IObjectFactory* factory, IDataSerializer* serializer, IDataContainer* container)
+        ClassData ClassData::Create(const char* name, const Uuid& typeUuid, IObjectFactory* factory, Serialization::IDataSerializer* serializer, IDataContainer* container)
         {
             ClassData cd;
             cd.m_name = name;
             cd.m_typeId = typeUuid;
             cd.m_version = 0;
             cd.m_converter = nullptr;
-            // A raw ptr to an IDataSerializer isn't owned by the SerializeContext class data
-            cd.m_serializer = IDataSerializerPtr(serializer, IDataSerializer::CreateNoDeleteDeleter());
+            // A raw ptr to an Serialization::IDataSerializer isn't owned by the SerializeContext class data
+            cd.m_serializer = Serialization::IDataSerializerPtr(serializer, Serialization::IDataSerializer::CreateNoDeleteDeleter());
             cd.m_factory = factory;
             cd.m_persistentId = nullptr;
             cd.m_doSave = nullptr;

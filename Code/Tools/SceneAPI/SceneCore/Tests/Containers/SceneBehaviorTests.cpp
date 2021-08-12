@@ -16,11 +16,13 @@
 #include <AzCore/Component/ComponentApplication.h>
 #include <AzCore/Serialization/Json/RegistrationContext.h>
 #include <AzCore/Serialization/Json/JsonSystemComponent.h>
+#include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/API/EditorPythonConsoleBus.h>
 
 #include <SceneAPI/SceneCore/Containers/Scene.h>
 #include <SceneAPI/SceneCore/Containers/SceneGraph.h>
 #include <SceneAPI/SceneCore/DataTypes/IGraphObject.h>
+#include <SceneAPI/SceneCore/DataTypes/IManifestObject.h>
 #include <SceneAPI/SceneCore/Mocks/DataTypes/MockIGraphObject.h>
 
 // the DLL entry point for SceneCore to reflect its behavior context

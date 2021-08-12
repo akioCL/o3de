@@ -57,7 +57,7 @@ namespace AZ
 
         template<class EnumType>
         class EnumSerializer
-            : public IDataSerializer
+            : public Serialization::IDataSerializer
         {
             static_assert(AZStd::is_enum<EnumType>::value, "Enum Serializer can only be used with enum types");
             using UnderlyingType = AZStd::RemoveEnumT<EnumType>;
@@ -183,8 +183,8 @@ namespace AZ
                 typename UuidToClassMap::pair_iter_bool enumTypeInsertIter =
                     m_uuidMap.emplace(enumTypeId, ClassData::Create<EnumType>(name, enumTypeId, factory));
                 ClassData& enumClassData = enumTypeInsertIter.first->second;
-                enumClassData.m_serializer = IDataSerializerPtr{ new SerializeContextEnumInternal::EnumSerializer<EnumType>(),
-                                                                    IDataSerializer::CreateDefaultDeleteDeleter() };
+                enumClassData.m_serializer = Serialization::IDataSerializerPtr{ new SerializeContextEnumInternal::EnumSerializer<EnumType>(),
+                                                                    Serialization::IDataSerializer::CreateDefaultDeleteDeleter() };
 
                 m_classNameToUuid.emplace(Crc32(name), enumTypeId);
                 m_uuidAnyCreationMap.emplace(enumTypeId, &AnyTypeInfoConcept<EnumType>::CreateAny);
@@ -228,7 +228,7 @@ namespace AZ
         template<typename SerializerImplementation>
         auto EnumBuilder::Serializer() -> EnumBuilder*
         {
-            return Serializer({ new SerializerImplementation, IDataSerializer::CreateDefaultDeleteDeleter() });
+            return Serializer({ new SerializerImplementation, Serialization::IDataSerializer::CreateDefaultDeleteDeleter() });
         }
 
         template<typename EventHandlerImplementation>

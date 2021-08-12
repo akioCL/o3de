@@ -20,7 +20,7 @@ namespace AZ
     namespace 
     {
         class TransformSerializer
-            : public SerializeContext::IDataSerializer
+            : public Serialization::IDataSerializer
         {
         public:
             // number of floats in the serialized representation, 4 for rotation, 1 for scale and 3 for translation

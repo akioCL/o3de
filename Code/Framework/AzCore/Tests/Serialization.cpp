@@ -5919,7 +5919,7 @@ namespace UnitTest
             AZStd::string_view versionMaxStringBinary = "00FFFFFFFF18EF8FF807DDEE4EB0B6784CA3A2C490A40000";
             AZStd::vector<AZ::u8> byteArray;
             AZ::IO::ByteContainerStream<AZStd::vector<AZ::u8>> binaryStream(&byteArray);
-            AZStd::unique_ptr<AZ::IDataSerializer> binarySerializer = AZStd::make_unique<AZ::Internal::AZByteStream<AZStd::allocator>>();
+            AZStd::unique_ptr<AZ::Serialization::IDataSerializer> binarySerializer = AZStd::make_unique<AZ::Internal::AZByteStream<AZStd::allocator>>();
             binarySerializer->TextToData(versionMaxStringBinary.data(), 0, binaryStream);
             binarySerializer.reset();
 
@@ -5983,7 +5983,7 @@ namespace UnitTest
             AZStd::string_view version1StringBinary = "0000000001085A2F60AAF63E4106BD5E0F77E01DDBAC5CC08C4427EF8FF807DDEE4EB0B6784CA3A2C490A454657374000000";
             AZStd::vector<AZ::u8> byteArray;
             AZ::IO::ByteContainerStream<AZStd::vector<AZ::u8>> binaryStream(&byteArray);
-            AZStd::unique_ptr<AZ::IDataSerializer> binarySerializer = AZStd::make_unique<AZ::Internal::AZByteStream<AZStd::allocator>>();
+            AZStd::unique_ptr<AZ::Serialization::IDataSerializer> binarySerializer = AZStd::make_unique<AZ::Internal::AZByteStream<AZStd::allocator>>();
             binarySerializer->TextToData(version1StringBinary.data(), 0, binaryStream);
             binarySerializer.reset();
 
@@ -6041,7 +6041,7 @@ namespace UnitTest
             AZStd::string_view version2StringBinary = "00000000021CEF8FF807DDEE4EB0B6784CA3A2C490A403AAAB3F5C475A669EBCD5FA4DB353C9546573740000";
             AZStd::vector<AZ::u8> byteArray;
             AZ::IO::ByteContainerStream<AZStd::vector<AZ::u8>> binaryStream(&byteArray);
-            AZStd::unique_ptr<AZ::IDataSerializer> binarySerializer = AZStd::make_unique<AZ::Internal::AZByteStream<AZStd::allocator>>();
+            AZStd::unique_ptr<AZ::Serialization::IDataSerializer> binarySerializer = AZStd::make_unique<AZ::Internal::AZByteStream<AZStd::allocator>>();
             binarySerializer->TextToData(version2StringBinary.data(), 0, binaryStream);
             binarySerializer.reset();
 
@@ -7486,10 +7486,10 @@ namespace UnitTest
     };
 
     class TestLeafNodeSerializer
-        : public IDataSerializer
+        : public AZ::Serialization::IDataSerializer
     {
         /// Store the class data into a stream.
-        size_t Save(const void* classPtr, IO::GenericStream& stream, bool isDataBigEndian /*= false*/) override
+        size_t Save(const void* classPtr, AZ::IO::GenericStream& stream, bool isDataBigEndian /*= false*/) override
         {
             int tempData;
 
@@ -7499,7 +7499,7 @@ namespace UnitTest
             return static_cast<size_t>(stream.Write(sizeof(tempData), reinterpret_cast<void*>(&tempData)));
         }
 
-        size_t DataToText(IO::GenericStream& in, IO::GenericStream& out, bool isDataBigEndian /*= false*/) override
+        size_t DataToText(AZ::IO::GenericStream& in, AZ::IO::GenericStream& out, bool isDataBigEndian /*= false*/) override
         {
             if (in.GetLength() < sizeof(int))
             {
@@ -7519,17 +7519,17 @@ namespace UnitTest
             return static_cast<size_t>(out.Write(outText.size(), outText.data()));
         }
 
-        size_t TextToData(const char* text, unsigned int /*textVersion*/, IO::GenericStream& stream, bool isDataBigEndian /*= false*/) override
+        size_t TextToData(const char* text, unsigned int /*textVersion*/, AZ::IO::GenericStream& stream, bool isDataBigEndian /*= false*/) override
         {
             int value;
             value = atoi(text);
             AZ_SERIALIZE_SWAP_ENDIAN(value, isDataBigEndian);
 
-            stream.Seek(0, IO::GenericStream::ST_SEEK_BEGIN);
+            stream.Seek(0, AZ::IO::GenericStream::ST_SEEK_BEGIN);
             return static_cast<size_t>(stream.Write(sizeof(value), reinterpret_cast<void*>(&value)));
         }
 
-        bool Load(void* classPtr, IO::GenericStream& stream, unsigned int version, bool isDataBigEndian /*= false*/) override
+        bool Load(void* classPtr, AZ::IO::GenericStream& stream, unsigned int version, bool isDataBigEndian /*= false*/) override
         {
             int tempData = 0;
             if (stream.GetLength() < sizeof(tempData))
@@ -7557,7 +7557,7 @@ namespace UnitTest
 
     // Serializer which sets a reference bool to true on deletion to detect when it's lifetime ends.
     class TestDeleterSerializer
-        : public IDataSerializer
+        : public AZ::Serialization::IDataSerializer
     {
     public:
         TestDeleterSerializer(bool& serializerDeleted)
@@ -7567,22 +7567,22 @@ namespace UnitTest
         {
             m_serializerDeleted = true;
         }
-        size_t Save(const void*, IO::GenericStream&, bool) override
+        size_t Save(const void*, AZ::IO::GenericStream&, bool) override
         {
             return {};
         }
 
-        size_t DataToText(IO::GenericStream&, IO::GenericStream&, bool) override
+        size_t DataToText(AZ::IO::GenericStream&, AZ::IO::GenericStream&, bool) override
         {
             return {};
         }
 
-        size_t TextToData(const char*, unsigned int , IO::GenericStream&, bool) override
+        size_t TextToData(const char*, unsigned int , AZ::IO::GenericStream&, bool) override
         {
             return {};
         }
 
-        bool Load(void*, IO::GenericStream&, unsigned int, bool) override
+        bool Load(void*, AZ::IO::GenericStream&, unsigned int, bool) override
         {
             return true;
         }
@@ -7643,7 +7643,7 @@ namespace UnitTest
     TEST_F(Serialization, CustomSerializerWithDefaultDeleter_IsDeletedOnUnreflect)
     {
         bool serializerDeleted = false;
-        AZ::IDataSerializerPtr customSerializer{ new TestDeleterSerializer{ serializerDeleted }, AZ::IDataSerializer::CreateDefaultDeleteDeleter() };
+        AZ::Serialization::IDataSerializerPtr customSerializer{ new TestDeleterSerializer{ serializerDeleted }, AZ::Serialization::IDataSerializer::CreateDefaultDeleteDeleter() };
         m_serializeContext->Class<TestLeafNode>()
             ->Version(1)
             ->Serializer(AZStd::move(customSerializer));
@@ -7660,7 +7660,7 @@ namespace UnitTest
     {
         bool serializerDeleted = false;
         TestDeleterSerializer* serializerInstance = new TestDeleterSerializer{ serializerDeleted };
-        AZ::IDataSerializerPtr customSerializer{ serializerInstance, AZ::IDataSerializer::CreateNoDeleteDeleter() };
+        AZ::Serialization::IDataSerializerPtr customSerializer{ serializerInstance, AZ::Serialization::IDataSerializer::CreateNoDeleteDeleter() };
         m_serializeContext->Class<TestLeafNode>()
             ->Version(1)
             ->Serializer(AZStd::move(customSerializer));

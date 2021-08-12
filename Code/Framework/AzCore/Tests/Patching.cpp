@@ -314,10 +314,10 @@ namespace UnitTest
                 }
             }
 
-            //! AZStd::string uses IDataSerializer for Serialization.
+            //! AZStd::string uses Serialization::IDataSerializer for Serialization.
             //! This is to test Field Converters for patched element that are on a class that is a descendant element of the patched class
             AZStd::string m_stringField;
-            //! AZStd::string uses IDataSerializer for Serialization.
+            //! AZStd::string uses Serialization::IDataSerializer for Serialization.
             //! This is to test Field Converters for patched element that are on a class that is a descendant element of the patched class
             AZStd::vector<AZStd::string> m_stringVector;
         };
@@ -368,13 +368,13 @@ namespace UnitTest
                 }
             }
 
-            //! AZStd::string uses IDataSerializer for Serialization.
+            //! AZStd::string uses Serialization::IDataSerializer for Serialization.
             //! This is to test Field Converters for patched element that are directly on the patched class
             AZStd::string m_rootStringField;
-            //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+            //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
             //! This is to test Field Converters for patched element that are directly on the patched class
             AZStd::vector<AZStd::string> m_rootStringVector;
-            //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+            //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
             //! This is to test Field Converters for patched element that are directly on the patched class
             InnerObjectFieldConverterV1 m_rootInnerObject{};
             InnerObjectFieldConverterV1* m_baseInnerObjectPolymorphic{};
@@ -2694,13 +2694,13 @@ namespace UnitTest
                     }
                 }
 
-                //! AZStd::string uses IDataSerializer for Serialization.
+                //! AZStd::string uses Serialization::IDataSerializer for Serialization.
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::string m_rootStringField;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::vector<AZStd::string> m_rootStringVector;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 InnerObjectFieldConverterV2 m_rootInnerObject{};
                 InnerObjectFieldConverterV2* m_baseInnerObjectPolymorphic{};
@@ -2788,7 +2788,7 @@ namespace UnitTest
         inline namespace RootLevelDataSerializerFieldConverter
         {
             // ObjectFieldConverterReplaceMemberDataSerializerV2, uses the same TypeId as ObjectFieldConverterV1
-            // for to test the FieldConverter for an IDataSerializer
+            // for to test the FieldConverter for an Serialization::IDataSerializer
             class ObjectFieldConverterReplaceMemberDataSerializerV2
             {
                 using ClassType = ObjectFieldConverterReplaceMemberDataSerializerV2;
@@ -2818,13 +2818,13 @@ namespace UnitTest
                     }
                 }
 
-                //! AZStd::string uses IDataSerializer for Serialization.
+                //! AZStd::string uses Serialization::IDataSerializer for Serialization.
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZ::Uuid m_rootUuidField{ AZ::Uuid::CreateNull() };
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::vector<AZStd::string> m_rootStringVector;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 InnerObjectFieldConverterV1 m_rootInnerObject{};
                 InnerObjectFieldConverterV1* m_baseInnerObjectPolymorphic{};
@@ -2868,13 +2868,13 @@ namespace UnitTest
                     }
                 }
 
-                //! AZStd::string uses IDataSerializer for Serialization.
+                //! AZStd::string uses Serialization::IDataSerializer for Serialization.
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 bool m_rootBoolField{};
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::vector<AZStd::string> m_rootStringVector;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 InnerObjectFieldConverterV1 m_rootInnerObject{};
                 InnerObjectFieldConverterV1* m_baseInnerObjectPolymorphic{};
@@ -3085,13 +3085,13 @@ namespace UnitTest
                     }
                 }
 
-                //! AZStd::string uses IDataSerializer for Serialization.
+                //! AZStd::string uses Serialization::IDataSerializer for Serialization.
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::string m_rootStringField;
-                //! AZStd::array<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::array<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::array<AZStd::string, 5> m_rootStringArray;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 InnerObjectFieldConverterV1 m_rootInnerObject{};
                 InnerObjectFieldConverterV1* m_baseInnerObjectPolymorphic{};
@@ -3138,13 +3138,13 @@ namespace UnitTest
                     }
                 }
 
-                //! AZStd::string uses IDataSerializer for Serialization.
+                //! AZStd::string uses Serialization::IDataSerializer for Serialization.
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::string m_rootStringField;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 AZStd::list<AZStd::string> m_rootStringList;
-                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses IDataSerializer for serialization
+                //! AZStd::vector<AZStd::string> uses IDataContainer for Serialization. The inner AZStd::string class uses Serialization::IDataSerializer for serialization
                 //! This is to test Field Converters for patched element that are directly on the patched class
                 InnerObjectFieldConverterV1 m_rootInnerObject{};
                 InnerObjectFieldConverterV1* m_baseInnerObjectPolymorphic{};

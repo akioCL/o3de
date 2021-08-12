@@ -12,6 +12,8 @@
 
 namespace AZ
 {
+    class ReflectContext;
+
     namespace SceneAPI
     {
         namespace DataTypes

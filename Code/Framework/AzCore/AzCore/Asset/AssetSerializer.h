@@ -33,7 +33,7 @@ namespace AZ
     /// This is used internally by the object stream because assets need
     /// special handling during serialization
     class AssetSerializer
-        : public IDataSerializer
+        : public Serialization::IDataSerializer
     {
     public:
         // Store the class data into a stream.

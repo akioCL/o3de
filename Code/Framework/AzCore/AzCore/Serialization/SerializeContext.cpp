@@ -41,7 +41,7 @@ namespace AZ
 
     template<class T>
     class BinaryValueSerializer
-        : public IDataSerializer
+        : public Serialization::IDataSerializer
     {
         /// Load the class data from a binary buffer.
         bool    Load(void* classPtr, IO::GenericStream& stream, unsigned int /*version*/, bool isDataBigEndian = false) override
@@ -346,7 +346,7 @@ namespace AZ
 
     // serializer without any data write
     class EmptySerializer
-        : public IDataSerializer
+        : public Serialization::IDataSerializer
     {
     public:
         /// Store the class data into a stream.
@@ -1691,7 +1691,7 @@ namespace AZ
         return this;
     }
 
-    SerializeContext::ClassBuilder* SerializeContext::ClassBuilder::Serializer(IDataSerializerPtr serializer)
+    SerializeContext::ClassBuilder* SerializeContext::ClassBuilder::Serializer(Serialization::IDataSerializerPtr serializer)
     {
         if (m_context->IsRemovingReflection())
         {
@@ -1711,9 +1711,9 @@ namespace AZ
     // ClassBuilder::Serializer
     // [10/05/2012]
     //=========================================================================
-    SerializeContext::ClassBuilder* SerializeContext::ClassBuilder::Serializer(IDataSerializer* serializer)
+    SerializeContext::ClassBuilder* SerializeContext::ClassBuilder::Serializer(Serialization::IDataSerializer* serializer)
     {
-        return Serializer(IDataSerializerPtr(serializer, IDataSerializer::CreateNoDeleteDeleter()));
+        return Serializer(Serialization::IDataSerializerPtr(serializer, Serialization::IDataSerializer::CreateNoDeleteDeleter()));
     }
 
     //=========================================================================
@@ -1725,7 +1725,7 @@ namespace AZ
         {
             return this; // we have already removed the class data.
         }
-        m_classData->second.m_serializer = IDataSerializerPtr(&Serialization::StaticInstance<EmptySerializer>::s_instance, IDataSerializer::CreateNoDeleteDeleter());
+        m_classData->second.m_serializer = Serialization::IDataSerializerPtr(&Serialization::StaticInstance<EmptySerializer>::s_instance, Serialization::IDataSerializer::CreateNoDeleteDeleter());
         return this;
     }
 

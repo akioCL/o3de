@@ -40,7 +40,7 @@ namespace AZ
         return this;
     }
 
-    auto SerializeContext::EnumBuilder::Serializer(IDataSerializerPtr serializer) -> EnumBuilder*
+    auto SerializeContext::EnumBuilder::Serializer(Serialization::IDataSerializerPtr serializer) -> EnumBuilder*
     {
         if (m_context->IsRemovingReflection())
         {

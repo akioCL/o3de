@@ -55,7 +55,7 @@ namespace AZ
                 // Index for a node.
                 //      Instead of using just a plain int, this is it's own type to reduce the
                 //      risk of invalid indices being passed.
-                class NodeIndex
+                class SCENE_CORE_API NodeIndex
                 {
                     friend class SceneGraph;
                     friend struct SceneBuilder::QueueNode;
@@ -90,7 +90,7 @@ namespace AZ
 
                 // NodeHeader contains the relationship a node has with its surrounding nodes and additional information about a node.
                 //      Note that this is always passed by value, so direct access to the member variables doesn't risk unwanted changes.
-                struct NodeHeader
+                struct SCENE_CORE_API NodeHeader
                 {
                     // Number of bits used for storing an index into the stored data. Currently 21 bits, which will support about 2 million nodes.
                     static const uint32_t INDEX_BIT_COUNT = 21;
@@ -117,7 +117,7 @@ namespace AZ
                     NodeHeader& operator=(const NodeHeader& rhs) = default;
                 };
 
-                class Name
+                class SCENE_CORE_API Name
                 {
                     friend class SceneGraph;
                 public:
@@ -141,7 +141,9 @@ namespace AZ
                     inline size_t GetNameLength() const;
 
                 private:
+                    AZ_PUSH_DISABLE_DLL_EXPORT_MEMBER_WARNING
                     AZStd::string m_path;
+                    AZ_POP_DISABLE_DLL_EXPORT_MEMBER_WARNING
                     size_t m_nameOffset;
                 };
 
@@ -170,44 +172,44 @@ namespace AZ
 
                 SCENE_CORE_API SceneGraph();
 
-                inline NodeIndex GetRoot() const;
+                SCENE_CORE_API NodeIndex GetRoot() const;
                 SCENE_CORE_API NodeIndex Find(const char* path) const;
                 SCENE_CORE_API NodeIndex Find(NodeIndex root, const char* name) const;
-                inline NodeIndex Find(const Name& name);
-                inline NodeIndex Find(const AZStd::string& path) const;
-                inline NodeIndex Find(NodeIndex root, const AZStd::string& name) const;
+                SCENE_CORE_API NodeIndex Find(const Name& name);
+                SCENE_CORE_API NodeIndex Find(const AZStd::string& path) const;
+                SCENE_CORE_API NodeIndex Find(NodeIndex root, const AZStd::string& name) const;
 
-                inline bool HasNodeContent(NodeIndex node) const;
-                inline bool HasNodeSibling(NodeIndex node) const;
-                inline bool HasNodeChild(NodeIndex node) const;
-                inline bool HasNodeParent(NodeIndex node) const;
-                inline bool IsNodeEndPoint(NodeIndex node) const;
+                SCENE_CORE_API bool HasNodeContent(NodeIndex node) const;
+                SCENE_CORE_API bool HasNodeSibling(NodeIndex node) const;
+                SCENE_CORE_API bool HasNodeChild(NodeIndex node) const;
+                SCENE_CORE_API bool HasNodeParent(NodeIndex node) const;
+                SCENE_CORE_API bool IsNodeEndPoint(NodeIndex node) const;
 
                 SCENE_CORE_API const Name& GetNodeName(NodeIndex node) const;
-                inline AZStd::shared_ptr<DataTypes::IGraphObject> GetNodeContent(NodeIndex node);
-                inline AZStd::shared_ptr<const DataTypes::IGraphObject> GetNodeContent(NodeIndex node) const;
+                SCENE_CORE_API AZStd::shared_ptr<DataTypes::IGraphObject> GetNodeContent(NodeIndex node);
+                SCENE_CORE_API AZStd::shared_ptr<const DataTypes::IGraphObject> GetNodeContent(NodeIndex node) const;
 
-                inline NodeIndex GetNodeParent(NodeIndex node) const;
-                inline NodeIndex GetNodeParent(NodeHeader node) const;
-                inline NodeIndex GetNodeSibling(NodeIndex node) const;
-                inline NodeIndex GetNodeSibling(NodeHeader node) const;
-                inline NodeIndex GetNodeChild(NodeIndex node) const;
-                inline NodeIndex GetNodeChild(NodeHeader node) const;
+                SCENE_CORE_API NodeIndex GetNodeParent(NodeIndex node) const;
+                SCENE_CORE_API NodeIndex GetNodeParent(NodeHeader node) const;
+                SCENE_CORE_API NodeIndex GetNodeSibling(NodeIndex node) const;
+                SCENE_CORE_API NodeIndex GetNodeSibling(NodeHeader node) const;
+                SCENE_CORE_API NodeIndex GetNodeChild(NodeIndex node) const;
+                SCENE_CORE_API NodeIndex GetNodeChild(NodeHeader node) const;
 
-                inline size_t GetNodeCount() const;
+                SCENE_CORE_API size_t GetNodeCount() const;
 
                 // Used when switching from index based navigation to iterator based.
-                inline HierarchyStorageConstData::iterator ConvertToHierarchyIterator(NodeIndex node) const;
-                inline NameStorageConstData::iterator ConvertToNameIterator(NodeIndex node) const;
-                inline ContentStorageData::iterator ConvertToStorageIterator(NodeIndex node);
-                inline ContentStorageConstData::iterator ConvertToStorageIterator(NodeIndex node) const;
+                SCENE_CORE_API HierarchyStorageConstData::iterator ConvertToHierarchyIterator(NodeIndex node) const;
+                SCENE_CORE_API NameStorageConstData::iterator ConvertToNameIterator(NodeIndex node) const;
+                SCENE_CORE_API ContentStorageData::iterator ConvertToStorageIterator(NodeIndex node);
+                SCENE_CORE_API ContentStorageConstData::iterator ConvertToStorageIterator(NodeIndex node) const;
                 // Used when switching from iterator based navigation to index based.
                 //      Note that any changes made to the SceneGraph using the node index will invalidate
                 //      the original iterator.
-                inline NodeIndex ConvertToNodeIndex(HierarchyStorageConstData::iterator iterator) const;
-                inline NodeIndex ConvertToNodeIndex(NameStorageConstData::iterator iterator) const;
-                inline NodeIndex ConvertToNodeIndex(ContentStorageData::iterator iterator) const;
-                inline NodeIndex ConvertToNodeIndex(ContentStorageConstData::iterator iterator) const;
+                SCENE_CORE_API NodeIndex ConvertToNodeIndex(HierarchyStorageConstData::iterator iterator) const;
+                SCENE_CORE_API NodeIndex ConvertToNodeIndex(NameStorageConstData::iterator iterator) const;
+                SCENE_CORE_API NodeIndex ConvertToNodeIndex(ContentStorageData::iterator iterator) const;
+                SCENE_CORE_API NodeIndex ConvertToNodeIndex(ContentStorageConstData::iterator iterator) const;
 
                 // Adds a child node to the given parent. If the parent already had a child, AddChild will search the sibling
                 //      chain for an available spot.
@@ -227,10 +229,10 @@ namespace AZ
                 // Marks a function to no longer accept child nodes.
                 SCENE_CORE_API bool MakeEndPoint(NodeIndex node);
 
-                inline HierarchyStorageConstData GetHierarchyStorage() const;
-                inline NameStorageConstData GetNameStorage() const;
-                inline ContentStorageData GetContentStorage();
-                inline ContentStorageConstData GetContentStorage() const;
+                SCENE_CORE_API HierarchyStorageConstData GetHierarchyStorage() const;
+                SCENE_CORE_API NameStorageConstData GetNameStorage() const;
+                SCENE_CORE_API ContentStorageData GetContentStorage();
+                SCENE_CORE_API ContentStorageConstData GetContentStorage() const;
 
                 // Clears all data stored inside and reads the default root node.
                 SCENE_CORE_API void Clear();
@@ -240,7 +242,7 @@ namespace AZ
                 SCENE_CORE_API static bool IsValidName(const char* name);
                 // Checks if the given name can be used as a valid name for a node. This only checks the name validity, not if it's
                 //      already in use. Use Find(...) to check if a name is already in use.
-                inline static bool IsValidName(const AZStd::string& name);
+                SCENE_CORE_API static bool IsValidName(const AZStd::string& name);
 
                 SCENE_CORE_API static char GetNodeSeperationCharacter();
 

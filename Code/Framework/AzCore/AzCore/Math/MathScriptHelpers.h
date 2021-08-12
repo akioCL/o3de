@@ -21,6 +21,11 @@ namespace AZ
     class Transform;
     class ScriptDataContext;
 
+    namespace IO
+    {
+        class GenericStream;
+    }
+
     AZStd::string Vector3ToString(const Vector3& v);
     AZStd::string Vector4ToString(const Vector4& v);
     AZStd::string QuaternionToString(const Quaternion& v);
@@ -45,7 +50,7 @@ namespace AZ
     }
 
     class UuidSerializer
-        : public IDataSerializer
+        : public Serialization::IDataSerializer
     {
         //! Store the class data into a binary buffer.
         size_t Save(const void* classPtr, IO::GenericStream& stream, bool isDataBigEndian /*= false*/) override;
@@ -72,7 +77,7 @@ namespace AZ
     //! Custom template to cover all fundamental AZMATH classes.
     template <class T, T CreateFromFloats(const float*), void (T::* StoreToFloat)(float*) const, float GetEpsilon(), size_t NumFloats = sizeof(T) / sizeof(float)>
     class FloatBasedContainerSerializer
-        : public IDataSerializer
+        : public Serialization::IDataSerializer
     {
         //! Store the class data into a stream.
         size_t Save(const void* classPtr, IO::GenericStream& stream, bool isDataBigEndian /*= false*/) override

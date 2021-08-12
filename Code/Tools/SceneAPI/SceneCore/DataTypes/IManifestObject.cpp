@@ -8,7 +8,7 @@
  *
  */
 
-#include <SceneCore/DataTypes/IManifestObject.h>
+#include <SceneAPI/SceneCore/DataTypes/IManifestObject.h>
 #include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ

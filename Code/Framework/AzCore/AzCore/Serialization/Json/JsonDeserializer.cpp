@@ -17,6 +17,7 @@
 #include <AzCore/std/string/conversions.h>
 #include <AzCore/std/string/fixed_string.h>
 #include <AzCore/std/string/string.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

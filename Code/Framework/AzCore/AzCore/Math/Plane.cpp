@@ -8,6 +8,8 @@
 
 #include <AzCore/Math/Plane.h>
 #include <AzCore/Math/MathScriptHelpers.h>
+#include <AzCore/Script/ScriptContext.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

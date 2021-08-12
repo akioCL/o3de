@@ -8,7 +8,7 @@
 
 #include <AzCore/Serialization/IDataSerializer.h>
 
-namespace AZ
+namespace AZ::Serialization
 {
     IDataSerializerDeleter IDataSerializer::CreateDefaultDeleteDeleter()
     {

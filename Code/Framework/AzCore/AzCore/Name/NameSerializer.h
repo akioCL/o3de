@@ -13,7 +13,7 @@
 namespace AZ
 {
     //! Provides flattened serialization of Name objects as a simple string.
-    class NameSerializer : public IDataSerializer
+    class NameSerializer : public Serialization::IDataSerializer
     {
     public:
 
