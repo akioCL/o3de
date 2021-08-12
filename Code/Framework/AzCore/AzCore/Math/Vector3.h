@@ -9,8 +9,7 @@
 #pragma once
 
 #include <AzCore/Math/Internal/MathTypes.h>
-#include <AzCore/RTTI/TypeInfo.h>
-#include <AzCore/std/algorithm.h>
+#include <AzCore/RTTI/TypeInfoSimple.h>
 
 namespace AZ
 {

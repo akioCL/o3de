@@ -85,7 +85,7 @@ namespace Multiplayer
         return m_replicationSet;
     }
 
-    uint32_t ServerToClientReplicationWindow::GetMaxEntityReplicatorSendCount() const
+    uint32_t ServerToClientReplicationWindow::GetMaxProxyEntityReplicatorSendCount() const
     {
         return m_isPoorConnection ? sv_MinEntitiesToReplicate : sv_MaxEntitiesToReplicate;
     }
@@ -107,8 +107,10 @@ namespace Multiplayer
     void ServerToClientReplicationWindow::UpdateWindow()
     {
         // clear the candidate queue, we're going to rebuild it
-        ReplicationCandidateQueue clearQueue;
-        clearQueue.get_container().reserve(sv_MaxEntitiesToTrackReplication);
+        ReplicationCandidateQueue::container_type clearQueueContainer;
+        clearQueueContainer.reserve(sv_MaxEntitiesToTrackReplication);
+        // Move the clearQueueContainer into the ReplicationCandidateQueue to maintain the reserved memory
+        ReplicationCandidateQueue clearQueue(ReplicationCandidateQueue::value_compare{}, AZStd::move(clearQueueContainer));
         m_candidateQueue.swap(clearQueue);
         m_replicationSet.clear();
 

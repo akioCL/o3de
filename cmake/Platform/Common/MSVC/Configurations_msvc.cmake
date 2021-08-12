@@ -6,12 +6,14 @@
 #
 #
 
+set(minimum_supported_toolset 142)
+if(MSVC_TOOLSET_VERSION VERSION_LESS ${minimum_supported_toolset})
+    message(FATAL_ERROR "MSVC toolset ${MSVC_TOOLSET_VERSION} is too old, minimum supported toolset is ${minimum_supported_toolset}")
+endif()
+unset(minimum_supported_toolset)
+
 include(cmake/Platform/Common/Configurations_common.cmake)
 include(cmake/Platform/Common/VisualStudio_common.cmake)
-
-if(NOT CMAKE_GENERATOR MATCHES "Visual Studio 1[6-7]")
-    message(FATAL_ERROR "Generator ${CMAKE_GENERATOR} not supported")
-endif()
 
 # Verify that it wasn't invoked with an unsupported target/host architecture. Currently only supports x64/x64
 if(CMAKE_VS_PLATFORM_NAME AND NOT CMAKE_VS_PLATFORM_NAME STREQUAL "x64")
@@ -36,10 +38,8 @@ ly_append_configurations_options(
         /wd4201 # nonstandard extension used: nameless struct/union. This actually became part of the C++11 std, MS has an open issue: https://developercommunity.visualstudio.com/t/warning-level-4-generates-a-bogus-warning-c4201-no/103064
 
         # Disabling these warnings while they get fixed
-        /wd4018 # signed/unsigned mismatch
         /wd4244 # conversion, possible loss of data
         /wd4245 # conversion, signed/unsigned mismatch
-        /wd4267 # conversion, possible loss of data
         /wd4389 # comparison, signed/unsigned mismatch
 
         # Enabling warnings that are disabled by default from /W4
@@ -112,14 +112,6 @@ else()
             /INCREMENTAL:NO
 
     )    
-endif()
-
-if(CMAKE_GENERATOR MATCHES "Visual Studio 15")
-    # Visual Studio 2017 has problems with [[maybe_unused]] on lambdas. Sadly, there is no different warning, so 4100 has to remain disabled on 2017
-    ly_append_configurations_options(
-        COMPILATION
-            /wd4100
-    )
 endif()
 
 # Configure system includes

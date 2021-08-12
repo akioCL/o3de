@@ -652,6 +652,11 @@ namespace AZ
             return RHI::ResourceMemoryRequirements{ vkRequirements.alignment, vkRequirements.size };
         }
 
+        void Device::ObjectCollectionNotify(RHI::ObjectCollectorNotifyFunction notifyFunction)
+        {
+            m_releaseQueue.Notify(notifyFunction);
+        }
+
         void Device::InitFeaturesAndLimits(const PhysicalDevice& physicalDevice)
         {
             m_features.m_tessellationShader = (m_enabledDeviceFeatures.tessellationShader == VK_TRUE);
@@ -815,11 +820,12 @@ namespace AZ
             createInfo.size = descriptor.m_byteCount;
             createInfo.usage = GetBufferUsageFlagBitsUnderRestrictions(descriptor.m_bindFlags);
             // Trying to guess here if the buffers are going to be used as attachments. Maybe it would be better to add an explicit flag in the descriptor.
-            createInfo.sharingMode =
-                RHI::CheckBitsAny(
-                    descriptor.m_bindFlags,
-                    RHI::BufferBindFlags::ShaderWrite | RHI::BufferBindFlags::Predication | RHI::BufferBindFlags::Indirect)
-                ? VK_SHARING_MODE_EXCLUSIVE
+            createInfo.sharingMode = 
+                (RHI::CheckBitsAny(
+                    descriptor.m_bindFlags, 
+                    RHI::BufferBindFlags::ShaderWrite | RHI::BufferBindFlags::Predication | RHI::BufferBindFlags::Indirect) || 
+                    (queueFamilies.size()) <= 1) 
+                ? VK_SHARING_MODE_EXCLUSIVE 
                 : VK_SHARING_MODE_CONCURRENT;
             createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilies.size());
             createInfo.pQueueFamilyIndices = queueFamilies.empty() ? nullptr : queueFamilies.data();
