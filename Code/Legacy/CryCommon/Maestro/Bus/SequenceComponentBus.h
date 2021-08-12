@@ -12,6 +12,7 @@
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/std/string/string.h>
+#include <AzCore/Asset/AssetCommon.h>
 
 namespace Maestro
 {

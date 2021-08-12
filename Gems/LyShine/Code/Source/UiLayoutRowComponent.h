@@ -17,6 +17,11 @@
 
 #include <UiLayoutHelpers.h>
 
+namespace AZ::Serialization
+{
+    class DataElementNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //! This component overrides the transforms of immediate children to organize them into a vertical column
 class UiLayoutRowComponent
@@ -138,5 +143,5 @@ protected: // data
 private: // static member functions
 
     static bool VersionConverter(AZ::SerializeContext& context,
-        AZ::SerializeContext::DataElementNode& classElement);
+        AZ::Serialization ::DataElementNode& classElement);
 };

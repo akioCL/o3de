@@ -473,6 +473,8 @@ set(FILES
     ScriptCanvas/ScriptCanvasAttributes.h
     ScriptCanvas/ScriptCanvasOnDemandNames.cpp
     ScriptCanvas/ScriptCanvasOnDemandNames.h
+    Serialization/AZBinaryData.cpp
+    Serialization/AZBinaryData.h
     Serialization/DataOverlay.h
     Serialization/DataOverlayInstanceMsgs.h
     Serialization/DataOverlayProviderMsgs.cpp
@@ -500,6 +502,7 @@ set(FILES
     Serialization/SerializeContextEnum.inl
     Serialization/SerializeFriend.h
     Serialization/SerializeSwapEndian.h
+    Serialization/DataPatchUpgrade.h
     Serialization/DataPatch.h
     Serialization/DataPatch.cpp
     Serialization/DataPatchBus.h

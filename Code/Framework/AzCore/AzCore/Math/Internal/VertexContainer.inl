@@ -8,10 +8,6 @@
 
 #pragma once
 
-#include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Serialization/SerializeContext.h>
-#include <AzCore/RTTI/BehaviorContext.h>
-
 namespace AZ
 {
     template<typename Vertex>

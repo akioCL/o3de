@@ -7,6 +7,7 @@
  */
 
 #include <AzCore/Serialization/DataOverlayProviderMsgs.h>
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace AZ
 {

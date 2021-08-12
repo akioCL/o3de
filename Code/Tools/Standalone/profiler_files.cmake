@@ -130,6 +130,7 @@ set(FILES
     Source/Driller/Rendering/VRAM/VRAMDataParser.h
     Source/Driller/Rendering/VRAM/VRAMEvents.cpp
     Source/Driller/Rendering/VRAM/VRAMEvents.h
+    Source/Driller/Replica/BaseDetailViewSavedState.cpp
     Source/Driller/Replica/BaseDetailViewSavedState.h
     Source/Driller/Replica/BaseDetailViewQObject.cpp
     Source/Driller/Replica/BaseDetailViewQObject.hxx

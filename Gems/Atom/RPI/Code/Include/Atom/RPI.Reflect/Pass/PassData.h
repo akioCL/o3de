@@ -25,14 +25,7 @@ namespace AZ
             PassData() = default;
             virtual ~PassData() = default;
 
-            static void Reflect(ReflectContext* context)
-            {
-                if (auto* serializeContext = azrtti_cast<SerializeContext*>(context))
-                {
-                    serializeContext->Class<PassData>()
-                        ->Version(0);
-                }
-            }
+            static void Reflect(ReflectContext* context);
         };
     } // namespace RPI
 } // namespace AZ

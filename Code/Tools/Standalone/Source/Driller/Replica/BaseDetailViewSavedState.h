@@ -12,6 +12,11 @@
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/UserSettings/UserSettings.h>
 
+namespace AZ
+{
+    class ReflectContext;
+}
+
 namespace Driller
 {
     class BaseDetailViewSplitterSavedState
@@ -23,18 +28,7 @@ namespace Driller
 
         AZStd::vector< AZ::u8 > m_splitterStorage;
 
-        static void Reflect(AZ::ReflectContext* context)
-        {
-            AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context);
-
-            if (serialize)
-            {
-                serialize->Class<BaseDetailViewSplitterSavedState>()
-                    ->Field("m_splitterStorage", &BaseDetailViewSplitterSavedState::m_splitterStorage)
-                    ->Version(1);
-                ;
-            }
-        }
+        static void Reflect(AZ::ReflectContext* context);
     };
 
     class BaseDetailViewTreeSavedState
@@ -46,17 +40,7 @@ namespace Driller
 
         AZStd::vector<AZ::u8> m_treeColumnStorage;
 
-        static void Reflect(AZ::ReflectContext* context)
-        {
-            AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context);
-
-            if (serialize)
-            {
-                serialize->Class<BaseDetailViewTreeSavedState>()
-                    ->Field("m_treeColumnStorage", &BaseDetailViewTreeSavedState::m_treeColumnStorage)
-                    ->Version(1);
-            }
-        }
+        static void Reflect(AZ::ReflectContext* context);
     };
 }
 #endif

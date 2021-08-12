@@ -8,9 +8,21 @@
 #pragma once
 
 #include <AzCore/Serialization/DataPatch.h>
+#include <AzCore/std/containers/set.h>
+#include <AzCore/std/containers/map.h>
 
 namespace AZ
 {
+    namespace Serialization
+    {
+        class DataPatchUpgrade;
+
+        struct NodeUpgradeSortFunctor;
+        using DataPatchUpgradeList = AZStd::set<DataPatchUpgrade*, NodeUpgradeSortFunctor>;
+        using DataPatchUpgradeMap = AZStd::map<unsigned int, DataPatchUpgradeList>;
+        using DataPatchFieldUpgrades = AZStd::unordered_map<AZ::Crc32, DataPatchUpgradeMap>;
+    }
+
     // Manages a collection of data patch upgrades
     class DataPatchUpgradeManager
     {
@@ -22,26 +34,26 @@ namespace AZ
 
     private:
         // This class requires field upgrades from the serialize context to function.
-        DataPatchUpgradeManager(const AZ::SerializeContext::DataPatchFieldUpgrades& upgrades, int startingVersion);
+        DataPatchUpgradeManager(const AZ::Serialization::DataPatchFieldUpgrades& upgrades, int startingVersion);
 
         // Apply appropriate upgrades to an address. Returns a new address.
-        void ApplyUpgrades(AZ::DataPatch::AddressTypeElement& addressElement, AZStd::vector<AZ::SerializeContext::DataPatchUpgrade*> upgrades = AZStd::vector<AZ::SerializeContext::DataPatchUpgrade*>()) const;
+        void ApplyUpgrades(AZ::DataPatch::AddressTypeElement& addressElement, AZStd::vector<AZ::Serialization::DataPatchUpgrade*> upgrades = AZStd::vector<AZ::Serialization::DataPatchUpgrade*>()) const;
 
         // Apply appropriate upgrades to a value AND an address. Returns a new value.
         void ApplyUpgrades(AZ::DataPatch::AddressTypeElement& addressElement, AZStd::any& value) const;
 
         // Retrieve an ordered list of upgrades managed by this handler that should be applied
         // to the given address or an associated value. Returns an empty vector if there are none.
-        AZStd::vector<AZ::SerializeContext::DataPatchUpgrade*> GetApplicableUpgrades(const DataPatch::AddressTypeElement& address) const;
+        AZStd::vector<AZ::Serialization::DataPatchUpgrade*> GetApplicableUpgrades(const DataPatch::AddressTypeElement& address) const;
 
         // Helper Functions
-        const AZ::SerializeContext::DataPatchUpgradeMap* GetPotentialUpgrades(const AZ::Crc32& fieldNameCRC) const;
-        AZ::SerializeContext::DataPatchUpgrade* GetNextUpgrade(unsigned int currentTypeVersion, unsigned int currentNameVersion, AZ::Crc32 currentFieldNameCRC) const;
-        AZ::SerializeContext::DataPatchUpgrade* GetNextTypeUpgrade(AZ::Crc32 currentFieldNameCRC, unsigned int currentTypeVersion) const;
-        AZ::SerializeContext::DataPatchUpgrade* GetNextNameUpgrade(AZ::Crc32 currentFieldNameCRC, unsigned int currentNameVersion) const;
+        const AZ::Serialization::DataPatchUpgradeMap* GetPotentialUpgrades(const AZ::Crc32& fieldNameCRC) const;
+        AZ::Serialization::DataPatchUpgrade* GetNextUpgrade(unsigned int currentTypeVersion, unsigned int currentNameVersion, AZ::Crc32 currentFieldNameCRC) const;
+        AZ::Serialization::DataPatchUpgrade* GetNextTypeUpgrade(AZ::Crc32 currentFieldNameCRC, unsigned int currentTypeVersion) const;
+        AZ::Serialization::DataPatchUpgrade* GetNextNameUpgrade(AZ::Crc32 currentFieldNameCRC, unsigned int currentNameVersion) const;
 
     private:
-        const AZ::SerializeContext::DataPatchFieldUpgrades& m_upgrades;
+        const AZ::Serialization::DataPatchFieldUpgrades& m_upgrades;
         unsigned int m_startingVersion;
     };
 }

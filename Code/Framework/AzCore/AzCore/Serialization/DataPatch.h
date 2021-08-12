@@ -9,6 +9,7 @@
 #define AZCORE_DATA_PATCH_FIELD_H
 
 #include <AzCore/Asset/AssetCommon.h>
+#include <AzCore/Serialization/AZBinaryData.h>
 
 #include "ObjectStream.h"
 
@@ -38,8 +39,8 @@ namespace AZ
 
             // Several other systems use the AddressType class for the addressElement
             // These default constructors allow reduced impact to those systems when we moved AddressType from u64 to AddressTypeElement
-            AddressTypeElement(const AZ::u64 addressElement, const AZ::SerializeContext::ClassData* classData = nullptr, const AZ::SerializeContext::ClassElement* classElement = nullptr, ElementType elementType = ElementType::None);
-            AddressTypeElement(const AZ::Crc32 addressElement, const AZ::SerializeContext::ClassData* classData = nullptr, const AZ::SerializeContext::ClassElement* classElement = nullptr, ElementType elementType = ElementType::None);
+            AddressTypeElement(const AZ::u64 addressElement, const AZ::Serialization::ClassData* classData = nullptr, const AZ::Serialization::ClassElement* classElement = nullptr, ElementType elementType = ElementType::None);
+            AddressTypeElement(const AZ::Crc32 addressElement, const AZ::Serialization::ClassData* classData = nullptr, const AZ::Serialization::ClassElement* classElement = nullptr, ElementType elementType = ElementType::None);
 
             // Constructors to build AddressTypeElements from another address type element and one changed aspect
             // Use only for class elements

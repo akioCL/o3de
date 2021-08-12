@@ -14,6 +14,15 @@
 namespace AZ
 {
     class DataOverlayTarget;
+    class SerializationContext;
+
+    namespace Serialization
+    {
+        class ClassData;
+        struct ClassElement;
+        class DataElementNode;
+        class ErrorHandler;
+    }
 
     /**
      * DataOverlayProviderBus is used to communicate with overlay providers
@@ -38,7 +47,7 @@ namespace AZ
     class DataOverlayTarget
     {
     public:
-        DataOverlayTarget(SerializeContext::DataElementNode* dataContainer, SerializeContext* sc, SerializeContext::ErrorHandler* errorLogger)
+        DataOverlayTarget(Serialization::DataElementNode* dataContainer, SerializeContext* sc, Serialization::ErrorHandler* errorLogger)
             : m_dataContainer(dataContainer)
             , m_sc(sc)
             , m_errorLogger(errorLogger)
@@ -49,15 +58,15 @@ namespace AZ
         void   SetData(const T& obj);
 
     protected:
-        typedef AZStd::vector<SerializeContext::DataElementNode*> NodeStack;
+        typedef AZStd::vector<Serialization::DataElementNode*> NodeStack;
 
-        void Parse(const void* classPtr, const SerializeContext::ClassData* classData);
-        bool ElementBegin(NodeStack* nodeStack, const void* elemPtr, const SerializeContext::ClassData* classData, const SerializeContext::ClassElement* elementData);
+        void Parse(const void* classPtr, const Serialization::ClassData* classData);
+        bool ElementBegin(NodeStack* nodeStack, const void* elemPtr, const Serialization::ClassData* classData, const Serialization::ClassElement* elementData);
         bool ElementEnd(NodeStack* nodeStack);
 
-        SerializeContext::DataElementNode*      m_dataContainer;
-        SerializeContext*                       m_sc;
-        SerializeContext::ErrorHandler*         m_errorLogger;
+        Serialization::DataElementNode* m_dataContainer;
+        SerializeContext*               m_sc;
+        Serialization::ErrorHandler*    m_errorLogger;
     };
 
     template<typename T>

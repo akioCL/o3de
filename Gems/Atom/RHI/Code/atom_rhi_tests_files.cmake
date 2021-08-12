@@ -8,6 +8,7 @@
 
 set(FILES
     Tests/RHITestFixture.h
+    Tests/RHITestFixture.cpp
     Tests/AllocatorTests.cpp
     Tests/BufferTests.cpp
     Tests/DrawPacketTests.cpp

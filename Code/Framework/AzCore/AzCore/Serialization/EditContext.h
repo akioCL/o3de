@@ -8,15 +8,22 @@
 
 #pragma once
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/typetraits/is_function.h>
 
 #include <AzCore/Math/Crc.h> // use by all functions to set the attribute id.
+#include <AzCore/RTTI/ReflectContext.h>
+#include <AzCore/std/containers/unordered_set.h>
 
 #include <AzCore/Serialization/EditContextConstants.inl>
 
 namespace AZ
 {
+    namespace Serialization
+    {
+        class ClassData;
+        struct ClassElement;
+    }
+
     namespace Edit
     {
         using AttributeId = AZ::AttributeId;
@@ -32,6 +39,8 @@ namespace AZ
         using AttributeFunction = AZ::AttributeFunction<F>;
         template<class F>
         using AttributeMemberFunction = AZ::AttributeMemberFunction<F>;
+
+        struct ElementData;
 
         /**
          * Enumerates the serialization context and inserts component Uuids which match at least one tag in requiredTags
@@ -49,7 +58,7 @@ namespace AZ
          */
         template <typename TagContainer>
         bool SystemComponentTagsMatchesAtLeastOneTag(
-            const AZ::SerializeContext::ClassData* classData,
+            const AZ::Serialization::ClassData* classData,
             const TagContainer& requiredTags,
             bool defaultVal = false);
 
@@ -85,7 +94,7 @@ namespace AZ
             const char*         m_description = nullptr;
             const char*         m_name = nullptr;
             const char*         m_deprecatedName = nullptr;
-            SerializeContext::ClassElement* m_serializeClassElement; ///< If nullptr this is class (logical) element, not physical element exists in the class
+            Serialization::ClassElement* m_serializeClassElement; ///< If nullptr this is class (logical) element, not physical element exists in the class
             AttributeArray      m_attributes;
         };
 
@@ -108,7 +117,7 @@ namespace AZ
 
             const char*                 m_name;
             const char*                 m_description;
-            SerializeContext::ClassData* m_classData;
+            Serialization::ClassData*   m_classData;
             DynamicEditDataProvider*    m_editDataProvider;
             AZStd::list<ElementData>    m_elements;
         };
@@ -146,7 +155,7 @@ namespace AZ
         template <class E>
         EnumBuilder Enum(const char* displayName, const char* description);
 
-        void RemoveClassData(SerializeContext::ClassData* classData);
+        void RemoveClassData(Serialization::ClassData* classData);
 
         const Edit::ElementData* GetEnumElementData(const AZ::Uuid& enumId) const;
 
@@ -187,7 +196,7 @@ namespace AZ
         class ClassBuilder
         {
             friend EditContext;
-            ClassBuilder(EditContext* context, SerializeContext::ClassData* classData, Edit::ClassData* classElement)
+            ClassBuilder(EditContext* context, Serialization::ClassData* classData, Edit::ClassData* classElement)
                 : m_context(context)
                 , m_classData(classData)
                 , m_classElement(classElement)
@@ -207,7 +216,7 @@ namespace AZ
             }
 
             EditContext*                    m_context;
-            SerializeContext::ClassData*    m_classData;
+            Serialization::ClassData*       m_classData;
             Edit::ClassData*                m_classElement;
             Edit::ElementData*              m_editElement;
 
@@ -424,18 +433,7 @@ namespace AZ
             return Crc32(uuid.begin(), uuid.end() - uuid.begin());
         }
 
-        inline bool IsModifyingGlobalEnum(Crc32 idCrc, Edit::ElementData& ed)
-        {
-            if (ed.m_serializeClassElement)
-            {
-                const Crc32 typeCrc = UuidToCrc32(ed.m_serializeClassElement->m_typeId);
-                if (ed.m_elementId == typeCrc)
-                {
-                    return idCrc == AZ::Edit::InternalAttributes::EnumValue || idCrc == AZ::Edit::Attributes::EnumValues;
-                }
-            }
-            return false;
-        }
+        bool IsModifyingGlobalEnum(Crc32 idCrc, Edit::ElementData& ed);
     }
 
     //=========================================================================

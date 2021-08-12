@@ -10,6 +10,22 @@
 
 namespace AZ
 {
+    namespace Internal
+    {
+        bool IsModifyingGlobalEnum(Crc32 idCrc, Edit::ElementData& ed)
+        {
+            if (ed.m_serializeClassElement)
+            {
+                const Crc32 typeCrc = UuidToCrc32(ed.m_serializeClassElement->m_typeId);
+                if (ed.m_elementId == typeCrc)
+                {
+                    return idCrc == AZ::Edit::InternalAttributes::EnumValue || idCrc == AZ::Edit::Attributes::EnumValues;
+                }
+            }
+            return false;
+        }
+    }
+
     //=========================================================================
     // EditContext
     // [10/26/2012]

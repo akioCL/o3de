@@ -8,7 +8,6 @@
 #ifndef AZCORE_OBJECT_STREAM_H
 #define AZCORE_OBJECT_STREAM_H
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/std/parallel/thread.h>
 #include <AzCore/Asset/AssetCommon.h>
@@ -48,6 +47,13 @@ namespace AZ
         static const AZ::Crc32 ObjectStreamWriteElementOverride = AZ_CRC("ObjectStreamWriteElementOverride", 0x35eb659f);
     }
 
+    namespace Serialization
+    {
+        class ClassData;
+        struct ClassElement;
+        struct EnumerateInstanceCallContext;
+    }
+
     ///< Callback that the object stream invokes to override saving an instance of the registered class
     ///< @param callContext EnumerateInstanceCallContext which contains the WriteElement BeingElemCB and the CloseElement EndElemCB
     ///< the callContext parameter can be passed to the SerializeContext::EnumerateInstance to continue object stream writing
@@ -55,8 +61,8 @@ namespace AZ
     ///< @param classData reference to this instance Class Data that will be supplied to the callback
     ///< @param classElement class element pointer which contains information about the element being serialized.
     ///< root elements do not not have a valid class element pointer
-    using ObjectStreamWriteOverrideCB = AZStd::function<void(SerializeContext::EnumerateInstanceCallContext& callContext,
-        const void* classPtr, const SerializeContext::ClassData& classData, const SerializeContext::ClassElement* classElement)>;
+    using ObjectStreamWriteOverrideCB = AZStd::function<void(Serialization::EnumerateInstanceCallContext& callContext,
+        const void* classPtr, const Serialization::ClassData& classData, const Serialization::ClassElement* classElement)>;
 
     AZ_TYPE_INFO_SPECIALIZE(ObjectStreamWriteOverrideCB, "{87B1A36B-8C8A-42B6-A0B5-E770D9FDBAD4}");
 
@@ -121,7 +127,7 @@ namespace AZ
          * \param classId provided to you for information
          * \param context provided to you for information
          */
-        typedef AZStd::function< void (void** /*rootAddress*/, const SerializeContext::ClassData** /*classData*/, const Uuid& /*classId*/, SerializeContext* /*context*/)> InplaceLoadRootInfoCB;
+        typedef AZStd::function< void (void** /*rootAddress*/, const Serialization::ClassData** /*classData*/, const Uuid& /*classId*/, SerializeContext* /*context*/)> InplaceLoadRootInfoCB;
 
         /// Called for each root object loaded
         typedef AZStd::function< void (void* /*classPtr*/, const Uuid& /*classId*/, SerializeContext* /*context*/) > ClassReadyCB;
@@ -176,7 +182,7 @@ namespace AZ
         /// Create a new object stream for writing
         static ObjectStream* Create(IO::GenericStream* stream, SerializeContext& sc, DataStream::StreamType fmt);
 
-        virtual bool WriteClass(const void* classPtr, const Uuid& classId, const SerializeContext::ClassData* classData = nullptr) = 0;
+        virtual bool WriteClass(const void* classPtr, const Uuid& classId, const Serialization::ClassData* classData = nullptr) = 0;
 
         /// Default asset filter obeys the Asset<> holder's load flags.
         static bool AssetFilterDefault(const Data::AssetFilterInfo& filterInfo);

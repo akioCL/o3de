@@ -142,6 +142,7 @@ set(FILES
     Source/RPI.Reflect/Material/ShaderCollection.cpp
     Source/RPI.Reflect/Material/MaterialFunctor.cpp
     Source/RPI.Reflect/Pass/PassAsset.cpp
+    Source/RPI.Reflect/Pass/PassData.cpp
     Source/RPI.Reflect/Pass/PassAttachmentReflect.cpp
     Source/RPI.Reflect/Pass/PassRequest.cpp
     Source/RPI.Reflect/Pass/PassTemplate.cpp

@@ -9,6 +9,7 @@
  */
 
 #include <AzCore/RTTI/RTTI.h>
+#include <SceneAPI/SceneCore/SceneCoreConfiguration.h>
 
 namespace AZ
 {
@@ -22,7 +23,7 @@ namespace AZ
             {
             public:
                 AZ_RTTI(IManifestObject, "{3B839407-1884-4FF4-ABEA-CA9D347E83F7}");
-                static void Reflect(AZ::ReflectContext* context);
+                SCENE_CORE_API static void Reflect(AZ::ReflectContext* context);
 
                 virtual ~IManifestObject() = default;
                 virtual void OnUserAdded() {};

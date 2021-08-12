@@ -18,13 +18,19 @@ namespace AZ
         class GenericStream;
     }
 
+    namespace Serialization
+    {
+        struct ClassElement;
+        class DataElementNode;
+    }
+
     namespace Utils
     {
         typedef AZ::ObjectStream::FilterDescriptor FilterDescriptor;
 
         void* LoadObjectFromStream(IO::GenericStream& stream, SerializeContext* context = nullptr, const Uuid* targetClassId = nullptr, const FilterDescriptor& filterDesc = FilterDescriptor());
         bool LoadObjectFromStreamInPlace(IO::GenericStream& stream, AZ::SerializeContext* context, const Uuid& targetClassId, void* targetPointer, const FilterDescriptor& filterDesc = FilterDescriptor());
-        bool LoadObjectFromStreamInPlace(IO::GenericStream& stream, AZ::SerializeContext* context, const SerializeContext::ClassData* objectClassData, void* targetPointer, const FilterDescriptor& filterDesc = FilterDescriptor());
+        bool LoadObjectFromStreamInPlace(IO::GenericStream& stream, AZ::SerializeContext* context, const Serialization::ClassData* objectClassData, void* targetPointer, const FilterDescriptor& filterDesc = FilterDescriptor());
 
         template <typename ObjectType>
         ObjectType* LoadObjectFromStream(IO::GenericStream& stream, SerializeContext* context = nullptr, const FilterDescriptor& filterDesc = FilterDescriptor())
@@ -47,10 +53,10 @@ namespace AZ
             return reinterpret_cast<ObjectType*>(LoadObjectFromFile(filePath, AzTypeInfo<ObjectType>::Uuid(), context, filterDesc, platformFlags));
         }
 
-        bool SaveObjectToStream(IO::GenericStream& stream, DataStream::StreamType streamType, const void* classPtr, const Uuid& classId, SerializeContext* context = nullptr, const SerializeContext::ClassData* classData = nullptr);
+        bool SaveObjectToStream(IO::GenericStream& stream, DataStream::StreamType streamType, const void* classPtr, const Uuid& classId, SerializeContext* context = nullptr, const Serialization::ClassData* classData = nullptr);
 
         template <typename ObjectType>
-        bool SaveObjectToStream(IO::GenericStream& stream, DataStream::StreamType streamType, const ObjectType* classPtr, SerializeContext* context = nullptr, const SerializeContext::ClassData* classData = nullptr)
+        bool SaveObjectToStream(IO::GenericStream& stream, DataStream::StreamType streamType, const ObjectType* classPtr, SerializeContext* context = nullptr, const Serialization::ClassData* classData = nullptr)
         {
             return SaveObjectToStream(stream, streamType, classPtr, AzTypeInfo<ObjectType>::Uuid(), context, classData);
         }
@@ -78,8 +84,8 @@ namespace AZ
             return LoadObjectFromStreamInPlace(stream, context, AzTypeInfo<ObjectType>::Uuid(), &destination, filterDesc);
         }
 
-        AZStd::vector<AZ::SerializeContext::DataElementNode*> FindDescendantElements(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement, const AZStd::vector<AZ::Crc32>& elementCrcQueue);
-        void FindDescendantElements(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement, AZStd::vector<AZ::SerializeContext::DataElementNode*>& dataElementNodes, AZStd::vector<AZ::Crc32>::const_iterator first, AZStd::vector<AZ::Crc32>::const_iterator last);
+        AZStd::vector<AZ::Serialization::DataElementNode*> FindDescendantElements(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement, const AZStd::vector<AZ::Crc32>& elementCrcQueue);
+        void FindDescendantElements(AZ::SerializeContext& context, AZ::Serialization::DataElementNode& classElement, AZStd::vector<AZ::Serialization::DataElementNode*>& dataElementNodes, AZStd::vector<AZ::Crc32>::const_iterator first, AZStd::vector<AZ::Crc32>::const_iterator last);
         bool LoadObjectFromFileInPlace(const AZStd::string& filePath, const Uuid& targetClassId, void* destination, AZ::SerializeContext* context = nullptr, const FilterDescriptor& filterDesc = FilterDescriptor());
 
         template <typename ObjectType>
@@ -102,6 +108,6 @@ namespace AZ
 
         /// Resolve the instance pointer for a given ClassElement by casting it to the actual type
         /// expected by the ClassData for this element
-        void* ResolvePointer(void* ptr, const SerializeContext::ClassElement& classElement, const SerializeContext& context);
+        void* ResolvePointer(void* ptr, const Serialization::ClassElement& classElement, const SerializeContext& context);
     } // namespace Utils
 } // namespace AzCore
