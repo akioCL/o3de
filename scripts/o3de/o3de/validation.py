@@ -24,7 +24,13 @@ def valid_o3de_repo_json(file_name: str or pathlib.Path) -> bool:
         try:
             json_data = json.load(f)
             test = json_data['repo_name']
+            if not test:
+                return False
+            if not test.isalnum():
+                return False
             test = json_data['origin']
+            if not test:
+                return False
         except (json.JSONDecodeError, KeyError) as e:
             return False
 
@@ -40,6 +46,10 @@ def valid_o3de_engine_json(file_name: str or pathlib.Path) -> bool:
         try:
             json_data = json.load(f)
             test = json_data['engine_name']
+            if not test:
+                return False
+            if not test.isalnum():
+                return False
         except (json.JSONDecodeError, KeyError) as e:
             return False
     return True
@@ -54,6 +64,10 @@ def valid_o3de_project_json(file_name: str or pathlib.Path) -> bool:
         try:
             json_data = json.load(f)
             test = json_data['project_name']
+            if not test:
+                return False
+            if not test.isalnum():
+                return False
         except (json.JSONDecodeError, KeyError) as e:
             return False
     return True
@@ -68,6 +82,10 @@ def valid_o3de_gem_json(file_name: str or pathlib.Path) -> bool:
         try:
             json_data = json.load(f)
             test = json_data['gem_name']
+            if not test:
+                return False
+            if not test.isalnum():
+                return False
         except (json.JSONDecodeError, KeyError) as e:
             return False
     return True
@@ -81,6 +99,10 @@ def valid_o3de_template_json(file_name: str or pathlib.Path) -> bool:
         try:
             json_data = json.load(f)
             test = json_data['template_name']
+            if not test:
+                return False
+            if not test.isalnum():
+                return False
         except (json.JSONDecodeError, KeyError) as e:
             return False
     return True
@@ -94,6 +116,10 @@ def valid_o3de_restricted_json(file_name: str or pathlib.Path) -> bool:
         try:
             json_data = json.load(f)
             test = json_data['restricted_name']
+            if not test:
+                return False
+            if not test.isalnum():
+                return False
         except (json.JSONDecodeError, KeyError) as e:
             return False
     return True

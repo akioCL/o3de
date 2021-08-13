@@ -434,11 +434,8 @@ def register_template_path(json_data: dict,
                            template_path: pathlib.Path,
                            remove: bool = False,
                            engine_path: pathlib.Path = None) -> int:
-    # If a project path or engine path has not been supplied auto detect which manifest to register the input path
-    if not project_path and not engine_path:
-        project_path = utils.find_ancestor_dir_containing_file(pathlib.PurePath('project.json'), template_path)
-        if not project_path:
-            engine_path = utils.find_ancestor_dir_containing_file(pathlib.PurePath('engine.json'), template_path)
+    if not engine_path:
+        engine_path = utils.find_ancestor_dir_containing_file(pathlib.PurePath('engine.json'), template_path)
     return register_o3de_object_path(json_data, template_path, 'templates', 'template.json',
                                        validation.valid_o3de_template_json, remove, engine_path, None)
 
@@ -447,11 +444,8 @@ def register_restricted_path(json_data: dict,
                              restricted_path: pathlib.Path,
                              remove: bool = False,
                              engine_path: pathlib.Path = None) -> int:
-    # If a project path or engine path has not been supplied auto detect which manifest to register the input path
-    if not project_path and not engine_path:
-        project_path = utils.find_ancestor_dir_containing_file(pathlib.PurePath('project.json'), restricted_path)
-        if not project_path:
-            engine_path = utils.find_ancestor_dir_containing_file(pathlib.PurePath('engine.json'), restricted_path)
+    if not engine_path:
+        engine_path = utils.find_ancestor_dir_containing_file(pathlib.PurePath('engine.json'), restricted_path)
     return register_o3de_object_path(json_data, restricted_path, 'restricted', 'restricted.json',
                                      validation.valid_o3de_restricted_json, remove, engine_path, None)
 
@@ -463,31 +457,266 @@ def register_repo(json_data: dict,
         logger.error(f'Repo URI cannot be empty.')
         return 1
 
-    url = f'{repo_uri}/repo.json'
-    parsed_uri = urllib.parse.urlparse(url)
+    parsed_uri = urllib.parse.urlparse(repo_uri)
 
-    if parsed_uri.scheme in ['http', 'https', 'ftp', 'ftps']:
+    if parsed_uri.scheme in ['http', 'https', 'ftp', 'ftps', 's3']:
         while repo_uri in json_data['repos']:
             json_data['repos'].remove(repo_uri)
     else:
         repo_uri = pathlib.Path(repo_uri).resolve()
-        while repo_uri.as_posix() in json_data['repos']:
-            json_data['repos'].remove(repo_uri.as_posix())
+        repo_uri = repo_uri.as_posix()
+        while repo_uri in json_data['repos']:
+            json_data['repos'].remove(repo_uri)
 
     if remove:
         logger.warn(f'Removing repo uri {repo_uri}.')
         return 0
 
-    repo_sha256 = hashlib.sha256(url.encode())
+    parsed_uri = urllib.parse.urlparse(f'{repo_uri}/repo.json')
+    repo_sha256 = hashlib.sha256(parsed_uri.geturl().encode())
     cache_file = manifest.get_o3de_cache_folder() / str(repo_sha256.hexdigest() + '.json')
+    if cache_file.is_file():
+        cache_file.unlink()
 
-    result = utils.download_file(url, cache_file)
-    if result == 0:
-        json_data['repos'].insert(0, repo_uri.as_posix())
+    result = utils.download_file(parsed_uri, cache_file)
+    if result:
+        return result
 
+    json_data['repos'].insert(0, repo_uri)
+
+    repo_set = set()
     result = repo.process_add_o3de_repo(cache_file, repo_set)
 
     return result
+
+
+def convert_git_uri_to_implementation_specific_raw_uri(parsed_uri, branch: str = None):
+    if parsed_uri.hostname in ['github.com']:
+        '''
+        When registering a github repo the uri will look like this
+        https://github.com/o3de/o3de which is
+        https://github.com/ account / repo
+        and we need to translate this into the uri that we can download a single o3de json file from =>
+        https://raw.githubusercontent.com/o3de/o3de/development which is
+        https://raw.githubusercontent.com/ account / repo / branch
+        '''
+        components = parsed_uri.path.split('/')
+        components = [ele for ele in components if ele.strip()]
+
+        if not branch:
+            repo_info_uri = urllib.parse.urlparse(f'http://api.github.com/repos/{components[0]}/{components[1]}')
+            git_sha256 = hashlib.sha256(repo_info_uri.geturl().encode())
+            repo_cache_file = manifest.get_o3de_cache_folder() / str(git_sha256.hexdigest() + '.json')
+            if not repo_cache_file.is_file():
+                if utils.download_file(repo_info_uri, repo_cache_file):
+                    return None
+            elif repo_cache_file.is_file():
+                age = utils.file_age(repo_cache_file)
+                if age > 60 * 60 * 24:
+                    repo_cache_file.unlink()
+                    if utils.download_file(repo_info_uri, repo_cache_file):
+                        return None
+            with repo_cache_file.open('r') as f:
+                try:
+                    repo_data = json.load(f)
+                    branch = repo_data['default_branch']
+                except Exception as e:
+                    logger.warn(str(e))
+                    branch = 'master'
+                    pass
+
+        raw_uri = f'{parsed_uri.scheme}://raw.githubusercontent.com/{components[0]}/{components[1]}/{branch}'
+        components.pop(0)
+        components.pop(0)
+        for ele in components:
+            raw_uri = f'{raw_uri}/{ele}'
+        return urllib.parse.urlparse(raw_uri)
+
+    elif parsed_uri.hostname in ['gitlab.com']:
+        '''
+        When registering a gitlab repo the uri will look like this
+        https://gitlab.com/o3de/o3de
+        https://gitlab.com/ account / repo
+        and we need to translate this into the uri that we can download a single o3de json file from =>
+        https://gitlab.com/o3de/o3de/-/raw/master which is
+        https://gitlab.com/ account / repo /-/raw/ branch
+        '''
+        components = parsed_uri.path.split('/')
+        components = [ele for ele in components if ele.strip()]
+
+        if not branch:
+            repo_info_uri = urllib.parse.urlparse(f'http://gitlab.com/api/v4/projects/{components[0]}%2F{components[1]}')
+            git_sha256 = hashlib.sha256(repo_info_uri.geturl().encode())
+            repo_cache_file = manifest.get_o3de_cache_folder() / str(git_sha256.hexdigest() + '.json')
+            if not repo_cache_file.is_file():
+                if utils.download_file(repo_info_uri, repo_cache_file):
+                    return None
+            elif repo_cache_file.is_file():
+                age = utils.file_age(repo_cache_file)
+                if age > 60 * 60 * 24:
+                    repo_cache_file.unlink()
+                    if utils.download_file(repo_info_uri, repo_cache_file):
+                        return None
+            with repo_cache_file.open('r') as f:
+                try:
+                    repo_data = json.load(f)
+                    branch = repo_data['default_branch']
+                except Exception as e:
+                    logger.warn(str(e))
+                    branch = 'master'
+                    pass
+
+        raw_uri = f'{parsed_uri.scheme}://gitlab.com/{components[0]}/{components[1]}/-/raw/{branch}'
+        components.pop(0)
+        components.pop(0)
+        for ele in components:
+            raw_uri = f'{raw_uri}/{ele}'
+        return urllib.parse.urlparse(raw_uri)
+
+    elif parsed_uri.hostname in ['bitbucket.com']:
+        '''
+        When registering a bitbucket repo the uri will look like this
+        https://bitbucket.org/o3de/o3de
+        https://bitbucket.com/ account / repo
+        and we need to translate this into the uri that we can download a single o3de json file from =>
+        https://bitbucket.org/o3de/o3de/raw/HEAD/o3de which is
+        https://bitbucket.org/ account / repo /raw/ branch
+        '''
+        components = parsed_uri.path.split('/')
+        components = [ele for ele in components if ele.strip()]
+
+        if not branch:
+            repo_info_uri = urllib.parse.urlparse(f'https://api.bitbucket.org/2.0/repositories/{components[0]}/{components[1]}')
+            git_sha256 = hashlib.sha256(repo_info_uri.geturl().encode())
+            repo_cache_file = manifest.get_o3de_cache_folder() / str(git_sha256.hexdigest() + '.json')
+            if not repo_cache_file.is_file():
+                if utils.download_file(repo_info_uri, repo_cache_file):
+                    return None
+            elif repo_cache_file.is_file():
+                age = utils.file_age(repo_cache_file)
+                if age > 60 * 60 * 24:
+                    repo_cache_file.unlink()
+                    if utils.download_file(repo_info_uri, repo_cache_file):
+                        return None
+            with repo_cache_file.open('r') as f:
+                try:
+                    repo_data = json.load(f)
+                    branch = repo_data['mainbranch']['name']
+                except Exception as e:
+                    logger.warn(str(e))
+                    branch = 'main'
+                    pass
+
+        raw_uri = f'{parsed_uri.scheme}://bitbucket.org/{components[0]}/{components[1]}/raw/{branch}'
+        components.pop(0)
+        components.pop(0)
+        for ele in components:
+            raw_uri = f'{raw_uri}/{ele}'
+        return urllib.parse.urlparse(raw_uri)
+
+    else:
+        return None
+
+
+def register_o3de_git_uri(json_data: dict,
+                          git_uri: str,
+                          o3de_object_key: str,
+                          o3de_json_filename: str,
+                          validation_func: callable = None,
+                          remove: bool = False) -> int:
+    if not git_uri:
+        logger.error(f'git uri cannot be empty.')
+        return 1
+
+    git_uri = urllib.parse.urlparse(git_uri)
+
+    try:
+        test = json_data[o3de_object_key]
+    except Exception:
+        json_data[o3de_object_key]=[]
+        pass
+
+    while git_uri.geturl() in json_data[o3de_object_key]:
+        json_data[o3de_object_key].remove(git_uri.geturl())
+
+    if remove:
+        logger.warn(f'Removing git uri {git_uri.geturl()}.')
+        return 0
+
+    parsed_uri = urllib.parse.urlparse(f'{git_uri.geturl()}/{o3de_json_filename}')
+    git_sha256 = hashlib.sha256(parsed_uri.geturl().encode())
+    cache_file = manifest.get_o3de_cache_folder() / str(git_sha256.hexdigest() + '.json')
+    if cache_file.is_file():
+        cache_file.unlink()
+
+    converted_parsed_uri = convert_git_uri_to_implementation_specific_raw_uri(parsed_uri)
+    if not converted_parsed_uri:
+        logger.error(f'{parsed_uri.hostname} provider rest api conversion not found.')
+        return 1
+
+    result = utils.download_file(converted_parsed_uri, cache_file)
+    if result:
+        return result
+
+    if validation_func:
+        if not validation_func(cache_file):
+            return 1
+
+    json_data[o3de_object_key].insert(0, git_uri.geturl())
+
+    return result
+
+
+def register_git_engine_uri(json_data: dict,
+                             git_engine_repo_uri: str,
+                             remove: bool = False) -> int:
+    return register_o3de_git_uri(json_data, git_project_uri, 'git_engine_repos', 'engine.json',
+                                 validation.valid_o3de_engine_json, remove)
+
+
+def register_git_project_uri(json_data: dict,
+                          git_project_uri: str,
+                          remove: bool = False) -> int:
+    return register_o3de_git_uri(json_data, git_project_uri, 'git_project_repos', 'project.json',
+                                     validation.valid_o3de_project_json, remove)
+
+
+def register_git_gem_uri(json_data: dict,
+                         git_gem_uri: str,
+                         remove: bool = False) -> int:
+    return register_o3de_git_uri(json_data, git_gem_uri, 'git_gem_repos', 'gem.json',
+                                 validation.valid_o3de_gem_json, remove)
+
+
+def register_git_external_subdirectory_repo_uri(json_data: dict,
+                                   git_external_subdirectory_uri: str,
+                                   remove: bool = False) -> int:
+    return register_o3de_git_uri(json_data, git_gem_uri, 'git_external_subdirectory_repos', 'CMakeLists.txt',
+                                 None, remove)
+
+
+def register_git_template_uri(json_data: dict,
+                           git_template_uri: str or pathlib.Path,
+                           remove: bool = False,
+                           engine_path: str or pathlib.Path = None) -> int:
+    return register_o3de_git_uri(json_data, git_template_uri, 'git_template_repos', 'template.json',
+                                 validation.valid_o3de_template_json, remove)
+
+
+def register_git_restricted_uri(json_data: dict,
+                           git_restricted_uri: str or pathlib.Path,
+                           remove: bool = False,
+                           engine_path: str or pathlib.Path = None) -> int:
+    return register_o3de_git_uri(json_data, git_restricted_uri, 'git_restricted_repos', 'restricted.json',
+                                 validation.valid_o3de_restricted_json, remove)
+
+
+def register_git_repo_uri(json_data: dict,
+                           git_repo_uri: str,
+                           remove: bool = False) -> int:
+    return register_o3de_git_uri(json_data, git_repo_uri, 'git_repo_repos', 'repo.json',
+                                 validation.valid_o3de_reo_json, remove)
+
 
 
 def register_default_o3de_object_folder(json_data: dict,
@@ -557,11 +786,20 @@ def register(engine_path: pathlib.Path = None,
              template_path: pathlib.Path = None,
              restricted_path: pathlib.Path = None,
              repo_uri: str or pathlib.Path = None,
-             default_engines_folder: pathlib.Path = None,
-             default_projects_folder: pathlib.Path = None,
-             default_gems_folder: pathlib.Path = None,
-             default_templates_folder: pathlib.Path = None,
-             default_restricted_folder: pathlib.Path = None,
+
+             git_engine_uri: str = None,
+             git_project_uri: str = None,
+             git_gem_uri: str = None,
+             git_external_subdir_uri: str = None,
+             git_template_uri: str = None,
+             git_restricted_uri: str = None,
+             git_repo_uri: str = None,
+
+             default_engines_folder: str or pathlib.Path = None,
+             default_projects_folder: str or pathlib.Path = None,
+             default_gems_folder: str or pathlib.Path = None,
+             default_templates_folder: str or pathlib.Path = None,
+             default_restricted_folder: str or pathlib.Path = None,
              default_third_party_folder: pathlib.Path = None,
              external_subdir_engine_path: pathlib.Path = None,
              external_subdir_project_path: pathlib.Path = None,
@@ -578,6 +816,15 @@ def register(engine_path: pathlib.Path = None,
     :param template_path: template folder
     :param restricted_path: restricted folder
     :param repo_uri: repo uri
+
+    :param git_engine_uri: a git uri for an engine
+    :param git_project_uri: a git uri for an project
+    :param git_gem_uri: str = a git uri for an gem
+    :param git_external_subdir_uri: a git uri for an external subdir
+    :param git_template_uri: a git uri for an template
+    :param git_restricted_uri: a git uri for a restricted
+    :param git_repo_uri: a git uri for a repo
+
     :param default_engines_folder: default engines folder
     :param default_projects_folder: default projects folder
     :param default_gems_folder: default gems folder
@@ -636,7 +883,49 @@ def register(engine_path: pathlib.Path = None,
             return 1
         result = result or register_repo(json_data, repo_uri, remove)
 
-    if isinstance(default_engines_folder, pathlib.PurePath):
+    if isinstance(git_engine_uri, str):
+        if not git_engine_uri:
+            logger.error(f'Git engine uri cannot be empty.')
+            return 1
+        result = result or register_git_engine_uri(json_data, git_engine_uri, remove)
+
+    if isinstance(git_project_uri, str):
+        if not git_project_uri:
+            logger.error(f'Git project uri cannot be empty.')
+            return 1
+        result = result or register_git_project_uri(json_data, git_project_uri, remove)
+
+    if isinstance(git_gem_uri, str):
+        if not git_gem_uri:
+            logger.error(f'Git gem uri cannot be empty.')
+            return 1
+        result = result or register_git_gem_uri(json_data, git_gem_uri, remove)
+
+    if isinstance(git_external_subdir_uri, str):
+        if not git_external_subdir_uri:
+            logger.error(f'Git external subdirectory uri cannot be Empty.')
+            return 1
+        result = result or register_git_external_subdirectory_uri(json_data, git_external_subdir_uri, remove)
+
+    if isinstance(git_template_uri, str):
+        if not git_template_uri:
+            logger.error(f'Git template uri cannot be empty.')
+            return 1
+        result = result or register_git_template_uri(json_data, git_template_uri, remove)
+
+    if isinstance(git_restricted_uri, str):
+        if not git_restricted_uri:
+            logger.error(f'Git restricted uri cannot be empty.')
+            return 1
+        result = result or register_git_restricted_uri(json_data, restricted_path, remove)
+
+    if isinstance(git_repo_uri, str):
+        if not git_repo_uri:
+            logger.error(f'Git repo uri cannot be empty.')
+            return 1
+        result = result or register_git_repo_repo_uri(json_data, git_repo_uri, remove)
+
+    if isinstance(default_engines_folder, str) or isinstance(default_engines_folder, pathlib.PurePath):
         result = result or register_default_engines_folder(json_data, default_engines_folder, remove)
 
     if isinstance(default_projects_folder, pathlib.PurePath):
@@ -771,6 +1060,9 @@ def _run_register(args: argparse) -> int:
         return repo.refresh_repos()
     elif args.this_engine:
         ret_val = register(engine_path=manifest.get_this_engine_path(), force=args.force)
+        #error_code = register_shipped_engine_o3de_objects(force=args.force)
+        #if error_code:
+        #    ret_val = error_code
         return ret_val
     elif args.all_engines_path:
         return register_all_engines_in_folder(args.all_engines_path, args.remove, args.force)
@@ -792,6 +1084,15 @@ def _run_register(args: argparse) -> int:
                         template_path=args.template_path,
                         restricted_path=args.restricted_path,
                         repo_uri=args.repo_uri,
+
+                        git_engine_uri=args.git_engine_uri,
+                        git_project_uri=args.git_project_uri,
+                        git_gem_uri=args.git_gem_uri,
+                        git_external_subdir_uri=args.git_external_subdirectory_uri,
+                        git_template_uri=args.git_template_uri,
+                        git_restricted_uri=args.git_restricted_uri,
+                        git_repo_uri=args.git_repo_uri,
+
                         default_engines_folder=args.default_engines_folder,
                         default_projects_folder=args.default_projects_folder,
                         default_gems_folder=args.default_gems_folder,
@@ -829,7 +1130,23 @@ def add_parser_args(parser):
                        help='A restricted folder to register/remove.')
     group.add_argument('-ru', '--repo-uri', type=str, required=False,
                        help='A repo uri to register/remove.')
-    group.add_argument('-aep', '--all-engines-path', type=pathlib.Path, required=False,
+
+    group.add_argument('-geu', '--git-engine-uri', type=str, required=False,
+                       help='Git engine uri to register/remove.')
+    group.add_argument('-gpu', '--git-project-uri', type=str, required=False,
+                       help='Git project uri to register/remove.')
+    group.add_argument('-ggu', '--git-gem-uri', type=str, required=False,
+                       help='Git gem uri to register/remove.')
+    group.add_argument('-gesu', '--git-external-subdirectory-uri', type=str, required=False,
+                       help='Git external subdirectory uri to register/remove.')
+    group.add_argument('-gtu', '--git-template-uri', type=str, required=False,
+                       help='Git template uri to register/remove.')
+    group.add_argument('-grsu', '--git-restricted-uri', type=str, required=False,
+                       help='Git restricted uri to register/remove.')
+    group.add_argument('-gru', '--git-repo-uri', type=str, required=False,
+                       help='Git repo uri to register/remove.')
+
+    group.add_argument('-aep', '--all-engines-path', type=str, required=False,
                        help='All engines under this folder to register/remove.')
     group.add_argument('-app', '--all-projects-path', type=pathlib.Path, required=False,
                        help='All projects under this folder to register/remove.')
@@ -858,15 +1175,15 @@ def add_parser_args(parser):
                        help='Refresh the repo cache.')
 
     parser.add_argument('-ohf', '--override-home-folder', type=pathlib.Path, required=False,
-                                    help='By default the home folder is the user folder, override it to this folder.')
+                        help='By default the home folder is the user folder, override it to this folder.')
     parser.add_argument('-r', '--remove', action='store_true', required=False,
-                                    default=False,
-                                    help='Remove entry.')
+                        default=False,
+                        help='Remove entry.')
     parser.add_argument('-f', '--force', action='store_true', default=False,
-                                    help='For the update of the registration field being modified.')
+                        help='For the update of the registration field being modified.')
 
     external_subdir_group =  parser.add_argument_group(title='external-subdirectory',
-                                                       description='path arguments to use with the --external-subdirectory option')
+                        description='path arguments to use with the --external-subdirectory option')
     external_subdir_path_group = external_subdir_group.add_mutually_exclusive_group()
     external_subdir_path_group.add_argument('-esep', '--external-subdirectory-engine-path', type=pathlib.Path,
                                        help='If supplied, registers the external subdirectory with the engine.json at' \

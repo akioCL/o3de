@@ -8,11 +8,18 @@
 """
 This file contains utility functions
 """
+import os
 import sys
 import uuid
 import pathlib
 import shutil
 import urllib.request
+import logging
+import boto3
+import zipfile
+import subprocess
+logger = logging.getLogger()
+logging.basicConfig()
 
 def validate_identifier(identifier: str) -> bool:
     """
@@ -74,6 +81,7 @@ def backup_file(file_name: str or pathlib.Path) -> None:
             file_name.rename(backup_file_name)
             if backup_file_name.is_file():
                 renamed = True
+    return backup_file_name
 
 
 def backup_folder(folder: str or pathlib.Path) -> None:
@@ -87,26 +95,90 @@ def backup_folder(folder: str or pathlib.Path) -> None:
             folder.rename(backup_folder_name)
             if backup_folder_name.is_dir():
                 renamed = True
+    return backup_folder_name
 
+def file_age(download_path: str or pathlib.Path):
+    import time
+    x = os.stat(download_path)
+    return time.time() - x.st_mtime
 
 def download_file(parsed_uri, download_path: pathlib.Path) -> int:
     """
-    :param parsed_uri: uniform resource identifier to zip file to download
+    :param parsed_uri: uniform resource identifier
     :param download_path: location path on disk to download file
     """
     if download_path.is_file():
         logger.warn(f'File already downloaded to {download_path}.')
     elif parsed_uri.scheme in ['http', 'https', 'ftp', 'ftps']:
-        with urllib.request.urlopen(url) as s:
+        try:
+            with urllib.request.urlopen(parsed_uri.geturl()) as s:
+                with download_path.open('wb') as f:
+                    shutil.copyfileobj(s, f)
+        except urllib.error.URLError as e:
+            logger.error(str(e))
+            if download_path.is_file():
+                os.unlink(download_path)
+            return 1
+        except Exception as e:
+            logger.error(str(e))
+            if download_path.is_file():
+                os.unlink(download_path)
+            return 1
+    elif parsed_uri.scheme in ['s3']:
+        s3 = boto3.client('s3')
+        try:
             with download_path.open('wb') as f:
-                shutil.copyfileobj(s, f)
+                s3.download_fileobj(parsed_uri.hostname, parsed_uri.path.strip('/'), f)
+        except Exception as e:
+            logger.error(str(e))
+            if download_path.is_file():
+                os.unlink(download_path)
+            return 1
     else:
-        origin_file = pathlib.Path(url).resolve()
+        origin_file = pathlib.Path(parsed_uri.geturl()).resolve()
         if not origin_file.is_file():
             return 1
-        shutil.copy(origin_file, download_path)
+        try:
+            shutil.copy(origin_file, download_path)
+        except Exception as e:
+            logger.error(str(e))
+            if download_path.is_file():
+                os.unlink(download_path)
+            return 1
 
     return 0
+
+
+def clone_git_uri(uri, download_path: pathlib.Path) -> int:
+    """
+    :param uri: uniform resource identifier
+    :param download_path: location path on disk to download file
+    """
+    params = ["git", "clone", uri, download_path.as_posix()]
+    try:
+        with subprocess.Popen(params, stdout=subprocess.PIPE) as proc:
+            print(proc.stdout.read())
+    except Exception as e:
+        logger.error(str(e))
+        return 1
+
+    return proc.returncode
+
+
+def update_git_uri(uri, download_path: pathlib.Path) -> int:
+    """
+    :param uri: uniform resource identifier
+    :param download_path: location path on disk to download file
+    """
+    params = ["git", "pull"]
+    try:
+        with subprocess.Popen(params, cwd=download_path.as_posix(), stdout=subprocess.PIPE) as proc:
+            print(proc.stdout.read())
+    except Exception as e:
+        logger.error(str(e))
+        return 1
+
+    return proc.returncode
 
 
 def download_zip_file(parsed_uri, download_zip_path: pathlib.Path) -> int:

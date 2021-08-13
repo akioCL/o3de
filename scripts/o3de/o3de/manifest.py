@@ -13,8 +13,9 @@ import json
 import logging
 import os
 import pathlib
+import shutil
 
-from o3de import validation
+from o3de import validation, utils
 
 logger = logging.getLogger()
 logging.basicConfig()
@@ -135,12 +136,20 @@ def get_o3de_manifest() -> pathlib.Path:
         json_data.update({'default_restricted_folder': default_restricted_folder.as_posix()})
         json_data.update({'default_third_party_folder': default_third_party_folder.as_posix()})
 
+        json_data.update({'engines': []})
         json_data.update({'projects': []})
         json_data.update({'external_subdirectories': []})
         json_data.update({'templates': []})
         json_data.update({'restricted': []})
         json_data.update({'repos': []})
-        json_data.update({'engines': []})
+
+        json_data.update({'git_engine_repos': []})
+        json_data.update({'git_project_repos': []})
+        json_data.update({'git_gem_repos': []})
+        json_data.update({'git_external_subdirectory_repos': []})
+        json_data.update({'git_template_repos': []})
+        json_data.update({'git_restricted_repos': []})
+        json_data.update({'git_repo_repos': []})
 
         default_restricted_folder_json = default_restricted_folder / 'restricted.json'
         if not default_restricted_folder_json.is_file():
@@ -195,22 +204,25 @@ def load_o3de_manifest(manifest_path: pathlib.Path = None) -> dict:
             return json_data
 
 
-def save_o3de_manifest(json_data: dict, manifest_path: pathlib.Path = None) -> bool:
+def save_o3de_manifest(json_data: dict, manifest_path: pathlib.Path = None) -> None:
     """
-        Save the json dictionary to the supplied manifest file or ~/.o3de/o3de_manifest.json if manifest_path is None
+    Save the json dictionary to the supplied manifest file or ~/.o3de/o3de_manifest.json if None
 
-        :param json_data: dictionary to save in json format at the file path
-        :param manifest_path: optional path to manifest file to save
-        """
+    :param json_data: dictionary to save in json format at the file path
+    :param manifest_path: optional path to manifest file to save
+    """
     if not manifest_path:
         manifest_path = get_o3de_manifest()
+    backup_name = utils.backup_file(manifest_path)
     with manifest_path.open('w') as s:
         try:
             s.write(json.dumps(json_data, indent=4) + '\n')
-            return True
-        except OSError as e:
+        except Exception as e:
             logger.error(f'Manifest json failed to save: {str(e)}')
-            return False
+            os.unlink(manifest_path)
+            os.rename(backup_name, manifest_path)
+        finally:
+            os.unlink(backup_name)
 
 
 
@@ -236,6 +248,12 @@ def get_gems_from_subdirectories(external_subdirs: list) -> list:
 
 
 # Data query methods
+def get_this_engine() -> dict:
+    json_data = load_o3de_manifest()
+    engine_data = find_engine_data(json_data)
+    return engine_data
+
+
 def get_engines() -> list:
     json_data = load_o3de_manifest()
     engine_list = json_data['engines'] if 'engines' in json_data else []
@@ -251,7 +269,11 @@ def get_projects() -> list:
 
 
 def get_gems() -> list:
-    return get_gems_from_subdirectories(get_external_subdirectories())
+    def is_gem_subdirectory(subdir):
+        return (pathlib.Path(subdir) / 'gem.json').exists()
+
+    external_subdirs = get_external_subdirectories()
+    return list(filter(is_gem_subdirectory, external_subdirs)) if external_subdirs else []
 
 
 def get_external_subdirectories() -> list:
@@ -272,6 +294,46 @@ def get_restricted() -> list:
 def get_repos() -> list:
     json_data = load_o3de_manifest()
     return json_data['repos'] if 'repos' in json_data else []
+
+
+
+
+def get_git_engine_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_engine_repos'] if 'git_engine_repos' in json_data else []
+
+
+def get_git_project_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_project_repos'] if 'git_project_repos' in json_data else []
+
+
+def get_git_gems_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_gem_repos'] if 'git_gem_repos' in json_data else []
+
+
+def get_git_external_subdirectory_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_external_subdirectory_repos'] if 'git_external_subdirectory_repos' in json_data else []
+
+
+def get_git_template_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_template_repos'] if 'git_template_repos' in json_data else []
+
+
+def get_git_restricted_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_restricted_repos'] if 'git_restricted_repos' in json_data else []
+
+
+def get_git_repo_repos() -> list:
+    json_data = load_o3de_manifest()
+    return json_data['git_repo_reposs'] if 'git_repo_repos' in json_data else []
+
+
+
 
 # engine.json queries
 def get_engine_projects() -> list:

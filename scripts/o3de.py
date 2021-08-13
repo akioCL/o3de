@@ -28,14 +28,15 @@ def add_args(parser, subparsers) -> None:
     o3de_package_dir = (script_dir / 'o3de').resolve()
     # add the scripts/o3de directory to the front of the sys.path
     sys.path.insert(0, str(o3de_package_dir))
-    from o3de import engine_properties, engine_template, gem_properties, global_project, register, print_registration, get_registration, \
-        enable_gem, disable_gem, project_properties, sha256
+    from o3de import engine_template, global_project, register, print_registration, get_registration, \
+        enable_gem, disable_gem, engine_properties, project_properties, gem_properties, sha256, download
     # Remove the temporarily added path
     sys.path = sys.path[1:]
 
     # global_project
     global_project.add_args(subparsers)
-    # engine templaate
+
+    # engine template
     engine_template.add_args(subparsers)
 
     # register
@@ -64,6 +65,9 @@ def add_args(parser, subparsers) -> None:
     
     # sha256
     sha256.add_args(subparsers)
+
+    # download
+    download.add_args(subparsers)
 
 
 if __name__ == "__main__":
