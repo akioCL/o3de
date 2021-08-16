@@ -11,6 +11,7 @@
 #include <AzCore/Component/Component.h>
 #include <AzToolsFramework/ViewportSelection/EditorInteractionSystemViewportSelectionRequestBus.h>
 #include <AzToolsFramework/ViewportSelection/EditorVisibleEntityDataCache.h>
+#include <AzToolsFramework/ViewportSelection/EditorModeSelect.h>
 
 namespace AzToolsFramework
 {
@@ -54,5 +55,7 @@ namespace AzToolsFramework
         AZStd::unique_ptr<InternalViewportSelectionRequests> m_interactionRequests; //!< Hold a concrete implementation of
                                                                                     //!< ViewportSelectionRequests to handle viewport
                                                                                     //!< input and drawing for the Editor.
+                                                                                    //!
+        AZStd::unique_ptr<EditorModeSelect> m_editorModeSelect;
     };
 } // namespace AzToolsFramework

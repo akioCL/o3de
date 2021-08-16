@@ -34,6 +34,8 @@ set(FILES
     API/EditorAnimationSystemRequestBus.h
     API/EditorEntityAPI.h
     API/EditorLevelNotificationBus.h
+    API/EditorModeNotificationBus.h
+    API/EditorModeRequestsBus.h
     API/EditorVegetationRequestsBus.h
     API/EditorPythonConsoleBus.h
     API/EditorPythonRunnerRequestsBus.h
@@ -524,6 +526,7 @@ set(FILES
     ViewportSelection/EditorDefaultSelection.cpp
     ViewportSelection/EditorHelpers.h
     ViewportSelection/EditorHelpers.cpp
+    ViewportSelection/EditorInteractionInterface.h
     ViewportSelection/EditorInteractionSystemComponent.h
     ViewportSelection/EditorInteractionSystemComponent.cpp
     ViewportSelection/EditorInteractionSystemViewportSelectionRequestBus.h
@@ -537,6 +540,8 @@ set(FILES
     ViewportSelection/EditorTransformComponentSelectionRequestBus.cpp
     ViewportSelection/EditorVisibleEntityDataCache.h
     ViewportSelection/EditorVisibleEntityDataCache.cpp
+    ViewportSelection/EditorModeSelect.h
+    ViewportSelection/EditorModeSelect.cpp
     ToolsFileUtils/ToolsFileUtils.h
     AssetBrowser/AssetBrowserBus.h
     AssetBrowser/AssetBrowserSourceDropBus.h

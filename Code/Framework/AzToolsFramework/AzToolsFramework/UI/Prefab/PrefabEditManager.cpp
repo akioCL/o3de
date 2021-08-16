@@ -25,10 +25,12 @@ namespace AzToolsFramework
             }
 
             AZ::Interface<PrefabEditInterface>::Register(this);
+            AZ::Interface<EditorInteractionInterface>::Register(this);
         }
 
         PrefabEditManager::~PrefabEditManager()
         {
+            AZ::Interface<EditorInteractionInterface>::Unregister(this);
             AZ::Interface<PrefabEditInterface>::Unregister(this);
         }
 
@@ -41,6 +43,34 @@ namespace AzToolsFramework
         {
             AZ::EntityId containerEntity = m_prefabPublicInterface->GetInstanceContainerEntityId(entityId);
             return m_instanceBeingEdited == containerEntity;
+        }
+
+        AZ::EntityId PrefabEditManager::RedirectEntitySelection(AZ::EntityId entityId)
+        {
+            // Retrieve the Level Container
+            AZ::EntityId levelContainerEntityId = m_prefabPublicInterface->GetLevelInstanceContainerEntityId();
+
+            // Find container entity for owning prefab of passed entity
+            AZ::EntityId containerEntityId = m_prefabPublicInterface->GetInstanceContainerEntityId(entityId);
+
+            // If the entity belongs to the level instance or an instance that is currently being edited, it can be selected
+            if (containerEntityId == levelContainerEntityId || m_editedPrefabHierarchyCache.contains(containerEntityId))
+            {
+                return entityId;
+            }
+
+            // Else keep looping until you can find an instance that is being edited, or the level instance
+            AZ::EntityId parentContainerEntityId = m_prefabPublicInterface->GetParentInstanceContainerEntityId(containerEntityId);
+
+            while (parentContainerEntityId.IsValid() && parentContainerEntityId != levelContainerEntityId &&
+                   !m_editedPrefabHierarchyCache.contains(parentContainerEntityId))
+            {
+                // Else keep going up the hierarchy
+                containerEntityId = parentContainerEntityId;
+                parentContainerEntityId = m_prefabPublicInterface->GetParentInstanceContainerEntityId(containerEntityId);
+            }
+
+            return containerEntityId;
         }
     }
 }

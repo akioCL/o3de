@@ -1007,6 +1007,8 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::OnPrefabComponentActivate(AZ::EntityId entityId)
         {
+            AZ_Printf("LYN-5265", "OnPrefabComponentActivate(%s)", entityId.ToString().c_str())
+
             if (s_prefabPublicInterface->IsLevelInstanceContainerEntity(entityId))
             {
                 s_editorEntityUiInterface->RegisterEntity(entityId, m_levelRootUiHandler.GetHandlerId());
@@ -1019,6 +1021,7 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::OnPrefabComponentDeactivate(AZ::EntityId entityId)
         {
+            AZ_Printf("LYN-5265", "OnPrefabComponentDeactivate(%s)", entityId.ToString().c_str())
             s_editorEntityUiInterface->UnregisterEntity(entityId);
         }
 

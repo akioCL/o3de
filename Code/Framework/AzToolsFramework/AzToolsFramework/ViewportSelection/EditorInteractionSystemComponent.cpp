@@ -17,10 +17,14 @@ namespace AzToolsFramework
     {
         EditorInteractionSystemViewportSelectionRequestBus::Handler::BusConnect(GetEntityContextId());
         EditorEventsBus::Handler::BusConnect();
+
+        m_editorModeSelect = AZStd::make_unique<EditorModeSelect>();
     }
 
     void EditorInteractionSystemComponent::Deactivate()
     {
+        m_editorModeSelect.reset();
+
         // EditorVisibleEntityDataCache does BusDisconnect in the destructor, so have to reset here
         m_entityDataCache.reset();
 

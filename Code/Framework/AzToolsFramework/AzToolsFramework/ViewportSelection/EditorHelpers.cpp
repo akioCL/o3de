@@ -18,6 +18,7 @@
 #include <AzToolsFramework/Viewport/ViewportTypes.h>
 #include <AzToolsFramework/ViewportSelection/EditorSelectionUtil.h>
 #include <AzToolsFramework/ViewportSelection/EditorVisibleEntityDataCache.h>
+#include <AzToolsFramework/ViewportSelection/EditorInteractionInterface.h>
 
 AZ_CVAR(
     bool,
@@ -174,6 +175,13 @@ namespace AzToolsFramework
                     }
                 }
             }
+        }
+
+        // Allow entity system to override the selection
+        auto editorInteractionInterface = AZ::Interface<EditorInteractionInterface>::Get();
+        if (editorInteractionInterface != nullptr)
+        {
+            entityIdUnderCursor = editorInteractionInterface->RedirectEntitySelection(entityIdUnderCursor);
         }
 
         return entityIdUnderCursor;
