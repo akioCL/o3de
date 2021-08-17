@@ -161,26 +161,26 @@ namespace PhysX
                     ->ClassElement(AZ::Edit::ClassElements::Group, "Linear Axis Locking")
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, false)
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockLinearX, "Lock X",
+                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockLinearX, "Lock Linear X",
                         "Lock motion along X direction")
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockLinearY, "Lock Y",
+                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockLinearY, "Lock Linear Y",
                         "Lock motion along Y direction")
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockLinearZ, "Lock Z",
+                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockLinearZ, "Lock Linear Z",
                         "Lock motion along Z direction")
 
                     // Angular axis locking properties
                     ->ClassElement(AZ::Edit::ClassElements::Group, "Angular Axis Locking")
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, false)
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockAngularX, "Lock X",
+                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockAngularX, "Lock Angular X",
                         "Lock rotation around X direction")
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockAngularY, "Lock Y",
+                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockAngularY, "Lock Angular Y",
                         "Lock rotation around Y direction")
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockAngularZ, "Lock Z",
+                        AZ::Edit::UIHandlers::Default, &AzPhysics::RigidBodyConfiguration::m_lockAngularZ, "Lock Angular Z",
                         "Lock rotation around Z direction")
 
                     ->ClassElement(AZ::Edit::ClassElements::Group, "Continuous Collision Detection")
