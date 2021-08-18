@@ -128,7 +128,10 @@
       "daily-pipeline-metrics",
       "weekly-build-metrics"
     ],
-    "COMMAND": "build_windows.cmd",
+    "PIPELINE_ENV": {
+      "ON_FAILURE_MARK": "UNSTABLE"
+    },
+    "COMMAND": "build_windows1.cmd",
     "PARAMETERS": {
       "CONFIGURATION": "profile",
       "OUTPUT_DIRECTORY": "build\\windows_vs2019",
