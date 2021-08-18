@@ -57,6 +57,16 @@ def CreateHashGuid(string):
 def EtreeToString(xmlNode):
     return etree.tostring(xmlNode)
 
+# Split a provided string into an array using the provided delimeter character
+def splitIntoArray(string, delim=';'):
+
+    tokens = string.split(delim)
+    result = []
+    for t in tokens:
+        result.append(t)
+
+    return result
+
 def SanitizePath(path):
     return (path or '').replace('\\', '/').replace('//', '/')
 
@@ -152,6 +162,7 @@ def ProcessTemplateConversion(dataInputSet, dataInputFiles, templateFile, output
         templateEnv.filters['booleanTrue'   ] = BooleanTrue
         templateEnv.filters['createHashGuid'] = CreateHashGuid
         templateEnv.filters['etreeToString' ] = EtreeToString
+        templateEnv.filters['splitIntoArray'] = splitIntoArray
         templateJinja  = templateEnv.get_template(os.path.basename(templateFile))
         templateVars   = \
             { \
