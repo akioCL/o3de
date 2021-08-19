@@ -129,7 +129,7 @@
       "weekly-build-metrics"
     ],
     "PIPELINE_ENV": {
-      "ON_FAILURE_MARK": "UNSTABLE"
+      "NONBLOCKING_STEP": "True"
     },
     "COMMAND": "build_windows1.cmd",
     "PARAMETERS": {
