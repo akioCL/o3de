@@ -477,6 +477,7 @@ def CreateSingleNode(Map pipelineConfig, def platform, def build_job, Map envVar
                 catch(Exception e) {
                     //  https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/model/Result.java
                     //  {SUCCESS,UNSTABLE,FAILURE,NOT_BUILT,ABORTED}
+                    echo 'Cheking ON_FAILURE_MARK'
                     def currentResult = envVars['ON_FAILURE_MARK'] ?: 'FAILURE'
                     if (currentResult == 'FAILURE') {
                         currentBuild.result = 'FAILURE'
