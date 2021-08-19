@@ -340,8 +340,7 @@ namespace AZ
 
                 if (m_useStatisticsTreeView)
                 {
-                    // Reconstruct the callstack every frame 
-
+                    // Reconstruct the callstack every frame since it will change every frame 
                     if (m_frameEndTicks.size() < 2)
                     {
                         return;
@@ -367,12 +366,8 @@ namespace AZ
                         {
                             const TimeRegion& region = *itr;
 
-                            if (treeOpenedStack.empty())
-                            {
-                                treeOpenedStack.push(DrawTableRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
-                            }
-                            else if (region.m_stackDepth < treeOpenedStack.size())
+                            // Pop off until getting to the appropriate depth
+                            if (region.m_stackDepth < treeOpenedStack.size())
                             {
                                 while (!treeOpenedStack.empty() && region.m_stackDepth != treeOpenedStack.size())
                                 {
@@ -385,7 +380,7 @@ namespace AZ
                                 treeOpenedStack.push(DrawTableRow(
                                     &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
-                            else if (treeOpenedStack.top() && region.m_stackDepth >= treeOpenedStack.size())
+                            else if (treeOpenedStack.empty() || (treeOpenedStack.top() && region.m_stackDepth >= treeOpenedStack.size()))
                             {
                                 treeOpenedStack.push(DrawTableRow(
                                     &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
@@ -403,7 +398,7 @@ namespace AZ
                         }
                     }
                 }
-                else
+                else // Fallback to normal tabular view 
                 {
                     for (const auto* statistics : m_tableData)
                     {
@@ -479,7 +474,7 @@ namespace AZ
                 ImGui::Separator();
                 ImGui::Columns(1, "view", false);
 
-                m_timedRegionFilter.Draw("Filter");
+                m_timedRegionFilter.Draw("Filter", ImGui::GetWindowWidth() / 3);
                 ImGui::SameLine();
                 if (ImGui::Button("Clear Filter"))
                 {
