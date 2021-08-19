@@ -291,7 +291,7 @@ namespace AZ
                     SortTable(sortSpecs);
                 }
 
-                auto drawRow = [&filter = m_timedRegionFilter](const TableRow* statistics) -> bool
+                auto drawRow = [&filter = m_timedRegionFilter](const TableRow* statistics, bool isTree) -> bool
                 {
                     if (!filter.PassFilter(statistics->m_groupName.c_str())
                         && !filter.PassFilter(statistics->m_regionName.c_str()))
@@ -299,9 +299,20 @@ namespace AZ
                         return false;
                     }
 
-                    // This unsafe casting is to get a valid ID for ImGui. It will never be dereferenced. 
-                    void* id = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
-                    bool opened = ImGui::TreeNode(id, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                    const bool opened = [&]
+                    {
+                        if (isTree)
+                        {
+                            // This unsafe casting is to get a valid ID for ImGui. It will never be dereferenced.
+                            void* id = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
+                            return ImGui::TreeNode(id, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                        }
+                        else
+                        {
+                            ImGui::Text("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                            return false;
+                        }
+                    }();
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
                     ImGui::TableNextColumn();
 
@@ -354,7 +365,7 @@ namespace AZ
 
                             if (callstack.empty())
                             {
-                                callstack.push(drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
+                                callstack.push(drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName], true));
                             }
                             else if (region.m_stackDepth < callstack.size())
                             {
@@ -367,12 +378,12 @@ namespace AZ
                                     callstack.pop();
                                 }
                                 callstack.push(drawRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName], true));
                             }
                             else if (callstack.top() && region.m_stackDepth >= callstack.size())
                             {
                                 callstack.push(drawRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName], true));
                             }
                             ++itr;
                         }
@@ -391,7 +402,7 @@ namespace AZ
                 {
                     for (const auto* statistics : m_tableData)
                     {
-                        drawRow(statistics);
+                        drawRow(statistics, false);
                     }
                 }
             }
