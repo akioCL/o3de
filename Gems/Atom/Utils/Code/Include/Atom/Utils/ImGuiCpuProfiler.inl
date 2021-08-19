@@ -22,6 +22,7 @@
 #include <AzCore/std/limits.h>
 #include <AzCore/std/sort.h>
 #include <AzCore/std/time.h>
+#include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
 
 
 namespace AZ
@@ -272,11 +273,10 @@ namespace AZ
         {
             const auto flags =
                 ImGuiTableFlags_Borders | ImGuiTableFlags_Sortable | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable;
-            if (ImGui::BeginTable("FunctionStatisticsTable", 6, flags))
+            if (ImGui::BeginTable("FunctionStatisticsTable", 5, flags))
             {
                 // Table header setup
-                ImGui::TableSetupColumn("Group");
-                ImGui::TableSetupColumn("Region");
+                ImGui::TableSetupColumn("GroupRegionName");
                 ImGui::TableSetupColumn("MTPC (ms)");
                 ImGui::TableSetupColumn("Max (ms)");
                 ImGui::TableSetupColumn("Invocations");
@@ -290,20 +290,16 @@ namespace AZ
                     SortTable(sortSpecs);
                 }
 
-                // Draw all of the rows held in the GroupRegionMap
-                for (const auto* statistics : m_tableData)
+                auto drawRow = [&filter = m_timedRegionFilter](const TableRow* statistics)
                 {
-                    if (!m_timedRegionFilter.PassFilter(statistics->m_groupName.c_str())
-                        && !m_timedRegionFilter.PassFilter(statistics->m_regionName.c_str()))
+                    if (!filter.PassFilter(statistics->m_groupName.c_str())
+                        && !filter.PassFilter(statistics->m_regionName.c_str()))
                     {
-                        continue;
+                        return;
                     }
 
-                    ImGui::Text(statistics->m_groupName.c_str());
+                    ImGui::Text("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
-                    ImGui::TableNextColumn();
-
-                    ImGui::Text(statistics->m_regionName.c_str());
                     ImGui::TableNextColumn();
 
                     ImGui::Text("%.2f", CpuProfilerImGuiHelper::TicksToMs(statistics->m_runningAverageTicks));
@@ -327,6 +323,75 @@ namespace AZ
                         ImGui::Text(statistics->GetExecutingThreadsLabel().c_str());
                         ImGui::EndTooltip();
                     }
+                };
+
+                if (m_useStatisticsTreeView)
+                {
+                    // reconstruct the call stack and draw rows 
+
+                    if (m_frameEndTicks.size() < 2)
+                    {
+                        return;
+                    }
+                    const AZStd::sys_time_t lastFrameBound = m_frameEndTicks.at(m_frameEndTicks.size() - 2);
+
+                    for (const auto& [threadId, singleThreadData] : m_savedData)
+                    {
+                        auto itr = AZStd::lower_bound(
+                            singleThreadData.begin(), singleThreadData.end(), lastFrameBound,
+                            [](const TimeRegion& wrapper, AZStd::sys_time_t target)
+                            {
+                                return wrapper.m_startTick < target;
+                            });
+                        u64 depth = 0;
+                        while (itr != singleThreadData.end())
+                        {
+                            const TimeRegion& region = *itr;
+
+                            if (depth == 0)
+                            {
+                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
+                                ImGui::Indent();
+                                ++depth;
+                            }
+                            else if (region.m_stackDepth < depth)
+                            {
+                                while (depth != 0 && region.m_stackDepth != depth)
+                                {
+                                    ImGui::Unindent();
+                                    --depth;
+                                }
+                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
+                                ++depth;
+                                ImGui::Indent();
+                            }
+                            else if (region.m_stackDepth == depth)
+                            {
+                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
+                                ++depth;
+                                ImGui::Indent();
+                            }
+                            else
+                            {
+                                ImGui::Indent();
+                                ++depth;
+                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
+                            }
+                            ++itr;
+                        }
+                        while (depth != 0)
+                        {
+                            ImGui::Unindent();
+                            --depth;
+                        }
+                    }
+                }
+                else
+                {
+                    for (const auto* statistics : m_tableData)
+                    {
+                        drawRow(statistics);
+                    }
                 }
             }
             ImGui::EndTable();
@@ -339,22 +404,19 @@ namespace AZ
                 
             switch (columnToSort)
             {
-            case (0): // Sort by group name
-                AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_groupName, ascending));
-                break;
-            case (1): // Sort by region name
+            case (0): // Sort by region name
                 AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_regionName, ascending));
                 break;
-            case (2): // Sort by average time
+            case (1): // Sort by average time
                 AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_runningAverageTicks, ascending));
                 break;
-            case (3): // Sort by max time
+            case (2): // Sort by max time
                 AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_maxTicks, ascending));
                 break;
-            case (4): // Sort by invocations
+            case (3): // Sort by invocations
                 AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_invocationsLastFrame, ascending));
                 break;
-            case (5): // Sort by total time 
+            case (4): // Sort by total time 
                 AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_lastFrameTotalTicks, ascending));
                 break;
             }
@@ -412,6 +474,8 @@ namespace AZ
                     m_tableData.clear();
                     m_groupRegionMap.clear();
                 }
+                ImGui::SameLine();
+                ImGui::Checkbox("Tree View", &m_useStatisticsTreeView);
 
                 DrawTable();
             } 
