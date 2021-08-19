@@ -291,7 +291,7 @@ namespace AZ
                     SortTable(sortSpecs);
                 }
 
-                auto drawRow = [&filter = m_timedRegionFilter](const TableRow* statistics, bool isTree) -> bool
+                const auto DrawTableRow = [&filter = m_timedRegionFilter, &isTree = m_useStatisticsTreeView](const TableRow* statistics) -> bool
                 {
                     if (!filter.PassFilter(statistics->m_groupName.c_str())
                         && !filter.PassFilter(statistics->m_regionName.c_str()))
@@ -299,20 +299,18 @@ namespace AZ
                         return false;
                     }
 
-                    const bool opened = [&]
+                    bool opened = false;
+                    if (isTree)
                     {
-                        if (isTree)
-                        {
-                            // This unsafe casting is to get a valid ID for ImGui. It will never be dereferenced.
-                            void* id = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
-                            return ImGui::TreeNode(id, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
-                        }
-                        else
-                        {
-                            ImGui::Text("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
-                            return false;
-                        }
-                    }();
+                        // This unsafe casting is to get a valid ID for ImGui. It will never be dereferenced.
+                        void* id = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
+                        opened = ImGui::TreeNode(id, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                    }
+                    else
+                    {
+                        ImGui::Text("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                    }
+
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
                     ImGui::TableNextColumn();
 
@@ -342,59 +340,66 @@ namespace AZ
 
                 if (m_useStatisticsTreeView)
                 {
-                    // reconstruct the call stack and draw rows 
+                    // Reconstruct the callstack every frame 
 
                     if (m_frameEndTicks.size() < 2)
                     {
                         return;
                     }
-                    const AZStd::sys_time_t lastFrameBound = m_frameEndTicks.at(m_frameEndTicks.size() - 2);
+
+                    const AZStd::sys_time_t lastFrameStartTick = m_frameEndTicks.at(m_frameEndTicks.size() - 2);
 
                     for (const auto& [threadId, singleThreadData] : m_savedData)
                     {
+                        // Find first region of last frame 
                         auto itr = AZStd::lower_bound(
-                            singleThreadData.begin(), singleThreadData.end(), lastFrameBound,
+                            singleThreadData.begin(), singleThreadData.end(), lastFrameStartTick,
                             [](const TimeRegion& wrapper, AZStd::sys_time_t target)
                             {
                                 return wrapper.m_startTick < target;
                             });
-                        AZStd::stack<bool> callstack;
+
+                        // ImGui::TreeNode returns a bool based on whether or not the node is open - we need to store this to
+                        // call ImGui::TreePop() the correct number of times.
+                        AZStd::stack<bool> treeOpenedStack;
+
                         while (itr != singleThreadData.end())
                         {
                             const TimeRegion& region = *itr;
 
-                            if (callstack.empty())
+                            if (treeOpenedStack.empty())
                             {
-                                callstack.push(drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName], true));
+                                treeOpenedStack.push(DrawTableRow(
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
-                            else if (region.m_stackDepth < callstack.size())
+                            else if (region.m_stackDepth < treeOpenedStack.size())
                             {
-                                while (!callstack.empty() && region.m_stackDepth != callstack.size())
+                                while (!treeOpenedStack.empty() && region.m_stackDepth != treeOpenedStack.size())
                                 {
-                                    if (callstack.top())
+                                    if (treeOpenedStack.top())
                                     {
                                         ImGui::TreePop();
                                     }
-                                    callstack.pop();
+                                    treeOpenedStack.pop();
                                 }
-                                callstack.push(drawRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName], true));
+                                treeOpenedStack.push(DrawTableRow(
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
-                            else if (callstack.top() && region.m_stackDepth >= callstack.size())
+                            else if (treeOpenedStack.top() && region.m_stackDepth >= treeOpenedStack.size())
                             {
-                                callstack.push(drawRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName], true));
+                                treeOpenedStack.push(DrawTableRow(
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
                             ++itr;
                         }
 
-                        while (!callstack.empty())
+                        while (!treeOpenedStack.empty())
                         {
-                            if (callstack.top())
+                            if (treeOpenedStack.top())
                             {
                                 ImGui::TreePop();
                             }
-                            callstack.pop();
+                            treeOpenedStack.pop();
                         }
                     }
                 }
@@ -402,7 +407,7 @@ namespace AZ
                 {
                     for (const auto* statistics : m_tableData)
                     {
-                        drawRow(statistics, false);
+                        DrawTableRow(statistics);
                     }
                 }
             }
