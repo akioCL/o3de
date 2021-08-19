@@ -23,6 +23,7 @@
 #include <AzCore/std/sort.h>
 #include <AzCore/std/time.h>
 #include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
+#include <AzCore/std/containers/stack.h>
 
 
 namespace AZ
@@ -290,15 +291,17 @@ namespace AZ
                     SortTable(sortSpecs);
                 }
 
-                auto drawRow = [&filter = m_timedRegionFilter](const TableRow* statistics)
+                auto drawRow = [&filter = m_timedRegionFilter](const TableRow* statistics) -> bool
                 {
                     if (!filter.PassFilter(statistics->m_groupName.c_str())
                         && !filter.PassFilter(statistics->m_regionName.c_str()))
                     {
-                        return;
+                        return false;
                     }
 
-                    ImGui::Text("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                    // This unsafe casting is to get a valid ID for ImGui. It will never be dereferenced. 
+                    void* id = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
+                    bool opened = ImGui::TreeNode(id, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
                     ImGui::TableNextColumn();
 
@@ -323,6 +326,7 @@ namespace AZ
                         ImGui::Text(statistics->GetExecutingThreadsLabel().c_str());
                         ImGui::EndTooltip();
                     }
+                    return opened;
                 };
 
                 if (m_useStatisticsTreeView)
@@ -343,46 +347,43 @@ namespace AZ
                             {
                                 return wrapper.m_startTick < target;
                             });
-                        u64 depth = 0;
+                        AZStd::stack<bool> callstack;
                         while (itr != singleThreadData.end())
                         {
                             const TimeRegion& region = *itr;
 
-                            if (depth == 0)
+                            if (callstack.empty())
                             {
-                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
-                                ImGui::Indent();
-                                ++depth;
+                                callstack.push(drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
-                            else if (region.m_stackDepth < depth)
+                            else if (region.m_stackDepth < callstack.size())
                             {
-                                while (depth != 0 && region.m_stackDepth != depth)
+                                while (!callstack.empty() && region.m_stackDepth != callstack.size())
                                 {
-                                    ImGui::Unindent();
-                                    --depth;
+                                    if (callstack.top())
+                                    {
+                                        ImGui::TreePop();
+                                    }
+                                    callstack.pop();
                                 }
-                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
-                                ++depth;
-                                ImGui::Indent();
+                                callstack.push(drawRow(
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
-                            else if (region.m_stackDepth == depth)
+                            else if (callstack.top() && region.m_stackDepth >= callstack.size())
                             {
-                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
-                                ++depth;
-                                ImGui::Indent();
-                            }
-                            else
-                            {
-                                ImGui::Indent();
-                                ++depth;
-                                drawRow(&m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]);
+                                callstack.push(drawRow(
+                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
                             }
                             ++itr;
                         }
-                        while (depth != 0)
+
+                        while (!callstack.empty())
                         {
-                            ImGui::Unindent();
-                            --depth;
+                            if (callstack.top())
+                            {
+                                ImGui::TreePop();
+                            }
+                            callstack.pop();
                         }
                     }
                 }
