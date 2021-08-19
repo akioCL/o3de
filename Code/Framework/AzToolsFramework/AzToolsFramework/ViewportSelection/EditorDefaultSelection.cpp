@@ -56,7 +56,6 @@ namespace AzToolsFramework
     void EditorDefaultSelection::BeginComponentMode(
         const AZStd::vector<ComponentModeFramework::EntityAndComponentModeBuilders>& entityAndComponentModeBuilders)
     {
-        AZ_Printf("LYN-5265", "BeginComponentMode()")
         for (const auto& componentModeBuilder : entityAndComponentModeBuilders)
         {
             AddComponentModes(componentModeBuilder);
@@ -163,13 +162,11 @@ namespace AzToolsFramework
 
     AZ::Uuid EditorDefaultSelection::ActiveComponentMode()
     {
-        AZ_Printf("LYN-5265", "ActiveComponentMode()")
         return m_componentModeCollection.ActiveComponentMode();
     }
 
     bool EditorDefaultSelection::ComponentModeInstantiated(const AZ::EntityComponentIdPair& entityComponentIdPair)
     {
-        AZ_Printf("LYN-5265", "ComponentModeInstantiated()")
         return m_componentModeCollection.ComponentModeInstantiated(entityComponentIdPair);
     }
 

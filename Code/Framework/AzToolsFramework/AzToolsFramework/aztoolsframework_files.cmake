@@ -520,13 +520,13 @@ set(FILES
     ComponentModes/BoxComponentMode.cpp
     ComponentModes/BoxViewportEdit.h
     ComponentModes/BoxViewportEdit.cpp
+    ViewportSelection/EditorInteractionInterface.h
     ViewportSelection/EditorBoxSelect.h
     ViewportSelection/EditorBoxSelect.cpp
     ViewportSelection/EditorDefaultSelection.h
     ViewportSelection/EditorDefaultSelection.cpp
     ViewportSelection/EditorHelpers.h
     ViewportSelection/EditorHelpers.cpp
-    ViewportSelection/EditorInteractionInterface.h
     ViewportSelection/EditorInteractionSystemComponent.h
     ViewportSelection/EditorInteractionSystemComponent.cpp
     ViewportSelection/EditorInteractionSystemViewportSelectionRequestBus.h
@@ -722,8 +722,11 @@ set(FILES
     UI/Prefab/LevelRootUiHandler.h
     UI/Prefab/LevelRootUiHandler.cpp
     UI/Prefab/PrefabEditInterface.h
+    UI/Prefab/PrefabEditPublicInterface.h
     UI/Prefab/PrefabEditManager.h
     UI/Prefab/PrefabEditManager.cpp
+    UI/Prefab/PrefabEditUndo.h
+    UI/Prefab/PrefabEditUndo.cpp
     UI/Prefab/PrefabIntegrationBus.h
     UI/Prefab/PrefabIntegrationManager.h
     UI/Prefab/PrefabIntegrationManager.cpp

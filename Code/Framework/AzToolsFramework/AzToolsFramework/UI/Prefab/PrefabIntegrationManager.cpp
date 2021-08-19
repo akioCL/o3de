@@ -40,7 +40,7 @@ namespace AzToolsFramework
         
         EditorEntityUiInterface* PrefabIntegrationManager::s_editorEntityUiInterface = nullptr;
         PrefabPublicInterface* PrefabIntegrationManager::s_prefabPublicInterface = nullptr;
-        PrefabEditInterface* PrefabIntegrationManager::s_prefabEditInterface = nullptr;
+        PrefabEditPublicInterface* PrefabIntegrationManager::s_prefabEditPublicInterface = nullptr;
         PrefabLoaderInterface* PrefabIntegrationManager::s_prefabLoaderInterface = nullptr;
 
         const AZStd::string PrefabIntegrationManager::s_prefabFileExtension = ".prefab";
@@ -73,10 +73,10 @@ namespace AzToolsFramework
                 return;
             }
 
-            s_prefabEditInterface = AZ::Interface<PrefabEditInterface>::Get();
-            if (s_prefabEditInterface == nullptr)
+            s_prefabEditPublicInterface = AZ::Interface<PrefabEditPublicInterface>::Get();
+            if (s_prefabEditPublicInterface == nullptr)
             {
-                AZ_Assert(false, "Prefab - could not get PrefabEditInterface on PrefabIntegrationManager construction.");
+                AZ_Assert(false, "Prefab - could not get PrefabEditPublicInterface on PrefabIntegrationManager construction.");
                 return;
             }
 
@@ -137,16 +137,12 @@ namespace AzToolsFramework
 
                         for (AZ::EntityId entityId : selectedEntities)
                         {
-                            if (!layerInSelection)
-                            {
-                                AzToolsFramework::Layers::EditorLayerComponentRequestBus::EventResult(
-                                    layerInSelection, entityId,
-                                    &AzToolsFramework::Layers::EditorLayerComponentRequestBus::Events::HasLayer);
+                            AzToolsFramework::Layers::EditorLayerComponentRequestBus::EventResult(
+                                layerInSelection, entityId, &AzToolsFramework::Layers::EditorLayerComponentRequestBus::Events::HasLayer);
 
-                                if (layerInSelection)
-                                {
-                                    break;
-                                }
+                            if (layerInSelection)
+                            {
+                                break;
                             }
                         }
 
@@ -188,9 +184,18 @@ namespace AzToolsFramework
                         // Edit Prefab
                         if (prefabWipFeaturesEnabled)
                         {
-                            bool beingEdited = s_prefabEditInterface->IsOwningPrefabBeingEdited(selectedEntity);
+                            bool beingEdited = s_prefabEditPublicInterface->IsOwningPrefabBeingEdited(selectedEntity);
 
-                            if (!beingEdited)
+                            if (beingEdited)
+                            {
+                                QAction* closeAction = menu->addAction(QObject::tr("Close Prefab"));
+                                closeAction->setToolTip(QObject::tr("Close the prefab focus mode."));
+
+                                QObject::connect(closeAction, &QAction::triggered, closeAction, [this] {
+                                    ContextMenu_ClosePrefab();
+                                });
+                            }
+                            else
                             {
                                 QAction* editAction = menu->addAction(QObject::tr("Edit Prefab"));
                                 editAction->setToolTip(QObject::tr("Edit the prefab in focus mode."));
@@ -198,9 +203,9 @@ namespace AzToolsFramework
                                 QObject::connect(editAction, &QAction::triggered, editAction, [this, selectedEntity] {
                                     ContextMenu_EditPrefab(selectedEntity);
                                 });
-
-                                itemWasShown = true;
                             }
+
+                            itemWasShown = true;
                         }
 
                         // Save Prefab
@@ -379,7 +384,12 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::ContextMenu_EditPrefab(AZ::EntityId containerEntity)
         {
-            s_prefabEditInterface->EditOwningPrefab(containerEntity);
+            s_prefabEditPublicInterface->EditOwningPrefab(containerEntity);
+        }
+
+        void PrefabIntegrationManager::ContextMenu_ClosePrefab()
+        {
+            s_prefabEditPublicInterface->EditOwningPrefab(AZ::EntityId());
         }
 
         void PrefabIntegrationManager::ContextMenu_SavePrefab(AZ::EntityId containerEntity)
@@ -1007,8 +1017,6 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::OnPrefabComponentActivate(AZ::EntityId entityId)
         {
-            AZ_Printf("LYN-5265", "OnPrefabComponentActivate(%s)", entityId.ToString().c_str())
-
             if (s_prefabPublicInterface->IsLevelInstanceContainerEntity(entityId))
             {
                 s_editorEntityUiInterface->RegisterEntity(entityId, m_levelRootUiHandler.GetHandlerId());
@@ -1021,7 +1029,6 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::OnPrefabComponentDeactivate(AZ::EntityId entityId)
         {
-            AZ_Printf("LYN-5265", "OnPrefabComponentDeactivate(%s)", entityId.ToString().c_str())
             s_editorEntityUiInterface->UnregisterEntity(entityId);
         }
 
