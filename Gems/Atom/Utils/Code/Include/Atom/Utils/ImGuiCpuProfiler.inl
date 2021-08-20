@@ -19,12 +19,10 @@
 #include <AzCore/Serialization/Json/JsonSerializationResult.h>
 #include <AzCore/std/containers/map.h>
 #include <AzCore/std/containers/set.h>
+#include <AzCore/std/containers/stack.h>
 #include <AzCore/std/limits.h>
 #include <AzCore/std/sort.h>
 #include <AzCore/std/time.h>
-#include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
-#include <AzCore/std/containers/stack.h>
-#pragma optimize("", off)
 
 
 namespace AZ
@@ -140,6 +138,8 @@ namespace AZ
 
             inline void RecurseOnRegionTree(TableRow* region, const ImGuiTextFilter& filter, AZStd::function<bool(TableRow* rowToDraw)> drawFn)
             {
+                // Since we need to know if any of this node's children pass the filter before any ImGui::TreeNode() calls,
+                // we must traverse the tree twice. 
                 if (filter.IsActive() && !TreeNodePassesFilter(region, filter))
                 {
                     return;
@@ -157,7 +157,6 @@ namespace AZ
 
                     auto begin = region->m_children.begin();
                     auto end = region->m_children.end();
-
 
                     switch (sortSpecs->Specs->ColumnIndex)
                     {
@@ -177,6 +176,8 @@ namespace AZ
                         AZStd::sort(begin, end, TableRow::TableRowCompareFunctor(&TableRow::m_lastFrameTotalTicks, ascending));
                         break;
                     }
+
+                    // don't set sortSpecs->SpecsDirty = false because following frames would be unsorted. 
                 }
 
                 for (TableRow* childRegion : region->m_children)
