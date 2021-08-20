@@ -24,6 +24,7 @@
 #include <AzCore/std/time.h>
 #include "../../../Gems/ImGui/External/ImGui/v1.82/imgui/imgui.h"
 #include <AzCore/std/containers/stack.h>
+#pragma optimize("", off)
 
 
 namespace AZ
@@ -167,6 +168,7 @@ namespace AZ
                 {
                     RecurseOnRegionTree(childRegion, filter, drawFn);
                 }
+                ImGui::TreePop();
             }
         } // namespace CpuProfilerImGuiHelper
 
@@ -335,7 +337,9 @@ namespace AZ
 
                 const auto DrawTableRow = [](const TableRow* statistics) 
                 {
-                    bool opened = ImGui::TreeNode("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
+                    // note: this unsafe casting is only to get a valid pointer ID for ImGui. it will not be dereferenced
+                    void* nodeId = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
+                    bool opened = ImGui::TreeNode(nodeId, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
                     ImGui::TableNextColumn();
 
@@ -370,6 +374,7 @@ namespace AZ
                 }
 
                 const AZStd::sys_time_t lastFrameStartTick = m_frameEndTicks.at(m_frameEndTicks.size() - 2);
+                const AZStd::sys_time_t lastFrameEndTick = m_frameEndTicks.at(m_frameEndTicks.size() - 1);
 
                 for (const auto& [threadId, singleThreadData] : m_savedData)
                 {
@@ -384,7 +389,7 @@ namespace AZ
                     AZStd::stack<TableRow*> currentStack;
                     AZStd::vector<TableRow*> rootRegions;
 
-                    while (itr != singleThreadData.end())
+                    while (itr != singleThreadData.end() && itr->m_startTick < lastFrameEndTick)
                     {
                         const TimeRegion& region = *itr;
                         TableRow* rowPtr =
@@ -395,7 +400,7 @@ namespace AZ
                             rootRegions.push_back(rowPtr);
                         }
 
-                        if (region.m_stackDepth < currentStack.size())
+                        if (region.m_stackDepth <= currentStack.size())
                         {
                             while (!currentStack.empty() && region.m_stackDepth != currentStack.size())
                             {
@@ -406,12 +411,6 @@ namespace AZ
                             {
                                 currentStack.top()->m_children.push_back(rowPtr);
                             }
-                            currentStack.push(rowPtr);
-                        }
-                        else if (region.m_stackDepth == currentStack.size())
-                        {
-                            currentStack.pop();
-                            currentStack.top()->m_children.push_back(rowPtr);
                             currentStack.push(rowPtr);
                         }
                         else if (region.m_stackDepth == currentStack.size() + 1)
@@ -740,7 +739,7 @@ namespace AZ
                     newVisualizerData.begin(), newVisualizerData.end(),
                     [](const TimeRegion& lhs, const TimeRegion& rhs)
                     {
-                        return lhs.m_startTick < rhs.m_startTick;
+                        return lhs.m_startTick != rhs.m_startTick ? lhs.m_startTick < rhs.m_startTick : lhs.m_endTick > rhs.m_endTick;
                     });
 
                 // Use the latest frame's data as the new bounds of the viewport
