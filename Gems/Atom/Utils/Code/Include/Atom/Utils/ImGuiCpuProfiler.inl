@@ -120,6 +120,54 @@ namespace AZ
 
                 return Success(AZStd::move(serializer.m_cpuProfilingStatisticsSerializerEntries));
             }
+
+            inline void RecurseOnRegionTree(TableRow* region, const ImGuiTextFilter& filter, AZStd::function<bool(TableRow* rowToDraw)> drawFn)
+            {
+                if (!filter.PassFilter(region->m_groupName.c_str())
+                    && !filter.PassFilter(region->m_regionName.c_str()))
+                {
+                    return;
+                }
+
+                if(!drawFn(region))
+                {
+                    return;
+                }
+
+                ImGuiTableSortSpecs* sortSpecs = ImGui::TableGetSortSpecs();
+                if (sortSpecs && sortSpecs->SpecsDirty)
+                {
+                    bool ascending = sortSpecs->Specs->SortDirection == ImGuiSortDirection_Ascending;
+
+                    auto begin = region->m_children.begin();
+                    auto end = region->m_children.end();
+
+
+                    switch (sortSpecs->Specs->ColumnIndex)
+                    {
+                    case (0):
+                        AZStd::sort(begin, end, TableRow::TableRowCompareFunctor(&TableRow::m_regionName, ascending));
+                        break;
+                    case (1):
+                        AZStd::sort(begin, end, TableRow::TableRowCompareFunctor(&TableRow::m_runningAverageTicks, ascending));
+                        break;
+                    case (2):
+                        AZStd::sort(begin, end, TableRow::TableRowCompareFunctor(&TableRow::m_invocationsLastFrame, ascending));
+                        break;
+                    case (3):
+                        AZStd::sort(begin, end, TableRow::TableRowCompareFunctor(&TableRow::m_maxTicks, ascending));
+                        break;
+                    case (4):
+                        AZStd::sort(begin, end, TableRow::TableRowCompareFunctor(&TableRow::m_lastFrameTotalTicks, ascending));
+                        break;
+                    }
+                }
+
+                for (TableRow* childRegion : region->m_children)
+                {
+                    RecurseOnRegionTree(childRegion, filter, drawFn);
+                }
+            }
         } // namespace CpuProfilerImGuiHelper
 
         inline void ImGuiCpuProfiler::Draw(bool& keepDrawing, const AZ::RHI::CpuTimingStatistics& currentCpuTimingStatistics)
@@ -285,32 +333,9 @@ namespace AZ
                 ImGui::TableHeadersRow();
                 ImGui::TableNextColumn();
 
-                ImGuiTableSortSpecs* sortSpecs = ImGui::TableGetSortSpecs();
-                if (sortSpecs && sortSpecs->SpecsDirty)
+                const auto DrawTableRow = [](const TableRow* statistics) 
                 {
-                    SortTable(sortSpecs);
-                }
-
-                const auto DrawTableRow = [&filter = m_timedRegionFilter, &isTree = m_useStatisticsTreeView](const TableRow* statistics) -> bool
-                {
-                    if (!filter.PassFilter(statistics->m_groupName.c_str())
-                        && !filter.PassFilter(statistics->m_regionName.c_str()))
-                    {
-                        return false;
-                    }
-
-                    bool opened = false;
-                    if (isTree)
-                    {
-                        // This unsafe casting is to get a valid ID for ImGui. It will never be dereferenced.
-                        void* id = reinterpret_cast<void*>(const_cast<TableRow*>(statistics));
-                        opened = ImGui::TreeNode(id, "%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
-                    }
-                    else
-                    {
-                        ImGui::Text("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
-                    }
-
+                    bool opened = ImGui::TreeNode("%s: %s", statistics->m_groupName.c_str(), statistics->m_regionName.c_str());
                     const ImVec2 topLeftBound = ImGui::GetItemRectMin();
                     ImGui::TableNextColumn();
 
@@ -338,101 +363,76 @@ namespace AZ
                     return opened;
                 };
 
-                if (m_useStatisticsTreeView)
+                // Reconstruct the callstack every frame since it will change every frame
+                if (m_frameEndTicks.size() < 2)
                 {
-                    // Reconstruct the callstack every frame since it will change every frame 
-                    if (m_frameEndTicks.size() < 2)
-                    {
-                        return;
-                    }
-
-                    const AZStd::sys_time_t lastFrameStartTick = m_frameEndTicks.at(m_frameEndTicks.size() - 2);
-
-                    for (const auto& [threadId, singleThreadData] : m_savedData)
-                    {
-                        // Find first region of last frame 
-                        auto itr = AZStd::lower_bound(
-                            singleThreadData.begin(), singleThreadData.end(), lastFrameStartTick,
-                            [](const TimeRegion& wrapper, AZStd::sys_time_t target)
-                            {
-                                return wrapper.m_startTick < target;
-                            });
-
-                        // ImGui::TreeNode returns a bool based on whether or not the node is open - we need to store this to
-                        // call ImGui::TreePop() the correct number of times.
-                        AZStd::stack<bool> treeOpenedStack;
-
-                        while (itr != singleThreadData.end())
-                        {
-                            const TimeRegion& region = *itr;
-
-                            // Pop off until getting to the appropriate depth
-                            if (region.m_stackDepth < treeOpenedStack.size())
-                            {
-                                while (!treeOpenedStack.empty() && region.m_stackDepth != treeOpenedStack.size())
-                                {
-                                    if (treeOpenedStack.top())
-                                    {
-                                        ImGui::TreePop();
-                                    }
-                                    treeOpenedStack.pop();
-                                }
-                                treeOpenedStack.push(DrawTableRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
-                            }
-                            else if (treeOpenedStack.empty() || (treeOpenedStack.top() && region.m_stackDepth >= treeOpenedStack.size()))
-                            {
-                                treeOpenedStack.push(DrawTableRow(
-                                    &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName]));
-                            }
-                            ++itr;
-                        }
-
-                        while (!treeOpenedStack.empty())
-                        {
-                            if (treeOpenedStack.top())
-                            {
-                                ImGui::TreePop();
-                            }
-                            treeOpenedStack.pop();
-                        }
-                    }
+                    return;
                 }
-                else // Fallback to normal tabular view 
+
+                const AZStd::sys_time_t lastFrameStartTick = m_frameEndTicks.at(m_frameEndTicks.size() - 2);
+
+                for (const auto& [threadId, singleThreadData] : m_savedData)
                 {
-                    for (const auto* statistics : m_tableData)
+                    // Find first region of last frame
+                    auto itr = AZStd::lower_bound(
+                        singleThreadData.begin(), singleThreadData.end(), lastFrameStartTick,
+                        [](const TimeRegion& wrapper, AZStd::sys_time_t target)
+                        {
+                            return wrapper.m_startTick < target;
+                        });
+
+                    AZStd::stack<TableRow*> currentStack;
+                    AZStd::vector<TableRow*> rootRegions;
+
+                    while (itr != singleThreadData.end())
                     {
-                        DrawTableRow(statistics);
+                        const TimeRegion& region = *itr;
+                        TableRow* rowPtr =
+                            &m_groupRegionMap[region.m_groupRegionName->m_groupName][region.m_groupRegionName->m_regionName];
+                        rowPtr->m_children.clear();
+
+                        if (region.m_stackDepth == 0) {
+                            rootRegions.push_back(rowPtr);
+                        }
+
+                        if (region.m_stackDepth < currentStack.size())
+                        {
+                            while (!currentStack.empty() && region.m_stackDepth != currentStack.size())
+                            {
+                                currentStack.pop();
+                            }
+
+                            if (!currentStack.empty())
+                            {
+                                currentStack.top()->m_children.push_back(rowPtr);
+                            }
+                            currentStack.push(rowPtr);
+                        }
+                        else if (region.m_stackDepth == currentStack.size())
+                        {
+                            currentStack.pop();
+                            currentStack.top()->m_children.push_back(rowPtr);
+                            currentStack.push(rowPtr);
+                        }
+                        else if (region.m_stackDepth == currentStack.size() + 1)
+                        {
+                            currentStack.top()->m_children.push_back(rowPtr);
+                            currentStack.push(rowPtr);
+                        }
+                        else
+                        {
+                            AZ_Assert(false, "Error in drawing");
+                        }
+
+                        ++itr;
+                    }
+                    for (TableRow* rootRegion : rootRegions)
+                    {
+                        CpuProfilerImGuiHelper::RecurseOnRegionTree(rootRegion, m_timedRegionFilter, DrawTableRow);
                     }
                 }
             }
             ImGui::EndTable();
-        }
-
-        inline void ImGuiCpuProfiler::SortTable(ImGuiTableSortSpecs* sortSpecs)
-        {
-            const bool ascending = sortSpecs->Specs->SortDirection == ImGuiSortDirection_Ascending;
-            const ImS16 columnToSort = sortSpecs->Specs->ColumnIndex;
-                
-            switch (columnToSort)
-            {
-            case (0): // Sort by region name
-                AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_regionName, ascending));
-                break;
-            case (1): // Sort by average time
-                AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_runningAverageTicks, ascending));
-                break;
-            case (2): // Sort by max time
-                AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_maxTicks, ascending));
-                break;
-            case (3): // Sort by invocations
-                AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_invocationsLastFrame, ascending));
-                break;
-            case (4): // Sort by total time 
-                AZStd::sort(m_tableData.begin(), m_tableData.end(), TableRow::TableRowCompareFunctor(&TableRow::m_lastFrameTotalTicks, ascending));
-                break;
-            }
-            sortSpecs->SpecsDirty = false;
         }
 
         inline void ImGuiCpuProfiler::DrawStatisticsView()
@@ -486,8 +486,6 @@ namespace AZ
                     m_tableData.clear();
                     m_groupRegionMap.clear();
                 }
-                ImGui::SameLine();
-                ImGui::Checkbox("Tree View", &m_useStatisticsTreeView);
 
                 DrawTable();
             } 

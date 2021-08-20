@@ -52,6 +52,7 @@ namespace AZ
                
             AZStd::string m_groupName;
             AZStd::string m_regionName;
+            AZStd::vector<TableRow*> m_children;
 
             // --- Per frame statistics ---
 
@@ -213,8 +214,6 @@ namespace AZ
 
             // Index into the file picker, used to determine which file to load when "Load File" is pressed.
             int m_currentFileIndex = 0;
-
-            bool m_useStatisticsTreeView = false;
         };
     } // namespace Render
 } // namespace AZ
