@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -101,6 +102,14 @@ namespace AzNetworking
         //! @param reason      reason for the disconnect
         //! @return boolean true on success
         virtual bool Disconnect(ConnectionId connectionId, DisconnectReason reason) = 0;
+
+        //! Sets whether this connection interface can disconnect by virtue of a timeout
+        //! @param timeoutEnabled If this connection interface will automatically disconnect due to a timeout
+        virtual void SetTimeoutEnabled(bool timeoutEnabled) = 0;
+
+        //! Whether this connection interface will disconnect by virtue of a time out (does not account for cvars affecting all connections)
+        //! @return boolean true if this connection will not disconnect on timeout (does not account for cvars affecting all connections)
+        virtual bool IsTimeoutEnabled() const = 0;
 
         //! Const access to the metrics tracked by this network interface.
         //! @return const reference to the metrics tracked by this network interface

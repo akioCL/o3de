@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -112,7 +113,7 @@ namespace
 
     AZStd::string PyTrackViewGetSequenceName(unsigned int index)
     {
-        if (index < PyTrackViewGetNumSequences())
+        if (static_cast<int>(index) < PyTrackViewGetNumSequences())
         {
             const CTrackViewSequenceManager* pSequenceManager = GetIEditor()->GetSequenceManager();
             return pSequenceManager->GetSequenceByIndex(index)->GetName();
@@ -377,7 +378,7 @@ namespace
         }
 
         CTrackViewAnimNodeBundle foundNodes = pParentDirector->GetAllAnimNodes();
-        if (index < 0 || index >= foundNodes.GetCount())
+        if (index < 0 || index >= static_cast<int>(foundNodes.GetCount()))
         {
             throw std::runtime_error("Invalid node index");
         }

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -13,7 +14,8 @@
 
 #include <QBasicTimer>
 #include <QEvent>
-#include <QTreeView>
+
+#include <AzQtComponents/Components/Widgets/TreeView.h>
 #endif
 
 #pragma once
@@ -32,7 +34,7 @@ namespace AzToolsFramework
     //! allow for dragging and dropping of entities from the outliner into the property editor
     //! of other entities. If the selection updates instantly, this would never be possible.
     class EntityOutlinerTreeView
-        : public QTreeView
+        : public AzQtComponents::StyledTreeView
     {
         Q_OBJECT;
     public:
@@ -67,9 +69,7 @@ namespace AzToolsFramework
 
         void processQueuedMousePressedEvent(QMouseEvent* event);
 
-        void startCustomDrag(const QModelIndexList& indexList, Qt::DropActions supportedActions);
-
-        QImage createDragImage(const QModelIndexList& indexList);
+        void StartCustomDrag(const QModelIndexList& indexList, Qt::DropActions supportedActions) override;
 
         void PaintBranchBackground(QPainter* painter, const QRect& rect, const QModelIndex& index) const;
         

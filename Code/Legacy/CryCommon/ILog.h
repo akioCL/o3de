@@ -1,16 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
-
-// In Mac, including ILog without including platform.h first fails because platform.h 
-// includes CryThread.h which includes CryThread_pthreads.h which uses ILog. 
-// So plaform.h needs the contents of ILog.h.
-// By including platform.h outside of the guard, we give platform.h the right include order
-#include <platform.h>
 
 #ifndef CRYINCLUDE_CRYCOMMON_ILOG_H
 #define CRYINCLUDE_CRYCOMMON_ILOG_H
@@ -144,9 +138,7 @@ struct ILog
     virtual void Unindent(class CLogIndenter* indenter) = 0;
 #endif
 
-#if !defined(RESOURCE_COMPILER)
     virtual void FlushAndClose() = 0;
-#endif
 };
 
 #if !defined(SUPPORT_LOG_IDENTER)

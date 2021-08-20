@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -64,7 +65,7 @@ namespace AZ
 
                 AZ::JobCompletion jobCompletion;
                 const int numThreads = 8;
-                const int numPixelsPerThread = buffer->size() / numChannels / numThreads;
+                const int numPixelsPerThread = static_cast<int>(buffer->size() / numChannels / numThreads);
                 for (int i = 0; i < numThreads; ++i)
                 {
                     int startPixel = i * numPixelsPerThread;

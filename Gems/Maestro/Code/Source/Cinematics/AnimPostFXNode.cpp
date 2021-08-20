@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 
-#include "Maestro_precompiled.h"
 #include <AzCore/Serialization/SerializeContext.h>
 #include "AnimPostFXNode.h"
 #include "AnimSplineTrack.h"
@@ -39,7 +39,7 @@ public:
         virtual void GetDefault(bool& val) const = 0;
         virtual void GetDefault(Vec4& val) const = 0;
 
-        string m_name;
+        AZStd::string m_name;
 
     protected:
         virtual ~CControlParamBase(){}
@@ -288,13 +288,13 @@ void CAnimPostFXNode::SerializeAnims(XmlNodeRef& xmlNode, bool bLoading, bool bL
 //-----------------------------------------------------------------------------
 unsigned int CAnimPostFXNode::GetParamCount() const
 {
-    return m_pDescription->m_nodeParams.size();
+    return static_cast<unsigned int>(m_pDescription->m_nodeParams.size());
 }
 
 //-----------------------------------------------------------------------------
 CAnimParamType CAnimPostFXNode::GetParamType(unsigned int nIndex) const
 {
-    if (nIndex >= 0 && nIndex < (int)m_pDescription->m_nodeParams.size())
+    if (nIndex < m_pDescription->m_nodeParams.size())
     {
         return m_pDescription->m_nodeParams[nIndex].paramType;
     }

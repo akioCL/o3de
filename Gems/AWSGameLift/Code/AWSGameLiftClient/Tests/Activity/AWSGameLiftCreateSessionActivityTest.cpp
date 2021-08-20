@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -43,7 +44,7 @@ TEST_F(AWSGameLiftCreateSessionActivityTest, ValidateCreateSessionRequest_CallWi
 TEST_F(AWSGameLiftCreateSessionActivityTest, ValidateCreateSessionRequest_CallWithNegativeMaxPlayer_GetFalseResult)
 {
     AWSGameLiftCreateSessionRequest request;
-    request.m_maxPlayer = -1;
+    request.m_maxPlayer = std::numeric_limits<uint64_t>::max();
 
     auto result = CreateSessionActivity::ValidateCreateSessionRequest(request);
     EXPECT_FALSE(result);

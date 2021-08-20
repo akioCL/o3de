@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -97,7 +98,7 @@ namespace
 
     void SortEntityChildren(AZ::EntityId entityId, const EntityIdCompareFunc& comparer, AzToolsFramework::EntityOrderArray* newEntityOrder = nullptr)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         AzToolsFramework::EntityOrderArray entityOrderArray = AzToolsFramework::GetEntityChildOrder(entityId);
         AZStd::sort(entityOrderArray.begin(), entityOrderArray.end(), comparer);
@@ -111,7 +112,7 @@ namespace
 
     void SortEntityChildrenRecursively(AZ::EntityId entityId, const EntityIdCompareFunc& comparer)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         AzToolsFramework::EntityOrderArray entityOrderArray;
         SortEntityChildren(entityId, comparer, &entityOrderArray);
@@ -324,7 +325,7 @@ namespace AzToolsFramework
             return;
         }
 
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         EntityIdList newlySelected;
         ExtractEntityIdsFromSelection(selected, newlySelected);
@@ -471,7 +472,7 @@ namespace AzToolsFramework
     {
         if (m_selectionChangeQueued)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
 
             m_selectionChangeInProgress = true;
 
@@ -479,7 +480,7 @@ namespace AzToolsFramework
             {
                 // Calling Deselect for a large number of items is very slow,
                 // use a single ClearAndSelect call instead.
-                AZ_PROFILE_SCOPE(AZ::Debug::ProfileCategory::AzToolsFramework, "EntityOutlinerWidget::ModelEntitySelectionChanged:ClearAndSelect");
+                AZ_PROFILE_SCOPE(AzToolsFramework, "EntityOutlinerWidget::ModelEntitySelectionChanged:ClearAndSelect");
 
                 EntityIdList selectedEntities;
                 ToolsApplicationRequests::Bus::BroadcastResult(selectedEntities, &ToolsApplicationRequests::Bus::Events::GetSelectedEntities);
@@ -490,12 +491,12 @@ namespace AzToolsFramework
             else
             {
                 {
-                    AZ_PROFILE_SCOPE(AZ::Debug::ProfileCategory::AzToolsFramework, "EntityOutlinerWidget::ModelEntitySelectionChanged:Deselect");
+                    AZ_PROFILE_SCOPE(AzToolsFramework, "EntityOutlinerWidget::ModelEntitySelectionChanged:Deselect");
                     m_gui->m_objectTree->selectionModel()->select(
                         BuildSelectionFromEntities(m_entitiesToDeselect), QItemSelectionModel::Deselect);
                 }
                 {
-                    AZ_PROFILE_SCOPE(AZ::Debug::ProfileCategory::AzToolsFramework, "EntityOutlinerWidget::ModelEntitySelectionChanged:Select");
+                    AZ_PROFILE_SCOPE(AzToolsFramework, "EntityOutlinerWidget::ModelEntitySelectionChanged:Select");
                     m_gui->m_objectTree->selectionModel()->select(
                         BuildSelectionFromEntities(m_entitiesToSelect), QItemSelectionModel::Select);
                 }
@@ -518,7 +519,7 @@ namespace AzToolsFramework
     template <class EntityIdCollection>
     QItemSelection EntityOutlinerWidget::BuildSelectionFromEntities(const EntityIdCollection& entityIds)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
         QItemSelection selection;
 
         for (const auto& entityId : entityIds)
@@ -538,7 +539,7 @@ namespace AzToolsFramework
 
     void EntityOutlinerWidget::OnOpenTreeContextMenu(const QPoint& pos)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::Editor);
+        AZ_PROFILE_FUNCTION(Editor);
 
         bool isDocumentOpen = false;
         EBUS_EVENT_RESULT(isDocumentOpen, EditorRequests::Bus, IsLevelDocumentOpen);
@@ -1056,7 +1057,7 @@ namespace AzToolsFramework
 
     void EntityOutlinerWidget::OnSearchTextChanged(const QString& activeTextFilter)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
         AZStd::string filterString = activeTextFilter.toUtf8().data();
 
         m_listModel->SearchStringChanged(filterString);
@@ -1167,7 +1168,7 @@ namespace AzToolsFramework
 
     void EntityOutlinerWidget::SortContent()
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         m_sortContentQueued = false;
 
@@ -1203,7 +1204,7 @@ namespace AzToolsFramework
 
         if (sortMode != EntityOutliner::DisplaySortMode::Manually)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
             auto comparer = AZStd::bind(&CompareEntitiesForSorting, AZStd::placeholders::_1, AZStd::placeholders::_2, sortMode);
             SortEntityChildrenRecursively(AZ::EntityId(), comparer);
         }

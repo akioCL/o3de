@@ -1,11 +1,11 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include "AzToolsFramework_precompiled.h"
 #include "ComponentPaletteUtil.hxx"
 
 #include <AzCore/Debug/Profiler.h>
@@ -121,7 +121,7 @@ namespace AzToolsFramework
             ComponentDataTable &componentDataTable,
             ComponentIconTable &componentIconTable)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
             serializeContext->EnumerateDerived<AZ::Component>(
                 [&](const AZ::SerializeContext::ClassData* componentClass, const AZ::Uuid& knownType) -> bool
                 {
@@ -179,7 +179,7 @@ namespace AzToolsFramework
             const AZStd::vector<AZ::ComponentServiceType>& incompatibleServiceFilter
         )
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
             
             bool containsEditable = false;
 

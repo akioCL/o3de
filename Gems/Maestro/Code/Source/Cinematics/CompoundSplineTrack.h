@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -107,7 +108,7 @@ public:
 
     virtual int NextKeyByTime(int key) const;
 
-    void SetSubTrackName(const int i, const string& name) { assert (i < MAX_SUBTRACKS); m_subTrackNames[i] = name; }
+    void SetSubTrackName(const int i, const AZStd::string& name) { assert (i < MAX_SUBTRACKS); m_subTrackNames[i] = name; }
 
 #ifdef MOVIESYSTEM_SUPPORT_EDITING
     virtual ColorB GetCustomColor() const

@@ -1,5 +1,6 @@
 """
-Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
+Copyright (c) Contributors to the Open 3D Engine Project.
+For complete copyright and license terms please see the LICENSE at the root of this distribution.
 
 SPDX-License-Identifier: Apache-2.0 OR MIT
 """
@@ -36,7 +37,7 @@ class TestBasicEditorWorkflows(EditorTestHelper):
     async def run_test(self):
         """
         Summary:
-        Open Lumberyard editor and check if basic Editor workflows are completable.
+        Open O3DE editor and check if basic Editor workflows are completable.
 
         Expected Behavior:
         - A new level can be created
@@ -47,7 +48,7 @@ class TestBasicEditorWorkflows(EditorTestHelper):
         - Level can be exported
 
         Note:
-        - This test file must be called from the Lumberyard Editor command terminal
+        - This test file must be called from the O3DE Editor command terminal
         - Any passed and failed tests are written to the Editor.log file.
                 Parsing the file or running a log_monitor are required to observe the test results.
 

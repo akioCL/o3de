@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -158,8 +159,8 @@ public:
         return numElements != m_elements.size();
     }
 
-    ILINE  int Count() const { return m_elements.size(); }
-    ILINE  unsigned int Size() const { return m_elements.size(); }
+    ILINE  size_t Count() const { return m_elements.size(); }
+    ILINE  size_t Size() const { return m_elements.size(); }
 
     ILINE  int IsEmpty() const { return m_elements.empty(); }
 

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -28,9 +29,10 @@ namespace AZ
             if (auto* serializeContext = azrtti_cast<SerializeContext*>(context))
             {
                 serializeContext->Class<ModelAsset, Data::AssetData>()
-                    ->Version(0)
+                    ->Version(1)
                     ->Field("Name", &ModelAsset::m_name)
                     ->Field("Aabb", &ModelAsset::m_aabb)
+                    ->Field("MaterialSlots", &ModelAsset::m_materialSlots)
                     ->Field("LodAssets", &ModelAsset::m_lodAssets)
                     ;
             }
@@ -55,6 +57,25 @@ namespace AZ
         {
             return m_aabb;
         }
+        
+        const ModelMaterialSlotMap& ModelAsset::GetMaterialSlots() const
+        {
+            return m_materialSlots;
+        }
+            
+        const ModelMaterialSlot& ModelAsset::FindMaterialSlot(uint32_t stableId) const
+        {
+            auto iter = m_materialSlots.find(stableId);
+
+            if (iter == m_materialSlots.end())
+            {
+                return m_fallbackSlot;
+            }
+            else
+            {
+                return iter->second;
+            }
+        }
 
         size_t ModelAsset::GetLodCount() const
         {
@@ -75,7 +96,7 @@ namespace AZ
             const AZ::Vector3& rayStart, const AZ::Vector3& rayDir, bool allowBruteForce,
             float& distanceNormalized, AZ::Vector3& normal) const
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
 
             if (!m_modelTriangleCount)
             {

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -107,7 +108,7 @@ namespace AzNetworking
                 return true;
             }
 
-            totalPacketSize += packetFragments[index]->GetChunkBuffer().GetSize();
+            totalPacketSize += static_cast<uint32_t>(packetFragments[index]->GetChunkBuffer().GetSize());
         }
 
         // We now mark this sequence as delivered, so if by some chance all the individual chunks get redelivered again we don't double deliver the reconstructed packet
@@ -124,7 +125,7 @@ namespace AzNetworking
         uint8_t* bufferPointer = buffer.GetBuffer();
         for (uint32_t index = 0; index < packetFragments.size(); ++index)
         {
-            const uint32_t chunkSize = packetFragments[index]->GetChunkBuffer().GetSize();
+            const uint32_t chunkSize = static_cast<uint32_t>(packetFragments[index]->GetChunkBuffer().GetSize());
             memcpy(bufferPointer, packetFragments[index]->GetChunkBuffer().GetBuffer(), chunkSize);
             bufferPointer += chunkSize;
         }
@@ -132,7 +133,7 @@ namespace AzNetworking
         // We can erase all the chunks now, packet is completed
         m_packetFragments.erase(fragmentSequence);
 
-        NetworkOutputSerializer networkSerializer(buffer.GetBuffer(), buffer.GetSize());
+        NetworkOutputSerializer networkSerializer(buffer.GetBuffer(), static_cast<uint32_t>(buffer.GetSize()));
         {
             ISerializer& networkISerializer = networkSerializer; // To get the default typeinfo parameters in ISerializer
 

@@ -1,11 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include <TestImpactFramework/TestImpactFileUtils.h>
+#include <TestImpactFramework/TestImpactUtils.h>
 
 #include <Artifact/Factory/TestImpactTestEnumerationSuiteFactory.h>
 #include <TestEngine/TestImpactTestEngineException.h>
@@ -168,7 +169,7 @@ namespace TestImpact
                             WriteFileContents<TestEngineException>(SerializeTestEnumeration(enumeration.value()), jobInfo->GetCache()->m_file);
                         }
                     }
-                    catch (const Exception& e)
+                    catch ([[maybe_unused]] const Exception& e)
                     {
                         AZ_Warning("Enumerate", false, e.what());
                         enumerations[jobId] = AZStd::nullopt;

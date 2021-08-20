@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -89,8 +90,8 @@ namespace EMotionFX
         const Transform& parentBindTransform = node->GetParentNode()
             ? bindPose->GetModelSpaceTransform(node->GetParentIndex())
             : Transform::CreateIdentity();
-        const AZ::Quaternion& nodeBindRotationWorld = nodeBindTransform.mRotation;
-        const AZ::Quaternion& parentBindRotationWorld = parentBindTransform.mRotation;
+        const AZ::Quaternion& nodeBindRotationWorld = nodeBindTransform.m_rotation;
+        const AZ::Quaternion& parentBindRotationWorld = parentBindTransform.m_rotation;
 
         AZ::Vector3 boneDirection = GetBoneDirection(skeleton, node);
         AZStd::vector<AZ::Quaternion> exampleRotationsLocal;

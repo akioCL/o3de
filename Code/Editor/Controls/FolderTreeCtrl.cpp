@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -399,7 +400,7 @@ void CFolderTreeCtrl::RemoveEmptyFolderItems(const QString& folder)
 
 void CFolderTreeCtrl::Edit(const QString& path)
 {
-    CFileUtil::EditTextFile(QtUtil::ToString(path), 0, IFileUtil::FILE_TYPE_SCRIPT);
+    CFileUtil::EditTextFile(path.toUtf8().data(), 0, IFileUtil::FILE_TYPE_SCRIPT);
 }
 
 void CFolderTreeCtrl::ShowInExplorer(const QString& path)

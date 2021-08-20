@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -47,7 +48,7 @@ namespace AWSGameLift
             {
                 request.SetFleetId(createSessionRequest.m_fleetId.c_str());
             }
-            request.SetMaximumPlayerSessionCount(createSessionRequest.m_maxPlayer);
+            request.SetMaximumPlayerSessionCount(static_cast<int>(createSessionRequest.m_maxPlayer));
 
             AZ_TracePrintf(AWSGameLiftCreateSessionActivityName,
                 "Built CreateGameSessionRequest with CreatorId=%s, Name=%s, IdempotencyToken=%s, GameProperties=%s, AliasId=%s, FleetId=%s and MaximumPlayerSessionCount=%d",
@@ -89,7 +90,7 @@ namespace AWSGameLift
         {
             auto gameliftCreateSessionRequest = azrtti_cast<const AWSGameLiftCreateSessionRequest*>(&createSessionRequest);
 
-            return gameliftCreateSessionRequest && gameliftCreateSessionRequest->m_maxPlayer >= 0 &&
+            return gameliftCreateSessionRequest &&
                 (!gameliftCreateSessionRequest->m_aliasId.empty() || !gameliftCreateSessionRequest->m_fleetId.empty());
         }
     } // namespace CreateSessionActivity

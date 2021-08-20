@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -68,7 +69,7 @@ namespace TestImpact
             Policy::TestFailure testFailurePolicy,
             AZStd::optional<AZStd::chrono::milliseconds> testTargetTimeout,
             AZStd::optional<AZStd::chrono::milliseconds> globalTimeout,
-            AZStd::optional<TestEngineJobCompleteCallback> callback);
+            AZStd::optional<TestEngineJobCompleteCallback> callback) const;
 
         //! Performs a test run without any instrumentation and, for each test target, returns the test run results and metrics about the run.
         //! @param testTargets The test targets to run.
@@ -88,7 +89,7 @@ namespace TestImpact
             Policy::TargetOutputCapture targetOutputCapture,
             AZStd::optional<AZStd::chrono::milliseconds> testTargetTimeout,
             AZStd::optional<AZStd::chrono::milliseconds> globalTimeout,
-            AZStd::optional<TestEngineJobCompleteCallback> callback);
+            AZStd::optional<TestEngineJobCompleteCallback> callback) const;
 
         //! Performs a test run with instrumentation and, for each test target, returns the test run results, coverage data and metrics about the run.
         //! @param testTargets The test targets to run.
@@ -110,7 +111,7 @@ namespace TestImpact
             Policy::TargetOutputCapture targetOutputCapture,
             AZStd::optional<AZStd::chrono::milliseconds> testTargetTimeout,
             AZStd::optional<AZStd::chrono::milliseconds> globalTimeout,
-            AZStd::optional<TestEngineJobCompleteCallback> callback);
+            AZStd::optional<TestEngineJobCompleteCallback> callback) const;
 
     private:
         //! Cleans up the artifacts directory of any artifacts from previous runs.

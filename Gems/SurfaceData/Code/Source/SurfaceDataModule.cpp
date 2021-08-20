@@ -1,11 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
-#include "SurfaceData_precompiled.h"
 
 #include <SurfaceDataModule.h>
 #include <SurfaceDataSystemComponent.h>
@@ -21,7 +20,7 @@ namespace SurfaceData
             SurfaceDataSystemComponent::CreateDescriptor(),
             SurfaceDataColliderComponent::CreateDescriptor(),
             SurfaceDataShapeComponent::CreateDescriptor(),
-            TerrainSurfaceDataSystemComponent::CreateDescriptor(),
+            Terrain::TerrainSurfaceDataSystemComponent::CreateDescriptor(),
         });
     }
 
@@ -29,7 +28,7 @@ namespace SurfaceData
     {
         return AZ::ComponentTypeList{
             azrtti_typeid<SurfaceDataSystemComponent>(),
-            azrtti_typeid<TerrainSurfaceDataSystemComponent>(),
+            azrtti_typeid<Terrain::TerrainSurfaceDataSystemComponent>(),
         };
     }
 }

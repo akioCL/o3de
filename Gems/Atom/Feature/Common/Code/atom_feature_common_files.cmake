@@ -1,6 +1,7 @@
 #
-# Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
-# 
+# Copyright (c) Contributors to the Open 3D Engine Project.
+# For complete copyright and license terms please see the LICENSE at the root of this distribution.
+#
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 #
@@ -36,6 +37,8 @@ set(FILES
     Include/Atom/Feature/TransformService/TransformServiceFeatureProcessor.h
     Include/Atom/Feature/Utils/FrameCaptureBus.h
     Include/Atom/Feature/Utils/GpuBufferHandler.h
+    Include/Atom/Feature/Utils/IndexedDataVector.h
+    Include/Atom/Feature/Utils/IndexedDataVector.inl
     Include/Atom/Feature/Utils/MultiIndexedDataVector.h
     Include/Atom/Feature/Utils/MultiSparseVector.h
     Include/Atom/Feature/Utils/ProfilingCaptureBus.h
@@ -76,8 +79,6 @@ set(FILES
     Source/CoreLights/DiskLightFeatureProcessor.cpp
     Source/CoreLights/EsmShadowmapsPass.h
     Source/CoreLights/EsmShadowmapsPass.cpp
-    Source/CoreLights/IndexedDataVector.h
-    Source/CoreLights/IndexedDataVector.inl
     Source/CoreLights/LtcCommon.h
     Source/CoreLights/LtcCommon.cpp
     Source/CoreLights/PointLightFeatureProcessor.h

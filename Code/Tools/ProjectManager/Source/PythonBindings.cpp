@@ -1,5 +1,6 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
  *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
@@ -433,8 +434,6 @@ namespace O3DE::ProjectManager
         {
             return AZ::Success(AZStd::move(engineInfo));
         }
-
-        return AZ::Failure();
     }
 
     bool PythonBindings::SetEngineInfo(const EngineInfo& engineInfo)
@@ -645,6 +644,7 @@ namespace O3DE::ProjectManager
     {
         GemInfo gemInfo;
         gemInfo.m_path = Py_To_String(path);
+        gemInfo.m_directoryLink = gemInfo.m_path;
 
         auto data = m_manifest.attr("get_gem_json_data")(pybind11::none(), path, pyProjectPath);
         if (pybind11::isinstance<pybind11::dict>(data))
@@ -660,6 +660,7 @@ namespace O3DE::ProjectManager
                 gemInfo.m_version = "";
                 gemInfo.m_requirement = Py_To_String_Optional(data, "requirements", "");
                 gemInfo.m_creator = Py_To_String_Optional(data, "origin", "");
+                gemInfo.m_documentationLink = Py_To_String_Optional(data, "documentation_url", "");
 
                 if (gemInfo.m_creator.contains("Open 3D Engine"))
                 {

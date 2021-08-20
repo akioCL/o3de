@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -34,12 +35,14 @@ namespace AzToolsFramework
             m_instanceUpdateExecutor.RegisterInstanceUpdateExecutorInterface();
             m_instanceToTemplatePropagator.RegisterInstanceToTemplateInterface();
             m_prefabPublicHandler.RegisterPrefabPublicHandlerInterface();
+            m_prefabPublicRequestHandler.Connect();
             AZ::SystemTickBus::Handler::BusConnect();
         }
 
         void PrefabSystemComponent::Deactivate()
         {
             AZ::SystemTickBus::Handler::BusDisconnect();
+            m_prefabPublicRequestHandler.Disconnect();
             m_prefabPublicHandler.UnregisterPrefabPublicHandlerInterface();
             m_instanceToTemplatePropagator.UnregisterInstanceToTemplateInterface();
             m_instanceUpdateExecutor.UnregisterInstanceUpdateExecutorInterface();
@@ -53,6 +56,7 @@ namespace AzToolsFramework
             AzToolsFramework::Prefab::PrefabConversionUtils::PrefabConversionPipeline::Reflect(context);
             AzToolsFramework::Prefab::PrefabConversionUtils::PrefabCatchmentProcessor::Reflect(context);
             AzToolsFramework::Prefab::PrefabConversionUtils::EditorInfoRemover::Reflect(context);
+            PrefabPublicRequestHandler::Reflect(context);
 
             AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context);
             if (serialize)
@@ -61,7 +65,6 @@ namespace AzToolsFramework
             }
 
             AZ::JsonRegistrationContext* jsonRegistration = azrtti_cast<AZ::JsonRegistrationContext*>(context);
-
             if (jsonRegistration)
             {
                 jsonRegistration->Serializer<JsonInstanceSerializer>()->HandlesType<Instance>();

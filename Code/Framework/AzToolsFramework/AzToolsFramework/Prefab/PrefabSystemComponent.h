@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -23,6 +24,7 @@
 #include <AzToolsFramework/Prefab/PrefabIdTypes.h>
 #include <AzToolsFramework/Prefab/PrefabLoader.h>
 #include <AzToolsFramework/Prefab/PrefabPublicHandler.h>
+#include <AzToolsFramework/Prefab/PrefabPublicRequestHandler.h>
 #include <AzToolsFramework/Prefab/PrefabSystemComponentInterface.h>
 #include <AzToolsFramework/Prefab/Template/Template.h>
 
@@ -368,6 +370,9 @@ namespace AzToolsFramework
 
             // Used for updating Templates when Instances are modified
             InstanceToTemplatePropagator m_instanceToTemplatePropagator;
+
+            // Handler of the public Prefab requests
+            PrefabPublicRequestHandler m_prefabPublicRequestHandler;
         };
     } // namespace Prefab
 } // namespace AzToolsFramework

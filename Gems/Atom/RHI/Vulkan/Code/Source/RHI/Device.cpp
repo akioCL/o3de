@@ -1,12 +1,14 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include "Atom_RHI_Vulkan_precompiled.h"
 #include <Atom/RHI.Loader/FunctionLoader.h>
+#include <Atom/RHI.Reflect/Vulkan/PlatformLimitsDescriptor.h>
+#include <Atom/RHI/Factory.h>
 #include <Atom/RHI/RHISystemInterface.h>
 #include <Atom/RHI/TransientAttachmentPool.h>
 #include <AzCore/std/containers/set.h>
@@ -31,6 +33,13 @@ namespace AZ
 {
     namespace Vulkan
     {
+        Device::Device()
+        {
+            RHI::Ptr<PlatformLimitsDescriptor> platformLimitsDescriptor = aznew PlatformLimitsDescriptor();
+            platformLimitsDescriptor->LoadPlatformLimitsDescriptor(RHI::Factory::Get().GetName().GetCStr());
+            m_descriptor.m_platformLimitsDescriptor = RHI::Ptr<RHI::PlatformLimitsDescriptor>(platformLimitsDescriptor);
+        }
+
         RHI::Ptr<Device> Device::Create()
         {
             return aznew Device();
@@ -69,7 +78,7 @@ namespace AZ
 
             BuildDeviceQueueInfo(physicalDevice);
 
-            m_supportedPipelineStageFlagsMask = ~0;
+            m_supportedPipelineStageFlagsMask = std::numeric_limits<VkPipelineStageFlags>::max();
 
             const auto& deviceFeatures = physicalDevice.GetPhysicalDeviceFeatures();
             m_enabledDeviceFeatures.samplerAnisotropy = deviceFeatures.samplerAnisotropy;
@@ -165,12 +174,12 @@ namespace AZ
             VkPhysicalDeviceDepthClipEnableFeaturesEXT depthClipEnabled = {};
             depthClipEnabled.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT;
             depthClipEnabled.depthClipEnable = physicalDevice.GetPhysicalDeviceDepthClipEnableFeatures().depthClipEnable;
-            descriptorIndexingFeatures.pNext = &depthClipEnabled;
+            bufferDeviceAddressFeatures.pNext = &depthClipEnabled;
 
             VkPhysicalDeviceRobustness2FeaturesEXT robustness2 = {};
             robustness2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
             robustness2.nullDescriptor = physicalDevice.GetPhysicalDeviceRobutness2Features().nullDescriptor;
-            bufferDeviceAddressFeatures.pNext = &robustness2;
+            depthClipEnabled.pNext = &robustness2;
 
             VkPhysicalDeviceVulkan12Features vulkan12Features = {};
             VkPhysicalDeviceShaderFloat16Int8FeaturesKHR float16Int8 = {};
@@ -232,7 +241,7 @@ namespace AZ
             return RHI::ResultCode::Success;
         }
 
-        RHI::ResultCode Device::PostInitInternal( const RHI::DeviceDescriptor& descriptor)
+        RHI::ResultCode Device::InitializeLimits()
         {
             CommandQueueContext::Descriptor commandQueueContextDescriptor;
             commandQueueContextDescriptor.m_frameCountMax = RHI::Limits::Device::FrameCountMax;
@@ -241,7 +250,7 @@ namespace AZ
 
             // Initialize member variables.
             ReleaseQueue::Descriptor releaseQueueDescriptor;
-            releaseQueueDescriptor.m_collectLatency = descriptor.m_frameCountMax - 1;
+            releaseQueueDescriptor.m_collectLatency = m_descriptor.m_frameCountMax - 1;
             m_releaseQueue.Init(releaseQueueDescriptor);
             
 
@@ -272,7 +281,7 @@ namespace AZ
             poolDesc.m_heapMemoryLevel = RHI::HeapMemoryLevel::Host;
             poolDesc.m_hostMemoryAccess = RHI::HostMemoryAccess::Write;
             poolDesc.m_bindFlags = RHI::BufferBindFlags::CopyRead;
-            poolDesc.m_budgetInBytes = RHI::RHISystemInterface::Get()->GetPlatformLimitsDescriptor()->m_platformDefaultValues.m_stagingBufferBudgetInBytes;
+            poolDesc.m_budgetInBytes = m_descriptor.m_platformLimitsDescriptor->m_platformDefaultValues.m_stagingBufferBudgetInBytes;
             result = m_stagingBufferPool->Init(*this, poolDesc);
             RETURN_RESULT_IF_UNSUCCESSFUL(result);
 
@@ -652,6 +661,11 @@ namespace AZ
             return RHI::ResourceMemoryRequirements{ vkRequirements.alignment, vkRequirements.size };
         }
 
+        void Device::ObjectCollectionNotify(RHI::ObjectCollectorNotifyFunction notifyFunction)
+        {
+            m_releaseQueue.Notify(notifyFunction);
+        }
+
         void Device::InitFeaturesAndLimits(const PhysicalDevice& physicalDevice)
         {
             m_features.m_tessellationShader = (m_enabledDeviceFeatures.tessellationShader == VK_TRUE);
@@ -815,11 +829,12 @@ namespace AZ
             createInfo.size = descriptor.m_byteCount;
             createInfo.usage = GetBufferUsageFlagBitsUnderRestrictions(descriptor.m_bindFlags);
             // Trying to guess here if the buffers are going to be used as attachments. Maybe it would be better to add an explicit flag in the descriptor.
-            createInfo.sharingMode =
-                RHI::CheckBitsAny(
-                    descriptor.m_bindFlags,
-                    RHI::BufferBindFlags::ShaderWrite | RHI::BufferBindFlags::Predication | RHI::BufferBindFlags::Indirect)
-                ? VK_SHARING_MODE_EXCLUSIVE
+            createInfo.sharingMode = 
+                (RHI::CheckBitsAny(
+                    descriptor.m_bindFlags, 
+                    RHI::BufferBindFlags::ShaderWrite | RHI::BufferBindFlags::Predication | RHI::BufferBindFlags::Indirect) || 
+                    (queueFamilies.size()) <= 1) 
+                ? VK_SHARING_MODE_EXCLUSIVE 
                 : VK_SHARING_MODE_CONCURRENT;
             createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilies.size());
             createInfo.pQueueFamilyIndices = queueFamilies.empty() ? nullptr : queueFamilies.data();

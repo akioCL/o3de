@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -14,6 +15,11 @@ namespace AZ
 {
     namespace Debug
     {
+        namespace Platform
+        {
+            void OutputToDebugger(const char* window, const char* message);
+        }
+    
         /// Global instance to the tracer.
         extern class Trace      g_tracer;
 
@@ -127,7 +133,7 @@ namespace AZ
     #define AZ_TraceFmtCompileTimeCheck(expression, isVaArgs, baseMsg, msg, msgVargs)                                                                                                 \
     {                                                                                                                                                                                 \
         using namespace AZ::TraceInternal;                                                                                                                                            \
-        const auto& rTraceFmtCompileTimeCheckExpressionHelper = (expression); /* This is needed for edge cases for expressions containing lambdas, that were unsupported before C++20 */   \
+        [[maybe_unused]] const auto& rTraceFmtCompileTimeCheckExpressionHelper = (expression); /* This is needed for edge cases for expressions containing lambdas, that were unsupported before C++20 */   \
         constexpr ExpressionValidResult isValidTraceFmtResult = ExpressionIsValid<decltype(rTraceFmtCompileTimeCheckExpressionHelper)>::value;                                        \
         /* Assert different message depending whether it's const char array or if we have extra arguments */                                                                          \
         static_assert(!(isVaArgs) ? isValidTraceFmtResult != ExpressionValidResult::Invalid_ConstCharArray : true, baseMsg " " msg);                                                    \

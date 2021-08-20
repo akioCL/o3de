@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -15,6 +16,7 @@
 
 class CUiAnimViewAnimNode;
 class CEntityObject;
+class QWidget;
 
 namespace AZ
 {
@@ -25,7 +27,7 @@ namespace AZ
 class CUiAnimViewAnimNodeBundle
 {
 public:
-    unsigned int GetCount() const { return m_animNodes.size(); }
+    unsigned int GetCount() const { return static_cast<unsigned int>(m_animNodes.size()); }
     CUiAnimViewAnimNode* GetNode(const unsigned int index) { return m_animNodes[index]; }
     const CUiAnimViewAnimNode* GetNode(const unsigned int index) const { return m_animNodes[index]; }
 

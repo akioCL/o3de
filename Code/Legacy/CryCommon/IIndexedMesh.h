@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -2093,7 +2094,7 @@ public:
         {
             if (activeStreams & (1U << i))
             {
-                nMeshSize += ((i == VSF_GENERAL) ? sizeof(SVF_P3S_C4B_T2S) : cSizeStream[i]) * GetVertexCount();
+                nMeshSize += static_cast<uint32>(((i == VSF_GENERAL) ? sizeof(SVF_P3S_C4B_T2S) : cSizeStream[i]) * GetVertexCount());
                 nMeshSize += TARGET_DEFAULT_ALIGN - (nMeshSize & (TARGET_DEFAULT_ALIGN - 1));
             }
         }

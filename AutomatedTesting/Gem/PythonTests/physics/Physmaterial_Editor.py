@@ -1,5 +1,6 @@
 """
-Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
+Copyright (c) Contributors to the Open 3D Engine Project.
+For complete copyright and license terms please see the LICENSE at the root of this distribution.
 
 SPDX-License-Identifier: Apache-2.0 OR MIT
 """
@@ -132,7 +133,7 @@ class Physmaterial_Editor:
     def _set_path(self):
         # type: (str) -> str
         if self.document_filename == None:
-            self.document_filename = os.path.join(self.project_folder, "surfacetypemateriallibrary.physmaterial")
+            self.document_filename = os.path.join(self.project_folder, "assets", "physics", "surfacetypemateriallibrary.physmaterial")
         else:
             for (root, directories, root_files) in os.walk(self.project_folder):
                 for root_file in root_files:

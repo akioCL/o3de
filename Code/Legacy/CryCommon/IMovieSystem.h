@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -62,7 +63,7 @@ typedef IMovieSystem* (* PFNCREATEMOVIESYSTEM)(struct ISystem*);
 typedef std::vector<IAnimSequence*> AnimSequences;
 typedef AZStd::vector<AZStd::string> TrackEvents;
 
-// Forward declare, including will cause much pain with the precompiled headers
+// Forward declare
 enum class SequenceType;
 enum class AnimNodeType;
 enum class AnimValueType;
@@ -111,7 +112,7 @@ public:
     CAnimParamType()
         : m_type(kAnimParamTypeInvalid) {}
 
-    CAnimParamType(const string& name)
+    CAnimParamType(const AZStd::string& name)
     {
         *this = name;
     }
@@ -127,17 +128,12 @@ public:
         m_type = type;
     }
 
-    void operator =(const string& name)
-    {
-        m_type = kAnimParamTypeByString;
-        m_name = name;
-    }
-
     void operator =(const AZStd::string& name)
     {
         m_type = kAnimParamTypeByString;
         m_name = name;
     }
+
     // Convert to enum. This needs to be explicit,
     // otherwise operator== will be ambiguous
     AnimParamType GetType() const { return m_type; }
@@ -1436,7 +1432,7 @@ inline void SAnimContext::Serialize(XmlNodeRef& xmlNode, bool bLoading)
     {
         if (sequence)
         {
-            string fullname = sequence->GetName();
+            AZStd::string fullname = sequence->GetName();
             xmlNode->setAttr("sequence", fullname.c_str());
         }
         xmlNode->setAttr("dt", dt);

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -152,7 +153,7 @@ namespace EditorPythonBindings
                     StaticPropertyHolderMapEntry& entry = iter->second;
                     entry.second->AddProperty(propertyName, behaviorProperty);
                 }
-                PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogGlobalProperty, scopeName, propertyName, behaviorProperty);
+                PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogGlobalProperty, scopeName, propertyName, behaviorProperty);
             }
 
             pybind11::module DetermineScope(pybind11::module scope, const AZStd::string& fullName)
@@ -301,7 +302,7 @@ namespace EditorPythonBindings
 
                 // log global method symbol
                 AZStd::string subModuleName = pybind11::cast<AZStd::string>(targetModule.attr("__name__"));
-                PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogGlobalMethod, subModuleName, methodName, behaviorMethod);
+                PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogGlobalMethod, subModuleName, methodName, behaviorMethod);
             }
         }
 
@@ -324,7 +325,7 @@ namespace EditorPythonBindings
 
                 //  log global property symbol
                 AZStd::string subModuleName = pybind11::cast<AZStd::string>(globalsModule.attr("__name__"));
-                PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::LogGlobalProperty, subModuleName, propertyName, behaviorProperty);
+                PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::LogGlobalProperty, subModuleName, propertyName, behaviorProperty);
 
                 if (behaviorProperty->m_getter && behaviorProperty->m_setter)
                 {
@@ -376,7 +377,7 @@ namespace EditorPythonBindings
             PythonProxyBusManagement::CreateSubmodule(parentModule);
             Internal::RegisterPaths(parentModule);
 
-            PythonSymbolEventBus::Broadcast(&PythonSymbolEventBus::Events::Finalize);
+            PythonSymbolEventBus::QueueBroadcast(&PythonSymbolEventBus::Events::Finalize);
         }
     }
 }

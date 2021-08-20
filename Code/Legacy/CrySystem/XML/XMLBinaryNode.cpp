@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -319,7 +320,7 @@ bool CBinaryXmlNode::getAttr(const char* key, ColorB& value) const
             // If we only found 3 values, a should be unchanged, and still be 255
             if (r < 256 && g < 256 && b < 256 && a < 256)
             {
-                value = ColorB(r, g, b, a);
+                value = ColorB(static_cast<uint8>(r), static_cast<uint8>(g), static_cast<uint8>(b), static_cast<uint8>(a));
                 return true;
             }
         }

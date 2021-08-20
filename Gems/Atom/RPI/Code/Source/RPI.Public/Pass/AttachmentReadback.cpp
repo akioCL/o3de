@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -120,7 +121,7 @@ namespace AZ
 
             // Load shader and srg
             const char* ShaderPath = "shader/decomposemsimage.azshader";
-            m_decomposeShader = LoadShader(ShaderPath);
+            m_decomposeShader = LoadCriticalShader(ShaderPath);
 
             if (m_decomposeShader == nullptr)
             {

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -13,11 +14,13 @@
 
 #include <Cry_Vector2.h>
 #include <IXml.h>
+#include <CryCommon/IFont.h>
 #include <AzCore/std/containers/map.h>
 #include <AzCore/std/smart_ptr/weak_ptr.h>
 #include <AzCore/std/parallel/shared_mutex.h>
 #include <AzCore/Asset/AssetCommon.h>
 #include <map>
+#include <unordered_map>
 
 #include <AzFramework/Font/FontInterface.h>
 #include <AzFramework/Scene/SceneSystemInterface.h>
@@ -80,7 +83,7 @@ namespace AZ
         FontFamilyPtr GetFontFamily(const char* fontFamilyName) override;
         void AddCharsToFontTextures(FontFamilyPtr fontFamily, const char* chars, int glyphSizeX = ICryFont::defaultGlyphSizeX, int glyphSizeY = ICryFont::defaultGlyphSizeY) override;
         void GetMemoryUsage([[maybe_unused]] ICrySizer* sizer) const override {}
-        string GetLoadedFontNames() const;
+        AZStd::string GetLoadedFontNames() const;
         void OnLanguageChanged() override;
         void ReloadAllFonts() override;
         //////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +97,7 @@ namespace AZ
         void UnregisterFont(const char* fontName);
 
     private:
-        using FontMap = std::unordered_map<AzFramework::FontId, FFont*>;
+        using FontMap = AZStd::unordered_map<AzFramework::FontId, FFont*>;
         using FontMapItor = FontMap::iterator;
         using FontMapConstItor = FontMap::const_iterator;
 
@@ -122,7 +125,7 @@ namespace AZ
         //! \param fontFamilyName The name of the font family, or path to a font family file.
         //! \param outputDirectory Path to loaded font family (no filename), may need resolving with PathUtil::MakeGamePath.
         //! \param outputFullPath Full path to loaded font family, may need resolving with PathUtil::MakeGamePath.
-        XmlNodeRef LoadFontFamilyXml(const char* fontFamilyName, string& outputDirectory, string& outputFullPath);
+        XmlNodeRef LoadFontFamilyXml(const char* fontFamilyName, AZStd::string& outputDirectory, AZStd::string& outputFullPath);
 
         // Data::AssetBus::Handler overrides...
         void OnAssetReady(Data::Asset<Data::AssetData> asset) override;

@@ -1,11 +1,11 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include "precompiled.h"
 
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
@@ -311,7 +311,7 @@ namespace ScriptCanvasEditor
     {
         if (AZStd::wildcard_match("*.scriptcanvas", fullSourceFileName))
         {
-            return AzToolsFramework::AssetBrowser::SourceFileDetails("Icons/AssetBrowser/ScriptCanvas_16.png");
+            return AzToolsFramework::AssetBrowser::SourceFileDetails("Editor/Icons/AssetBrowser/ScriptCanvas_16.png");
         }
 
         // not one of our types.

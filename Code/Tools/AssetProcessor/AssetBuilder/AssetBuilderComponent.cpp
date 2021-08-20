@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -336,7 +337,7 @@ bool AssetBuilderComponent::ConnectToAssetProcessor()
     AZStd::string overridePort;
     if (GetParameter(s_paramPort, overridePort, false))
     {
-        connectionSettings.m_assetProcessorPort = AZStd::stoi(overridePort);
+        connectionSettings.m_assetProcessorPort = static_cast<AZ::u16>(AZStd::stoi(overridePort));
     }
 
     //the asset builder may have been given an optional asset platform to use

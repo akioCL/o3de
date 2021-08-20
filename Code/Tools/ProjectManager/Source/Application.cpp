@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -54,8 +55,6 @@ namespace O3DE::ProjectManager
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
         QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
-
-        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
         QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
         AzQtComponents::Utilities::HandleDpiAwareness(AzQtComponents::Utilities::SystemDpiAware);
@@ -169,8 +168,13 @@ namespace O3DE::ProjectManager
         // the decoration wrapper is intended to remember window positioning and sizing 
         auto wrapper = new AzQtComponents::WindowDecorationWrapper();
         wrapper->setGuest(m_mainWindow.data());
-        wrapper->show();
+
+        // show the main window here to apply the stylesheet before restoring geometry or we
+        // can end up with empty white space at the bottom of the window until the frame is resized again
         m_mainWindow->show();
+
+        wrapper->enableSaveRestoreGeometry("O3DE", "ProjectManager", "mainWindowGeometry");
+        wrapper->showFromSettings();
 
         qApp->setQuitOnLastWindowClosed(true);
 

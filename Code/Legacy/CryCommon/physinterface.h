@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -24,6 +25,8 @@
 #endif
 
 #include <ISystem.h>
+
+#include <AzCore/std/parallel/spin_mutex.h>
 
 //////////////////////////////////////////////////////////////////////////
 // Physics defines.
@@ -2833,8 +2836,8 @@ struct IGeometry
     virtual int PointInsideStatus(const Vec3& pt) = 0; // for meshes, will create an auxiliary hashgrid for acceleration
     // IntersectLocked - the main function for geomtries. pdata1,pdata2,pparams can be 0 - defaults will be assumed.
     // returns a pointer to an internal thread-specific contact buffer, locked with the lock argument
-    virtual int IntersectLocked(IGeometry* pCollider, geom_world_data* pdata1, geom_world_data* pdata2, intersection_params* pparams, geom_contact*& pcontacts,  WriteLockCond& lock) = 0;
-    virtual int IntersectLocked(IGeometry* pCollider, geom_world_data* pdata1, geom_world_data* pdata2, intersection_params* pparams, geom_contact*& pcontacts, WriteLockCond& lock, int iCaller) = 0;
+    virtual int IntersectLocked(IGeometry* pCollider, geom_world_data* pdata1, geom_world_data* pdata2, intersection_params* pparams, geom_contact*& pcontacts,  AZStd::spin_mutex& lock) = 0;
+    virtual int IntersectLocked(IGeometry* pCollider, geom_world_data* pdata1, geom_world_data* pdata2, intersection_params* pparams, geom_contact*& pcontacts, AZStd::spin_mutex& lock, int iCaller) = 0;
     // Intersect - same as Intersect, but doesn't lock pcontacts
     virtual int Intersect(IGeometry* pCollider, geom_world_data* pdata1, geom_world_data* pdata2, intersection_params* pparams, geom_contact*& pcontacts) = 0;
     // FindClosestPoint - for non-convex meshes only does local search, doesn't guarantee global minimum

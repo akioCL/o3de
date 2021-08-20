@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -89,24 +90,38 @@ namespace AzToolsFramework
             const QAbstractItemModel* model, const QModelIndex& parent /*= QModelIndex()*/, int row /*= 0*/)
         {
             int rows = model ? model->rowCount(parent) : 0;
-            for (int i = 0; i < rows; ++i)
+
+            if (parent == QModelIndex())
             {
-                QModelIndex index = model->index(i, 0, parent);
-                AssetBrowserEntry* entry = GetAssetEntry(m_filterModel->mapToSource(index));
-                //We only wanna see the source assets.
-                if (entry->GetEntryType() == AssetBrowserEntry::AssetEntryType::Source)
-                {
-                    beginInsertRows(parent, row, row);
-                    m_indexMap[row] = index;
-                    endInsertRows();
+                m_displayedItemsCounter = 0;
+            }
 
-                    Q_EMIT dataChanged(index, index);
-                    ++row;
+            for (int currentRow = 0; currentRow < rows; ++currentRow)
+            {
+                if (m_displayedItemsCounter < m_numberOfItemsDisplayed)
+                {
+                    QModelIndex index = model->index(currentRow, 0, parent);
+                    AssetBrowserEntry* entry = GetAssetEntry(m_filterModel->mapToSource(index));
+                    // We only want to see the source assets.
+                    if (entry->GetEntryType() == AssetBrowserEntry::AssetEntryType::Source)
+                    {
+                        beginInsertRows(parent, row, row);
+                        m_indexMap[row] = index;
+                        endInsertRows();
+
+                        Q_EMIT dataChanged(index, index);
+                        ++row;
+                        ++m_displayedItemsCounter;
+                    }
+
+                    if (model->hasChildren(index))
+                    {
+                        row = BuildTableModelMap(model, index, row);
+                    }
                 }
-
-                if (model->hasChildren(index))
+                else
                 {
-                    row = BuildTableModelMap(model, index, row);
+                    break;
                 }
             }
             return row;
@@ -134,6 +149,10 @@ namespace AzToolsFramework
                 m_indexMap.clear();
                 endRemoveRows();
             }
+
+            AzToolsFramework::EditorSettingsAPIBus::BroadcastResult(
+                m_numberOfItemsDisplayed, &AzToolsFramework::EditorSettingsAPIBus::Handler::GetMaxNumberOfItemsShownInSearchView);
+
             BuildTableModelMap(sourceModel());
             emit layoutChanged();
         }

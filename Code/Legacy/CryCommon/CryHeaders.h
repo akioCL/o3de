@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -16,7 +17,7 @@
 
 #ifdef MAX_SUB_MATERIALS
 // This checks that the values are in sync in the different files.
-COMPILE_TIME_ASSERT(MAX_SUB_MATERIALS == 128);
+static_assert(MAX_SUB_MATERIALS == 128);
 #else
     #define MAX_SUB_MATERIALS 128
 #endif
@@ -394,7 +395,7 @@ struct MotionParams905
     MotionParams905()
     {
         m_nAssetFlags = 0;
-        m_nCompression = -1;
+        m_nCompression = std::numeric_limits<uint32>::max();
         m_nTicksPerFrame = 0;
         m_fSecsPerTick = 0;
         m_nStart = 0;

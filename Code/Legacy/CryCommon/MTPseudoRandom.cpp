@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -62,7 +63,7 @@ void CMTRand_int32::seed(const uint32* array, int size)   // init by array
     }
     for (int k = n - 1; k; --k)
     {
-        PREFAST_SUPPRESS_WARNING(6385)  PREFAST_SUPPRESS_WARNING(6386)  m_nState[i] = (m_nState[i] ^ ((m_nState[i - 1] ^ (m_nState[i - 1] >> 30)) * 1566083941UL)) - i;
+        m_nState[i] = (m_nState[i] ^ ((m_nState[i - 1] ^ (m_nState[i - 1] >> 30)) * 1566083941UL)) - i;
         if ((++i) == n)
         {
             m_nState[0] = m_nState[n - 1];

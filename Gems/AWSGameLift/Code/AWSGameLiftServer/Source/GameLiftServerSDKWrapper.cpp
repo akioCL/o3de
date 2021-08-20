@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -8,8 +9,6 @@
 #include <GameLiftServerSDKWrapper.h>
 
 #include <ctime>
-
-#pragma warning(disable : 4996)
 
 namespace AWSGameLift
 {
@@ -55,7 +54,13 @@ namespace AWSGameLift
         }
 
         char buffer[50];
-        strftime(buffer, sizeof(buffer), "%FT%TZ", gmtime(&terminationTime));
+        tm time;
+#if AZ_TRAIT_USE_SECURE_CRT_FUNCTIONS
+        gmtime_s(&time, &terminationTime);
+#else
+        time = *gmtime(&terminationTime);
+#endif
+        strftime(buffer, sizeof(buffer), "%FT%TZ", &time);
 
         return AZStd::string(buffer);
     }

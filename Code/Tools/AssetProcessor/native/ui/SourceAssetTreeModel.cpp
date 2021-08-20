@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -93,7 +94,7 @@ namespace AssetProcessor
         AZ::IO::Path currentFullFolderPath(AZ::IO::PosixPathSeparator);
         const AZ::IO::FixedMaxPath filename = fullPath.Filename();
         fullPath.RemoveFilename();
-        AZStd::fixed_string<AZ::IO::MaxPathLength> currentPath;
+        AZ::IO::FixedMaxPathString currentPath;
         for (auto pathIt = fullPath.begin(); pathIt != fullPath.end(); ++pathIt)
         {
             currentPath = pathIt->FixedMaxPathString();
@@ -124,7 +125,7 @@ namespace AssetProcessor
         }
 
         m_sourceToTreeItem[source.m_sourceName] =
-            parentItem->CreateChild(SourceAssetTreeItemData::MakeShared(&source, &scanFolder, source.m_sourceName, AZStd::fixed_string<AZ::IO::MaxPathLength>(filename.Native()).c_str(), false));
+            parentItem->CreateChild(SourceAssetTreeItemData::MakeShared(&source, &scanFolder, source.m_sourceName, AZ::IO::FixedMaxPathString(filename.Native()).c_str(), false));
         m_sourceIdToTreeItem[source.m_sourceID] = m_sourceToTreeItem[source.m_sourceName];
         if (!modelIsResetting)
         {

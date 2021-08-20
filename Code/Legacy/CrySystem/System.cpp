@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -48,9 +49,7 @@
 #endif
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-// If app hasn't chosen, set to work with Windows 98, Windows Me, Windows 2000, Windows XP and beyond
-#include <windows.h>
+#include <AzCore/PlatformIncl.h>
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -89,14 +88,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     // Handle with the default procedure
-#if defined(UNICODE) || defined(_UNICODE)
     assert(IsWindowUnicode(hWnd) && "Window should be Unicode when compiling with UNICODE");
-#else
-    if (!IsWindowUnicode(hWnd))
-    {
-        return DefWindowProcA(hWnd, uMsg, wParam, lParam);
-    }
-#endif
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 #endif
@@ -139,7 +131,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 #include "RemoteConsole/RemoteConsole.h"
 
 #include <PNoise3.h>
-#include <StringUtils.h>
 
 #include <LyShine/Bus/UiCursorBus.h>
 #include <AzFramework/Asset/AssetSystemBus.h>
@@ -710,7 +701,7 @@ void CSystem::SleepIfNeeded()
     int sleepMS = (int)(1000.0f * sleepTime + 0.5f);
     if (sleepMS > 0)
     {
-        AZ_PROFILE_FUNCTION_IDLE(AZ::Debug::ProfileCategory::System);
+        AZ_PROFILE_FUNCTION(System);
         Sleep(sleepMS);
     }
 
@@ -899,24 +890,6 @@ bool CSystem::UpdatePreTickBus(int updateFlags, int nPauseMode)
     {
         Quit();
         return false;
-    }
-
-       //////////////////////////////////////////////////////////////////////
-       //update sound system Part 1 if in Editor / in Game Mode Viewsystem updates the Listeners
-    if (!m_env.IsEditorGameMode())
-    {
-        if ((updateFlags & ESYSUPDATE_EDITOR) != 0 && !bNoUpdate && nPauseMode != 1)
-        {
-            // updating the Listener Position in a first separate step.
-            // Updating all views here is a bit of a workaround, since we need
-            // to ensure that sound listeners owned by inactive views are also
-            // marked as inactive. Ideally that should happen when exiting game mode.
-            if (GetIViewSystem())
-            {
-                FRAME_PROFILER("SysUpdate:UpdateSoundListeners", this, PROFILE_SYSTEM);
-                GetIViewSystem()->UpdateSoundListeners();
-            }
-        }
     }
 
     // Use UI timer for CryMovie, because it should not be affected by pausing game time
@@ -1157,7 +1130,7 @@ void CSystem::WarningV(EValidatorModule module, EValidatorSeverity severity, int
     if (sModuleFilter && *sModuleFilter != 0)
     {
         const char* sModule = ValidatorModuleToString(module);
-        if (strlen(sModule) > 1 || CryStringUtils::stristr(sModule, sModuleFilter) == 0)
+        if (strlen(sModule) > 1 || AZ::StringFunc::Find(sModule, sModuleFilter) == AZStd::string::npos)
         {
             // Filter out warnings from other modules.
             return;
@@ -1191,7 +1164,7 @@ void CSystem::WarningV(EValidatorModule module, EValidatorSeverity severity, int
 
     if (file && *file)
     {
-        CryFixedStringT<MAX_WARNING_LENGTH> fmt = szBuffer;
+        AZStd::fixed_string<MAX_WARNING_LENGTH> fmt = szBuffer;
         fmt += " [File=";
         fmt += file;
         fmt += "]";
@@ -1210,10 +1183,11 @@ void CSystem::WarningV(EValidatorModule module, EValidatorSeverity severity, int
 }
 
 //////////////////////////////////////////////////////////////////////////
-void CSystem::GetLocalizedPath(const char* sLanguage, string& sLocalizedPath)
+void CSystem::GetLocalizedPath(const char* sLanguage, AZStd::string& sLocalizedPath)
 {
     // Omit the trailing slash!
-    string sLocalizationFolder(string().assign(PathUtil::GetLocalizationFolder(), 0, PathUtil::GetLocalizationFolder().size() - 1));
+    AZStd::string sLocalizationFolder(PathUtil::GetLocalizationFolder());
+    sLocalizationFolder.pop_back();
 
     int locFormat = 0;
     LocalizationManagerRequestBus::BroadcastResult(locFormat, &LocalizationManagerRequestBus::Events::GetLocalizationFormat);
@@ -1223,37 +1197,38 @@ void CSystem::GetLocalizedPath(const char* sLanguage, string& sLocalizedPath)
     }
     else
     {
-    if (sLocalizationFolder.compareNoCase("Languages") != 0)
-    {
-        sLocalizedPath = sLocalizationFolder + "/" + sLanguage + "_xml.pak";
-    }
-    else
-    {
-        sLocalizedPath = string("Localized/") + sLanguage + "_xml.pak";
+        if (AZ::StringFunc::Equal(sLocalizationFolder, "Languages", false))
+        {
+            sLocalizedPath = sLocalizationFolder + "/" + sLanguage + "_xml.pak";
+        }
+        else
+        {
+            sLocalizedPath = AZStd::string("Localized/") + sLanguage + "_xml.pak";
         }
     }
 }
 
 //////////////////////////////////////////////////////////////////////////
-void CSystem::GetLocalizedAudioPath(const char* sLanguage, string& sLocalizedPath)
+void CSystem::GetLocalizedAudioPath(const char* sLanguage, AZStd::string& sLocalizedPath)
 {
     // Omit the trailing slash!
-    string sLocalizationFolder(string().assign(PathUtil::GetLocalizationFolder(), 0, PathUtil::GetLocalizationFolder().size() - 1));
+    AZStd::string sLocalizationFolder(PathUtil::GetLocalizationFolder());
+    sLocalizationFolder.pop_back();
 
-    if (sLocalizationFolder.compareNoCase("Languages") != 0)
+    if (AZ::StringFunc::Equal(sLocalizationFolder, "Languages", false))
     {
         sLocalizedPath = sLocalizationFolder + "/" + sLanguage + ".pak";
     }
     else
     {
-        sLocalizedPath = string("Localized/") + sLanguage + ".pak";
+        sLocalizedPath = AZStd::string("Localized/") + sLanguage + ".pak";
     }
 }
 
 //////////////////////////////////////////////////////////////////////////
 void CSystem::CloseLanguagePak(const char* sLanguage)
 {
-    string sLocalizedPath;
+    AZStd::string sLocalizedPath;
     GetLocalizedPath(sLanguage, sLocalizedPath);
     m_env.pCryPak->ClosePacks({ sLocalizedPath.c_str(), sLocalizedPath.size() });
 }
@@ -1261,7 +1236,7 @@ void CSystem::CloseLanguagePak(const char* sLanguage)
 //////////////////////////////////////////////////////////////////////////
 void CSystem::CloseLanguageAudioPak(const char* sLanguage)
 {
-    string sLocalizedPath;
+    AZStd::string sLocalizedPath;
     GetLocalizedAudioPath(sLanguage, sLocalizedPath);
     m_env.pCryPak->ClosePacks({ sLocalizedPath.c_str(), sLocalizedPath.size() });
 }
@@ -1335,11 +1310,11 @@ void CSystem::ExecuteCommandLine(bool deferred)
 
         if (pCmd->GetType() == eCLAT_Post)
         {
-            string sLine = pCmd->GetName();
+            AZStd::string sLine = pCmd->GetName();
             {
                 if (pCmd->GetValue())
                 {
-                    sLine += string(" ") + pCmd->GetValue();
+                    sLine += AZStd::string(" ") + pCmd->GetValue();
                 }
 
                 GetILog()->Log("Executing command from command line: \n%s\n", sLine.c_str()); // - the actual command might be executed much later (e.g. level load pause)
@@ -1428,20 +1403,6 @@ void CSystem::OnLanguageCVarChanged(ICVar* language)
                 gEnv->pCryFont->OnLanguageChanged();
             }
         }
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-void CSystem::OnLanguageAudioCVarChanged(ICVar* language)
-{
-    static Audio::SAudioRequest oLanguageRequest;
-    static Audio::SAudioManagerRequestData<Audio::eAMRT_CHANGE_LANGUAGE> oLanguageRequestData;
-
-    if (language && (language->GetType() == CVAR_STRING))
-    {
-        oLanguageRequest.pData = &oLanguageRequestData;
-        oLanguageRequest.nFlags = Audio::eARF_PRIORITY_HIGH;
-        Audio::AudioSystemRequestBus::Broadcast(&Audio::AudioSystemRequestBus::Events::PushRequest, oLanguageRequest);
     }
 }
 

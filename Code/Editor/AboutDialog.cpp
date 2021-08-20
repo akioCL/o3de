@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -24,7 +25,7 @@ AZ_PUSH_DISABLE_DLL_EXPORT_MEMBER_WARNING
 #include <ui_AboutDialog.h>
 AZ_POP_DISABLE_DLL_EXPORT_MEMBER_WARNING
 
-CAboutDialog::CAboutDialog(QString versionText, QString richTextCopyrightNotice, QWidget* pParent /*=NULL*/)
+CAboutDialog::CAboutDialog(QString versionText, QString richTextCopyrightNotice, QWidget* pParent /*=nullptr*/)
     : QDialog(pParent)
     , m_ui(new Ui::CAboutDialog)
 {

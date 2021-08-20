@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -50,6 +51,7 @@ namespace AZ
             void ModifyFrameSchedulerStatisticsFlags(RHI::FrameSchedulerStatisticsFlags statisticsFlags, bool enableFlags) override;
             const RHI::CpuTimingStatistics* GetCpuTimingStatistics() const override;
             const RHI::TransientAttachmentStatistics* GetTransientAttachmentStatistics() const override;
+            const RHI::MemoryStatistics* GetMemoryStatistics() const override;
             const RHI::TransientAttachmentPoolDescriptor* GetTransientAttachmentPoolDescriptor() const override;
             ConstPtr<PlatformLimitsDescriptor> GetPlatformLimitsDescriptor() const override;
             void QueueRayTracingShaderTableForBuild(RayTracingShaderTable* rayTracingShaderTable) override;
@@ -66,7 +68,6 @@ namespace AZ
             RHI::FrameScheduler m_frameScheduler;
             RHI::FrameSchedulerCompileRequest m_compileRequest;
 
-            ConstPtr<PlatformLimitsDescriptor> m_platformLimitsDescriptor = nullptr;
             RHI::CpuProfilerImpl m_cpuProfiler;
         };
     } // namespace RPI

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -79,7 +80,7 @@ namespace AWSCore
     {
 #ifdef AWSCORE_EDITOR_RESOURCE_MAPPING_TOOL_ENABLED
         AWSCoreResourceMappingToolAction* resourceMappingTool =
-            new AWSCoreResourceMappingToolAction(QObject::tr(AWSResourceMappingToolActionText));
+            new AWSCoreResourceMappingToolAction(QObject::tr(AWSResourceMappingToolActionText), this);
         QObject::connect(resourceMappingTool, &QAction::triggered, this,
             [resourceMappingTool, this]() {
                 AZStd::string launchCommand = resourceMappingTool->GetToolLaunchCommand();
@@ -108,7 +109,7 @@ namespace AWSCore
 
                 if (!m_resourceMappingToolWatcher || !m_resourceMappingToolWatcher->IsProcessRunning())
                 {
-                    AZStd::string resourceMappingToolLogPath = resourceMappingTool->GetToolLogPath();
+                    AZStd::string resourceMappingToolLogPath = resourceMappingTool->GetToolLogFilePath();
                     AZStd::string message = AZStd::string::format(AWSResourceMappingToolLogWarningText, resourceMappingToolLogPath.c_str());
                     QMessageBox::warning(QApplication::activeWindow(), "Warning", message.c_str(), QMessageBox::Ok);
                 }

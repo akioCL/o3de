@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -18,7 +19,7 @@ namespace AZ
 {
     namespace Render
     {
-        static const size_t DefaultMaterialSlotIndex = -1;
+        static const size_t DefaultMaterialSlotIndex = std::numeric_limits<size_t>::max();
 
         //! Details for a single editable material assignment
         struct EditorMaterialComponentSlot final
@@ -33,7 +34,7 @@ namespace AZ
             AZStd::string GetLabel() const;
             bool HasSourceData() const;
             void OpenMaterialEditor() const;
-            void SetDefaultAsset();
+            void ResetToDefaultAsset();
             void Clear();
             void ClearOverrides();
             void OpenMaterialExporter();
@@ -41,7 +42,9 @@ namespace AZ
             void OpenUvNameMapInspector();
 
             MaterialAssignmentId m_id;
+            AZStd::string m_label;
             Data::Asset<RPI::MaterialAsset> m_materialAsset;
+            Data::Asset<RPI::MaterialAsset> m_defaultMaterialAsset;
             MaterialPropertyOverrideMap m_propertyOverrides;
             AZStd::function<void()> m_materialChangedCallback;
             AZStd::function<void()> m_propertyChangedCallback;

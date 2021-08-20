@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -106,8 +107,7 @@ namespace AZ
 
             if (m_deviceBufferNeedsUpdate)
             {
-                [[maybe_unused]] bool success = m_lightBufferHandler.UpdateBuffer(m_capsuleLightData.GetDataVector());
-                AZ_Error(FeatureProcessorName, success, "Unable to update buffer during Simulate().");
+                m_lightBufferHandler.UpdateBuffer(m_capsuleLightData.GetDataVector());
                 m_deviceBufferNeedsUpdate = false;
             }
         }

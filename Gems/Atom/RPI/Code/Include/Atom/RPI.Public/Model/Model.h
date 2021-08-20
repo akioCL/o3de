@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -89,8 +90,8 @@ namespace AZ
         private:
             Model() = default;
 
-            static Data::Instance<Model> CreateInternal(ModelAsset& modelAsset);
-            RHI::ResultCode Init(ModelAsset& modelAsset);
+            static Data::Instance<Model> CreateInternal(const Data::Asset<ModelAsset>& modelAsset);
+            RHI::ResultCode Init(const Data::Asset<ModelAsset>& modelAsset);
 
             AZStd::fixed_vector<Data::Instance<ModelLod>, ModelLodAsset::LodCountMax> m_lods;
             Data::Asset<ModelAsset> m_modelAsset;

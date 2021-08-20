@@ -1,12 +1,14 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 #include <ExpressionEvaluationSystemComponent.h>
 
+#include <AzCore/Debug/Profiler.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
@@ -250,7 +252,7 @@ namespace ExpressionEvaluation
 
     AZ::Outcome<void, ParsingError> ExpressionEvaluationSystemComponent::ParseRestrictedExpressionInPlace(const AZStd::unordered_set<ExpressionParserId>& parsers, AZStd::string_view expressionString, ExpressionTree& expressionTree) const
     {
-        AZ_PROFILE_TIMER("ExpressionEvaluation", __FUNCTION__);
+        AZ_PROFILE_FUNCTION(ExpressionEvaluation);
 
         expressionTree.ClearTree();
 
@@ -512,7 +514,7 @@ namespace ExpressionEvaluation
 
     ExpressionResult ExpressionEvaluationSystemComponent::Evaluate(const ExpressionTree& expressionTree) const
     {
-        AZ_PROFILE_TIMER("ExpressionEvaluation", __FUNCTION__);
+        AZ_PROFILE_FUNCTION(ExpressionEvaluation);
 
         ExpressionResultStack resultStack;
 

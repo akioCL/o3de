@@ -1,11 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include <TestImpactFramework/TestImpactFileUtils.h>
+#include <TestImpactFramework/TestImpactUtils.h>
 
 #include <Target/TestImpactTestTarget.h>
 #include <TestEngine/TestImpactTestEngineException.h>
@@ -261,7 +262,7 @@ namespace TestImpact
         Policy::TestFailure testFailurePolicy,
         AZStd::optional<AZStd::chrono::milliseconds> testTargetTimeout,
         AZStd::optional<AZStd::chrono::milliseconds> globalTimeout,
-        AZStd::optional<TestEngineJobCompleteCallback> callback)
+        AZStd::optional<TestEngineJobCompleteCallback> callback) const
     {
         TestEngineJobMap<TestEnumerator::JobInfo::IdType> engineJobs;
         const auto jobInfos = m_testJobInfoGenerator->GenerateTestEnumerationJobInfos(testTargets, TestEnumerator::JobInfo::CachePolicy::Write);
@@ -284,7 +285,7 @@ namespace TestImpact
         [[maybe_unused]]Policy::TargetOutputCapture targetOutputCapture,
         AZStd::optional<AZStd::chrono::milliseconds> testTargetTimeout,
         AZStd::optional<AZStd::chrono::milliseconds> globalTimeout,
-        AZStd::optional<TestEngineJobCompleteCallback> callback)
+        AZStd::optional<TestEngineJobCompleteCallback> callback) const
     {
         DeleteArtifactXmls();
 
@@ -311,7 +312,7 @@ namespace TestImpact
         [[maybe_unused]]Policy::TargetOutputCapture targetOutputCapture,
         AZStd::optional<AZStd::chrono::milliseconds> testTargetTimeout,
         AZStd::optional<AZStd::chrono::milliseconds> globalTimeout,
-        AZStd::optional<TestEngineJobCompleteCallback> callback)
+        AZStd::optional<TestEngineJobCompleteCallback> callback) const
     {
         DeleteArtifactXmls();
 

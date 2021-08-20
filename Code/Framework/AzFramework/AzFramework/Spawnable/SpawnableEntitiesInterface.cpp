@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -226,8 +227,10 @@ namespace AzFramework
 
     EntitySpawnTicket::EntitySpawnTicket(EntitySpawnTicket&& rhs)
         : m_payload(rhs.m_payload)
+        , m_id(rhs.m_id)
     {
         rhs.m_payload = nullptr;
+        rhs.m_id = 0;
     }
 
     EntitySpawnTicket::EntitySpawnTicket(AZ::Data::Asset<Spawnable> spawnable)

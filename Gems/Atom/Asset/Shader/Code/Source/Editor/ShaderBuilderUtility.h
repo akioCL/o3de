@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -93,10 +94,6 @@ namespace AZ
                 RPI::ShaderOutputContract& shaderOutputContract, size_t& colorAttachmentCount);
 
 
-            //! Returns a list of acceptable default entry point names as a single string for debug messages.
-            AZStd::string GetAcceptableDefaultEntryPointNames(const AzslData& shaderData);
-
-
             //! Create a file from a string's content.
             //! That file will be named filename.api.azslin
             //! This is meant to be used at this stage:
@@ -136,10 +133,6 @@ namespace AZ
             // is the default, nameless, supervariant.
             AZStd::vector<RPI::ShaderSourceData::SupervariantInfo> GetSupervariantListFromShaderSourceData(
                 const RPI::ShaderSourceData& shaderSourceData);
-
-            void GetDefaultEntryPointsFromFunctionDataList(
-                const AZStd::vector<FunctionData> azslFunctionDataList,
-                AZStd::unordered_map<AZStd::string, RPI::ShaderStageType>& shaderEntryPoints);
 
             void LogProfilingData(const char* builderName, AZStd::string_view shaderPath);
 

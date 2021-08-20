@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -36,7 +37,7 @@ namespace AzToolsFramework
     static void HandleAccents(
         const AZ::EntityId entityIdUnderCursor, AZ::EntityId& hoveredEntityId, const ViewportInteraction::MouseButtons mouseButtons)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         const bool invalidMouseButtonHeld = mouseButtons.Middle() || mouseButtons.Right();
 

@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 
-#include "Maestro_precompiled.h"
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Math/Quaternion.h>
 #include <AzCore/Math/Transform.h>
@@ -254,13 +254,13 @@ void CAnimSceneNode::CreateDefaultTracks()
 //////////////////////////////////////////////////////////////////////////
 unsigned int CAnimSceneNode::GetParamCount() const
 {
-    return s_nodeParams.size();
+    return static_cast<unsigned int>(s_nodeParams.size());
 }
 
 //////////////////////////////////////////////////////////////////////////
 CAnimParamType CAnimSceneNode::GetParamType(unsigned int nIndex) const
 {
-    if (nIndex >= 0 && nIndex < (int)s_nodeParams.size())
+    if (nIndex < s_nodeParams.size())
     {
         return s_nodeParams[nIndex].paramType;
     }
@@ -661,7 +661,7 @@ void CAnimSceneNode::OnStop()
 //////////////////////////////////////////////////////////////////////////
 void CAnimSceneNode::ResetSounds()
 {
-    for (int i = m_SoundInfo.size(); --i >= 0; )
+    for (int i = static_cast<int>(m_SoundInfo.size()); --i >= 0; )
     {
         m_SoundInfo[i].Reset();
     }
@@ -916,8 +916,8 @@ void CAnimSceneNode::ApplyCameraKey(ISelectKey& key, SAnimContext& ec)
 void CAnimSceneNode::ApplyEventKey(IEventKey& key, [[maybe_unused]] SAnimContext& ec)
 {
     char funcName[1024];
-    cry_strcpy(funcName, "Event_");
-    cry_strcat(funcName, key.event.c_str());
+    azstrcpy(funcName, AZ_ARRAY_SIZE(funcName), "Event_");
+    azstrcat(funcName, AZ_ARRAY_SIZE(funcName), key.event.c_str());
     gEnv->pMovieSystem->SendGlobalEvent(funcName);
 }
 
@@ -1003,7 +1003,7 @@ void CAnimSceneNode::ApplyGotoKey(CGotoTrack*   poGotoTrack, SAnimContext& ec)
         {
             if (stDiscreteFloadKey.m_fValue >= 0)
             {
-                string fullname = m_pSequence->GetName();
+                AZStd::string fullname = m_pSequence->GetName();
                 GetMovieSystem()->GoToFrame(fullname.c_str(), stDiscreteFloadKey.m_fValue);
             }
         }

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -73,7 +74,7 @@ namespace AZ
 
             // load shader
             // Note: the shader may not be available on all platforms
-            Data::Instance<RPI::Shader> shader = RPI::LoadShader("Shaders/DiffuseGlobalIllumination/DiffuseProbeGridRender.azshader");
+            Data::Instance<RPI::Shader> shader = RPI::LoadCriticalShader("Shaders/DiffuseGlobalIllumination/DiffuseProbeGridRender.azshader");
             if (shader)
             {
                 m_probeGridRenderData.m_drawListTag = shader->GetDrawListTag();
@@ -110,7 +111,7 @@ namespace AZ
 
         void DiffuseProbeGridFeatureProcessor::Simulate([[maybe_unused]] const FeatureProcessor::SimulatePacket& packet)
         {
-            AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
 
             // update pipeline states
             if (m_needUpdatePipelineStates)
@@ -148,7 +149,7 @@ namespace AZ
             // if the volumes changed we need to re-sort the probe list
             if (m_probeGridSortRequired)
             {
-                AZ_PROFILE_SCOPE(Debug::ProfileCategory::AzRender, "Sort diffuse probe grids");
+                AZ_PROFILE_SCOPE(AzRender, "Sort diffuse probe grids");
 
                 // sort the probes by descending inner volume size, so the smallest volumes are rendered last
                 auto sortFn = [](AZStd::shared_ptr<DiffuseProbeGrid> const& probe1, AZStd::shared_ptr<DiffuseProbeGrid> const& probe2) -> bool
@@ -604,13 +605,6 @@ namespace AZ
                 RPI::PassHierarchyFilter updatePassFilter(AZ::Name("DiffuseProbeGridUpdatePass"));
                 const AZStd::vector<RPI::Pass*>& updatePasses = RPI::PassSystemInterface::Get()->FindPasses(updatePassFilter);
                 for (RPI::Pass* pass : updatePasses)
-                {
-                    pass->SetEnabled(false);
-                }
-
-                RPI::PassHierarchyFilter renderPassFilter(AZ::Name("DiffuseProbeGridRenderPass"));
-                const AZStd::vector<RPI::Pass*>& renderPasses = RPI::PassSystemInterface::Get()->FindPasses(renderPassFilter);
-                for (RPI::Pass* pass : renderPasses)
                 {
                     pass->SetEnabled(false);
                 }

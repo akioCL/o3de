@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -90,7 +91,7 @@ XmlNodeRef CXmlUtils::LoadXmlFromFile(const char* sFilename, bool bReuseStrings,
 XmlNodeRef CXmlUtils::LoadXmlFromBuffer(const char* buffer, size_t size, bool bReuseStrings, bool bSuppressWarnings)
 {
     XmlParser parser(bReuseStrings);
-    XmlNodeRef node = parser.ParseBuffer(buffer, size, true, bSuppressWarnings);
+    XmlNodeRef node = parser.ParseBuffer(buffer, static_cast<int>(size), true, bSuppressWarnings);
     return node;
 }
 
@@ -110,7 +111,7 @@ const char* CXmlUtils::HashXml(XmlNodeRef node)
     static char temp[16];
     static const char* hex = "0123456789abcdef";
     XmlString str = node->getXML();
-    GetMD5(str.data(), str.length(), temp);
+    GetMD5(str.data(), static_cast<int>(str.length()), temp);
     for (int i = 0; i < 16; i++)
     {
         signature[2 * i + 0] = hex[((uint8)temp[i]) >> 4];
@@ -312,7 +313,7 @@ bool CXmlUtils::SaveBinaryXmlFile(const char* filename, XmlNodeRef root)
         return false;
     }
     XMLBinary::CXMLBinaryWriter writer;
-    string error;
+    AZStd::string error;
     return writer.WriteNode(&fileSink, root, false, 0, error);
 }
 

@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 
-#include "UiCanvasEditor_precompiled.h"
 #include "UiEditorAnimationBus.h"
 #include "UiEditorDLLBus.h"
 #include "UiAnimViewAnimNode.h"
@@ -18,7 +18,6 @@
 #include "UiAnimViewSequenceManager.h"
 #include "Objects/EntityObject.h"
 #include "ViewManager.h"
-#include "RenderViewport.h"
 #include "Clipboard.h"
 
 #include <AzCore/Math/Crc.h>
@@ -1100,7 +1099,7 @@ bool CUiAnimViewAnimNode::SetName(const char* pName)
         }
     }
 
-    string oldName = GetName();
+    AZStd::string oldName = GetName();
     m_pAnimNode->SetName(pName);
 
     if (UiAnimUndo::IsRecording())
@@ -1108,7 +1107,7 @@ bool CUiAnimViewAnimNode::SetName(const char* pName)
         UiAnimUndo::Record(new CUndoAnimNodeRename(this, oldName));
     }
 
-    GetSequence()->OnNodeRenamed(this, oldName);
+    GetSequence()->OnNodeRenamed(this, oldName.c_str());
 
     return true;
 }
@@ -1483,7 +1482,7 @@ bool CUiAnimViewAnimNode::PasteNodesFromClipboard(QWidget* context)
     const bool bLightAnimationSetActive = GetSequence()->GetFlags() & IUiAnimSequence::eSeqFlags_LightAnimationSet;
 
     const unsigned int numNodes = animNodesRoot->getChildCount();
-    for (int i = 0; i < numNodes; ++i)
+    for (unsigned int i = 0; i < numNodes; ++i)
     {
         XmlNodeRef xmlNode = animNodesRoot->getChild(i);
 

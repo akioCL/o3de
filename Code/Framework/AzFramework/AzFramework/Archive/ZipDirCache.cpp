@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -74,7 +75,7 @@ namespace AZ::IO::ZipDir
                 for (i = 0; i < AZ_ARRAY_SIZE(szBuf) - 1; ++i)
                 {
                     int r = distrib(gen);
-                    szBuf[i] = r > 9 ? (r - 10) + 'a' : '0' + r;
+                    szBuf[i] = static_cast<char>(r > 9 ? (r - 10) + 'a' : '0' + r);
                 }
                 szBuf[i] = '\0';
                 return szBuf;

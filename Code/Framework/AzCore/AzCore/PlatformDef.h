@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -86,9 +87,6 @@
 #define AZ_POP_DISABLE_DLL_EXPORT_MEMBER_WARNING AZ_POP_DISABLE_WARNING
 
 #   define AZ_FORCE_INLINE  __forceinline
-#if !defined(_DEBUG)
-#   pragma warning(disable:4714) //warning C4714 marked as __forceinline not inlined. Sadly this happens when LTCG during linking. We tried to NOT use force inline but VC 2012 is bad at inlining.
-#endif
 
 /// Aligns a declaration.
 #   define AZ_ALIGN(_decl, _alignment) \

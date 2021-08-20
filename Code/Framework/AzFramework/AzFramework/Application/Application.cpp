@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -10,6 +11,7 @@
 #include <AzCore/Math/Crc.h>
 #include <AzCore/Component/ComponentApplication.h>
 #include <AzCore/Component/NonUniformScaleBus.h>
+#include <AzCore/Debug/Profiler.h>
 #include <AzCore/Memory/MemoryComponent.h>
 #include <AzCore/Slice/SliceSystemComponent.h>
 #include <AzCore/Jobs/JobManagerComponent.h>
@@ -539,7 +541,7 @@ namespace AzFramework
         const AZStd::function<void()>& workForNewThread,
         const char* newThreadName)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzFramework);
+        AZ_PROFILE_FUNCTION(AzFramework);
 
         AZStd::thread_desc newThreadDesc;
         newThreadDesc.m_cpuId = AFFINITY_MASK_USERTHREADS;
@@ -547,7 +549,7 @@ namespace AzFramework
         AZStd::binary_semaphore binarySemaphore;
         AZStd::thread newThread([&workForNewThread, &binarySemaphore, &newThreadName]
         {
-            AZ_PROFILE_SCOPE_DYNAMIC(AZ::Debug::ProfileCategory::AzFramework,
+            AZ_PROFILE_SCOPE(AzFramework,
                 "Application::PumpSystemEventLoopWhileDoingWorkInNewThread:ThreadWorker %s", newThreadName);
 
             workForNewThread();
@@ -558,7 +560,7 @@ namespace AzFramework
             PumpSystemEventLoopUntilEmpty();
         }
         {
-            AZ_PROFILE_SCOPE_STALL_DYNAMIC(AZ::Debug::ProfileCategory::AzFramework,
+            AZ_PROFILE_SCOPE(AzFramework,
                 "Application::PumpSystemEventLoopWhileDoingWorkInNewThread:WaitOnThread %s", newThreadName);
             newThread.join();
         }
@@ -570,10 +572,14 @@ namespace AzFramework
     ////////////////////////////////////////////////////////////////////////////
     void Application::RunMainLoop()
     {
+        uint32_t frameCounter = 0;
         while (!m_exitMainLoopRequested)
         {
             PumpSystemEventLoopUntilEmpty();
+
+            AZ_PROFILE_SCOPE(AzCore, "Frame %i", frameCounter);
             Tick();
+            ++frameCounter;
         }
     }
 
@@ -706,25 +712,23 @@ namespace AzFramework
                 }
             }
 
-            if (AZ::IO::FixedMaxPath projectUserPath;
-                m_settingsRegistry->Get(projectUserPath.Native(), AZ::SettingsRegistryMergeUtils::FilePathKey_ProjectUserPath))
+            AZ::IO::FixedMaxPath engineRoot = GetEngineRoot();
+            AZ::IO::FixedMaxPath projectUserPath;
+            if (!m_settingsRegistry->Get(projectUserPath.Native(), AZ::SettingsRegistryMergeUtils::FilePathKey_ProjectUserPath))
             {
-                fileIoBase->SetAlias("@user@", projectUserPath.c_str());
-                AZ::IO::FixedMaxPath projectLogPath = projectUserPath / "log";
-                fileIoBase->SetAlias("@log@", projectLogPath.c_str());
-                fileIoBase->CreatePath(projectLogPath.c_str()); // Create the log directory at this point
+                projectUserPath = engineRoot / "user";
+            }
+            fileIoBase->SetAlias("@user@", projectUserPath.c_str());
+            fileIoBase->CreatePath(projectUserPath.c_str());
+            CreateUserCache(projectUserPath, *fileIoBase);
 
-                CreateUserCache(projectUserPath, *fileIoBase);
-            }
-            else
+            AZ::IO::FixedMaxPath projectLogPath;
+            if (!m_settingsRegistry->Get(projectLogPath.Native(), AZ::SettingsRegistryMergeUtils::FilePathKey_ProjectLogPath))
             {
-                AZ::IO::FixedMaxPath fallbackLogPath = GetEngineRoot();
-                fallbackLogPath /= "user";
-                fileIoBase->SetAlias("@user@", fallbackLogPath.c_str());
-                fallbackLogPath /= "log";
-                fileIoBase->SetAlias("@log@", fallbackLogPath.c_str());
-                fileIoBase->CreatePath(fallbackLogPath.c_str());
+                projectLogPath = projectUserPath / "log";
             }
+            fileIoBase->SetAlias("@log@", projectLogPath.c_str());
+            fileIoBase->CreatePath(projectLogPath.c_str());
         }
     }
 

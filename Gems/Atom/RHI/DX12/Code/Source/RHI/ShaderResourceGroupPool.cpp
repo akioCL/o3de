@@ -1,11 +1,11 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include "RHI/Atom_RHI_DX12_precompiled.h"
 #include <RHI/ShaderResourceGroupPool.h>
 #include <RHI/Buffer.h>
 #include <RHI/BufferView.h>
@@ -356,7 +356,7 @@ namespace AZ
 
                     if (!bufferViews.empty())
                     {
-                        group.m_unboundedDescriptorTables[tableIndex] = m_descriptorContext->CreateDescriptorTable(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, bufferViews.size());
+                        group.m_unboundedDescriptorTables[tableIndex] = m_descriptorContext->CreateDescriptorTable(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<uint32_t>(bufferViews.size()));
                         AZ_Assert(group.m_unboundedDescriptorTables[tableIndex].IsValid(), "Descriptor context failed to allocate unbounded array descriptor table, most likely out of memory.");
 
                         ShaderResourceGroupCompiledData& compiledData = group.m_compiledData[group.m_compiledDataIndex];
@@ -415,7 +415,7 @@ namespace AZ
 
                     if (!imageViews.empty())
                     {
-                        group.m_unboundedDescriptorTables[tableIndex] = m_descriptorContext->CreateDescriptorTable(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, imageViews.size());
+                        group.m_unboundedDescriptorTables[tableIndex] = m_descriptorContext->CreateDescriptorTable(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<uint32_t>(imageViews.size()));
                         AZ_Assert(group.m_unboundedDescriptorTables[tableIndex].IsValid(), "Descriptor context failed to allocate unbounded array descriptor table, most likely out of memory.");
 
                         ShaderResourceGroupCompiledData& compiledData = group.m_compiledData[group.m_compiledDataIndex];

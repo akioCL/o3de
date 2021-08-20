@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -101,11 +102,25 @@ namespace AzFramework
             static const AZ::EBusAddressPolicy AddressPolicy = AZ::EBusAddressPolicy::Single;
             //////////////////////////////////////////////////////////////////////////
 
-            virtual void OnTerrainDataCreateBegin() {};
-            virtual void OnTerrainDataCreateEnd() {};
+            enum TerrainDataChangedMask : uint8_t
+            {
+                None        = 0b00000000,
+                Settings    = 0b00000001,
+                HeightData  = 0b00000010,
+                ColorData   = 0b00000100,
+                SurfaceData = 0b00001000
+            };
 
-            virtual void OnTerrainDataDestroyBegin() {};
-            virtual void OnTerrainDataDestroyEnd() {};
+            virtual void OnTerrainDataCreateBegin() {}
+            virtual void OnTerrainDataCreateEnd() {}
+
+            virtual void OnTerrainDataDestroyBegin() {}
+            virtual void OnTerrainDataDestroyEnd() {}
+
+            virtual void OnTerrainDataChanged(
+                [[maybe_unused]] const AZ::Aabb& dirtyRegion, [[maybe_unused]] TerrainDataChangedMask dataChangedMask)
+            {
+            }
         };
         using TerrainDataNotificationBus = AZ::EBus<TerrainDataNotifications>;
 

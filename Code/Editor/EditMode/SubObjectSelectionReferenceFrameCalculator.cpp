@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -43,14 +44,14 @@ bool SubObjectSelectionReferenceFrameCalculator::GetFrame(Matrix34& refFrame)
 
         if (this->nNormals > 0)
         {
-            this->normal = this->normal / this->nNormals;
+            this->normal = this->normal / static_cast<float>(this->nNormals);
             if (!this->normal.IsZero())
             {
                 this->normal.Normalize();
             }
 
             // Average position.
-            this->pos = this->pos / this->nNormals;
+            this->pos = this->pos / static_cast<float>(this->nNormals);
             refFrame.SetTranslation(this->pos);
         }
 

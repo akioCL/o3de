@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -20,15 +21,12 @@ namespace O3DELauncher
         CryAllocatorsRAII()
         {
             AZ_Assert(!AZ::AllocatorInstance<AZ::LegacyAllocator>::IsReady(), "Expected allocator to not be initialized, hunt down the static that is initializing it");
-            AZ_Assert(!AZ::AllocatorInstance<CryStringAllocator>::IsReady(), "Expected allocator to not be initialized, hunt down the static that is initializing it");
 
             AZ::AllocatorInstance<AZ::LegacyAllocator>::Create();
-            AZ::AllocatorInstance<CryStringAllocator>::Create();
         }
 
         ~CryAllocatorsRAII()
         {
-            AZ::AllocatorInstance<CryStringAllocator>::Destroy();
             AZ::AllocatorInstance<AZ::LegacyAllocator>::Destroy();
         }
     };

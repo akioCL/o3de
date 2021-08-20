@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -138,7 +139,7 @@ namespace AWSCore
         AZStd::chrono::seconds lastSendTimeStamp = AZStd::chrono::seconds(lastSendTimeStampSeconds);
         AZStd::chrono::seconds secondsSinceLastSend =
             AZStd::chrono::duration_cast<AZStd::chrono::seconds>(AZStd::chrono::system_clock::now().time_since_epoch()) - lastSendTimeStamp;
-        if (secondsSinceLastSend.count() >= delayInSeconds)
+        if (static_cast<AZ::u64>(secondsSinceLastSend.count()) >= delayInSeconds)
         {
             return true;
         }

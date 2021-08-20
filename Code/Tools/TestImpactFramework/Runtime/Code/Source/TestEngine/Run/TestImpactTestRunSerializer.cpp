@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -51,7 +52,7 @@ namespace TestImpact
 
         // Run duration
         writer.Key(TestRunFields::Keys[TestRunFields::DurationKey]);
-        writer.Uint(testRun.GetDuration().count());
+        writer.Uint(static_cast<unsigned int>(testRun.GetDuration().count()));
 
         // Suites
         writer.Key(TestRunFields::Keys[TestRunFields::SuitesKey]);
@@ -68,7 +69,7 @@ namespace TestImpact
 
             // Suite duration
             writer.Key(TestRunFields::Keys[TestRunFields::DurationKey]);
-            writer.Uint(suite.m_duration.count());
+            writer.Uint(static_cast<unsigned int>(suite.m_duration.count()));
 
             // Suite enabled
             writer.Key(TestRunFields::Keys[TestRunFields::EnabledKey]);
@@ -92,7 +93,7 @@ namespace TestImpact
 
                 // Test duration
                 writer.Key(TestRunFields::Keys[TestRunFields::DurationKey]);
-                writer.Uint(test.m_duration.count());
+                writer.Uint(static_cast<unsigned int>(test.m_duration.count()));
 
                 // Test status
                 writer.Key(TestRunFields::Keys[TestRunFields::StatusKey]);

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -173,6 +174,16 @@ namespace AzNetworking
         return connection->Disconnect(reason, TerminationEndpoint::Local);
     }
 
+    void TcpNetworkInterface::SetTimeoutEnabled(bool timeoutEnabled)
+    {
+        m_timeoutEnabled = timeoutEnabled;
+    }
+
+    bool TcpNetworkInterface::IsTimeoutEnabled() const
+    {
+        return m_timeoutEnabled;
+    }
+
     void TcpNetworkInterface::QueueNewConnection(const PendingConnection& pendingConnection)
     {
         m_pendingConnections.PushBackItem(pendingConnection);
@@ -305,7 +316,7 @@ namespace AzNetworking
         {
             tcpConnection->SendReliablePacket(CorePackets::HeartbeatPacket());
         }
-        else if (net_TcpTimeoutConnections)
+        else if (net_TcpTimeoutConnections && m_networkInterface.IsTimeoutEnabled())
         {
             tcpConnection->Disconnect(DisconnectReason::Timeout, TerminationEndpoint::Local);
             return TimeoutResult::Delete;

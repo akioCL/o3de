@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -98,6 +99,8 @@ namespace AzNetworking
         bool WasPacketAcked(ConnectionId connectionId, PacketId packetId) override;
         bool StopListening() override;
         bool Disconnect(ConnectionId connectionId, DisconnectReason reason) override;
+        void SetTimeoutEnabled(bool timeoutEnabled) override;
+        bool IsTimeoutEnabled() const override;
         //! @}
 
         //! Queues a new incoming connection for this network interface.
@@ -153,6 +156,7 @@ namespace AzNetworking
         AZ::Name m_name;
         TrustZone m_trustZone;
         uint16_t m_port = 0;
+        bool m_timeoutEnabled = true;
         IConnectionListener& m_connectionListener;
         TcpConnectionSet m_connectionSet;
         TcpSocketManager m_tcpSocketManager;

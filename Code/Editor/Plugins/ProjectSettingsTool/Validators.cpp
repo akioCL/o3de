@@ -1,11 +1,11 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include "ProjectSettingsTool_precompiled.h"
 #include "Validators.h"
 
 #include <QDir>
@@ -16,7 +16,7 @@
 
 namespace 
 {
-    typedef ProjectSettingsTool::FunctorValidator::ReturnType RetType;
+    using RetType = ProjectSettingsTool::FunctorValidator::ReturnType;
 
     static const int noMaxLength = -1;
     static const int maxIosVersionLength = 18;

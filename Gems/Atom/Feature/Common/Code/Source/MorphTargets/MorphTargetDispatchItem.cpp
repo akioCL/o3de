@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -84,9 +85,9 @@ namespace AZ
             {
                 const auto& args = *numThreads;
                 // Check that the arguments are valid integers, and fall back to 1,1,1 if there is an error
-                arguments.m_threadsPerGroupX = args[0].type() == azrtti_typeid<int>() ? AZStd::any_cast<int>(args[0]) : 1;
-                arguments.m_threadsPerGroupY = args[1].type() == azrtti_typeid<int>() ? AZStd::any_cast<int>(args[1]) : 1;
-                arguments.m_threadsPerGroupZ = args[2].type() == azrtti_typeid<int>() ? AZStd::any_cast<int>(args[2]) : 1;
+                arguments.m_threadsPerGroupX = static_cast<uint16_t>(args[0].type() == azrtti_typeid<int>() ? AZStd::any_cast<int>(args[0]) : 1);
+                arguments.m_threadsPerGroupY = static_cast<uint16_t>(args[1].type() == azrtti_typeid<int>() ? AZStd::any_cast<int>(args[1]) : 1);
+                arguments.m_threadsPerGroupZ = static_cast<uint16_t>(args[2].type() == azrtti_typeid<int>() ? AZStd::any_cast<int>(args[2]) : 1);
             }
 
             arguments.m_totalNumberOfThreadsX = m_morphTargetMetaData.m_vertexCount;
@@ -161,7 +162,7 @@ namespace AZ
                 m_rootConstantData.SetConstant(colorOffsetIndex, m_morphInstanceMetaData.m_accumulatedColorDeltaOffsetInBytes / 4);
             }
 
-            m_dispatchItem.m_rootConstantSize = m_rootConstantData.GetConstantData().size();
+            m_dispatchItem.m_rootConstantSize = static_cast<uint8_t>(m_rootConstantData.GetConstantData().size());
             m_dispatchItem.m_rootConstants = m_rootConstantData.GetConstantData().data();
         }
 

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -277,7 +278,6 @@ public:
     ~CSystem();
 
     static void OnLanguageCVarChanged(ICVar* language);
-    static void OnLanguageAudioCVarChanged(ICVar* language);
     static void OnLocalizationFolderCVarChanged(ICVar* const pLocalizationFolder);
     // adding CVAR to toggle assert verbosity level
     static void OnAssertLevelCvarChanged(ICVar* pArgs);
@@ -352,9 +352,6 @@ public:
     virtual XmlNodeRef LoadXmlFromBuffer(const char* buffer, size_t size, bool bReuseStrings = false, bool bSuppressWarnings = false);
     virtual IXmlUtils* GetXmlUtils();
     //////////////////////////////////////////////////////////////////////////
-
-    void SetViewCamera(CCamera& Camera){ m_ViewCamera = Camera; }
-    CCamera& GetViewCamera() { return m_ViewCamera; }
 
     void IgnoreUpdates(bool bIgnore) { m_bIgnoreUpdates = bIgnore; };
 
@@ -453,7 +450,7 @@ private:
     bool ReLaunchMediaCenter();
     void UpdateAudioSystems();
 
-    void AddCVarGroupDirectory(const string& sPath);
+    void AddCVarGroupDirectory(const AZStd::string& sPath);
 
     AZStd::unique_ptr<AZ::DynamicModuleHandle> LoadDynamiclibrary(const char* dllName) const;
 
@@ -494,7 +491,6 @@ private: // ------------------------------------------------------
     SSystemGlobalEnvironment m_env;
 
     CTimer                              m_Time;                             //!<
-    CCamera                             m_ViewCamera;                   //!<
     bool                                    m_bInitializedSuccessfully;     //!< true if the system completed all initialization steps
     bool                                    m_bRelaunch;                    //!< relaunching the app or not (true beforerelaunch)
     int                                     m_iLoadingMode;             //!< Game is loading w/o changing context (0 not, 1 quickloading, 2 full loading)
@@ -623,7 +619,7 @@ private: // ------------------------------------------------------
     //  ICVar *m_sys_filecache;
     ICVar* m_gpu_particle_physics;
 
-    string  m_sSavedRDriver;                                //!< to restore the driver when quitting the dedicated server
+    AZStd::string  m_sSavedRDriver;                                //!< to restore the driver when quitting the dedicated server
 
     //////////////////////////////////////////////////////////////////////////
     //! User define callback for system events.
@@ -672,8 +668,8 @@ public:
     void OpenBasicPaks();
     void OpenLanguagePak(const char* sLanguage);
     void OpenLanguageAudioPak(const char* sLanguage);
-    void GetLocalizedPath(const char* sLanguage, string& sLocalizedPath);
-    void GetLocalizedAudioPath(const char* sLanguage, string& sLocalizedPath);
+    void GetLocalizedPath(const char* sLanguage, AZStd::string& sLocalizedPath);
+    void GetLocalizedAudioPath(const char* sLanguage, AZStd::string& sLocalizedPath);
     void CloseLanguagePak(const char* sLanguage);
     void CloseLanguageAudioPak(const char* sLanguage);
     void UpdateMovieSystem(const int updateFlags, const float fFrameTime, const bool bPreUpdate);
@@ -718,14 +714,14 @@ protected: // -------------------------------------------------------------
 
     CCmdLine*                                      m_pCmdLine;
 
-    string  m_currentLanguageAudio;
-    string  m_systemConfigName; // computed from system_(hardwareplatform)_(assetsPlatform) - eg, system_android_android.cfg or system_windows_pc.cfg
+    AZStd::string  m_currentLanguageAudio;
+    AZStd::string  m_systemConfigName; // computed from system_(hardwareplatform)_(assetsPlatform) - eg, system_android_android.cfg or system_windows_pc.cfg
 
     std::vector< std::pair<CTimeValue, float> > m_updateTimes;
 
     struct SErrorMessage
     {
-        string m_Message;
+        AZStd::string m_Message;
         float m_fTimeToShow;
         float m_Color[4];
         bool m_HardFailure;

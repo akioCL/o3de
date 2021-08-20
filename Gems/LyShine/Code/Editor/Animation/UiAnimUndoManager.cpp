@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 
-#include "UiCanvasEditor_precompiled.h"
 #include "UiAnimUndoManager.h"
 #include "UiAnimUndoObject.h"
 #include "Undo/IUndoManagerListener.h"
@@ -59,7 +59,7 @@ public:
     virtual bool IsEmpty() const { return m_undoObjects.empty(); };
     virtual void Undo(bool bUndo)
     {
-        for (int i = m_undoObjects.size() - 1; i >= 0; i--)
+        for (int i = aznumeric_cast<int>(m_undoObjects.size()) - 1; i >= 0; i--)
         {
             m_undoObjects[i]->Undo(bUndo);
         }

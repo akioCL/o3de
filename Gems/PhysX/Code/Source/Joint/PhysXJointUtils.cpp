@@ -1,11 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
-#include <PhysX_precompiled.h>
 
 #include <AzFramework/Physics/PhysicsScene.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
@@ -14,6 +13,8 @@
 
 #include <PhysX/Joint/Configuration/PhysXJointConfiguration.h>
 #include <PhysX/PhysXLocks.h>
+#include <PhysX/Debug/PhysXDebugConfiguration.h>
+#include <PhysX/MathConversion.h>
 #include <Source/Joint/PhysXJointUtils.h>
 #include <Include/PhysX/NativeTypeIdentifiers.h>
 
@@ -189,8 +190,9 @@ namespace PhysX {
             {
                 PxJointActorData actorData = GetJointPxActors(sceneHandle, parentBodyHandle, childBodyHandle);
 
-                if (!actorData.parentActor || !actorData.childActor)
+                if (actorData.parentActor == nullptr && actorData.childActor == nullptr)
                 {
+                    AZ_Warning("PhysX Joint", false, "CreateJoint failed - at least one body must be a PxRigidActor.");
                     return nullptr;
                 }
 
@@ -238,7 +240,8 @@ namespace PhysX {
             {
                 PxJointActorData actorData = GetJointPxActors(sceneHandle, parentBodyHandle, childBodyHandle);
 
-                if (!actorData.parentActor || !actorData.childActor)
+                //only check the child actor, as a null parent actor means this joint is a global constraint.
+                if (!actorData.childActor)
                 {
                     return nullptr;
                 }
@@ -251,7 +254,8 @@ namespace PhysX {
 
                 {
                     PHYSX_SCENE_READ_LOCK(actorData.childActor->getScene());
-                    joint = physx::PxFixedJointCreate(PxGetPhysics(), 
+                    joint = physx::PxFixedJointCreate(
+                        PxGetPhysics(), 
                         actorData.parentActor, PxMathConvert(parentLocalTM),
                         actorData.childActor, PxMathConvert(childLocalTM));
                 }
@@ -271,7 +275,8 @@ namespace PhysX {
             {
                 PxJointActorData actorData = GetJointPxActors(sceneHandle, parentBodyHandle, childBodyHandle);
 
-                if (!actorData.parentActor || !actorData.childActor)
+                // only check the child actor, as a null parent actor means this joint is a global constraint.
+                if (!actorData.childActor)
                 {
                     return nullptr;
                 }
@@ -305,7 +310,8 @@ namespace PhysX {
             {
                 PxJointActorData actorData = GetJointPxActors(sceneHandle, parentBodyHandle, childBodyHandle);
 
-                if (!actorData.parentActor || !actorData.childActor)
+                // only check the child actor, as a null parent actor means this joint is a global constraint.
+                if (!actorData.childActor)
                 {
                     return nullptr;
                 }

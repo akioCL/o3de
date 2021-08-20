@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -20,8 +21,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include "MultiThread.h"
-#include "CryThread.h"
+#include <AzCore/std/parallel/spin_mutex.h>
 
 namespace stl
 {
@@ -51,43 +51,20 @@ namespace stl
 
     struct PSyncMultiThread
     {
-        PSyncMultiThread()
-            : _Semaphore(0) {}
+        PSyncMultiThread() {}
 
         void Lock()
         {
-            CryWriteLock(&_Semaphore);
+            m_lock.lock();
         }
         void Unlock()
         {
-            CryReleaseWriteLock(&_Semaphore);
-        }
-        int IsLocked() const volatile
-        {
-            return _Semaphore;
+            m_lock.unlock();
         }
 
     private:
-        volatile int _Semaphore;
+        AZStd::spin_mutex m_lock;
     };
-
-#ifdef _DEBUG
-
-    struct PSyncDebug
-        : public PSyncMultiThread
-    {
-        void Lock()
-        {
-            assert(!IsLocked());
-            PSyncMultiThread::Lock();
-        }
-    };
-
-#else
-
-    typedef PSyncNone PSyncDebug;
-
-#endif
 };
 
 #endif // CRYINCLUDE_CRYCOMMON_SYNCHRONIZATION_H

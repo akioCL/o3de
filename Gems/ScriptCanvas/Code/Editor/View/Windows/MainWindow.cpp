@@ -1,11 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
-#include <precompiled.h>
 
 #include <ISystem.h>
 #include <IConsole.h>
@@ -1385,7 +1384,7 @@ namespace ScriptCanvasEditor
         AZStd::string assetPath = scriptCanvasAsset.GetAbsolutePath();
         if (!assetPath.empty() && !m_loadingNewlySavedFile)
         {
-            int eraseCount = m_loadingWorkspaceAssets.erase(fileAssetId);
+            const size_t eraseCount = m_loadingWorkspaceAssets.erase(fileAssetId);
 
             if (eraseCount == 0)
             {
@@ -2530,7 +2529,7 @@ namespace ScriptCanvasEditor
         AZ::Data::AssetId fileAssetId = memoryAsset.GetFileAssetId();
         AZ::Data::AssetId memoryAssetId = memoryAsset.GetId();
 
-        int eraseCount = m_loadingAssets.erase(fileAssetId);
+        size_t eraseCount = m_loadingAssets.erase(fileAssetId);
 
         if (eraseCount > 0)
         {

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -304,16 +305,12 @@ namespace Multiplayer
 
     bool EntityReplicator::RemoteManagerOwnsEntityLifetime() const
     {
-        bool ret(false);
         bool isServer = (GetBoundLocalNetworkRole() == NetEntityRole::Server)
                      && (GetRemoteNetworkRole() == NetEntityRole::Authority);
         bool isClient = (GetBoundLocalNetworkRole() == NetEntityRole::Client)
                      || (GetBoundLocalNetworkRole() == NetEntityRole::Autonomous);
-        if (isServer || isClient)
-        {
-            ret = true;
-        }
-        return ret;
+
+        return isServer || isClient;
     }
 
     void EntityReplicator::MarkForRemoval()
@@ -433,7 +430,7 @@ namespace Multiplayer
             updateMessage.SetPrefabEntityId(netBindComponent->GetPrefabEntityId());
         }
 
-        AzNetworking::NetworkInputSerializer inputSerializer(updateMessage.ModifyData().GetBuffer(), updateMessage.ModifyData().GetCapacity());
+        AzNetworking::NetworkInputSerializer inputSerializer(updateMessage.ModifyData().GetBuffer(), static_cast<uint32_t>(updateMessage.ModifyData().GetCapacity()));
         m_propertyPublisher->UpdateSerialization(inputSerializer);
         updateMessage.ModifyData().Resize(inputSerializer.GetSize());
 
@@ -444,7 +441,8 @@ namespace Multiplayer
     {
         // Received rpc metrics, log rpc sent, number of bytes, and the componentId/rpcId for bandwidth metrics
         MultiplayerStats& stats = GetMultiplayer()->GetStats();
-        stats.RecordRpcSent(entityRpcMessage.GetComponentId(), entityRpcMessage.GetRpcIndex(), entityRpcMessage.GetEstimatedSerializeSize());
+        stats.RecordRpcSent(GetEntityHandle().GetEntity()->GetId(), GetEntityHandle().GetEntity()->GetName().c_str(),
+            entityRpcMessage.GetComponentId(), entityRpcMessage.GetRpcIndex(), entityRpcMessage.GetEstimatedSerializeSize());
 
         m_replicationManager.AddDeferredRpcMessage(entityRpcMessage);
     }
@@ -518,7 +516,7 @@ namespace Multiplayer
                 && (GetRemoteNetworkRole() == NetEntityRole::Server))
             {
                 // We are on a server, and we received this message from another server, therefore we should forward this to our autonomous player
-                // This can occur if we've recently migrated 
+                // This can occur if we've recently migrated
                 result = RpcValidationResult::ForwardToAutonomous;
             }
         }
@@ -627,7 +625,8 @@ namespace Multiplayer
     {
         // Received rpc metrics, log rpc received, time spent, number of bytes, and the componentId/rpcId for bandwidth metrics
         MultiplayerStats& stats = GetMultiplayer()->GetStats();
-        stats.RecordRpcReceived(entityRpcMessage.GetComponentId(), entityRpcMessage.GetRpcIndex(), entityRpcMessage.GetEstimatedSerializeSize());
+        stats.RecordRpcReceived(GetEntityHandle().GetEntity()->GetId(), GetEntityHandle().GetEntity()->GetName().c_str(),
+            entityRpcMessage.GetComponentId(), entityRpcMessage.GetRpcIndex(), entityRpcMessage.GetEstimatedSerializeSize());
 
         if (!m_netBindComponent)
         {

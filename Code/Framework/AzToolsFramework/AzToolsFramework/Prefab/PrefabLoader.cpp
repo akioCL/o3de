@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -299,7 +300,7 @@ namespace AzToolsFramework
             }
 
             PrefabDom storedPrefabDom(&loadedTemplateDom->get().GetAllocator());
-            if (!PrefabDomUtils::StoreInstanceInPrefabDom(loadedPrefabInstance, storedPrefabDom))
+            if (!PrefabDomUtils::StoreInstanceInPrefabDom(loadedPrefabInstance, storedPrefabDom, PrefabDomUtils::StoreFlags::StoreLinkIds))
             {
                 return false;
             }
@@ -327,7 +328,7 @@ namespace AzToolsFramework
 
             PrefabDom storedPrefabDom(&savingTemplateDom->get().GetAllocator());
             if (!PrefabDomUtils::StoreInstanceInPrefabDom(savingPrefabInstance, storedPrefabDom,
-                PrefabDomUtils::StoreInstanceFlags::StripDefaultValues))
+                PrefabDomUtils::StoreFlags::StripDefaultValues))
             {
                 return false;
             }

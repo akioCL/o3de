@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -109,7 +110,6 @@ public:
     void PostSerialize() override;
     CCamera& GetCamera() override { return m_camera; }
     const CCamera& GetCamera() const override { return m_camera; }
-    void UpdateAudioListener(const Matrix34& rMatrix) override;
 
     void GetMemoryUsage(ICrySizer* s) const;
 

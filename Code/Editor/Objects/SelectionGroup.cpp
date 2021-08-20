@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -108,7 +109,7 @@ bool CSelectionGroup::SameObjectType()
 //////////////////////////////////////////////////////////////////////////
 int CSelectionGroup::GetCount() const
 {
-    return m_objects.size();
+    return static_cast<int>(m_objects.size());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -156,7 +157,7 @@ Vec3    CSelectionGroup::GetCenter() const
     }
     if (GetCount() > 0)
     {
-        c /= GetCount();
+        c /= static_cast<f32>(GetCount());
     }
     return c;
 }
@@ -631,11 +632,11 @@ void CSelectionGroup::IndicateSnappingVertex(DisplayContext& dc) const
 void CSelectionGroup::FinishChanges()
 {
     Objects selectedObjects(m_objects);
-    int iObjectSize(selectedObjects.size());
+    int iObjectSize = static_cast<int>(selectedObjects.size());
     for (int i = 0; i < iObjectSize; ++i)
     {
         CBaseObject* pObject = selectedObjects[i];
-        if (pObject == NULL)
+        if (pObject == nullptr)
         {
             continue;
         }

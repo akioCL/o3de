@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -183,7 +184,7 @@ bool QtViewPane::CloseInstance(QDockWidget* dockWidget, CloseModes closeModes)
         const int numTopLevel = topLevelWidgets.size();
         for (size_t i = 0; i < numTopLevel; ++i)
         {
-            QWidget* widget = topLevelWidgets[i];
+            QWidget* widget = topLevelWidgets[static_cast<int>(i)];
             if (widget->isModal() && widget->isVisible())
             {
                 widget->activateWindow();
@@ -1101,7 +1102,7 @@ void QtViewPaneManager::RestoreDefaultLayout(bool resetSettings)
             entityInspectorViewPane->m_dockWidget->setFloating(false);
 
             static const float tabWidgetWidthPercentage = 0.2f;
-            int newWidth = (float)screenWidth * tabWidgetWidthPercentage;
+            int newWidth = static_cast<int>((float)screenWidth * tabWidgetWidthPercentage);
 
             if (levelInspectorPane)
             {
@@ -1138,7 +1139,7 @@ void QtViewPaneManager::RestoreDefaultLayout(bool resetSettings)
             // so that they get an appropriate default width since the minimum sizes have
             // been removed from these widgets
             static const float entityOutlinerWidthPercentage = 0.15f;
-            int newWidth = (float)screenWidth * entityOutlinerWidthPercentage;
+            int newWidth = static_cast<int>((float)screenWidth * entityOutlinerWidthPercentage);
             m_mainWindow->resizeDocks({ entityOutlinerViewPane->m_dockWidget }, { newWidth }, Qt::Horizontal);
         }
 

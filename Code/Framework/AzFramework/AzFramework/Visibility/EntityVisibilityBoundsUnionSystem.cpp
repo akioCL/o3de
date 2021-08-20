@@ -1,12 +1,14 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 #include "EntityVisibilityBoundsUnionSystem.h"
 
+#include <AzCore/Debug/Profiler.h>
 #include <AzFramework/Visibility/BoundsBus.h>
 #include <cstring>
 
@@ -41,7 +43,7 @@ namespace AzFramework
 
     void EntityVisibilityBoundsUnionSystem::OnEntityActivated(AZ::Entity* entity)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzFramework);
+        AZ_PROFILE_FUNCTION(AzFramework);
 
         // ignore any entity that might activate which does not have a TransformComponent
         if (entity->GetTransform() == nullptr)
@@ -67,7 +69,7 @@ namespace AzFramework
 
     void EntityVisibilityBoundsUnionSystem::OnEntityDeactivated(AZ::Entity* entity)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzFramework);
+        AZ_PROFILE_FUNCTION(AzFramework);
 
         // ignore any entity that might deactivate which does not have a TransformComponent
         if (entity->GetTransform() == nullptr)
@@ -88,7 +90,7 @@ namespace AzFramework
 
     void EntityVisibilityBoundsUnionSystem::UpdateVisibilitySystem(AZ::Entity* entity, EntityVisibilityBoundsUnionInstance& instance)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzFramework);
+        AZ_PROFILE_FUNCTION(AzFramework);
 
         if (const auto& localEntityBoundsUnions = instance.m_localEntityBoundsUnion; localEntityBoundsUnions.IsValid())
         {
@@ -135,7 +137,7 @@ namespace AzFramework
 
     void EntityVisibilityBoundsUnionSystem::ProcessEntityBoundsUnionRequests()
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzFramework);
+        AZ_PROFILE_FUNCTION(AzFramework);
 
         // iterate over all entities whose bounds changed and recalculate them
         for (const auto& entity : m_entityBoundsDirty)
@@ -154,7 +156,7 @@ namespace AzFramework
 
     void EntityVisibilityBoundsUnionSystem::OnTransformUpdated(AZ::Entity* entity)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzFramework);
+        AZ_PROFILE_FUNCTION(AzFramework);
 
         // update the world transform of the visibility bounds union
         if (auto instance_it = m_entityVisibilityBoundsUnionInstanceMapping.find(entity);

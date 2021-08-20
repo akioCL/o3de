@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -72,7 +73,7 @@ public:
     virtual IDataBaseLibrary* AddLibrary(const QString& library, bool bIsLevelLibrary = false, bool bIsLoading = true) override;
     virtual void DeleteLibrary(const QString& library, bool forceDeleteLevel = false) override;
     //! Get number of libraries.
-    virtual int GetLibraryCount() const override { return m_libs.size(); };
+    virtual int GetLibraryCount() const override { return static_cast<int>(m_libs.size()); };
     //! Get number of modified libraries.
     virtual int GetModifiedLibraryCount() const override;
 

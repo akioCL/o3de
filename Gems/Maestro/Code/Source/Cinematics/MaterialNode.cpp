@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 
-#include "Maestro_precompiled.h"
 #include <AzCore/Serialization/SerializeContext.h>
 #include "MaterialNode.h"
 #include "AnimTrack.h"
@@ -174,13 +174,13 @@ void CAnimMaterialNode::UpdateDynamicParamsInternal()
 //////////////////////////////////////////////////////////////////////////
 unsigned int CAnimMaterialNode::GetParamCount() const
 {
-    return s_nodeParams.size() + m_dynamicShaderParamInfos.size();
+    return static_cast<unsigned int>(s_nodeParams.size() + m_dynamicShaderParamInfos.size());
 }
 
 //////////////////////////////////////////////////////////////////////////
 CAnimParamType CAnimMaterialNode::GetParamType(unsigned int nIndex) const
 {
-    if (nIndex >= 0 && nIndex < (int)s_nodeParams.size())
+    if (nIndex < s_nodeParams.size())
     {
         return s_nodeParams[nIndex].paramType;
     }

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -136,7 +137,7 @@ namespace EMotionFX
         AZ::Transform currentTransform = AZ::Transform::CreateIdentity();
         AZ::TransformBus::EventResult(currentTransform, m_entityId, &AZ::TransformBus::Events::GetWorldTM);
 
-        const AZ::Vector3 actorInstancePosition = actorInstance->GetWorldSpaceTransform().mPosition;
+        const AZ::Vector3 actorInstancePosition = actorInstance->GetWorldSpaceTransform().m_position;
         const AZ::Vector3 positionDelta = actorInstancePosition - currentTransform.GetTranslation();
 
         EXPECT_CALL(testBus, ExtractMotion(testing::_, testing::_));

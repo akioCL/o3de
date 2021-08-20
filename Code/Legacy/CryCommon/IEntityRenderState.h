@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -204,7 +205,7 @@ struct IRenderNode
     // Debug info about object.
     virtual const char* GetName() const = 0;
     virtual const char* GetEntityClassName() const = 0;
-    virtual string GetDebugString([[maybe_unused]] char type = 0) const { return ""; }
+    virtual AZStd::string GetDebugString([[maybe_unused]] char type = 0) const { return ""; }
     virtual float GetImportance() const   { return 1.f; }
 
     // Description:

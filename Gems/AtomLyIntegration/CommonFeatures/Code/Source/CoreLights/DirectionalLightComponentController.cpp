@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -258,7 +259,8 @@ namespace AZ
 
         void DirectionalLightComponentController::SetCascadeCount(uint32_t cascadeCount)
         {
-            const uint16_t cascadeCount16 = cascadeCount = GetMin(Shadow::MaxNumberOfCascades, GetMax<uint16_t>(1, aznumeric_cast<uint16_t>(cascadeCount)));
+            const uint16_t cascadeCount16 = GetMin(static_cast<uint16_t>(Shadow::MaxNumberOfCascades), GetMax<uint16_t>(1, aznumeric_cast<uint16_t>(cascadeCount)));
+            cascadeCount = cascadeCount16;
             m_configuration.m_cascadeCount = cascadeCount16;
             if (m_featureProcessor)
             {

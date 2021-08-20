@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -85,7 +86,7 @@ void CTrackViewKeyHandle::SetTime(float time, bool notifyListeners)
     if (!m_pTrack->IsSortMarkerKey(m_keyIndex))
     {
         CTrackViewKeyBundle allKeys = m_pTrack->GetAllKeys();
-        for (int x = 0; x < allKeys.GetKeyCount(); x++)
+        for (unsigned int x = 0; x < allKeys.GetKeyCount(); x++)
         {
             unsigned int curIndex = allKeys.GetKey(x).GetIndex();
             if (m_pTrack->IsSortMarkerKey(curIndex))

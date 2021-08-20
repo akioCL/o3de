@@ -1,22 +1,21 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 #pragma once
 
-#include <AzCore/Component/TickBus.h>
-#include <AzCore/Component/TransformBus.h>
-#include <AtomCore/Instance/Instance.h>
-
-#include <Atom/RPI.Public/Base.h>
-#include <Atom/Document/MaterialDocumentNotificationBus.h>
 #include <Atom/Feature/CoreLights/DirectionalLightFeatureProcessorInterface.h>
 #include <Atom/Feature/SkyBox/SkyBoxFeatureProcessorInterface.h>
+#include <Atom/RPI.Public/Base.h>
 #include <Atom/Viewport/MaterialViewportNotificationBus.h>
-
+#include <AtomCore/Instance/Instance.h>
+#include <AtomToolsFramework/Document/AtomToolsDocumentNotificationBus.h>
+#include <AzCore/Component/TickBus.h>
+#include <AzCore/Component/TransformBus.h>
 #include <AzFramework/Windowing/WindowBus.h>
 #include <Viewport/InputController/MaterialEditorViewportInputController.h>
 
@@ -44,7 +43,7 @@ namespace MaterialEditor
     class MaterialViewportRenderer
         : public AZ::Data::AssetBus::Handler
         , public AZ::TickBus::Handler
-        , public MaterialDocumentNotificationBus::Handler
+        , public AtomToolsFramework::AtomToolsDocumentNotificationBus::Handler
         , public MaterialViewportNotificationBus::Handler
         , public AZ::TransformNotificationBus::MultiHandler
         , public AzFramework::WindowSystemRequestBus::Handler
@@ -59,7 +58,7 @@ namespace MaterialEditor
 
     private:
 
-        // MaterialDocumentNotificationBus::Handler interface overrides...
+        // AtomToolsFramework::AtomToolsDocumentNotificationBus::Handler interface overrides...
         void OnDocumentOpened(const AZ::Uuid& documentId) override;
 
         // MaterialViewportNotificationBus::Handler interface overrides...

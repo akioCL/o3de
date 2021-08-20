@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -45,7 +46,7 @@ namespace AZ
         void            Reset()
         {
             m_usage = 0;
-            m_currentCharacter = ~0;
+            m_currentCharacter = std::numeric_limits<uint32_t>::max();
 
             m_characterWidth = 0;
             m_characterHeight = 0;
@@ -78,7 +79,7 @@ namespace AZ
         int Create(int iCacheSize, int glyphBitmapWidth, int glyphBitmapHeight, FontSmoothMethod smoothMethod, FontSmoothAmount smoothAmount, float sizeRatio);
         int Release();
 
-        int LoadFontFromFile(const string& fileName);
+        int LoadFontFromFile(const AZStd::string& fileName);
         int LoadFontFromMemory(unsigned char* fileBuffer, int dataSize);
         int ReleaseFont();
 

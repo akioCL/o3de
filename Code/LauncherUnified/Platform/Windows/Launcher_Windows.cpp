@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -8,6 +9,7 @@
 
 #include <CryCommon/CryLibrary.h>
 #include <AzCore/Math/Vector2.h>
+#include <AzCore/Memory/SystemAllocator.h>
 
 int APIENTRY WinMain([[maybe_unused]] HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance, [[maybe_unused]] LPSTR lpCmdLine, [[maybe_unused]] int nCmdShow)
 {
@@ -71,8 +73,8 @@ void CVar_OnViewportPosition(const AZ::Vector2& value)
     if (HWND windowHandle = GetActiveWindow())
     {
         SetWindowPos(windowHandle, nullptr,
-            value.GetX(),
-            value.GetY(),
+            static_cast<int>(value.GetX()),
+            static_cast<int>(value.GetY()),
             0, 0, SWP_NOOWNERZORDER | SWP_NOSIZE);
     }
 }

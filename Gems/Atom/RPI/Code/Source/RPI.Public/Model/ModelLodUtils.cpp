@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -26,7 +27,7 @@ namespace AZ
 
             ModelLodIndex SelectLod(const View* view, const Vector3& position, const Model& model, ModelLodIndex lodOverride)
             {
-                AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
+                AZ_PROFILE_FUNCTION(AzRender);
                 ModelLodIndex lodIndex;
                 if (model.GetLodCount() == 1)
                 {

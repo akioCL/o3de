@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -31,12 +32,12 @@ namespace JsonSerializationTests
 
         AZStd::shared_ptr<NumberType> CreateDefaultInstance() override
         {
-            return AZStd::make_shared<NumberType>(0);
+            return AZStd::make_shared<NumberType>(NumberType(0));
         }
 
         AZStd::shared_ptr<NumberType> CreateFullySetInstance() override
         {
-            return AZStd::make_shared<NumberType>(4);
+            return AZStd::make_shared<NumberType>(NumberType(4));
         }
 
         AZStd::string_view GetJsonForFullySetInstance() override

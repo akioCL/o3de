@@ -1,5 +1,6 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
  *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
@@ -30,6 +31,8 @@ namespace SandboxEditor
     constexpr AZStd::string_view CameraPanSpeedSetting = "/Amazon/Preferences/Editor/Camera/PanSpeed";
     constexpr AZStd::string_view CameraRotateSmoothnessSetting = "/Amazon/Preferences/Editor/Camera/RotateSmoothness";
     constexpr AZStd::string_view CameraTranslateSmoothnessSetting = "/Amazon/Preferences/Editor/Camera/TranslateSmoothness";
+    constexpr AZStd::string_view CameraTranslateSmoothingSetting = "/Amazon/Preferences/Editor/Camera/TranslateSmoothing";
+    constexpr AZStd::string_view CameraRotateSmoothingSetting = "/Amazon/Preferences/Editor/Camera/RotateSmoothing";
     constexpr AZStd::string_view CameraTranslateForwardIdSetting = "/Amazon/Preferences/Editor/Camera/CameraTranslateForwardId";
     constexpr AZStd::string_view CameraTranslateBackwardIdSetting = "/Amazon/Preferences/Editor/Camera/CameraTranslateBackwardId";
     constexpr AZStd::string_view CameraTranslateLeftIdSetting = "/Amazon/Preferences/Editor/Camera/CameraTranslateLeftId";
@@ -256,6 +259,26 @@ namespace SandboxEditor
     void SetCameraTranslateSmoothness(const float smoothness)
     {
         SetRegistry(CameraTranslateSmoothnessSetting, smoothness);
+    }
+
+    bool CameraRotateSmoothingEnabled()
+    {
+        return GetRegistry(CameraRotateSmoothingSetting, true);
+    }
+
+    void SetCameraRotateSmoothingEnabled(const bool enabled)
+    {
+        SetRegistry(CameraRotateSmoothingSetting, enabled);
+    }
+
+    bool CameraTranslateSmoothingEnabled()
+    {
+        return GetRegistry(CameraTranslateSmoothingSetting, true);
+    }
+
+    void SetCameraTranslateSmoothingEnabled(const bool enabled)
+    {
+        SetRegistry(CameraTranslateSmoothingSetting, enabled);
     }
 
     AzFramework::InputChannelId CameraTranslateForwardChannelId()

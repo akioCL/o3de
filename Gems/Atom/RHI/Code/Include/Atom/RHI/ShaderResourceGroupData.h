@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -171,6 +172,9 @@ namespace AZ
             //! CAUTION!
             //! Different platforms might follow different packing rules for the internally-managed SRG constant buffer.
             AZStd::array_view<uint8_t> GetConstantData() const;
+
+            //! Returns the underlying ConstantsData struct
+            const ConstantsData& GetConstantsData() const;
 
             //! Returns the shader resource layout for this group.
             const ShaderResourceGroupLayout* GetLayout() const;

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -51,10 +52,10 @@ namespace UnitTest
         {
         public:
             AZ_CLASS_ALLOCATOR(Device, AZ::SystemAllocator, 0);
+            Device();
 
         private:
             AZ::RHI::ResultCode InitInternal(AZ::RHI::PhysicalDevice&) override { return AZ::RHI::ResultCode::Success; }
-            AZ::RHI::ResultCode PostInitInternal(const AZ::RHI::DeviceDescriptor&) override { return AZ::RHI::ResultCode::Success; }
             void ShutdownInternal() override {}
             void BeginFrameInternal() override {}
             void EndFrameInternal() override {}
@@ -66,9 +67,11 @@ namespace UnitTest
                 return AZStd::chrono::microseconds();
             }
             void FillFormatsCapabilitiesInternal([[maybe_unused]] FormatCapabilitiesList& formatsCapabilities) override {}
+            AZ::RHI::ResultCode InitializeLimits() override { return AZ::RHI::ResultCode::Success; }
             void PreShutdown() override {}
             AZ::RHI::ResourceMemoryRequirements GetResourceMemoryRequirements([[maybe_unused]] const AZ::RHI::ImageDescriptor& descriptor) { return AZ::RHI::ResourceMemoryRequirements{}; };
             AZ::RHI::ResourceMemoryRequirements GetResourceMemoryRequirements([[maybe_unused]] const AZ::RHI::BufferDescriptor& descriptor) { return AZ::RHI::ResourceMemoryRequirements{}; };
+            void ObjectCollectionNotify(AZ::RHI::ObjectCollectorNotifyFunction notifyFunction) override {}
         };
 
         class ImageView

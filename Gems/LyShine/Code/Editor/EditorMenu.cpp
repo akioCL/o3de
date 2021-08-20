@@ -1,11 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#include "UiCanvasEditor_precompiled.h"
-
 #include "EditorCommon.h"
 #include "FeedbackDialog.h"
 #include <AzQtComponents/Buses/ShortcutDispatch.h>
@@ -17,6 +16,7 @@
 #include "CanvasHelpers.h"
 #include "GuideHelpers.h"
 #include <LyShine/Bus/UiEditorCanvasBus.h>
+#include <Util/PathUtil.h>
 
 #include <QFileDialog>
 #include <QMenuBar>
@@ -724,7 +724,7 @@ void EditorWindow::AddMenu_View_LanguageSetting(QMenu* viewMenu)
     // Iterate through the subdirectories of the localization folder. Each
     // directory corresponds to a different language containing localization
     // translations for that language.
-    string fullLocPath(string(gEnv->pFileIO->GetAlias("@assets@")) + "/" + string(m_startupLocFolderName.toUtf8().constData()));
+    AZStd::string fullLocPath(AZStd::string(gEnv->pFileIO->GetAlias("@assets@")) + "/" + AZStd::string(m_startupLocFolderName.toUtf8().constData()));
     QDir locDir(fullLocPath.c_str());
     locDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     locDir.setSorting(QDir::Name);

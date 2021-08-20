@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -648,7 +649,7 @@ namespace AZ
             AZ::u8 width,
             int32_t viewProjOverrideIndex)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
 
             // grab a mutex lock for the rest of this function so that a commit cannot happen during it and
             // other threads can't add geometry during it
@@ -719,7 +720,7 @@ namespace AZ
             AZ::u8 width,
             int32_t viewProjOverrideIndex)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
             AZ_ATOM_PROFILE_FUNCTION("AuxGeom", "AuxGeomDrawQueue: DrawPrimitiveWithSharedVerticesCommon");
 
             AZ_Assert(indexCount >= verticesPerPrimitiveType && (indexCount % verticesPerPrimitiveType == 0),

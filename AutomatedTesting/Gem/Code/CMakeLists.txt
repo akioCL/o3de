@@ -1,6 +1,7 @@
 #
-# Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
-# 
+# Copyright (c) Contributors to the Open 3D Engine Project.
+# For complete copyright and license terms please see the LICENSE at the root of this distribution.
+#
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 #
@@ -54,6 +55,12 @@ if (PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_enable_gems(
         PROJECT_NAME AutomatedTesting GEM_FILE enabled_gems.cmake
         TARGETS Editor
+        VARIANTS Tools)
+
+    # The Material Editor needs the Lyshine "Tools" gem variant for the custom LyShine pass
+    ly_enable_gems(
+        PROJECT_NAME AutomatedTesting GEMS LyShine
+        TARGETS MaterialEditor
         VARIANTS Tools)
 
     # The pipeline tools use "Builders" gem variants:

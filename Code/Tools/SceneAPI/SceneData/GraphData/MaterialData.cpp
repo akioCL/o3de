@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -16,11 +17,6 @@ namespace AZ
         namespace GraphData
         {
             namespace DataTypes = AZ::SceneAPI::DataTypes;
-
-            const AZStd::string MaterialData::s_DiffuseMapName = "Diffuse";
-            const AZStd::string MaterialData::s_SpecularMapName = "Specular";
-            const AZStd::string MaterialData::s_BumpMapName = "Bump";
-            const AZStd::string MaterialData::s_emptyString = "";
 
             MaterialData::MaterialData()
                 : m_isNoDraw(false)
@@ -71,7 +67,7 @@ namespace AZ
                     return result->second;
                 }
 
-                return s_emptyString;
+                return m_emptyString;
             }
 
             void MaterialData::SetNoDraw(bool isNoDraw)

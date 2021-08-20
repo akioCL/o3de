@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -114,7 +115,6 @@ public:
     // AWSCoreInternalRequestBus interface implementation
     AZStd::string GetProfileName() const override { return ""; }
     AZStd::string GetResourceMappingConfigFilePath() const override { return m_normalizedConfigFilePath; }
-    AZStd::string GetResourceMappingConfigFolderPath() const override { return m_normalizedConfigFolderPath; }
     void ReloadConfiguration() override { m_reloadConfigurationCounter++; }
 
     AZStd::unique_ptr<AWSCore::AWSResourceMappingManager> m_resourceMappingManager;

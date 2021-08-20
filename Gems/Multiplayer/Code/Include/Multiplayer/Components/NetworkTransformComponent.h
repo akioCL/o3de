@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -29,11 +30,14 @@ namespace Multiplayer
 
     private:
         void OnPreRender(float deltaTime, float blendFactor);
+        void OnCorrection();
 
         void OnRotationChangedEvent(const AZ::Quaternion& rotation);
         void OnTranslationChangedEvent(const AZ::Vector3& translation);
         void OnScaleChangedEvent(float scale);
         void OnResetCountChangedEvent();
+
+        void UpdateTargetHostFrameId();
 
         AZ::Transform m_previousTransform = AZ::Transform::CreateIdentity();
         AZ::Transform m_targetTransform = AZ::Transform::CreateIdentity();
@@ -44,6 +48,9 @@ namespace Multiplayer
         AZ::Event<uint8_t>::Handler m_resetCountEventHandler;
 
         EntityPreRenderEvent::Handler m_entityPreRenderEventHandler;
+        EntityCorrectionEvent::Handler m_entityCorrectionEventHandler;
+
+        Multiplayer::HostFrameId m_targetHostFrameId = HostFrameId(0);
     };
 
     class NetworkTransformComponentController

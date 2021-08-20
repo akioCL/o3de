@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -103,7 +104,7 @@ namespace AZ
             }
 
             AZStd::shared_ptr<Containers::Scene> AssetImportRequest::LoadSceneFromVerifiedPath(const AZStd::string& assetFilePath, const Uuid& sourceGuid,
-                RequestingApplication requester)
+                RequestingApplication requester, const Uuid& loadingComponentUuid)
             {
                 AZStd::string sceneName;
                 AzFramework::StringFunc::Path::GetFileName(assetFilePath.c_str(), sceneName);
@@ -112,7 +113,7 @@ namespace AZ
 
                 // Unique pointer, will deactivate and clean up once going out of scope.
                 SceneCore::EntityConstructor::EntityPointer loaders = 
-                    SceneCore::EntityConstructor::BuildEntity("Scene Loading", SceneCore::LoadingComponent::TYPEINFO_Uuid());
+                    SceneCore::EntityConstructor::BuildEntity("Scene Loading", loadingComponentUuid);
 
                 ProcessingResultCombiner areAllPrepared;
                 AssetImportRequestBus::BroadcastResult(areAllPrepared, &AssetImportRequestBus::Events::PrepareForAssetLoading, *scene, requester);

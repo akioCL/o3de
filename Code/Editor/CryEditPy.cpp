@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -209,7 +210,7 @@ namespace
     const char* PyGetCurrentLevelName()
     {
         // Using static member to capture temporary data
-        static string tempLevelName;
+        static AZ::IO::FixedMaxPathString tempLevelName;
         tempLevelName = GetIEditor()->GetGameEngine()->GetLevelName().toUtf8().data();
         return tempLevelName.c_str();
     }
@@ -217,7 +218,7 @@ namespace
     const char* PyGetCurrentLevelPath()
     {
         // Using static member to capture temporary data
-        static string tempLevelPath;
+        static AZ::IO::FixedMaxPathString tempLevelPath;
         tempLevelPath = GetIEditor()->GetGameEngine()->GetLevelPath().toUtf8().data();
         return tempLevelPath.c_str();
     }
@@ -358,7 +359,7 @@ namespace
             {
                 AZ::TickBus::Handler::BusConnect();
             }
-            ~Ticker()
+            ~Ticker() override
             {
                 AZ::TickBus::Handler::BusDisconnect();
             }

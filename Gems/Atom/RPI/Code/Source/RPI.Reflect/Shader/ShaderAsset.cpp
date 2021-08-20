@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -171,7 +172,7 @@ namespace AZ
         Data::Asset<ShaderVariantAsset> ShaderAsset::GetVariant(
             const ShaderVariantId& shaderVariantId, SupervariantIndex supervariantIndex)
         {
-            AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
 
             auto variantFinder = AZ::Interface<IShaderVariantFinder>::Get();
             AZ_Assert(variantFinder, "The IShaderVariantFinder doesn't exist");
@@ -188,7 +189,7 @@ namespace AZ
 
         ShaderVariantSearchResult ShaderAsset::FindVariantStableId(const ShaderVariantId& shaderVariantId)
         {
-            AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
 
             uint32_t dynamicOptionCount = aznumeric_cast<uint32_t>(GetShaderOptionGroupLayout()->GetShaderOptions().size());
             ShaderVariantSearchResult variantSearchResult{RootShaderVariantStableId,  dynamicOptionCount };
@@ -515,7 +516,7 @@ namespace AZ
         SupervariantIndex ShaderAsset::GetSupervariantIndexInternal(AZ::Name supervariantName) const
         {
             const auto& supervariants = GetCurrentShaderApiData().m_supervariants;
-            const uint32_t supervariantCount = supervariants.size();
+            const uint32_t supervariantCount = static_cast<uint32_t>(supervariants.size());
             for (uint32_t index = 0; index < supervariantCount; ++index)
             {
                 if (supervariants[index].m_name == supervariantName)

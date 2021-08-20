@@ -1,11 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
-#include "SliceFavorites_precompiled.h"
 
 #include "FavoriteDataModel.h"
 #include "ComponentSliceFavoritesWindow.h"
@@ -474,14 +473,14 @@ namespace SliceFavorites
 
         for (size_t index = 0; index < currentList.size(); index++)
         {
-            FavoriteData* current = currentList[index];
+            FavoriteData* current = currentList[static_cast<int>(index)];
 
             if (!current)
             {
                 continue;
             }
 
-            settings.setArrayIndex(index);
+            settings.setArrayIndex(static_cast<int>(index));
             settings.setValue("name", current->m_name);
 
             AZStd::string assetIdString;

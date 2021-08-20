@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -8,8 +9,7 @@
 #pragma once
 
 #include <AzCore/Math/Internal/MathTypes.h>
-#include <AzCore/RTTI/TypeInfo.h>
-#include <AzCore/std/algorithm.h>
+#include <AzCore/RTTI/TypeInfoSimple.h>
 
 namespace AZ
 {
@@ -312,10 +312,6 @@ namespace AZ
 
     private:
 
-#ifdef AZ_COMPILER_MSVC
-#   pragma warning(push)
-#   pragma warning(disable:4201) // anonymous union
-#endif
         union
         {
             Simd::Vec3::FloatType m_value;
@@ -328,9 +324,6 @@ namespace AZ
                 float m_z;
             };
         };
-#ifdef AZ_COMPILER_MSVC
-#   pragma warning(pop)
-#endif
     };
 
     //! Non member functionality belonging to the AZ namespace.

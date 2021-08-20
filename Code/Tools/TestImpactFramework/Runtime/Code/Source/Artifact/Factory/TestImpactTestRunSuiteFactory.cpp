@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -66,7 +67,7 @@ namespace TestImpact
                     const auto getDuration = [&Keys](const AZ::rapidxml::xml_node<>* node)
                     {
                         const AZStd::string duration = node->first_attribute(Keys[DurationKey])->value();
-                        return AZStd::chrono::milliseconds(AZStd::stof(duration) * 1000.f);
+                        return AZStd::chrono::milliseconds(static_cast<AZStd::sys_time_t>(AZStd::stof(duration) * 1000.f));
                     };
 
                     TestRunSuite testSuite;
@@ -94,7 +95,7 @@ namespace TestImpact
 
                         const auto getResult = [](const AZ::rapidxml::xml_node<>* node)
                         {
-                            for (auto child_node = node->first_node("failure"); child_node; child_node = child_node->next_sibling())
+                            if (auto child_node = node->first_node("failure"))
                             {
                                 return TestRunResult::Failed;
                             }

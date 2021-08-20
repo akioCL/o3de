@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -57,7 +58,7 @@ namespace AZ
             {
                 if (m_modelAsset.IsReady())
                 {
-                    lodCount = m_modelAsset->GetLodCount();
+                    lodCount = static_cast<uint32_t>(m_modelAsset->GetLodCount());
                 }
                 else
                 {
@@ -65,7 +66,7 @@ namespace AZ
                     Data::Instance<RPI::Model> model = Data::InstanceDatabase<RPI::Model>::Instance().Find(Data::InstanceId::CreateFromAssetId(m_modelAsset.GetId()));
                     if (model)
                     {
-                        lodCount = model->GetLodCount();
+                        lodCount = static_cast<uint32_t>(model->GetLodCount());
                     }
                 }
             }
@@ -250,6 +251,25 @@ namespace AZ
                 m_meshFeatureProcessor->SetTransform(m_meshHandle, m_transformInterface->GetWorldTM(), m_cachedNonUniformScale);
             }
         }
+        
+        RPI::ModelMaterialSlotMap MeshComponentController::GetModelMaterialSlots() const
+        {
+            Data::Asset<const RPI::ModelAsset> modelAsset = GetModelAsset();
+            if (modelAsset.IsReady())
+            {
+                return modelAsset->GetMaterialSlots();
+            }
+            else
+            {
+                return {};
+            }
+        }
+
+        MaterialAssignmentId MeshComponentController::FindMaterialAssignmentId(
+            const MaterialAssignmentLodIndex lod, const AZStd::string& label) const
+        {
+            return FindMaterialAssignmentIdInModel(GetModel(), lod, label);
+        }
 
         MaterialAssignmentMap MeshComponentController::GetMaterialAssignments() const
         {
@@ -422,7 +442,7 @@ namespace AZ
 
         RPI::Cullable::LodOverride MeshComponentController::GetLodOverride() const
         {
-            return m_meshFeatureProcessor->GetSortKey(m_meshHandle);
+            return static_cast<RPI::Cullable::LodOverride>(m_meshFeatureProcessor->GetSortKey(m_meshHandle));
         }
 
         void MeshComponentController::SetVisibility(bool visible)

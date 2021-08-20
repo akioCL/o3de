@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -65,10 +66,10 @@ namespace ExporterLib
 
         // the motion event table chunk header
         EMotionFX::FileFormat::FileChunk chunkHeader;
-        chunkHeader.mChunkID = EMotionFX::FileFormat::SHARED_CHUNK_MOTIONEVENTTABLE;
-        chunkHeader.mVersion = 3;
+        chunkHeader.m_chunkId = EMotionFX::FileFormat::SHARED_CHUNK_MOTIONEVENTTABLE;
+        chunkHeader.m_version = 3;
 
-        chunkHeader.mSizeInBytes = static_cast<uint32>(serializedTableSizeInBytes + sizeof(EMotionFX::FileFormat::FileMotionEventTableSerialized));
+        chunkHeader.m_sizeInBytes = static_cast<uint32>(serializedTableSizeInBytes + sizeof(EMotionFX::FileFormat::FileMotionEventTableSerialized));
 
         EMotionFX::FileFormat::FileMotionEventTableSerialized tableHeader;
         tableHeader.m_size = serializedTableSizeInBytes;

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -49,7 +50,7 @@ namespace AzToolsFramework
 
     AzFramework::ScreenPoint GetScreenPosition(const int viewportId, const AZ::Vector3& worldTranslation)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         auto screenPosition = AzFramework::ScreenPoint(0, 0);
         ViewportInteraction::ViewportInteractionRequestBus::EventResult(
@@ -61,7 +62,7 @@ namespace AzToolsFramework
 
     bool AabbIntersectMouseRay(const ViewportInteraction::MouseInteraction& mouseInteraction, const AZ::Aabb& aabb)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
 
         const AZ::Vector3 rayScaledDir = mouseInteraction.m_mousePick.m_rayDirection * s_pickRayLength;
 
@@ -77,7 +78,7 @@ namespace AzToolsFramework
         float& closestDistance,
         const int viewportId)
     {
-        AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::Entity);
+        AZ_PROFILE_FUNCTION(Entity);
 
         bool entityPicked = false;
         EditorComponentSelectionRequestsBus::EnumerateHandlersId(

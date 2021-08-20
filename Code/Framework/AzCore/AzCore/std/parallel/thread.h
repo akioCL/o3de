@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -68,8 +69,7 @@ namespace AZStd
         int             m_priority{ -100000 };
 
         //! The CPU ids (as a bitfield) that this thread will be running on, see \ref AZStd::thread_desc::m_cpuId.
-        //! Windows: This parameter is ignored.
-        //! On other platforms, each bit maps directly to the core numbers [0-n], default is 0
+        //! Each bit maps directly to the core numbers [0-n], default is 0
         int             m_cpuId{ AFFINITY_MASK_ALL };
 
         //! If we can join the thread.

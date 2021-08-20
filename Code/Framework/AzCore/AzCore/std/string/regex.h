@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -20,11 +21,6 @@
 
 // used for std::pointer_traits \note do an AZStd version
 #include <memory>
-
-#if defined(AZ_COMPILER_MSVC)
-#   pragma warning(push)
-#   pragma warning(disable: 6011 28198)
-#endif // AZ_COMPILER_MSVC
 
  #ifndef AZ_REGEX_MAX_COMPLEXITY_COUNT
   #define AZ_REGEX_MAX_COMPLEXITY_COUNT 10000000L   /* set to 0 to disable */
@@ -4765,7 +4761,3 @@ namespace AZStd
         Trans();
     }
 } // namespace AZStd
-
-#if defined(AZ_COMPILER_MSVC)
-#   pragma warning(pop)
-#endif // AZ_COMPILER_MSVC

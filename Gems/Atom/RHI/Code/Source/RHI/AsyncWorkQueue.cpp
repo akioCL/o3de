@@ -1,10 +1,13 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 #include <Atom/RHI/AsyncWorkQueue.h>
+
+#include <AzCore/Debug/Profiler.h>
 
 namespace AZ
 {
@@ -123,7 +126,7 @@ namespace AZ
                 return;
             }
 
-            AZ_PROFILE_FUNCTION_IDLE(AZ::Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
 
             AZStd::unique_lock<AZStd::mutex> lock(m_waitWorkItemMutex);
             m_waitWorkItemCondition.wait(lock, [&]() {return HasFinishedWork(workHandle); });

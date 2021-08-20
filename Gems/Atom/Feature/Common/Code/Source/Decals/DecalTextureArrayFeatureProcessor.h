@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -8,6 +9,7 @@
 #pragma once
 
 #include <Atom/Feature/Utils/GpuBufferHandler.h>
+#include <Atom/Feature/Utils/IndexedDataVector.h>
 #include <Atom/Feature/Decals/DecalFeatureProcessorInterface.h>
 #include <Atom/RPI.Reflect/Image/ImageAsset.h>
 #include <Atom/RPI.Public/Image/StreamingImage.h>
@@ -15,7 +17,6 @@
 #include <Atom/Feature/Utils/IndexableList.h>
 #include <Decals/DecalTextureArray.h>
 #include <Decals/AsyncLoadTracker.h>
-#include <CoreLights/IndexedDataVector.h>
 
 namespace AZ
 {

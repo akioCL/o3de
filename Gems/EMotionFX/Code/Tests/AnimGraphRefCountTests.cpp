@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -38,8 +39,8 @@ namespace EMotionFX
                     const uint32 threadIndex = this->m_actorInstance->GetThreadIndex();
 
                     // Check if data and pose ref counts are back to 0 for all nodes.
-                    const uint32 numNodes = this->m_animGraph->GetNumNodes();
-                    for (uint32 i = 0; i < numNodes; ++i)
+                    const size_t numNodes = this->m_animGraph->GetNumNodes();
+                    for (size_t i = 0; i < numNodes; ++i)
                     {
                         const AnimGraphNode* node = this->m_animGraph->GetNode(i);
 

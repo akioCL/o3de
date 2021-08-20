@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -111,10 +112,7 @@ namespace AZ
 
                 // The id of the render pipeline created by this component
                 RPI::RenderPipelineId m_renderPipelineId;
-
-                // Variables which are system component configuration
-                AZStd::string m_defaultPipelineAssetPath = "passes/MainRenderPipeline.azasset";
-
+                
                 // Save a reference to the image created by the BRDF pipeline so it doesn't get auto deleted if it's ref count goes to zero
                 // For example, if we delete all the passes, we won't have to recreate the BRDF pipeline to recreate the BRDF texture
                 Data::Instance<RPI::AttachmentImage> m_brdfTexture;

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -245,7 +246,6 @@ struct IView
     virtual void SetScale(const float scale) = 0;
     virtual void SetZoomedScale(const float scale) = 0;
     virtual void SetActive(const bool bActive) = 0;
-    virtual void UpdateAudioListener(const Matrix34& rMatrix) = 0;
 };
 
 struct IViewSystemListener
@@ -293,8 +293,6 @@ struct IViewSystem
     virtual void SetOverrideCameraRotation(bool bOverride, Quat rotation) = 0;
 
     virtual bool IsPlayingCutScene() const = 0;
-
-    virtual void UpdateSoundListeners() = 0;
 
     virtual void SetDeferredViewSystemUpdate(bool const bDeferred) = 0;
     virtual bool UseDeferredViewSystemUpdate() const = 0;

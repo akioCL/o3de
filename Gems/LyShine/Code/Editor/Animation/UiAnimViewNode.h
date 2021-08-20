@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -120,7 +121,7 @@ public:
 
     virtual bool AreAllKeysOfSameType() const override { return m_bAllOfSameType; }
 
-    virtual unsigned int GetKeyCount() const override { return m_keys.size(); }
+    virtual unsigned int GetKeyCount() const override { return static_cast<unsigned int>(m_keys.size()); }
     virtual CUiAnimViewKeyHandle GetKey(unsigned int index) override { return m_keys[index]; }
 
     virtual void SelectKeys(const bool bSelected) override;
@@ -172,7 +173,7 @@ public:
     CUiAnimViewNode* GetParentNode() const { return m_pParentNode; }
 
     // Children
-    unsigned int GetChildCount() const { return m_childNodes.size(); }
+    unsigned int GetChildCount() const { return static_cast<unsigned int>(m_childNodes.size()); }
     CUiAnimViewNode* GetChild(unsigned int index) const { return m_childNodes[index].get(); }
 
     // Snap time value to prev/next key in sequence

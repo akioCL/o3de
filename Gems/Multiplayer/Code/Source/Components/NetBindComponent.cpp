@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -266,10 +267,15 @@ namespace Multiplayer
         return m_isProcessingInput;
     }
 
+    bool NetBindComponent::IsReprocessingInput() const
+    {
+        return m_isReprocessingInput;
+    }
+
     void NetBindComponent::CreateInput(NetworkInput& networkInput, float deltaTime)
     {
-        // Only autonomous or authority runs this logic
-        AZ_Assert(m_netEntityRole == NetEntityRole::Autonomous || m_netEntityRole == NetEntityRole::Authority, "Incorrect network role for input creation");
+        // Only autonomous runs this logic
+        AZ_Assert(IsNetEntityRoleAutonomous(), "Incorrect network role for input creation");
         for (MultiplayerComponent* multiplayerComponent : m_multiplayerInputComponentVector)
         {
             multiplayerComponent->GetController()->CreateInput(networkInput, deltaTime);
@@ -278,12 +284,21 @@ namespace Multiplayer
 
     void NetBindComponent::ProcessInput(NetworkInput& networkInput, float deltaTime)
     {
+        m_isProcessingInput = true;
         // Only autonomous and authority runs this logic
         AZ_Assert((NetworkRoleHasController(m_netEntityRole)), "Incorrect network role for input processing");
         for (MultiplayerComponent* multiplayerComponent : m_multiplayerInputComponentVector)
         {
             multiplayerComponent->GetController()->ProcessInput(networkInput, deltaTime);
         }
+        m_isProcessingInput = false;
+    }
+
+    void NetBindComponent::ReprocessInput(NetworkInput& networkInput, float deltaTime)
+    {
+        m_isReprocessingInput = true;
+        ProcessInput(networkInput, deltaTime);
+        m_isReprocessingInput = false;
     }
 
     bool NetBindComponent::HandleRpcMessage(AzNetworking::IConnection* invokingConnection, NetEntityRole remoteRole, NetworkEntityRpcMessage& message)
@@ -393,6 +408,11 @@ namespace Multiplayer
         m_entityPreRenderEvent.Signal(deltaTime, blendFactor);
     }
 
+    void NetBindComponent::NotifyCorrection()
+    {
+        m_entityCorrectionEvent.Signal();
+    }
+
     void NetBindComponent::AddEntityStopEventHandler(EntityStopEvent::Handler& eventHandler)
     {
         eventHandler.Connect(m_entityStopEvent);
@@ -428,6 +448,11 @@ namespace Multiplayer
         eventHandler.Connect(m_entityPreRenderEvent);
     }
 
+    void NetBindComponent::AddEntityCorrectionEventHandler(EntityCorrectionEvent::Handler& eventHandler)
+    {
+        eventHandler.Connect(m_entityCorrectionEvent);
+    }
+
     bool NetBindComponent::SerializeEntityCorrection(AzNetworking::ISerializer& serializer)
     {
         m_predictableRecord.ResetConsumedBits();
@@ -446,11 +471,18 @@ namespace Multiplayer
 
     bool NetBindComponent::SerializeStateDeltaMessage(ReplicationRecord& replicationRecord, AzNetworking::ISerializer& serializer)
     {
+        auto& stats = GetMultiplayer()->GetStats();
+        stats.RecordEntitySerializeStart(serializer.GetSerializerMode(), GetEntityId(), GetEntity()->GetName().c_str());
+
         bool success = true;
         for (auto iter = m_multiplayerSerializationComponentVector.begin(); iter != m_multiplayerSerializationComponentVector.end(); ++iter)
         {
             success &= (*iter)->SerializeStateDeltaMessage(replicationRecord, serializer);
+
+            stats.RecordComponentSerializeEnd(serializer.GetSerializerMode(), (*iter)->GetNetComponentId());
         }
+
+        stats.RecordEntitySerializeStop(serializer.GetSerializerMode(), GetEntityId(), GetEntity()->GetName().c_str());
 
         return success;
     }
@@ -648,6 +680,7 @@ namespace Multiplayer
             MultiplayerComponent* multiplayerComponent = azrtti_cast<MultiplayerComponent*>(component);
             if (multiplayerComponent != nullptr)
             {
+                multiplayerComponent->SetOwningConnectionId(m_owningConnectionId);
                 m_multiplayerInputComponentVector.push_back(multiplayerComponent);
             }
         }

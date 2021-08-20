@@ -1,6 +1,7 @@
 #
-# Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
-# 
+# Copyright (c) Contributors to the Open 3D Engine Project.
+# For complete copyright and license terms please see the LICENSE at the root of this distribution.
+#
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 #
@@ -21,6 +22,7 @@ set(FILES
     Include/Atom/RPI.Reflect/Model/ModelKdTree.h
     Include/Atom/RPI.Reflect/Model/ModelLodAsset.h
     Include/Atom/RPI.Reflect/Model/ModelLodIndex.h
+    Include/Atom/RPI.Reflect/Model/ModelMaterialSlot.h
     Include/Atom/RPI.Reflect/Model/ModelAssetCreator.h
     Include/Atom/RPI.Reflect/Model/ModelLodAssetCreator.h
     Include/Atom/RPI.Reflect/Model/MorphTargetDelta.h
@@ -105,6 +107,7 @@ set(FILES
     Source/RPI.Reflect/Model/ModelLodAsset.cpp
     Source/RPI.Reflect/Model/ModelAssetCreator.cpp
     Source/RPI.Reflect/Model/ModelLodAssetCreator.cpp
+    Source/RPI.Reflect/Model/ModelMaterialSlot.cpp
     Source/RPI.Reflect/Model/MorphTargetDelta.cpp
     Source/RPI.Reflect/Model/MorphTargetMetaAsset.cpp
     Source/RPI.Reflect/Model/MorphTargetMetaAssetCreator.cpp

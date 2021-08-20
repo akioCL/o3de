@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -37,13 +38,13 @@ namespace AZStd
 
         binary_semaphore(bool initialState = false)
         {
-            m_event = CreateEvent(nullptr, false, initialState, nullptr);
+            m_event = CreateEventW(nullptr, false, initialState, nullptr);
             AZ_Assert(m_event != NULL, "CreateEvent error: %d\n", GetLastError());
         }
         binary_semaphore(const char* name, bool initialState = false)
         {
             (void)name; // name is used only for debug, if we pass it to the semaphore it will become named semaphore
-            m_event = CreateEvent(nullptr, false, initialState, nullptr);
+            m_event = CreateEventW(nullptr, false, initialState, nullptr);
             AZ_Assert(m_event != NULL, "CreateEvent error: %d\n", GetLastError());
         }
 

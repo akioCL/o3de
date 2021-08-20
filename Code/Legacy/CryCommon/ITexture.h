@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -313,8 +314,8 @@ public:
 
     void GetMemoryUsage([[maybe_unused]] ICrySizer* pSizer) const
     {
-        COMPILE_TIME_ASSERT(eTT_MaxTexType <= 255);
-        COMPILE_TIME_ASSERT(eTF_MaxFormat <= 255);
+        static_assert(eTT_MaxTexType <= 255);
+        static_assert(eTF_MaxFormat <= 255);
         /*LATER*/
     }
 

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -41,7 +42,7 @@ public:
         AzToolsFramework::EditorEvents::Bus::Handler::BusConnect();
     }
 
-    ~ListenerForShowAssetEditorEvent()
+    ~ListenerForShowAssetEditorEvent() override
     {
         AzToolsFramework::EditorEvents::Bus::Handler::BusDisconnect();
     }
@@ -81,6 +82,7 @@ AzAssetBrowserWindow::AzAssetBrowserWindow(QWidget* parent)
 
     m_ui->m_assetBrowserTableViewWidget->setVisible(false);
     m_ui->m_toggleDisplayViewBtn->setVisible(false);
+    m_ui->m_searchWidget->SetFilterInputInterval(AZStd::chrono::milliseconds(250));
     if (ed_useNewAssetBrowserTableView)
     {
         m_ui->m_toggleDisplayViewBtn->setVisible(true);

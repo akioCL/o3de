@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -46,7 +47,7 @@ public:
         g_pXmlStrCmp = pPrevCmpFunc;
         return bReturn;
     }
-    ILINE bool GetAttr([[maybe_unused]] XmlNodeRef& node, [[maybe_unused]] const char* name, [[maybe_unused]] const string& value)
+    ILINE bool GetAttr([[maybe_unused]] XmlNodeRef& node, [[maybe_unused]] const char* name, [[maybe_unused]] const AZStd::string& value)
     {
         return false;
     }
@@ -74,7 +75,7 @@ public:
     }
 
     bool Value(const char* name, int8& value);
-    bool Value(const char* name, string& value);
+    bool Value(const char* name, AZStd::string& value);
     bool Value(const char* name, CTimeValue& value);
     bool Value(const char* name, XmlNodeRef& value);
 
@@ -87,7 +88,7 @@ public:
     void BeginGroup(const char* szName);
     bool BeginOptionalGroup(const char* szName, bool condition);
     void EndGroup();
-    const char* GetStackInfo() const;
+    AZStd::string GetStackInfo() const;
 
     void GetMemoryUsage(ICrySizer* pSizer) const;
 
@@ -171,8 +172,8 @@ private:
     void DefaultValue(Quat& v) const { v.w = 1.0f; v.v.x = 0; v.v.y = 0; v.v.z = 0; }
     void DefaultValue(CTimeValue& v) const { v.SetValue(0); }
     //void DefaultValue( char *str ) const { if (str) str[0] = 0; }
-    void DefaultValue(string& str) const { str = ""; }
-    void DefaultValue([[maybe_unused]] const string& str) const {}
+    void DefaultValue(AZStd::string& str) const { str = ""; }
+    void DefaultValue([[maybe_unused]] const AZStd::string& str) const {}
     void DefaultValue([[maybe_unused]] SNetObjectID& id) const {}
     void DefaultValue([[maybe_unused]] SSerializeString& str) const {}
     void DefaultValue(XmlNodeRef& ref) const { ref = NULL; }

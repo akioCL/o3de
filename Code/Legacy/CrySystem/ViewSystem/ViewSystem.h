@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -64,8 +65,6 @@ public:
     {
         return m_cutsceneCount > 0;
     }
-    virtual void UpdateSoundListeners();
-
     virtual void SetDeferredViewSystemUpdate(bool const bDeferred){ m_useDeferredViewSystemUpdate = bDeferred; }
     virtual bool UseDeferredViewSystemUpdate() const { return m_useDeferredViewSystemUpdate; }
     virtual void SetControlAudioListeners(bool const bActive);

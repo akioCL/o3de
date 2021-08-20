@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -46,7 +47,7 @@ namespace AWSGameLift
             //sessionConnectionConfig.m_dnsName = createPlayerSessionResult.GetPlayerSession().GetDnsName().c_str();
             sessionConnectionConfig.m_ipAddress = createPlayerSessionResult.GetPlayerSession().GetIpAddress().c_str();
             sessionConnectionConfig.m_playerSessionId = createPlayerSessionResult.GetPlayerSession().GetPlayerSessionId().c_str();
-            sessionConnectionConfig.m_port = createPlayerSessionResult.GetPlayerSession().GetPort();
+            sessionConnectionConfig.m_port = static_cast<uint16_t>(createPlayerSessionResult.GetPlayerSession().GetPort());
 
             AZ_TracePrintf(AWSGameLiftJoinSessionActivityName,
                 "Built SessionConnectionConfig with IpAddress=%s, PlayerSessionId=%s and Port=%d",

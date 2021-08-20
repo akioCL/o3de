@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -63,14 +64,14 @@ void CSerializeXMLWriterImpl::BeginGroup(const char* szName)
     if (strchr(szName, ' ') != 0)
     {
         assert(0 && "Spaces in group name not supported");
-        CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "!Spaces in group name not supported: %s/%s", GetStackInfo(), szName);
+        CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "!Spaces in group name not supported: %s/%s", GetStackInfo().c_str(), szName);
     }
     XmlNodeRef node = CreateNodeNamed(szName);
     CurNode()->addChild(node);
     m_nodeStack.push_back(node);
     if (m_nodeStack.size() > MAX_NODE_STACK_DEPTH)
     {
-        CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "!Too Deep Node Stack:\r\n%s", GetStackInfo());
+        CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "!Too Deep Node Stack:\r\n%s", GetStackInfo().c_str());
     }
 }
 
@@ -111,10 +112,9 @@ void CSerializeXMLWriterImpl::GetMemoryUsage(ICrySizer* pSizer) const
 }
 
 //////////////////////////////////////////////////////////////////////////
-const char* CSerializeXMLWriterImpl::GetStackInfo() const
+AZStd::string CSerializeXMLWriterImpl::GetStackInfo() const
 {
-    static string str;
-    str.assign("");
+    AZStd::string str;
     for (int i = 0; i < (int)m_nodeStack.size(); i++)
     {
         const char* name = m_nodeStack[i]->getAttr(TAG_SCRIPT_NAME);
@@ -131,14 +131,13 @@ const char* CSerializeXMLWriterImpl::GetStackInfo() const
             str += "/";
         }
     }
-    return str.c_str();
+    return str;
 }
 
 //////////////////////////////////////////////////////////////////////////
-const char* CSerializeXMLWriterImpl::GetLuaStackInfo() const
+AZStd::string CSerializeXMLWriterImpl::GetLuaStackInfo() const
 {
-    static string str;
-    str.assign("");
+    AZStd::string str;
     for (int i = 0; i < (int)m_luaSaveStack.size(); i++)
     {
         const char* name = m_luaSaveStack[i];
@@ -148,5 +147,5 @@ const char* CSerializeXMLWriterImpl::GetLuaStackInfo() const
             str += ".";
         }
     }
-    return str.c_str();
+    return str;
 }

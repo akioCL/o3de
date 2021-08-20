@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -10,6 +11,7 @@
 
 #include <AzCore/EBus/Event.h>
 #include <AzCore/IO/FileIO.h>
+#include <AzCore/RTTI/RTTI.h>
 #include <AzCore/std/containers/map.h>
 #include <AzCore/std/smart_ptr/intrusive_base.h>
 #include <AzCore/std/smart_ptr/intrusive_ptr.h>
@@ -29,7 +31,7 @@ namespace AZ::IO
     struct INestedArchive;
     struct IArchive;
 
-    using PathString = AZStd::fixed_string<AZ::IO::MaxPathLength>;
+    using PathString = AZ::IO::FixedMaxPathString;
     using StackString = AZStd::fixed_string<512>;
 
     struct MemoryBlock;

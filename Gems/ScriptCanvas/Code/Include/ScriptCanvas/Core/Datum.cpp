@@ -1,5 +1,6 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
  *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
@@ -2082,7 +2083,6 @@ namespace ScriptCanvas
                 editContext->Class<Datum>("Datum", "Datum")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "Datum")
                     ->Attribute(AZ::Edit::Attributes::Visibility, &Datum::GetVisibility)
-                    ->Attribute(AZ::Edit::Attributes::ChildNameLabelOverride, &Datum::GetLabel)
                     ->DataElement(AZ::Edit::UIHandlers::Default, &Datum::m_storage, "Datum", "")
                     ->Attribute(AZ::Edit::Attributes::Visibility, &Datum::GetDatumVisibility)
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
@@ -2219,7 +2219,7 @@ namespace ScriptCanvas
 
         const_cast<Datum*>(this)->InitializeOverloadedStorage(Data::FromAZType(description.m_typeId), eOriginality::Copy);
 
-        if (!Data::IsValueType(m_type) && !SatisfiesTraits(description.m_traits))
+        if (!Data::IsValueType(m_type) && !SatisfiesTraits(static_cast<AZ::u8>(description.m_traits)))
         {
             return AZ::Failure(AZStd::string("Attempting to convert null value to BehaviorValueParameter that expects reference or value"));
         }

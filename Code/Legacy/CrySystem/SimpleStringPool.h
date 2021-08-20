@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -215,8 +216,8 @@ public:
             CryFatalError("Can't replace strings in an xml node that reuses strings");
         }
 
-        int nStrLen1 = strlen(str1);
-        int nStrLen2 = strlen(str2);
+        int nStrLen1 = static_cast<int>(strlen(str1));
+        int nStrLen2 = static_cast<int>(strlen(str2));
 
         // undo ptr1 add.
         if (m_ptr != m_start)

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -54,9 +55,6 @@ namespace SceneBuilder
         void PopulateProductDependencies(const AZ::SceneAPI::Events::ExportProduct& exportProduct, const char* watchFolder, AssetBuilderSDK::JobProduct& jobProduct) const;
 
     protected:
-
-        void BuildDebugSceneGraph(const char* outputFolder, AZ::SceneAPI::Events::ExportProductList& productList, const AZStd::shared_ptr<AZ::SceneAPI::Containers::Scene>& scene) const;
-
         bool LoadScene(AZStd::shared_ptr<AZ::SceneAPI::Containers::Scene>& result, 
             const AssetBuilderSDK::ProcessJobRequest& request, AssetBuilderSDK::ProcessJobResponse& response);
 

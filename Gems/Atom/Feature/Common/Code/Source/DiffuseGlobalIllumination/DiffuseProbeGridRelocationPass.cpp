@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -41,7 +42,7 @@ namespace AZ
             // load shader
             // Note: the shader may not be available on all platforms
             AZStd::string shaderFilePath = "Shaders/DiffuseGlobalIllumination/DiffuseProbeGridRelocation.azshader";
-            m_shader = RPI::LoadShader(shaderFilePath);
+            m_shader = RPI::LoadCriticalShader(shaderFilePath);
             if (m_shader == nullptr)
             {
                 return;
@@ -75,9 +76,9 @@ namespace AZ
                     return;
                 }
 
-                m_dispatchArgs.m_threadsPerGroupX = AZStd::any_cast<int>(args[0]);
-                m_dispatchArgs.m_threadsPerGroupY = AZStd::any_cast<int>(args[1]);
-                m_dispatchArgs.m_threadsPerGroupZ = AZStd::any_cast<int>(args[2]);
+                m_dispatchArgs.m_threadsPerGroupX = static_cast<uint16_t>(AZStd::any_cast<int>(args[0]));
+                m_dispatchArgs.m_threadsPerGroupY = static_cast<uint16_t>(AZStd::any_cast<int>(args[1]));
+                m_dispatchArgs.m_threadsPerGroupZ = static_cast<uint16_t>(AZStd::any_cast<int>(args[2]));
             }
         }
 

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -97,7 +98,7 @@ namespace AzToolsFramework
         SourceControlFileInfo GetSceneSourceControlInfo() override;
 
         bool AreAnyEntitiesSelected() override { return !m_selectedEntities.empty(); }
-        int GetSelectedEntitiesCount() override { return m_selectedEntities.size(); }
+        int GetSelectedEntitiesCount() override { return static_cast<int>(m_selectedEntities.size()); }
         const EntityIdList& GetSelectedEntities() override { return m_selectedEntities; }
         const EntityIdList& GetHighlightedEntities() override { return m_highlightedEntities; }
         void SetSelectedEntities(const EntityIdList& selectedEntities) override;

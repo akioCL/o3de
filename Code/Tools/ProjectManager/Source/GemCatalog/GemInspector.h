@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -37,7 +38,6 @@ namespace O3DE::ProjectManager
         // Colors
         inline constexpr static const char* s_headerColor = "#FFFFFF";
         inline constexpr static const char* s_textColor = "#DDDDDD";
-        inline constexpr static const char* s_creatorColor = "#94D2FF";
 
     private slots:
         void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);

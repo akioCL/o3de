@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -229,7 +230,7 @@ namespace TestImpact
             processInFlight.m_process = LaunchProcess(AZStd::move(processInfo));
             processInFlight.m_startTime = createTime;
         }
-        catch (ProcessException& e)
+        catch ([[maybe_unused]] ProcessException& e)
         {
             AZ_Warning("ProcessScheduler", false, e.what());
             createResult = LaunchResult::Failure;

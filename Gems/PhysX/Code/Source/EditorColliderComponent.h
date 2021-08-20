@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -57,8 +58,8 @@ namespace PhysX
     //! Proxy container for only displaying a specific shape configuration depending on the shapeType selected.
     struct EditorProxyShapeConfig
     {
-        AZ_CLASS_ALLOCATOR(EditorProxyShapeConfig, AZ::SystemAllocator, 0);
-        AZ_RTTI(EditorProxyShapeConfig, "{531FB42A-42A9-4234-89BA-FD349EF83D0C}");
+        AZ_CLASS_ALLOCATOR(PhysX::EditorProxyShapeConfig, AZ::SystemAllocator, 0);
+        AZ_RTTI(PhysX::EditorProxyShapeConfig, "{531FB42A-42A9-4234-89BA-FD349EF83D0C}");
         static void Reflect(AZ::ReflectContext* context);
 
         EditorProxyShapeConfig() = default;
@@ -83,9 +84,12 @@ namespace PhysX
 
         AZStd::shared_ptr<Physics::ShapeConfiguration> CloneCurrent() const;
 
+    private:
         bool ShowingSubdivisionLevel() const;
-
+        AZ::u32 OnShapeTypeChanged();
         AZ::u32 OnConfigurationChanged();
+
+        Physics::ShapeType m_lastShapeType = Physics::ShapeType::PhysicsAsset;
     };
 
     class EditorColliderComponentDescriptor;

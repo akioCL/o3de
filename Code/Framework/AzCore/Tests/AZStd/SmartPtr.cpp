@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -2050,10 +2051,11 @@ namespace UnitTest
 
     TEST_F(SmartPtr, IntrusivePtr_DynamicCast)
     {
+
         AZStd::intrusive_ptr<RefCountedClass> basePointer = new RefCountedSubclass;
 
-        AZStd::intrusive_ptr<RefCountedSubclass> correctCast = dynamic_pointer_cast<RefCountedSubclass>(basePointer);
-        AZStd::intrusive_ptr<RefCountedSubclassB> wrongCast = dynamic_pointer_cast<RefCountedSubclassB>(basePointer);
+        AZStd::intrusive_ptr<RefCountedSubclass> correctCast = azdynamic_cast<RefCountedSubclass *>(basePointer);
+        AZStd::intrusive_ptr<RefCountedSubclassB> wrongCast = azdynamic_cast<RefCountedSubclassB *>(basePointer);
 
         EXPECT_TRUE(correctCast.get() == basePointer.get());
         EXPECT_TRUE(wrongCast.get() == nullptr);

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -85,7 +86,7 @@ void GotoPositionDialog::OnChangeEdit()
     const QStringList parts = m_transform.split(QRegularExpression("[\\s,;\\t]"), Qt::SkipEmptyParts);
     for (int i = 0; i < argCount && i < parts.count(); ++i)
     {
-        transform[i] = parts[i].toDouble();
+        transform[i] = parts[i].toFloat();
     }
 
     m_ui->m_dymX->setValue(transform[0]);
@@ -107,24 +108,12 @@ void GotoPositionDialog::OnUpdateNumbers()
 
 void GotoPositionDialog::accept()
 {
-    if (SandboxEditor::UsingNewCameraSystem())
-    {
-        SandboxEditor::InterpolateDefaultViewportCameraToTransform(
-            AZ::Vector3(
-                aznumeric_cast<float>(m_ui->m_dymX->value()), aznumeric_cast<float>(m_ui->m_dymY->value()),
-                aznumeric_cast<float>(m_ui->m_dymZ->value())),
-            AZ::DegToRad(aznumeric_cast<float>(m_ui->m_dymAnglePitch->value())),
-            AZ::DegToRad(aznumeric_cast<float>(m_ui->m_dymAngleYaw->value())));
-    }
-    else
-    {
-        SandboxEditor::SetDefaultViewportCameraPosition(AZ::Vector3(
+    SandboxEditor::InterpolateDefaultViewportCameraToTransform(
+        AZ::Vector3(
             aznumeric_cast<float>(m_ui->m_dymX->value()), aznumeric_cast<float>(m_ui->m_dymY->value()),
-            aznumeric_cast<float>(m_ui->m_dymZ->value())));
-        SandboxEditor::SetDefaultViewportCameraRotation(
-            AZ::DegToRad(aznumeric_cast<float>(m_ui->m_dymAnglePitch->value())),
-            AZ::DegToRad(aznumeric_cast<float>(m_ui->m_dymAngleYaw->value())));
-    }
+            aznumeric_cast<float>(m_ui->m_dymZ->value())),
+        AZ::DegToRad(aznumeric_cast<float>(m_ui->m_dymAnglePitch->value())),
+        AZ::DegToRad(aznumeric_cast<float>(m_ui->m_dymAngleYaw->value())));
 
     QDialog::accept();
 }

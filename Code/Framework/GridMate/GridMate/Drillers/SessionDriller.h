@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -61,7 +62,7 @@ namespace GridMate
             /// Callback that notifies the title when a session will be left. session pointer is NOT valid after the callback returns.
             virtual void OnSessionDelete(GridSession* session);
             /// Called when a session error occurs.
-            virtual void OnSessionError(GridSession* session, const string& errorMsg);
+            virtual void OnSessionError(GridSession* session, const AZStd::string& errorMsg);
             /// Called when the actual game(match) starts
             virtual void OnSessionStart(GridSession* session);
             /// Called when the actual game(match) ends

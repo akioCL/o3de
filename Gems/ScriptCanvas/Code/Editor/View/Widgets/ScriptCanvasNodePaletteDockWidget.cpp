@@ -1,10 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#include "precompiled.h"
 
 #include <QLineEdit>
 #include <QMenu>
@@ -80,12 +80,11 @@ namespace ScriptCanvasEditor
                 GraphCanvas::NodePaletteTreeItem* variablesRoot = root->CreateChildNode<LocalVariablesListNodePaletteTreeItem>("Variables");
                 root->RegisterCategoryNode(variablesRoot, "Variables");
 
-                // We always want to keep these around as place holders
                 GraphCanvas::NodePaletteTreeItem* customEventRoot = root->GetCategoryNode("Script Events");
-                customEventRoot->SetAllowPruneOnEmpty(false);
+                customEventRoot->SetAllowPruneOnEmpty(true);
 
                 GraphCanvas::NodePaletteTreeItem* globalFunctionRoot = root->GetCategoryNode("User Functions");
-                globalFunctionRoot->SetAllowPruneOnEmpty(false);
+                globalFunctionRoot->SetAllowPruneOnEmpty(true);
 
             }
 

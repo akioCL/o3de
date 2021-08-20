@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -175,7 +176,7 @@ namespace AzNetworking
         //! Takes a quantized integral value and stores the floating point representation.
         void DecodeQuantizedValues();
 
-        AZ_PUSH_DISABLE_WARNING(4201 4324, "-Wunknown-warning-option") // anonymous union, structure was padded due to alignment
+        AZ_PUSH_DISABLE_WARNING(4324, "-Wunknown-warning-option") // structure was padded due to alignment
         union
         {
             float m_quantizedValues[NUM_ELEMENTS];

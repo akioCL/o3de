@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -122,6 +123,14 @@ namespace AZ::Render
         }
     }
 
+    void DiskLightDelegate::SetShadowBias(float bias)
+    {
+        if (GetShadowsEnabled() && GetLightHandle().IsValid())
+        {
+            GetFeatureProcessor()->SetShadowBias(GetLightHandle(), bias);
+        }
+    }
+
     void DiskLightDelegate::SetShadowmapMaxSize(ShadowmapSize size)
     {
         if (GetShadowsEnabled() && GetLightHandle().IsValid())
@@ -150,7 +159,7 @@ namespace AZ::Render
     {
         if (GetShadowsEnabled() && GetLightHandle().IsValid())
         {
-            GetFeatureProcessor()->SetPredictionSampleCount(GetLightHandle(), count);
+            GetFeatureProcessor()->SetPredictionSampleCount(GetLightHandle(), static_cast<uint16_t>(count));
         }
     }
 
@@ -158,7 +167,7 @@ namespace AZ::Render
     {
         if (GetShadowsEnabled() && GetLightHandle().IsValid())
         {
-            GetFeatureProcessor()->SetFilteringSampleCount(GetLightHandle(), count);
+            GetFeatureProcessor()->SetFilteringSampleCount(GetLightHandle(), static_cast<uint16_t>(count));
         }
     }
 

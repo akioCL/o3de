@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -83,6 +84,14 @@ namespace AZ
 
             //! Returns the constants layout.
             const ConstantsLayout* GetLayout() const;
+
+            //! Returns whether other constant data and this have the same value at the specified shader input index
+            bool ConstantIsEqual(const ConstantsData& other, ShaderInputConstantIndex inputIndex) const;
+
+            //! Performs a diff between this and input constant data and returns a list of all the shader input indices
+            //! for which the constants are not the same between the two. If one of the two has more constants than the
+            //! other, these additional constants will be added to the end of the returned list.
+            AZStd::vector<ShaderInputConstantIndex> GetIndicesOfDifferingConstants(const ConstantsData& other) const;
 
         private:
             enum class ValidateConstantAccessExpect : uint32_t

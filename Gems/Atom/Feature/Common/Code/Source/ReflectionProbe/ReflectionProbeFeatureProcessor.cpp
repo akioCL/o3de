@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -153,7 +154,7 @@ namespace AZ
 
         void ReflectionProbeFeatureProcessor::Simulate([[maybe_unused]] const FeatureProcessor::SimulatePacket& packet)
         {
-            AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
+            AZ_PROFILE_FUNCTION(AzRender);
             AZ_ATOM_PROFILE_FUNCTION("ReflectionProbe", "ReflectionProbeFeatureProcessor: Simulate");
 
             // update pipeline states
@@ -192,7 +193,7 @@ namespace AZ
             // if the volumes changed we need to re-sort the probe list
             if (m_probeSortRequired)
             {
-                AZ_PROFILE_SCOPE(Debug::ProfileCategory::AzRender, "Sort reflection probes");
+                AZ_PROFILE_SCOPE(AzRender, "Sort reflection probes");
                 AZ_ATOM_PROFILE_FUNCTION("ReflectionProbe", "ReflectionProbeFeatureProcessor: Sort reflection probes");
 
                 // sort the probes by descending inner volume size, so the smallest volumes are rendered last
@@ -486,7 +487,7 @@ namespace AZ
             RHI::DrawListTag& drawListTag)
         {
             // load shader
-            shader = RPI::LoadShader(filePath);
+            shader = RPI::LoadCriticalShader(filePath);
             AZ_Error("ReflectionProbeFeatureProcessor", shader, "Failed to find asset for shader [%s]", filePath);
 
             // store drawlist tag

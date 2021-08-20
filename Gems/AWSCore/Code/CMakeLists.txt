@@ -1,6 +1,7 @@
 #
-# Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
-# 
+# Copyright (c) Contributors to the Open 3D Engine Project.
+# For complete copyright and license terms please see the LICENSE at the root of this distribution.
+#
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 #
@@ -165,3 +166,9 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
         )
     endif()
 endif()
+
+install(DIRECTORY "Tools/ResourceMappingTool"
+    DESTINATION "Gems/AWSCore/Code/Tools"
+    COMPONENT ${CMAKE_INSTALL_DEFAULT_COMPONENT_NAME}
+    PATTERN "__pycache__" EXCLUDE
+)

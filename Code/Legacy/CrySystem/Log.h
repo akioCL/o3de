@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -9,8 +10,6 @@
 #pragma once
 
 #include <ILog.h>
-#include <CryThread.h>
-#include <MultiThread.h>
 #include <MultiThread_Containers.h>
 
 //////////////////////////////////////////////////////////////////////
@@ -36,7 +35,7 @@ class CLog
 {
 public:
     typedef std::list<ILogCallback*> Callbacks;
-    typedef CryStackStringT<char, MAX_TEMP_LENGTH_SIZE> LogStringType;
+    typedef AZStd::fixed_string<MAX_TEMP_LENGTH_SIZE> LogStringType;
 
     // constructor
     CLog(ISystem* pSystem);
@@ -167,15 +166,13 @@ private: // -------------------------------------------------------------------
     };
 
     std::vector<SAssetScopeInfo> m_assetScopeQueue;
-    CryCriticalSection m_assetScopeQueueLock;
+    AZStd::mutex m_assetScopeQueueLock;
     string m_assetScopeString;
 #endif
 
     ICVar*                 m_pLogIncludeTime;                                       //
 
     IConsole*          m_pConsole;                                                      //
-
-    CryCriticalSection m_logCriticalSection;
 
     struct SLogHistoryItem
     {

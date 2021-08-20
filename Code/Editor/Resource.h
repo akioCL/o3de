@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -81,7 +82,6 @@
 #define ID_TOOLS_CUSTOMIZEKEYBOARD                 32914
 #define ID_EXPORT_INDOORS                          32915
 #define ID_VIEW_CYCLE2DVIEWPORT                    32916
-#define ID_SNAPANGLE                               32917
 #define ID_PHYSICS_GETPHYSICSSTATE                 32937
 #define ID_PHYSICS_RESETPHYSICSSTATE               32938
 #define ID_GAME_SYNCPLAYER                         32941
@@ -107,9 +107,6 @@
 #define ID_MOVE_OBJECT                             33481
 #define ID_RENAME_OBJ                              33483
 #define ID_FETCH                                   33496
-#define ID_EDITMODE_ROTATE                         33506
-#define ID_EDITMODE_SCALE                          33507
-#define ID_EDITMODE_MOVE                           33508
 #define ID_SELECTION_DELETE                        33512
 #define ID_EDIT_ESCAPE                             33513
 #define ID_UNDO                                    33524
@@ -136,7 +133,6 @@
 #define ID_ADDNODE                                 33570
 #define ID_ADDSCENETRACK                           33573
 #define ID_FIND                                    33574
-#define ID_SNAP_TO_GRID                            33575
 #define ID_TAG_LOC1                                33576
 #define ID_TAG_LOC2                                33577
 #define ID_TAG_LOC3                                33578

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -55,7 +56,7 @@ public:
     MOCK_METHOD0(IsOpened, bool ());
     MOCK_METHOD0(GetNumVars, int());
     MOCK_METHOD0(GetNumVisibleVars, int());
-    MOCK_METHOD3(GetSortedVars, size_t (const char** pszArray, size_t numItems, const char* szPrefix));
+    MOCK_METHOD2(GetSortedVars, size_t (AZStd::vector<AZStd::string_view>& pszArray, const char* szPrefix));
     MOCK_METHOD1(AutoComplete, const char*(const char* substr));
     MOCK_METHOD1(AutoCompletePrev, const char*(const char* substr));
     MOCK_METHOD1(ProcessCompletion, const char*(const char* szInputBuffer));

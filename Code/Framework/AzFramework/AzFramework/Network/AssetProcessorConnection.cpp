@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -135,7 +136,7 @@ namespace AzFramework
             AZStd::array<char, MaxMessageSize> buffer;
             azsnprintf(buffer.data(), buffer.size(), "(%p/%#" PRIxPTR "): %s\n", this, numericThreadId, msg.data());
 
-            Platform::DebugOutput(buffer.data());
+            AZ::Debug::Platform::OutputToDebugger("AssetProcessorConnection", buffer.data());
 #else // ASSETPROCESORCONNECTION_VERBOSE_LOGGING is not defined
             (void)format;
 #endif

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -20,6 +21,9 @@ namespace Multiplayer
 {
     //! The default number of rewindable samples for us to store.
     static constexpr uint32_t RewindHistorySize = 128;
+
+    //! The default blend factor for ScopedAlterTime
+    static constexpr float DefaultBlendFactor = 1.f;
 
     AZ_TYPE_SAFE_INTEGRAL(HostId, uint32_t);
     static constexpr HostId InvalidHostId = static_cast<HostId>(-1);

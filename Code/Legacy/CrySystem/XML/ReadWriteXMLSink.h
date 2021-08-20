@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -35,7 +36,7 @@ public:
     ELSE_LOAD_PROPERTY(Vec3);                       \
     ELSE_LOAD_PROPERTY(int);                        \
     ELSE_LOAD_PROPERTY(float);                      \
-    ELSE_LOAD_PROPERTY(string);                     \
+    ELSE_LOAD_PROPERTY(AZStd::string);              \
     ELSE_LOAD_PROPERTY(bool);
 
 

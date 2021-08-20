@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
 
-#include "LyShine_precompiled.h"
 #include <AzCore/Serialization/SerializeContext.h>
 #include "AnimNode.h"
 #include "AnimTrack.h"
@@ -62,7 +62,7 @@ void CUiAnimNode::Activate([[maybe_unused]] bool bActivate)
 //////////////////////////////////////////////////////////////////////////
 int CUiAnimNode::GetTrackCount() const
 {
-    return m_tracks.size();
+    return static_cast<int>(m_tracks.size());
 }
 
 const char* CUiAnimNode::GetParamName(const CUiAnimParamType& paramType) const

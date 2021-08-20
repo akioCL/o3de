@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -184,7 +185,7 @@ bool CImageGif::Load(const QString& fileName, CImageEx& outImage)
         CLogFile::FormatLine("File not found %s", fileName.toUtf8().data());
         return false;
     }
-    long filesize = file.GetLength();
+    long filesize = static_cast<long>(file.GetLength());
 
     data.resize(filesize);
     uint8* ptr = &data[0];
@@ -222,7 +223,7 @@ bool CImageGif::Load(const QString& fileName, CImageEx& outImage)
     Pass = 0;
     OutCount = 0;
 
-    Palette = NULL;
+    Palette = nullptr;
     CHK (Raster = new uint8 [filesize]);
 
     if (strncmp((char*) ptr, id87, 6))
@@ -410,7 +411,7 @@ bool CImageGif::Load(const QString& fileName, CImageEx& outImage)
             FreeCode = FirstFree;
             CurCode  = OldCode = Code = ReadCode();
             FinChar  = CurCode & BitMask;
-            AddToPixel (FinChar);
+            AddToPixel(static_cast<uint8>(FinChar));
         }
         else
         {
@@ -454,7 +455,7 @@ bool CImageGif::Load(const QString& fileName, CImageEx& outImage)
 
             for (i = OutCount - 1; i >= 0; i--)
             {
-                AddToPixel (OutCode[i]);
+                AddToPixel(static_cast<uint8>(OutCode[i]));
             }
             OutCount = 0;
 

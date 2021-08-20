@@ -1,21 +1,20 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
+#include <Atom/Document/MaterialDocumentRequestBus.h>
 #include <Atom/RPI.Edit/Common/AssetUtils.h>
 #include <Atom/RPI.Edit/Material/MaterialPropertyId.h>
 #include <Atom/RPI.Edit/Material/MaterialTypeSourceData.h>
 #include <Atom/RPI.Edit/Material/MaterialUtils.h>
-
-#include <Atom/Document/MaterialDocumentRequestBus.h>
-
+#include <AtomToolsFramework/Document/AtomToolsDocumentRequestBus.h>
 #include <AtomToolsFramework/DynamicProperty/DynamicPropertyGroup.h>
 #include <AtomToolsFramework/Inspector/InspectorPropertyGroupWidget.h>
 #include <AtomToolsFramework/Util/MaterialPropertyUtil.h>
-
 #include <Window/MaterialInspector/MaterialInspector.h>
 
 namespace MaterialEditor
@@ -26,12 +25,12 @@ namespace MaterialEditor
         m_windowSettings = AZ::UserSettings::CreateFind<MaterialEditorWindowSettings>(
             AZ::Crc32("MaterialEditorWindowSettings"), AZ::UserSettings::CT_GLOBAL);
 
-        MaterialDocumentNotificationBus::Handler::BusConnect();
+        AtomToolsFramework::AtomToolsDocumentNotificationBus::Handler::BusConnect();
     }
 
     MaterialInspector::~MaterialInspector()
     {
-        MaterialDocumentNotificationBus::Handler::BusDisconnect();
+        AtomToolsFramework::AtomToolsDocumentNotificationBus::Handler::BusDisconnect();
         AtomToolsFramework::InspectorRequestBus::Handler::BusDisconnect();
     }
 
@@ -68,9 +67,9 @@ namespace MaterialEditor
         m_documentId = documentId;
 
         bool isOpen = false;
-        MaterialDocumentRequestBus::EventResult(isOpen, m_documentId, &MaterialDocumentRequestBus::Events::IsOpen);
+        AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(isOpen, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::IsOpen);
 
-        MaterialDocumentRequestBus::EventResult(m_documentPath, m_documentId, &MaterialDocumentRequestBus::Events::GetAbsolutePath);
+        AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(m_documentPath, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::GetAbsolutePath);
 
         if (!m_documentId.IsNull() && isOpen)
         {
@@ -112,13 +111,13 @@ namespace MaterialEditor
         auto& group = m_groups[groupNameId];
 
         AtomToolsFramework::DynamicProperty property;
-        MaterialDocumentRequestBus::EventResult(
-            property, m_documentId, &MaterialDocumentRequestBus::Events::GetProperty, AZ::Name("overview.materialType"));
+        AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(
+            property, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::GetProperty, AZ::Name("overview.materialType"));
         group.m_properties.push_back(property);
 
         property = {};
-        MaterialDocumentRequestBus::EventResult(
-            property, m_documentId, &MaterialDocumentRequestBus::Events::GetProperty, AZ::Name("overview.parentMaterial"));
+        AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(
+            property, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::GetProperty, AZ::Name("overview.parentMaterial"));
         group.m_properties.push_back(property);
 
         // Passing in same group as main and comparison instance to enable custom value comparison for highlighting modified properties
@@ -144,8 +143,8 @@ namespace MaterialEditor
         for (const auto& uvNamePair : uvNameMap)
         {
             AtomToolsFramework::DynamicProperty property;
-            MaterialDocumentRequestBus::EventResult(
-                property, m_documentId, &MaterialDocumentRequestBus::Events::GetProperty,
+            AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(
+                property, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::GetProperty,
                 AZ::RPI::MaterialPropertyId(groupNameId, uvNamePair.m_shaderInput.ToString()).GetFullName());
             group.m_properties.push_back(property);
 
@@ -181,8 +180,8 @@ namespace MaterialEditor
                 for (const auto& propertyDefinition : propertyListItr->second)
                 {
                     AtomToolsFramework::DynamicProperty property;
-                    MaterialDocumentRequestBus::EventResult(
-                        property, m_documentId, &MaterialDocumentRequestBus::Events::GetProperty,
+                    AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(
+                        property, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::GetProperty,
                         AZ::RPI::MaterialPropertyId(groupNameId, propertyDefinition.m_nameId).GetFullName());
                     group.m_properties.push_back(property);
                 }
@@ -195,8 +194,8 @@ namespace MaterialEditor
             AddGroup(groupNameId, groupDisplayName, groupDescription, propertyGroupWidget);
             
             bool isGroupVisible = false;
-            MaterialDocumentRequestBus::EventResult(
-                isGroupVisible, m_documentId, &MaterialDocumentRequestBus::Events::IsPropertyGroupVisible, AZ::Name{groupNameId});
+            AtomToolsFramework::AtomToolsDocumentRequestBus::EventResult(
+                isGroupVisible, m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::IsPropertyGroupVisible, AZ::Name{groupNameId});
             SetGroupVisible(groupNameId, isGroupVisible);
         }
     }
@@ -263,7 +262,7 @@ namespace MaterialEditor
             if (m_activeProperty != property)
             {
                 m_activeProperty = property;
-                MaterialDocumentRequestBus::Event(m_documentId, &MaterialDocumentRequestBus::Events::BeginEdit);
+                AtomToolsFramework::AtomToolsDocumentRequestBus::Event(m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::BeginEdit);
             }
         }
     }
@@ -275,8 +274,8 @@ namespace MaterialEditor
         {
             if (m_activeProperty == property)
             {
-                MaterialDocumentRequestBus::Event(
-                    m_documentId, &MaterialDocumentRequestBus::Events::SetPropertyValue, property->GetId(), property->GetValue());
+                AtomToolsFramework::AtomToolsDocumentRequestBus::Event(
+                    m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::SetPropertyValue, property->GetId(), property->GetValue());
             }
         }
     }
@@ -291,10 +290,10 @@ namespace MaterialEditor
         {
             if (m_activeProperty == property)
             {
-                MaterialDocumentRequestBus::Event(
-                    m_documentId, &MaterialDocumentRequestBus::Events::SetPropertyValue, property->GetId(), property->GetValue());
+                AtomToolsFramework::AtomToolsDocumentRequestBus::Event(
+                    m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::SetPropertyValue, property->GetId(), property->GetValue());
 
-                MaterialDocumentRequestBus::Event(m_documentId, &MaterialDocumentRequestBus::Events::EndEdit);
+                AtomToolsFramework::AtomToolsDocumentRequestBus::Event(m_documentId, &AtomToolsFramework::AtomToolsDocumentRequestBus::Events::EndEdit);
                 m_activeProperty = nullptr;
             }
         }

@@ -1,11 +1,10 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
-#include "StandaloneTools_precompiled.h"
 
 #include <AzCore/Debug/Profiler.h>
 #include <AzCore/Math/MathUtils.h>
@@ -1629,7 +1628,7 @@ namespace Driller
 
     void ReplicaDataView::ParseFrameData(FrameNumberType frameId)
     {
-        AZ_PROFILE_TIMER("Standalone Tools", __FUNCTION__);
+        AZ_PROFILE_FUNCTION(AzToolsFramework);
         if (frameId < 0 || frameId >= m_aggregator->GetFrameCount() || m_parsedFrames.find(frameId) != m_parsedFrames.end())
         {
             return;

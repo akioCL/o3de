@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -545,7 +546,7 @@ bool CAxisHelper::HitTestForRotationCircle(const Matrix34& worldTM, IDisplayView
     Vec3 vShortestHitPos;
     float shortestDist = 3e11f;
 
-    for (int i = 0, iCount(vList.size()); i < iCount; ++i)
+    for (int i = 0, iCount(static_cast<int>(vList.size())); i < iCount; ++i)
     {
         const Vec3& v0 = vList[i];
         const Vec3& v1 = vList[(i + 1) % iCount];

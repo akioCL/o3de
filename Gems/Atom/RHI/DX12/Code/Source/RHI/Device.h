@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -142,12 +143,11 @@ namespace AZ
 
             bool IsAftermathInitialized() const;
         private:
-            Device() = default;
+            Device();
 
             //////////////////////////////////////////////////////////////////////////
             // RHI::Device
             RHI::ResultCode InitInternal(RHI::PhysicalDevice& physicalDevice) override;
-            RHI::ResultCode PostInitInternal(const RHI::DeviceDescriptor & params) override;
 
             void ShutdownInternal() override;
             void CompileMemoryStatisticsInternal(RHI::MemoryStatisticsBuilder& builder) override;
@@ -157,10 +157,12 @@ namespace AZ
             void WaitForIdleInternal() override;
             AZStd::chrono::microseconds GpuTimestampToMicroseconds(uint64_t gpuTimestamp, RHI::HardwareQueueClass queueClass) const override;
             void FillFormatsCapabilitiesInternal(FormatCapabilitiesList& formatsCapabilities) override;
+            RHI::ResultCode InitializeLimits() override;
             AZStd::vector<RHI::Format> GetValidSwapChainImageFormats(const RHI::WindowHandle& windowHandle) const override;
             void PreShutdown() override;
             RHI::ResourceMemoryRequirements GetResourceMemoryRequirements(const RHI::ImageDescriptor & descriptor) override;
             RHI::ResourceMemoryRequirements GetResourceMemoryRequirements(const RHI::BufferDescriptor & descriptor) override;
+            void ObjectCollectionNotify(RHI::ObjectCollectorNotifyFunction notifyFunction) override;
             //////////////////////////////////////////////////////////////////////////
 
             RHI::ResultCode InitSubPlatform(RHI::PhysicalDevice& physicalDevice);

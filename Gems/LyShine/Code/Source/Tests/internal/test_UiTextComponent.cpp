@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -2715,7 +2716,7 @@ namespace
         float newWidth;
         EBUS_EVENT_ID_RESULT(newWidth, testElemId, UiLayoutCellDefaultBus, GetTargetWidth, LyShine::UiLayoutCellUnspecifiedSize);
 
-        const int testStringLength = testString.length();
+        const int testStringLength = static_cast<int>(testString.length());
         const int numGapsBetweenCharacters = testStringLength >= 1 ? testStringLength - 1 : 0;
         const float ems = characterSpacing * 0.001f;
         float expectedWidth = baseWidth + numGapsBetweenCharacters * ems * fontSize;
@@ -3507,7 +3508,7 @@ void UiTextComponent::UnitTestLocalization(CLyShine* lyshine, IConsoleCmdArgs* /
 {
     ILocalizationManager* pLocMan = GetISystem()->GetLocalizationManager();
 
-    string localizationXml("libs/localization/localization.xml");
+    AZStd::string localizationXml("libs/localization/localization.xml");
 
     bool initLocSuccess = false;
 

@@ -1,11 +1,11 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
 
-#include "EditorAssetImporter_precompiled.h"
 #include <AssetImporterWindow.h>
 #include <ui_AssetImporterWindow.h>
 #include <AssetImporterPlugin.h>
@@ -500,10 +500,10 @@ void AssetImporterWindow::SetTitle(const char* filePath)
             AZStd::string extension;
             if (AzFramework::StringFunc::Path::GetExtension(filePath, extension, false))
             {
-                extension[0] = toupper(extension[0]);
+                extension[0] = static_cast<char>(toupper(extension[0]));
                 for (size_t i = 1; i < extension.size(); ++i)
                 {
-                    extension[i] = tolower(extension[i]);
+                    extension[i] = static_cast<char>(tolower(extension[i]));
                 }
             }
             else

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -48,7 +49,7 @@
 */
 
 #include <stdio.h>
-#include <AzCore/PlatformDef.h>
+#include <AzCore/PlatformIncl.h>
 #include <AzCore/Module/Environment.h>
 
 #define INJECT_ENVIRONMENT_FUNCTION "InjectEnvironment"
@@ -62,7 +63,6 @@ using DetachEnvironmentFunction = void(*)();
     #if !defined(WIN32_LEAN_AND_MEAN)
         #define WIN32_LEAN_AND_MEAN
     #endif
-    #include <CryWindows.h>
 
     HMODULE CryLoadLibrary(const char* libName);
     

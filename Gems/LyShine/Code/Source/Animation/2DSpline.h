@@ -1,6 +1,7 @@
 /*
- * Copyright (c) Contributors to the Open 3D Engine Project. For complete copyright and license terms please see the LICENSE at the root of this distribution.
- * 
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
@@ -61,7 +62,7 @@ namespace UiSpline
         ILINE void flag_clr(int flag) { m_flags &= ~flag; };
         ILINE int  flag(int flag)  { return m_flags & flag; };
 
-        ILINE void ORT(int ort) { m_ORT = ort; };
+        ILINE void ORT(int ort) { m_ORT = static_cast<uint8>(ort); };
         ILINE int  ORT() const { return m_ORT; };
         ILINE int  isORT(int o) const { return (m_ORT == o); };
 
