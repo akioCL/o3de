@@ -122,10 +122,25 @@ namespace AZ
                 return Success(AZStd::move(serializer.m_cpuProfilingStatisticsSerializerEntries));
             }
 
+            inline bool TreeNodePassesFilter(const TableRow* region, const ImGuiTextFilter& filter)
+            {
+                if (filter.PassFilter(region->m_regionName.c_str()) || filter.PassFilter(region->m_groupName.c_str()))
+                {
+                    return true;
+                }
+                    
+                for (const TableRow* child : region->m_children)
+                {
+                    if (TreeNodePassesFilter(child, filter)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             inline void RecurseOnRegionTree(TableRow* region, const ImGuiTextFilter& filter, AZStd::function<bool(TableRow* rowToDraw)> drawFn)
             {
-                if (!filter.PassFilter(region->m_groupName.c_str())
-                    && !filter.PassFilter(region->m_regionName.c_str()))
+                if (filter.IsActive() && !TreeNodePassesFilter(region, filter))
                 {
                     return;
                 }
@@ -400,7 +415,7 @@ namespace AZ
                             rootRegions.push_back(rowPtr);
                         }
 
-                        if (region.m_stackDepth <= currentStack.size())
+                        if (region.m_stackDepth <= currentStack.size() + 1)
                         {
                             while (!currentStack.empty() && region.m_stackDepth != currentStack.size())
                             {
@@ -413,18 +428,11 @@ namespace AZ
                             }
                             currentStack.push(rowPtr);
                         }
-                        else if (region.m_stackDepth == currentStack.size() + 1)
-                        {
-                            currentStack.top()->m_children.push_back(rowPtr);
-                            currentStack.push(rowPtr);
-                        }
-                        else
-                        {
-                            AZ_Assert(false, "Error in drawing");
-                        }
 
                         ++itr;
                     }
+
+                    // Traverse the built callstack
                     for (TableRow* rootRegion : rootRegions)
                     {
                         CpuProfilerImGuiHelper::RecurseOnRegionTree(rootRegion, m_timedRegionFilter, DrawTableRow);
