@@ -174,4 +174,9 @@ namespace AzPhysics
     private:
         AZStd::vector<Preset> m_groups;
     };
+
+    //! Construct a Group with the given Id of a collision group.
+    //! This will lookup the group Id to retrieve the group mask. If not found, CollisionGroup::All is returned.
+    //! @param id The Id of the group to look up the group mask.
+    CollisionGroup MakeCollisionGroup(const CollisionGroups::Id& id);
 }
