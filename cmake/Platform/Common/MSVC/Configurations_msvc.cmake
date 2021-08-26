@@ -62,12 +62,14 @@ ly_append_configurations_options(
     COMPILATION_PROFILE
         /GF             # Enable string pooling   
         /Gy             # Function level linking
+        /Gw             # for Live++
         /MD             # Causes the application to use the multithread-specific and DLL-specific version of the run-time library. Defines _MT and _DLL and causes the compiler 
                         # to place the library name MSVCRT.lib into the .obj file.
         /O2             # Maximinize speed, equivalent to /Og /Oi /Ot /Oy /Ob2 /GF /Gy
         /Zc:inline      # Removes unreferenced functions or data that are COMDATs or only have internal linkage
         /Zc:wchar_t     # Use compiler native wchar_t
         /Zi             # Generate debugging information (no Edit/Continue)
+        /Z7             # for Live++
     COMPILATION_RELEASE
         /Ox             # Full optimization
         /Ob2            # Inline any suitable function
@@ -78,10 +80,11 @@ ly_append_configurations_options(
         /NOLOGO             # Suppress Copyright and version number message
         /IGNORE:4099        # 3rdParty linking produces noise with LNK4099
     LINK_NON_STATIC_PROFILE
-        /OPT:REF            # Eliminates functions and data that are never referenced
-        /OPT:ICF            # Perform identical COMDAT folding. Redundant COMDATs can be removed from the linker output
+        /OPT:NOREF            # for Live++
+        /OPT:NOICF            # for Live++
         /INCREMENTAL:NO
         /DEBUG              # Generate pdbs
+        /FUNCTIONPADMIN     # for Live++
     LINK_NON_STATIC_RELEASE
         /OPT:REF # Eliminates functions and data that are never referenced
         /OPT:ICF # Perform identical COMDAT folding. Redundant COMDATs can be removed from the linker output
