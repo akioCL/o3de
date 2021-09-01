@@ -44,9 +44,9 @@ fi
 if [ ! -d /data ]
 then
     echo Data folder does not exist. Creating it.
-	mkdir /data
-	chown $USER /data
-fi	
+    mkdir /data
+    chown $USER /data
+fi
 
 echo Packages and tools for O3DE setup complete
 exit 0
