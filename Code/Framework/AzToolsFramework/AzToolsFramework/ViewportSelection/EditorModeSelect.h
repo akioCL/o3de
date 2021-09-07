@@ -24,6 +24,6 @@ namespace AzToolsFramework
         void EnterMode(EditorMode mode) override;
         void ExitMode(EditorMode mode) override;
 
-        EditorMode m_editorMode = EditorMode::None;
+        EditorMode m_editorMode = EditorMode::Undefined;
     };
 } // namespace AzToolsFramework

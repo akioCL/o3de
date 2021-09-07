@@ -33,6 +33,6 @@ namespace AzToolsFramework
         AZ_Printf("LYN-5265", "ExitMode(%u)", static_cast<AZ::u8>(mode));
         AzToolsFramework::EditorModeNotificationsBus::Broadcast(
             &AzToolsFramework::EditorModeNotificationsBus::Events::OnEditorModeExit, EditorMode::Component);
-        m_editorMode = EditorMode::None;
+        m_editorMode = EditorMode::Undefined;
     }
 } // namespace AzToolsFramework

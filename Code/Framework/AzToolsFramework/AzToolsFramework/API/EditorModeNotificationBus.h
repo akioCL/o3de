@@ -14,9 +14,11 @@ namespace AzToolsFramework
 {
     enum class EditorMode : AZ::u8
     {
-        None,
+        Undefined,
+        Default,
         Component,
-        Focus
+        Focus,
+        Pick
     };
 
     //! Provides a bus to notify when the different editor modes are entered/exit.
