@@ -27,8 +27,8 @@ class TestPySideExample(object):
         unexpected_lines = []
         expected_lines = [
             'New entity with no parent created',
-            'Environment Probe component added to entity',
-            'ComboBox Values retrieved:'
+            'Component added to entity',
+            'Value retrieved:'
             ]
 
         test_case_file = os.path.join(os.path.dirname(__file__), 'PySide_Example_test_case.py')

@@ -12,6 +12,11 @@ import azlmbr.editor as editor
 import azlmbr.math
 import azlmbr.legacy.general as general
 
+# Open a level (any level should work)
+import azlmbr.legacy.general as general
+editor.EditorToolsApplicationRequestBus(bus.Broadcast, 'OpenLevelNoPrompt', 'auto_test')
+general.idle_wait(2.0)
+
 def fetch_vector3_parts(vec3):
     x = vec3.get_property('x')
     y = vec3.get_property('y')
@@ -24,16 +29,16 @@ rot = general.get_current_view_rotation()
 px, py, pz = fetch_vector3_parts(pos)
 rx, ry, rz = fetch_vector3_parts(rot)
 
-px = px + 5.0
-py = py - 2.0
-pz = pz + 1.0
+p1x = px + 5.0
+p1y = py - 2.0
+p1z = pz + 1.0
 
-rx = rx + 2.0
-ry = ry + 3.0
-rz = rz - 5.0
+r1x = rx + 2.0
+r1y = ry + 3.0
+r1z = rz - 5.0
 
-general.set_current_view_position(px, py, pz)
-general.set_current_view_rotation(rx, ry, rz)
+general.set_current_view_position(p1x, p1y, p1z)
+general.set_current_view_rotation(r1x, r1y, r1z)
 
 pos2 = general.get_current_view_position()
 rot2 = general.get_current_view_rotation()

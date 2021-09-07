@@ -15,7 +15,7 @@ import ly_test_tools.environment.file_system as file_system
 import editor_python_test_tools.hydra_test_utils as hydra
 
 logger = logging.getLogger(__name__)
-test_directory = os.path.join(os.path.dirname(__file__), "EditorScripts")
+test_directory = os.path.join(os.path.dirname(__file__))
 
 
 @pytest.mark.SUITE_sandbox
@@ -27,11 +27,11 @@ class TestComponentAssetListAutomation(object):
     @pytest.fixture(autouse=True)
     def setup_teardown(self, request, workspace, project, level):
         # Cleanup our temp level
-        file_system.delete([os.path.join(workspace.paths.dev(), project, "Levels", level)], True, True)
+        file_system.delete([os.path.join(workspace.paths.engine_root(), project, "Levels", level)], True, True)
 
         def teardown():
             # Cleanup our temp level
-            file_system.delete([os.path.join(workspace.paths.dev(), project, "Levels", level)], True, True)
+            file_system.delete([os.path.join(workspace.paths.engine_root(), project, "Levels", level)], True, True)
 
         request.addfinalizer(teardown)
 

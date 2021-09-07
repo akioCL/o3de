@@ -26,9 +26,6 @@ class TestEditorAutomation(object):
     def test_Editor(self, request, editor, level, launcher_platform):
         unexpected_lines = []
         expected_lines = [
-            "SetCVarFromFloat worked",
-            "SetCVarFromString worked",
-            "SetCVarFromInteger worked",
             "axis constraint works",
             "end of editor utility tests"
         ]
@@ -40,9 +37,6 @@ class TestEditorAutomation(object):
 
         unexpected_lines=[]
         expected_lines = [
-            "set_cvar_float worked",
-            "set_cvar_string worked",
-            "set_cvar_integer worked",
             "axis constraint works",
             "end of editor utility tests"
             ]

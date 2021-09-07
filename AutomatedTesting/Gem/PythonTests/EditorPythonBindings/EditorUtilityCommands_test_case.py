@@ -14,16 +14,6 @@ import azlmbr.globals
 import math
 
 
-def testing_cvar(setMethod, methodName, label, value, compare):
-    try:
-        python_editor_funcs.PythonEditorBus(bus.Broadcast, setMethod, label, value)
-        test_value = python_editor_funcs.PythonEditorBus(bus.Broadcast, 'GetCVar', label)
-        if compare(test_value, value):
-            print('{} worked'.format(methodName))
-    except:
-        print('{} failed'.format(methodName))
-
-
 def testing_axis_constraints(constraint):
     python_editor_funcs.PythonEditorBus(bus.Broadcast, 'SetAxisConstraint', constraint)
 
@@ -32,17 +22,6 @@ def testing_axis_constraints(constraint):
 
     return False
 
-
-# ----- Test cvar
-
-compare = lambda lhs, rhs: rhs == float(lhs)
-testing_cvar('SetCVarFromFloat', 'SetCVarFromFloat', 'sys_LocalMemoryOuterViewDistance', 501.0, compare)
-
-compare = lambda lhs, rhs: rhs == lhs
-testing_cvar('SetCVarFromString', 'SetCVarFromString', 'e_ScreenShotFileFormat', 'jpg', compare)
-
-compare = lambda lhs, rhs: rhs == int(lhs)
-testing_cvar('SetCVarFromInteger', 'SetCVarFromInteger', 'sys_LocalMemoryGeometryLimit', 33, compare)
 
 # ----- Test Axis Constraints
 

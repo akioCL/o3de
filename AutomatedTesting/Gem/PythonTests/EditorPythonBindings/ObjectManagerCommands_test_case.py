@@ -23,9 +23,9 @@ general.idle_enable(True)
 # Try to open the WaterSample level. If not, fail the test.
 # We need to rely on an existing level since the API does not provide
 # a way to create entities, but only lets us manipulate them.
-editor.EditorToolsApplicationRequestBus(bus.Broadcast, 'OpenLevelNoPrompt', 'WaterSample')
+editor.EditorToolsApplicationRequestBus(bus.Broadcast, 'OpenLevelNoPrompt', 'ocean_component')
 
-if (editor.EditorToolsApplicationRequestBus(bus.Broadcast, 'GetCurrentLevelName') == 'WaterSample'):
+if (editor.EditorToolsApplicationRequestBus(bus.Broadcast, 'GetCurrentLevelName') == 'ocean_component'):
     
     objs_list = general.get_all_objects()
     

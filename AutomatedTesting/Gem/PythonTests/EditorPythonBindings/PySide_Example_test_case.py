@@ -15,14 +15,14 @@ import sys
 import os
 import PySide2
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../automatedtesting_shared')
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../EditorPythonTestTools')
 
 import azlmbr.bus as bus
 import azlmbr.entity as entity
 import azlmbr.editor as editor
 import azlmbr.legacy.general as general
-import editor_python_test_tools.pyside_component_utils as pysde_component_utils
-
+import editor_python_test_tools.pyside_component_utils as pyside_component_utils
+import editor_python_test_tools.pyside_component_utils as pyside_utils
 
 def PySide_Example_test_case():
     # Open level, any level should work
@@ -33,23 +33,26 @@ def PySide_Example_test_case():
     if entityId:
         print('New entity with no parent created')
 
-    # Get Component Type for Environment Probe and attach to entity
-    typeIdsList = editor.EditorComponentAPIBus(bus.Broadcast, 'FindComponentTypeIdsByEntityType', ["Environment Probe"],
+    # Get Component Type for White Box and attach to entity
+    typeIdsList = editor.EditorComponentAPIBus(bus.Broadcast,
+                                               'FindComponentTypeIdsByEntityType',
+                                               ["White Box"],
                                                entity.EntityType().Game)
+
     componentOutcome = editor.EditorComponentAPIBus(bus.Broadcast, 'AddComponentsOfType', entityId, typeIdsList)
     if componentOutcome.IsSuccess():
-        print('Environment Probe component added to entity')
+        print('Component added to entity')
 
     # Waiting for one frame so that the widgets in the UI are updated with the new component information
     general.idle_enable(True)
     general.idle_wait_frames(1)
 
-    values = pyside_component_utils.get_component_combobox_values('Environment Probe', 'Resolution', print)
+    values = pyside_component_utils.get_component_combobox_values('White Box', 'Default Shape', print)
 
     if values:
-        print(f'ComboBox Values retrieved: {values}.')
+        print(f'Value retrieved: true')
     else:
-        print('Could not retrieve ComboBox values')
+        print('Could not retrieve values')
 
     editor.EditorToolsApplicationRequestBus(bus.Broadcast, 'ExitNoPrompt')
 

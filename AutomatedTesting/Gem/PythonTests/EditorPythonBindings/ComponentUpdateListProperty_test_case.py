@@ -17,8 +17,7 @@ import azlmbr.math as math
 import azlmbr.paths
 
 sys.path.append(os.path.join(azlmbr.paths.devroot, 'AutomatedTesting', 'Gem', 'PythonTests'))
-from automatedtesting_shared.editor_test_helper import EditorTestHelper
-
+from editor_python_test_tools.editor_test_helper import EditorTestHelper
 
 def add_component_with_uuid(entityId, typeId):
     componentOutcome = editor.EditorComponentAPIBus(bus.Broadcast, 'AddComponentsOfType', entityId, [typeId])
