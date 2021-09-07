@@ -19,6 +19,7 @@
 #include "Undo/Undo.h"
 #include "Util/PredefinedAspectRatios.h"
 #include "EditorViewportSettings.h"
+#include "EditorModularViewportCameraComposer.h"
 
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/std/optional.h>
@@ -54,12 +55,29 @@ namespace AZ::ViewportHelpers
 namespace AtomToolsFramework
 {
     class RenderViewportWidget;
-}
+    class ModularViewportCameraController;
+} // namespace AtomToolsFramework
 
 namespace AzToolsFramework
 {
     class ManipulatorManager;
 }
+
+//! Viewport settings for the EditorViewportWidget
+struct EditorViewportSettings : public AzToolsFramework::ViewportInteraction::ViewportSettingsRequestBus::Handler
+{
+    void Connect(AzFramework::ViewportId viewportId);
+    void Disconnect();
+
+    // ViewportSettingsRequestBus overrides ...
+    bool GridSnappingEnabled() const override;
+    float GridSize() const override;
+    bool ShowGrid() const override;
+    bool AngleSnappingEnabled() const override;
+    float AngleStep() const override;
+    float ManipulatorLineBoundWidth() const override;
+    float ManipulatorCircleBoundWidth() const override;
+};
 
 // EditorViewportWidget window
 AZ_PUSH_DISABLE_DLL_EXPORT_BASECLASS_WARNING
@@ -219,7 +237,6 @@ private:
     // Draw a selected region if it has been selected
     void RenderSelectedRegion();
 
-    bool AdjustObjectPosition(const ray_hit& hit, Vec3& outNormal, Vec3& outPos) const;
     bool RayRenderMeshIntersection(IRenderMesh* pRenderMesh, const Vec3& vInPos, const Vec3& vInDir, Vec3& vOutPos, Vec3& vOutNormal) const;
 
     bool AddCameraMenuItems(QMenu* menu);
@@ -337,7 +354,7 @@ private:
     // Note that any attempts to draw anything with this object will crash. Exists here for legacy "reasons"
     DisplayContext m_displayContext;
 
-    // Re-entrency guard for on paint events
+    // Reentrancy guard for on paint events
     bool m_isOnPaint = false;
 
     // Shapes of various safe frame helpers which can be displayed in the editor
@@ -369,6 +386,8 @@ private:
     // This widget holds a reference to the manipulator manage because its responsible for drawing manipulators
     AZStd::shared_ptr<AzToolsFramework::ManipulatorManager> m_manipulatorManager;
 
+    AZStd::unique_ptr<SandboxEditor::EditorModularViewportCameraComposer> m_editorModularViewportCameraComposer;
+
     // Helper for getting EditorEntityNotificationBus events
     AZStd::unique_ptr<AZ::ViewportHelpers::EditorEntityNotifications> m_editorEntityNotifications;
 
@@ -377,6 +396,9 @@ private:
 
     // Atom debug display
     AzFramework::DebugDisplayRequests* m_debugDisplay = nullptr;
+
+    // Type to return current state of editor viewport settings
+    EditorViewportSettings m_editorViewportSettings;
 
     // The default view created for the viewport context, which is used as the "Editor Camera"
     AZ::RPI::ViewPtr m_defaultView;

@@ -153,7 +153,7 @@ namespace AzToolsFramework
                             QAction* createAction = menu->addAction(QObject::tr("Create Prefab..."));
                             createAction->setToolTip(QObject::tr("Creates a prefab out of the currently selected entities."));
 
-                            QObject::connect(createAction, &QAction::triggered, createAction, [this, selectedEntities] {
+                            QObject::connect(createAction, &QAction::triggered, createAction, [selectedEntities] {
                                 ContextMenu_CreatePrefab(selectedEntities);
                             });
                         }
@@ -167,7 +167,7 @@ namespace AzToolsFramework
                 instantiateAction->setToolTip(QObject::tr("Instantiates a prefab file in the scene."));
 
                 QObject::connect(
-                    instantiateAction, &QAction::triggered, instantiateAction, [this] { ContextMenu_InstantiatePrefab(); });
+                    instantiateAction, &QAction::triggered, instantiateAction, [] { ContextMenu_InstantiatePrefab(); });
             }
 
             menu->addSeparator();
@@ -201,7 +201,7 @@ namespace AzToolsFramework
                                 QAction* editAction = menu->addAction(QObject::tr("Edit Prefab"));
                                 editAction->setToolTip(QObject::tr("Edit the prefab in focus mode."));
 
-                                QObject::connect(editAction, &QAction::triggered, editAction, [this, selectedEntity] {
+                                QObject::connect(editAction, &QAction::triggered, editAction, [selectedEntity] {
                                     ContextMenu_EditPrefab(selectedEntity);
                                 });
                             }
@@ -218,7 +218,7 @@ namespace AzToolsFramework
                             QAction* saveAction = menu->addAction(QObject::tr("Save Prefab to file"));
                             saveAction->setToolTip(QObject::tr("Save the changes to the prefab to disk."));
 
-                            QObject::connect(saveAction, &QAction::triggered, saveAction, [this, selectedEntity] {
+                            QObject::connect(saveAction, &QAction::triggered, saveAction, [selectedEntity] {
                                 ContextMenu_SavePrefab(selectedEntity);
                             });
 
@@ -234,7 +234,7 @@ namespace AzToolsFramework
             }
 
             QAction* deleteAction = menu->addAction(QObject::tr("Delete"));
-            QObject::connect(deleteAction, &QAction::triggered, deleteAction, [this] { ContextMenu_DeleteSelected(); });
+            QObject::connect(deleteAction, &QAction::triggered, deleteAction, [] { ContextMenu_DeleteSelected(); });
             if (selectedEntities.size() == 0 ||
                 (selectedEntities.size() == 1 && s_prefabPublicInterface->IsLevelInstanceContainerEntity(selectedEntities[0])))
             {
@@ -252,7 +252,7 @@ namespace AzToolsFramework
                     QAction* detachPrefabAction = menu->addAction(QObject::tr("Detach Prefab..."));
                     QObject::connect(
                         detachPrefabAction, &QAction::triggered, detachPrefabAction,
-                        [this, selectedEntity]
+                        [selectedEntity]
                         {
                             ContextMenu_DetachPrefab(selectedEntity);
                         });
@@ -444,7 +444,7 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::GenerateSuggestedFilenameFromEntities(const EntityIdList& entityIds, AZStd::string& outName)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
 
             AZStd::string suggestedName;
 
@@ -525,7 +525,7 @@ namespace AzToolsFramework
             while (true)
             {
                 {
-                    AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+                    AZ_PROFILE_FUNCTION(AzToolsFramework);
                     saveAs = QFileDialog::getSaveFileName(nullptr, QString("Save As..."), saveAsInitialSuggestedFullPath.c_str(), QString("Prefabs (*.prefab)"));
                 }
 
@@ -861,7 +861,7 @@ namespace AzToolsFramework
 
         void PrefabIntegrationManager::GatherAllReferencedEntities(EntityIdSet& entitiesWithReferences, AZ::SerializeContext& serializeContext)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
 
             AZStd::vector<AZ::EntityId> floodQueue;
             floodQueue.reserve(entitiesWithReferences.size());
@@ -953,7 +953,7 @@ namespace AzToolsFramework
         bool PrefabIntegrationManager::QueryAndPruneMissingExternalReferences(EntityIdSet& entities, EntityIdSet& selectedAndReferencedEntities,
             bool& useReferencedEntities, bool defaultMoveExternalRefs)
         {
-            AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+            AZ_PROFILE_FUNCTION(AzToolsFramework);
             useReferencedEntities = false;
 
             AZStd::string includedEntities;
@@ -988,7 +988,7 @@ namespace AzToolsFramework
             {
                 if (!defaultMoveExternalRefs)
                 {
-                    AZ_PROFILE_FUNCTION(AZ::Debug::ProfileCategory::AzToolsFramework);
+                    AZ_PROFILE_FUNCTION(AzToolsFramework);
 
                     const AZStd::string message = AZStd::string::format(
                         "Entity references may not be valid if the entity IDs change or if the entities do not exist when the prefab is instantiated.\r\n\r\nSelected Entities\n%s\nReferenced Entities\n%s\n",
@@ -1004,7 +1004,7 @@ namespace AzToolsFramework
                     msgBox.setStandardButtons(QMessageBox::Cancel);
                     msgBox.setDefaultButton(QMessageBox::Yes);
                     msgBox.setDetailedText(message.c_str());
-                    const int response = msgBox.exec();
+                    msgBox.exec();
 
                     if (msgBox.clickedButton() == moveButton)
                     {
