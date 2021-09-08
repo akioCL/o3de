@@ -26,6 +26,7 @@
 
 // AzFramework
 #include <AzFramework/API/ApplicationAPI.h>
+#include <AzToolsFramework/API/ToolsApplicationAPI.h>
 
 // AzToolsFramework
 #include <AzToolsFramework/SourceControl/SourceControlAPI.h>
@@ -34,7 +35,6 @@
 #include "CryEdit.h"
 #include "MainWindow.h"
 
-#pragma comment(lib, "Gdi32.lib")
 
 //////////////////////////////////////////////////////////////////////////
 // Global Instance of Editor settings.
@@ -82,7 +82,6 @@ private:
 
 namespace
 {
-
     class QtApplicationListener
         : public AzToolsFramework::EditorEvents::Bus::Handler
     {
@@ -99,20 +98,8 @@ namespace
             delete this;
         }
     };
-
 }
 
-//////////////////////////////////////////////////////////////////////////
-SGizmoSettings::SGizmoSettings()
-{
-    axisGizmoSize = 0.2f;
-    axisGizmoText = true;
-    axisGizmoMaxCount = 50;
-    helpersScale = 1.f;
-    tagpointScaleMulti = 0.5f;
-    rulerSphereScale = 0.5f;
-    rulerSphereTrans = 0.5f;
-}
 //////////////////////////////////////////////////////////////////////////
 SEditorSettings::SEditorSettings()
 {
@@ -244,7 +231,7 @@ SEditorSettings::SEditorSettings()
 
     gui.nToolbarIconSize = static_cast<int>(AzQtComponents::ToolBar::ToolBarIconSize::Default);
 
-    int lfHeight = 8;// -MulDiv(8, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72);
+    int lfHeight = 8;// -MulDiv(8, GetDeviceCaps(GetDC(nullptr), LOGPIXELSY), 72);
     gui.nDefaultFontHieght = lfHeight;
     gui.hSystemFont = QFont("Ms Shell Dlg 2", lfHeight, QFont::Normal);
     gui.hSystemFontBold = QFont("Ms Shell Dlg 2", lfHeight, QFont::Bold);
@@ -393,7 +380,7 @@ void SEditorSettings::LoadValue(const char* sSection, const char* sKey, float& v
     {
         const SettingsGroup sg(sSection);
         const QString defaultVal = s_editorSettings()->value(sKey, QString::number(value)).toString();
-        value = defaultVal.toDouble();
+        value = defaultVal.toFloat();
 
         if (GetIEditor()->GetSettingsManager())
         {
@@ -500,6 +487,7 @@ void SEditorSettings::Save()
     SaveValue("Settings", "AutoBackupTime", autoBackupTime);
     SaveValue("Settings", "AutoBackupMaxCount", autoBackupMaxCount);
     SaveValue("Settings", "AutoRemindTime", autoRemindTime);
+    SaveValue("Settings", "MaxDisplayedItemsNumInSearch", maxNumberOfItemsShownInSearch);
     SaveValue("Settings", "CameraMoveSpeed", cameraMoveSpeed);
     SaveValue("Settings", "CameraRotateSpeed", cameraRotateSpeed);
     SaveValue("Settings", "StylusMode", stylusMode);
@@ -533,7 +521,7 @@ void SEditorSettings::Save()
     SaveValue("Settings", "ShowTimeInConsole", bShowTimeInConsole);
 
     SaveValue("Settings", "EnableSceneInspector", enableSceneInspector);
-    
+
     //////////////////////////////////////////////////////////////////////////
     // Viewport settings.
     //////////////////////////////////////////////////////////////////////////
@@ -562,18 +550,6 @@ void SEditorSettings::Save()
     SaveValue("Settings", "WarningIconsDrawDistance", viewports.fWarningIconsDrawDistance);
     SaveValue("Settings", "ShowScaleWarnings", viewports.bShowScaleWarnings);
     SaveValue("Settings", "ShowRotationWarnings", viewports.bShowRotationWarnings);
-
-    //////////////////////////////////////////////////////////////////////////
-    // Gizmos.
-    //////////////////////////////////////////////////////////////////////////
-    SaveValue("Settings", "AxisGizmoSize", gizmo.axisGizmoSize);
-    SaveValue("Settings", "AxisGizmoText", gizmo.axisGizmoText);
-    SaveValue("Settings", "AxisGizmoMaxCount", gizmo.axisGizmoMaxCount);
-    SaveValue("Settings", "HelpersScale", gizmo.helpersScale);
-    SaveValue("Settings", "TagPointScaleMulti", gizmo.tagpointScaleMulti);
-    SaveValue("Settings", "RulerSphereScale", gizmo.rulerSphereScale);
-    SaveValue("Settings", "RulerSphereTrans", gizmo.rulerSphereTrans);
-    //////////////////////////////////////////////////////////////////////////
 
     SaveValue("Settings", "TextEditorScript", textEditorForScript);
     SaveValue("Settings", "TextEditorShaders", textEditorForShaders);
@@ -626,7 +602,7 @@ void SEditorSettings::Save()
     SaveValue("Settings\\AssetBrowser", "AutoFilterFromViewportSelection", sAssetBrowserSettings.bAutoFilterFromViewportSelection);
     SaveValue("Settings\\AssetBrowser", "VisibleColumnNames", sAssetBrowserSettings.sVisibleColumnNames);
     SaveValue("Settings\\AssetBrowser", "ColumnNames", sAssetBrowserSettings.sColumnNames);
-      
+
     //////////////////////////////////////////////////////////////////////////
     // Deep Selection Settings
     //////////////////////////////////////////////////////////////////////////
@@ -659,22 +635,6 @@ void SEditorSettings::Save()
     //////////////////////////////////////////////////////////////////////////
     SaveValue("Settings\\Slices", "DynamicByDefault", sliceSettings.dynamicByDefault);
 
-    /*
-    //////////////////////////////////////////////////////////////////////////
-    // Save paths.
-    //////////////////////////////////////////////////////////////////////////
-    for (int id = 0; id < EDITOR_PATH_LAST; id++)
-    {
-        for (int i = 0; i < searchPaths[id].size(); i++)
-        {
-            CString path = searchPaths[id][i];
-            CString key;
-            key.Format( "Paths","Path_%.2d_%.2d",id,i );
-            SaveValue( "Paths",key,path );
-        }
-    }
-    */
-
     s_editorSettings()->sync();
 
     // --- Settings Registry values
@@ -705,7 +665,7 @@ void SEditorSettings::Load()
     QString     strPlaceholderString;
     // Load settings from registry.
     LoadValue("Settings", "UndoLevels", undoLevels);
-    LoadValue("Settings", "UndoSliceOverrideSaveValue", m_undoSliceOverrideSaveValue);  
+    LoadValue("Settings", "UndoSliceOverrideSaveValue", m_undoSliceOverrideSaveValue);
     LoadValue("Settings", "ShowWelcomeScreenAtStartup", bShowDashboardAtStartup);
     LoadValue("Settings", "ShowCircularDependencyError", m_showCircularDependencyError);
     LoadValue("Settings", "LoadLastLevelAtStartup", bAutoloadLastLevelAtStartup);
@@ -714,6 +674,7 @@ void SEditorSettings::Load()
     LoadValue("Settings", "AutoBackupTime", autoBackupTime);
     LoadValue("Settings", "AutoBackupMaxCount", autoBackupMaxCount);
     LoadValue("Settings", "AutoRemindTime", autoRemindTime);
+    LoadValue("Settings", "MaxDisplayedItemsNumInSearch", maxNumberOfItemsShownInSearch);
     LoadValue("Settings", "CameraMoveSpeed", cameraMoveSpeed);
     LoadValue("Settings", "CameraRotateSpeed", cameraRotateSpeed);
     LoadValue("Settings", "StylusMode", stylusMode);
@@ -782,18 +743,6 @@ void SEditorSettings::Load()
     LoadValue("Settings", "WarningIconsDrawDistance", viewports.fWarningIconsDrawDistance);
     LoadValue("Settings", "ShowScaleWarnings", viewports.bShowScaleWarnings);
     LoadValue("Settings", "ShowRotationWarnings", viewports.bShowRotationWarnings);
-
-    //////////////////////////////////////////////////////////////////////////
-    // Gizmos.
-    //////////////////////////////////////////////////////////////////////////
-    LoadValue("Settings", "AxisGizmoSize", gizmo.axisGizmoSize);
-    LoadValue("Settings", "AxisGizmoText", gizmo.axisGizmoText);
-    LoadValue("Settings", "AxisGizmoMaxCount", gizmo.axisGizmoMaxCount);
-    LoadValue("Settings", "HelpersScale", gizmo.helpersScale);
-    LoadValue("Settings", "TagPointScaleMulti", gizmo.tagpointScaleMulti);
-    LoadValue("Settings", "RulerSphereScale", gizmo.rulerSphereScale);
-    LoadValue("Settings", "RulerSphereTrans", gizmo.rulerSphereTrans);
-    //////////////////////////////////////////////////////////////////////////
 
     LoadValue("Settings", "TextEditorScript", textEditorForScript);
     LoadValue("Settings", "TextEditorShaders", textEditorForShaders);
@@ -1074,7 +1023,7 @@ void SEditorSettings::ConvertPath(const AZStd::string_view sourcePath, AZStd::st
     // The reason for the difference is to have this API be consistent with the path syntax in Open 3D Engine Python APIs.
 
     // Find the last pipe separator ("|") in the path
-    int lastSeparator = sourcePath.find_last_of("|");
+    size_t lastSeparator = sourcePath.find_last_of("|");
 
     // Everything before the last separator is the category (since only the category is hierarchical)
     category = sourcePath.substr(0, lastSeparator);
@@ -1088,7 +1037,7 @@ void SEditorSettings::ConvertPath(const AZStd::string_view sourcePath, AZStd::st
 
 AzToolsFramework::EditorSettingsAPIRequests::SettingOutcome SEditorSettings::GetValue(const AZStd::string_view path)
 {
-    if (path.find("|") < 0)
+    if (path.find("|") == AZStd::string_view::npos)
     {
         return { AZStd::string("Invalid Path - could not find separator \"|\"") };
     }
@@ -1106,7 +1055,7 @@ AzToolsFramework::EditorSettingsAPIRequests::SettingOutcome SEditorSettings::Get
 
 AzToolsFramework::EditorSettingsAPIRequests::SettingOutcome SEditorSettings::SetValue(const AZStd::string_view path, const AZStd::any& value)
 {
-    if (path.find("|") < 0)
+    if (path.find("|") == AZStd::string_view::npos)
     {
         return { AZStd::string("Invalid Path - could not find separator \"|\"") };
     }
@@ -1208,4 +1157,9 @@ bool SEditorSettings::GetSettingsRegistry_Bool(const char* key, bool& value)
 AzToolsFramework::ConsoleColorTheme SEditorSettings::GetConsoleColorTheme() const
 {
     return consoleBackgroundColorTheme;
+}
+
+int SEditorSettings::GetMaxNumberOfItemsShownInSearchView() const
+{
+    return SEditorSettings::maxNumberOfItemsShownInSearch;
 }

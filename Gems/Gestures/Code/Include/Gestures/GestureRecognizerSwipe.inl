@@ -8,6 +8,7 @@
 
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
+#include <CryCommon/ISystem.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 inline void Gestures::RecognizerSwipe::Config::Reflect(AZ::ReflectContext* context)
@@ -58,7 +59,7 @@ inline Gestures::RecognizerSwipe::~RecognizerSwipe()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 inline bool Gestures::RecognizerSwipe::OnPressedEvent(const AZ::Vector2& screenPosition, uint32_t pointerIndex)
 {
-    if (pointerIndex != m_config.pointerIndex)
+    if (!gEnv || !gEnv->pTimer || pointerIndex != m_config.pointerIndex)
     {
         return false;
     }
@@ -88,7 +89,7 @@ inline bool Gestures::RecognizerSwipe::OnPressedEvent(const AZ::Vector2& screenP
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 inline bool Gestures::RecognizerSwipe::OnDownEvent([[maybe_unused]] const AZ::Vector2& screenPosition, uint32_t pointerIndex)
 {
-    if (pointerIndex != m_config.pointerIndex)
+    if (!gEnv || !gEnv->pTimer || pointerIndex != m_config.pointerIndex)
     {
         return false;
     }
@@ -124,7 +125,7 @@ inline bool Gestures::RecognizerSwipe::OnDownEvent([[maybe_unused]] const AZ::Ve
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 inline bool Gestures::RecognizerSwipe::OnReleasedEvent(const AZ::Vector2& screenPosition, uint32_t pointerIndex)
 {
-    if (pointerIndex != m_config.pointerIndex)
+    if (!gEnv || !gEnv->pTimer || pointerIndex != m_config.pointerIndex)
     {
         return false;
     }
