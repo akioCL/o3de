@@ -160,20 +160,18 @@ namespace AzNetworking
         return SerializeHelper(buffer, bufferCapacity, isString, outSize, name);
     }
 
-    AZStd::string DeltaSerializerCreate::GetNextObjectName(const char* name)
+    void DeltaSerializerCreate::GetNextObjectName(NamePrefixString& outString, const char* name)
     {
-        AZStd::string objectName = name;
-        objectName += ".";
-        objectName += AZStd::to_string(m_objectCounter);
+        outString += name;
+        outString += ".";
+        outString += GenerateIndexLabel<0xFFFF>(m_objectCounter);
         ++m_objectCounter;
-        return objectName;
     }
 
     bool DeltaSerializerCreate::BeginObject(const char* name, [[maybe_unused]] const char* typeName)
     {
         m_nameLengthStack.push_back(m_namePrefix.length());
-        m_namePrefix += GetNextObjectName(name);
-        m_namePrefix += ".";
+        GetNextObjectName(m_namePrefix, name);
         return true;
     }
 
@@ -206,7 +204,7 @@ namespace AzNetworking
         typedef AbstractValue::ValueT<T> ValueType;
 
         const size_t prevLen = m_namePrefix.length();
-        m_namePrefix += GetNextObjectName(name);
+        GetNextObjectName(m_namePrefix, name);
 
         const AZ::HashValue32 nameHash = AZ::TypeHash32(m_namePrefix.c_str());
 
