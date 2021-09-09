@@ -55,6 +55,7 @@ namespace AZ
                 void AddDispatchItem(HairRenderObject* hairObject);
 
                 // Pass behavior overrides
+                void InitializeInternal() override;
                 void CompileResources(const RHI::FrameGraphCompileContext& context) override;
 
                 virtual bool IsEnabled() const override;
@@ -77,11 +78,8 @@ namespace AZ
                 void BuildCommandListInternal(const RHI::FrameGraphExecuteContext& context) override;
 
                 // Attach here all the pass buffers
-                void InitializeInternal() override;
                 void BuildInternal() override;
                 void FrameBeginInternal(FramePrepareParams params) override;
-
-                void SetupFrameGraphDependencies(RHI::FrameGraphInterface frameGraph) override;
 
                 // ShaderReloadNotificationBus::Handler overrides...
                 void OnShaderReinitialized(const AZ::RPI::Shader& shader) override;

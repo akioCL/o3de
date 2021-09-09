@@ -57,14 +57,6 @@ namespace AZ
                 UpdateFollowHairPass = Name{ "HairUpdateFollowHairComputePassTemplate" };
 
                 ++s_instanceCount;
-
-                // Create right away for everyone to use
-                if (!CreatePerPassResources())
-                {   // this might not be an error - if the pass system is still empty / minimal
-                    //  and these passes are not part of the minimal pipeline, they will not
-                    //  be created.
-                    AZ_Error("Hair Gem", false, "Failed to create the PerPass Srg.");
-                }
             }
 
             void HairFeatureProcessor::Reflect(ReflectContext* context)
@@ -94,7 +86,10 @@ namespace AZ
                 TickBus::Handler::BusDisconnect();
                 HairGlobalSettingsRequestBus::Handler::BusDisconnect();
 
+                // Setting the flag to indicate that it is being evicted.
+                m_initialized = false;
                 m_sharedDynamicBuffer.reset();
+                m_linkedListNodesBuffer.reset();
             }
 
             void HairFeatureProcessor::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
@@ -114,10 +109,8 @@ namespace AZ
 
             void HairFeatureProcessor::AddHairRenderObject(Data::Instance<HairRenderObject> renderObject)
             {
-                if (!m_initialized)
-                {
-                    Init();
-                }
+                const bool forceInit = false;
+                Initialize(forceInit);  // do not force init if already done.
 
                 m_hairRenderObjects.push_back(renderObject);
 
@@ -202,7 +195,8 @@ namespace AZ
                 AZ_ATOM_PROFILE_FUNCTION("Hair", "HairFeatureProcessor: Simulate");
                 AZ_UNUSED(packet);
 
-                if (m_hairRenderObjects.empty() || (!m_initialized && !Init()))
+                const bool forceInit = false;
+                if (m_hairRenderObjects.empty() || !Initialize(forceInit))
                 {   // there might not be are no render objects yet, indicating that scene data might not be ready
                     // to initialize just yet.
                     return;
@@ -250,11 +244,11 @@ namespace AZ
                 AZ_PROFILE_FUNCTION(Debug::ProfileCategory::Hair);
                 AZ_ATOM_PROFILE_FUNCTION("Hair", "HairFeatureProcessor: Render");
 
-                if (!m_initialized && !Init())
+                const bool forceInit = false;
+                if (m_hairRenderObjects.empty() || !Initialize(forceInit))
                 {
                     return;
                 }
-
 
                 // [To Do] - no culling scheme applied yet.
                 // Possibly setup the hair culling work group to be re-used for each view.
@@ -295,7 +289,8 @@ namespace AZ
 
             void HairFeatureProcessor::OnRenderPipelineAdded([[maybe_unused]] RPI::RenderPipelinePtr pipeline)
             {
-                Init();
+                const bool forceInit = true;
+                Initialize(forceInit);
 
                 // Mark for all passes to evacuate their render data and recreate it.
                 m_forceRebuildRenderData = true;
@@ -303,12 +298,13 @@ namespace AZ
 
             void HairFeatureProcessor::OnRenderPipelineRemoved([[maybe_unused]] RPI::RenderPipeline* pipeline)
             {
-                ClearPasses();
+                ClearPasses();  // Also resets the m_initialized flag
             }
 
             void HairFeatureProcessor::OnRenderPipelinePassesChanged([[maybe_unused]] RPI::RenderPipeline* renderPipeline)
             {
-                Init();
+                const bool forceInit = true;
+                Initialize(forceInit);
 
                 // Mark for all passes to evacuate their render data and recreate it.
                 m_forceRebuildRenderData = true;
@@ -324,9 +320,14 @@ namespace AZ
                 RPI::FeatureProcessor::OnEndPrepareRender();
             }
 
-            bool HairFeatureProcessor::Init()
+            bool HairFeatureProcessor::Initialize(bool forceInit = false)
             {
-                ClearPasses();
+                if (m_initialized && !forceInit)
+                {
+                    return true;
+                }
+
+                ClearPasses();  // Also resets the m_initialized flag
 
                 // Compute Passes - populate the passes map
                 bool resultSuccess = InitComputePass(GlobalShapeConstraintsPass);
@@ -345,10 +346,13 @@ namespace AZ
 
                 m_initialized = resultSuccess;
 
-                // this might not be an error - if the pass system is still empty / minimal
-                //  and these passes are not part of the minimal pipeline, they will not
-                //  be created.
-                AZ_Error("Hair Gem", resultSuccess, "Passes could not be retrieved.");
+                AZ_ErrorOnce("Hair Gem", m_initialized,
+                    "Failed to initilize HairFeatureProcessor due to missing hair passes.  Check your game project's .pass assets");
+
+                if (m_initialized)
+                {
+                    AZ_ErrorOnce("Hair Gem", CreatePerPassResources(), "Failed to create the PerPass Srg.");
+                }
 
                 return m_initialized;
             }
@@ -425,7 +429,7 @@ namespace AZ
                     }
                     else
                     {
-                        AZ_Error("Hair Gem", false,
+                        AZ_ErrorOnce("Hair Gem", false,
                             "%s does not have any valid passes. Check your game project's .pass assets.",
                             passName.GetCStr());
                         return false;
@@ -433,9 +437,6 @@ namespace AZ
                 }
                 else
                 {
-                    AZ_Error("Hair Gem", false,
-                        "Failed to find passes for %s. Check your game project's .pass assets.",
-                        passName.GetCStr());
                     return false;
                 }
                 return true;
@@ -457,13 +458,12 @@ namespace AZ
                         m_hairPPLLRasterPass->SetFeatureProcessor(this);                  }
                     else
                     {
-                        AZ_Error("Hair Gem", false, "HairPPLLRasterPassTemplate does not have any valid passes. Check your game project's .pass assets.");
+                        AZ_ErrorOnce("Hair Gem", false, "HairPPLLRasterPassTemplate does not have any valid passes. Check your game project's .pass assets.");
                         return false;
                     }
                 }
                 else
                 {
-                    AZ_Error("Hair Gem", false, "Failed to find passes for HairPPLLRasterPassTemplate. Check your game project's .pass assets.");
                     return false;
                 }
                 return true;
@@ -486,13 +486,12 @@ namespace AZ
                     }
                     else
                     {
-                        AZ_Error("Hair Gem", false, "HairPPLLResolvePassTemplate does not have any valid passes. Check your game project's .pass assets.");
+                        AZ_ErrorOnce("Hair Gem", false, "HairPPLLResolvePassTemplate does not have any valid passes. Check your game project's .pass assets.");
                         return false;
                     }
                 }
                 else
                 {
-                    AZ_Error("Hair Gem", false, "Failed to find passes for HairPPLLResolvePassTemplate. Check your game project's .pass assets.");
                     return false;
                 }
                 return true;
@@ -524,8 +523,9 @@ namespace AZ
             Data::Instance<HairSkinningComputePass> HairFeatureProcessor::GetHairSkinningComputegPass()
             {
                 if (!m_computePasses[GlobalShapeConstraintsPass])
-                {   
-                    Init();
+                {
+                    const bool forceInit = true;
+                    Initialize(forceInit);
                 }
                 return m_computePasses[GlobalShapeConstraintsPass];
             }
@@ -534,7 +534,8 @@ namespace AZ
             {
                 if (!m_hairPPLLRasterPass)
                 {
-                    Init();
+                    const bool forceInit = true;
+                    Initialize(forceInit);
                 }
                 return m_hairPPLLRasterPass;
             }

@@ -53,25 +53,37 @@ namespace AZ
 
             bool HairPPLLRasterPass::AcquireFeatureProcessor()
             {
-                if (m_featureProcessor)
+                // Quick verification that work can be carried on
+                if (m_featureProcessor && m_featureProcessor->IsInitialized())
                 {
                     return true;
+
                 }
 
-                RPI::Scene* scene = GetScene();
-                if (scene)
-                {
-                    m_featureProcessor = scene->GetFeatureProcessor<HairFeatureProcessor>();
-                }
-                else
-                {
-                    return false;
-                }
-
+                // No feature processor - try getting it from the scene
                 if (!m_featureProcessor)
                 {
+                    RPI::Scene* scene = GetScene();
+                    if (scene)
+                    {
+                        m_featureProcessor = scene->GetFeatureProcessor<HairFeatureProcessor>();
+                        if (!m_featureProcessor)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                // Feature processor retrieved - check if initialized / try to initialize if not.
+                const bool forceInit = false;
+                if (!m_featureProcessor->Initialize(forceInit))
+                {
                     AZ_Warning("Hair Gem", false,
-                        "HairPPLLRasterPass [%s] - Failed to retrieve Hair feature processor from the scene",
+                        "HairSkinningComputePass [%s] - Feature processor is not ready or could not be retrieve",
                         GetName().GetCStr());
                     return false;
                 }

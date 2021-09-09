@@ -61,46 +61,51 @@ namespace AZ
                 return AZStd::move(pass);
             }
 
+            bool HairPPLLResolvePass::AcquireFeatureProcessor()
+            {
+                // Quick verification that work can be carried on
+                if (m_featureProcessor && m_featureProcessor->IsInitialized())
+                {
+                    return true;
+
+                }
+
+                // No feature processor - try getting it from the scene
+                if (!m_featureProcessor)
+                {
+                    RPI::Scene* scene = GetScene();
+                    if (scene)
+                    {
+                        m_featureProcessor = scene->GetFeatureProcessor<HairFeatureProcessor>();
+                        if (!m_featureProcessor)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                // Feature processor retrieved - check if initialized / try to initialize if not.
+                const bool forceInit = false;
+                if (!m_featureProcessor->Initialize(forceInit))
+                {
+                    AZ_Warning("Hair Gem", false,
+                        "HairSkinningComputePass [%s] - Feature processor is not ready or could not be retrieve",
+                        GetName().GetCStr());
+                    return false;
+                }
+                return true;
+            }
+
             void HairPPLLResolvePass::InitializeInternal()
             {
                 if (GetScene())
                 {
                     FullscreenTrianglePass::InitializeInternal();
                 }
-            }
-
-            bool HairPPLLResolvePass::AcquireFeatureProcessor()
-            {
-                if (m_featureProcessor)
-                {
-                    return true;
-                }
-
-                RPI::Scene* scene = GetScene();
-                if (scene)
-                {
-                    m_featureProcessor = scene->GetFeatureProcessor<HairFeatureProcessor>();
-                }
-                else
-                {
-                    return false;
-                }
-
-                if (!m_featureProcessor || !m_featureProcessor->IsInitialized())
-                {
-                    AZ_Warning("Hair Gem", m_featureProcessor,
-                        "HairPPLLResolvePass [%s] - Failed to retrieve Hair feature processor from the scene",
-                        GetName().GetCStr());
-                    m_featureProcessor = nullptr;   // set it as null if not initialized to repeat this check.
-                    return false;
-                }
-                return true;
-            }
-
-            void HairPPLLResolvePass::BuildInternal()
-            {
-                // No need to attach any buffer / image - it is done in the fill pass
-                FullscreenTrianglePass::BuildInternal();
             }
 
             void HairPPLLResolvePass::CompileResources(const RHI::FrameGraphCompileContext& context)
@@ -117,7 +122,6 @@ namespace AZ
                 {
                     m_shaderResourceGroup->SetShaderVariantKeyFallbackValue(m_shaderOptions);
                 }
-
 
                 SrgBufferDescriptor descriptor = SrgBufferDescriptor(
                     RPI::CommonBufferPoolType::ReadWrite, RHI::Format::Unknown,

@@ -108,8 +108,11 @@ namespace AZ
                 AZ_Assert(createSceneOutcome, createSceneOutcome.GetError().c_str()); // This should never happen unless scene creation has changed.
                 data->m_frameworkScene = createSceneOutcome.TakeValue();
                 data->m_frameworkScene->SetSubsystem(data->m_scene);
-
                 data->m_frameworkScene->SetSubsystem(data->m_entityContext.get());
+
+                // Register the scene with the RPI so that it's available to the passes
+                RPI::RPISystemInterface::Get()->RegisterScene(data->m_scene);
+
                 // Create a render pipeline from the specified asset for the window context and add the pipeline to the scene
                 RPI::RenderPipelineDescriptor pipelineDesc;
                 pipelineDesc.m_mainViewTagName = "MainCamera";
@@ -121,7 +124,6 @@ namespace AZ
                 data->m_renderPipeline = RPI::RenderPipeline::CreateRenderPipeline(pipelineDesc);
                 data->m_scene->AddRenderPipeline(data->m_renderPipeline);
                 data->m_scene->Activate();
-                RPI::RPISystemInterface::Get()->RegisterScene(data->m_scene);
                 data->m_passHierarchy.push_back(data->m_pipelineName);
                 data->m_passHierarchy.push_back("CopyToSwapChain");
 

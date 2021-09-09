@@ -5,6 +5,22 @@
     "ClassData": {
         "AssetPaths": [
             {
+                "Name": "MainPipeline",
+                "Path": "Passes/MainPipeline.pass"
+            },
+            {
+                "Name": "MainPipelineRenderToTexture",
+                "Path": "Passes/MainPipelineRenderToTexture.pass"
+            },
+            {
+                "Name": "ToolsPipeline",
+                "Path": "Passes/ToolsPipeline.pass"
+            },
+            {
+                "Name": "ThumbnailPipelineRenderToTexture",
+                "Path": "Passes/ThumbnailPipelineRenderToTexture.pass"
+            },
+            {
                 "Name": "MSAAResolveColorTemplate",
                 "Path": "Passes/MSAAResolveColor.pass"
             },
@@ -51,14 +67,6 @@
             {
                 "Name": "ForwardSubsurfaceMSAAPassTemplate",
                 "Path": "Passes/ForwardSubsurfaceMSAA.pass"
-            },
-            {
-                "Name": "MainPipeline",
-                "Path": "Passes/MainPipeline.pass"
-            },
-            {
-                "Name": "MainPipelineRenderToTexture",
-                "Path": "Passes/MainPipelineRenderToTexture.pass"
             },
             {
                 "Name": "CascadedShadowmapsTemplate",
@@ -475,14 +483,6 @@
             {
                 "Name": "OpaqueParentTemplate",
                 "Path": "Passes/OpaqueParent.pass"
-            },
-            {
-                "Name": "ThumbnailPipeline",
-                "Path": "Passes/ThumbnailPipeline.pass"
-            },
-            {
-                "Name": "ThumbnailPipelineRenderToTexture",
-                "Path": "Passes/ThumbnailPipelineRenderToTexture.pass"
             },
             {
                 "Name": "TransparentParentTemplate",

@@ -90,7 +90,9 @@ namespace AZ
 
                 void UpdateHairSkinning();
 
-                bool Init();
+                //! Initialize passes and shared buffers.  forceInit set will force initialization
+                //! even if it was already initialized - used when the pipeline changes.  
+                bool Initialize(bool forceInit);
                 bool IsInitialized() { return m_initialized; }
 
                 // FeatureProcessor overrides ...

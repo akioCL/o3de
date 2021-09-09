@@ -13,8 +13,7 @@
         "Depth" : 
         { 
             "Enable" : true,
-             "CompareFunc" : "GreaterEqual"
-            // Adi - in TressFX this is LessEqual
+             "CompareFunc" : "GreaterEqual"     // In TressFX its LessEqual - Atom uses inverse depth
         },
         "Stencil" :
         {
@@ -30,9 +29,6 @@
     "BlendState" : 
     {
         "Enable" : false
-//        "BlendSource" : "AlphaSource",
-//        "BlendDest" : "AlphaSourceInverse",
-//        "BlendOp" : "Add"
     },
 
     "ProgramSettings":

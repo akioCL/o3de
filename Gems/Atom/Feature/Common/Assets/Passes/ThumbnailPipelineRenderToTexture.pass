@@ -15,7 +15,7 @@
             "PassRequests": [
                 {
                     "Name": "Pipeline",
-                    "TemplateName": "ThumbnailPipeline",
+                    "TemplateName": "ToolsPipeline",
                     "Connections": [
                         {
                             "LocalSlot": "SwapChainOutput",

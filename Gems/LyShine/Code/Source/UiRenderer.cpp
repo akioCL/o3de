@@ -99,8 +99,11 @@ AZ::RPI::ScenePtr UiRenderer::CreateScene(AZStd::shared_ptr<AZ::RPI::ViewportCon
     // Assign the new scene to the specified viewport context
     viewportContext->SetRenderScene(atomScene);
 
+    // Register the scene with the RPI so that it's available to the passes
+    AZ::RPI::RPISystemInterface::Get()->RegisterScene(atomScene);
+
     // Create a render pipeline and add it to the scene
-    AZStd::string pipelineAssetPath = "passes/MainRenderPipeline.azasset"; // LYSHINE_ATOM_TODO - make and use a UI pipeline
+    AZStd::string pipelineAssetPath = "passes/ToolsPipeline.azasset";
     AZ::Data::Asset<AZ::RPI::AnyAsset> pipelineAsset = AZ::RPI::AssetUtils::LoadAssetByProductPath<AZ::RPI::AnyAsset>(pipelineAssetPath.c_str(), AZ::RPI::AssetUtils::TraceLevel::Error);
     AZStd::shared_ptr<AZ::RPI::WindowContext> windowContext = viewportContext->GetWindowContext();
     auto renderPipeline = AZ::RPI::RenderPipeline::CreateRenderPipelineForWindow(pipelineAsset, *windowContext.get());
@@ -108,9 +111,6 @@ AZ::RPI::ScenePtr UiRenderer::CreateScene(AZStd::shared_ptr<AZ::RPI::ViewportCon
     atomScene->AddRenderPipeline(renderPipeline);
 
     atomScene->Activate();
-
-    // Register the scene
-    AZ::RPI::RPISystemInterface::Get()->RegisterScene(atomScene);
 
     return atomScene;
 }

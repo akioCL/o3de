@@ -46,29 +46,49 @@ namespace AZ
 
             bool HairSkinningComputePass::AcquireFeatureProcessor()
             {
-                if (m_featureProcessor)
+                // Quick verification that work can be carried on
+                if (m_featureProcessor && m_featureProcessor->IsInitialized())
                 {
                     return true;
+
                 }
 
-                RPI::Scene* scene = GetScene();
-                if (scene)
-                {
-                    m_featureProcessor = scene->GetFeatureProcessor<HairFeatureProcessor>();
-                }
-                else
-                {
-                    return false;
-                }
-
+                // No feature processor - try getting it from the scene
                 if (!m_featureProcessor)
                 {
+                    RPI::Scene* scene = GetScene();
+                    if (scene)
+                    {
+                        m_featureProcessor = scene->GetFeatureProcessor<HairFeatureProcessor>();
+                        if (!m_featureProcessor)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                // Feature processor retrieved - check if initialized / try to initialize if not.
+                const bool forceInit = false;
+                if (!m_featureProcessor->Initialize(forceInit))
+                {
                     AZ_Warning("Hair Gem", false,
-                        "HairSkinningComputePass [%s] - Failed to retrieve Hair feature processor from the scene",
+                        "HairSkinningComputePass [%s] - Feature processor is not ready or could not be retrieve",
                         GetName().GetCStr());
                     return false;
                 }
                 return true;
+            }
+
+            void HairSkinningComputePass::InitializeInternal()
+            {
+                if (GetScene())
+                {
+                    ComputePass::InitializeInternal();
+                }
             }
 
             RPI::Ptr<HairSkinningComputePass> HairSkinningComputePass::Create(const RPI::PassDescriptor& descriptor)
@@ -82,25 +102,12 @@ namespace AZ
             {
             }
 
-            void HairSkinningComputePass::SetupFrameGraphDependencies(RHI::FrameGraphInterface frameGraph)
-            {
-                ComputePass::SetupFrameGraphDependencies(frameGraph);
-            }
-
-            void HairSkinningComputePass::InitializeInternal()
-            {
-                if (GetScene())
-                {
-                    ComputePass::InitializeInternal();
-                }
-            }
-
             void HairSkinningComputePass::BuildInternal()
             {
                 ComputePass::BuildInternal();
 
                 if (!AcquireFeatureProcessor())
-                {
+                {   // initialization was not complete - buffers might not be set
                     return;
                 }
 
@@ -146,7 +153,7 @@ namespace AZ
 
             void HairSkinningComputePass::CompileResources([[maybe_unused]] const RHI::FrameGraphCompileContext& context)
             {
-                if (!m_featureProcessor)
+                if (!AcquireFeatureProcessor())
                 {
                     return;
                 }
@@ -184,7 +191,6 @@ namespace AZ
                 {
                     return;
                 }
-
 
                 // For dispatches that change the same base data this lock method might not be enough.
                 // Since build might take more than several frames, iterating over passes in the future
