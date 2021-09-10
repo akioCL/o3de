@@ -8,6 +8,8 @@
 
 set(FILES
     Tests/Main.cpp
+    Tests/MockInterfaces.h
+    Tests/HierarchyTests.cpp
     Tests/IMultiplayerConnectionMock.h
     Tests/MultiplayerSystemTests.cpp
     Tests/RewindableContainerTests.cpp
