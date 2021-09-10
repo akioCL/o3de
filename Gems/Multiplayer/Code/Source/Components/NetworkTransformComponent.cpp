@@ -12,8 +12,6 @@
 #include <AzCore/EBus/IEventScheduler.h>
 #include <AzFramework/Components/TransformComponent.h>
 
-#pragma optimize("", off)
-
 namespace Multiplayer
 {
     void NetworkTransformComponent::NetworkTransformComponent::Reflect(AZ::ReflectContext* context)

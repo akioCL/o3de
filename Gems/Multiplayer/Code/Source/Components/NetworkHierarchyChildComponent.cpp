@@ -15,8 +15,6 @@
 #include <Multiplayer/IMultiplayer.h>
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 
-#pragma optimize("", off)
-
 namespace Multiplayer
 {
     void NetworkHierarchyChildComponent::Reflect(AZ::ReflectContext* context)

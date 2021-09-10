@@ -29,8 +29,6 @@
 #include <AzCore/Console/ILogger.h>
 #include <AzCore/Math/Transform.h>
 
-#pragma optimize("", off)
-
 namespace Multiplayer
 {
     // Current max size for a UdpPacketHeader is 11 bytes
@@ -542,7 +540,7 @@ namespace Multiplayer
 
     bool EntityReplicationManager::HandlePropertyChangeMessage
     (
-        AzNetworking::IConnection* invokingConnection, 
+        AzNetworking::IConnection* invokingConnection,
         EntityReplicator* entityReplicator,
         AzNetworking::PacketId packetId,
         NetEntityId netEntityId,
@@ -1155,7 +1153,7 @@ namespace Multiplayer
                 AzNetworking::TrackChangedSerializer<AzNetworking::NetworkOutputSerializer> outputSerializer(message.m_propertyUpdateData.GetBuffer(), static_cast<uint32_t>(message.m_propertyUpdateData.GetSize()));
                 if (!HandlePropertyChangeMessage
                 (
-                    invokingConnection, 
+                    invokingConnection,
                     replicator,
                     AzNetworking::InvalidPacketId,
                     message.m_entityId,

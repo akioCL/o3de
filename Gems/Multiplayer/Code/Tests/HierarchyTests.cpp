@@ -26,8 +26,6 @@
 #include <NetworkEntity/EntityReplication/EntityReplicationManager.h>
 #include <NetworkEntity/EntityReplication/EntityReplicator.h>
 
-#pragma optimize("", off)
-
 namespace Multiplayer
 {
     using namespace testing;
@@ -265,4 +263,3 @@ namespace Multiplayer
         parentEntity.Deactivate();
     }
 }
-
