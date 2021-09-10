@@ -32,6 +32,8 @@
 
 #include <AzFramework/Components/TransformComponent.h>
 
+AZ_CVAR(bool, bg_debugHierarchyActivation, false, nullptr, AZ::ConsoleFunctorFlags::Null, "Helpful messages when debugging network hierarchy behavior");
+
 namespace Multiplayer
 {
     EntityReplicator::EntityReplicator
@@ -438,23 +440,27 @@ namespace Multiplayer
                     const AZ::Entity* parentEntity = parentHandle.GetEntity();
                     if (parentEntity && parentEntity->GetState() == AZ::Entity::State::Active)
                     {
-                        AZ_Printf("DebugReplication", "entity %s asking for activation - granted", entity->GetName().c_str());
+                        if (bg_debugHierarchyActivation)
+                        {
+                            AZLOG_DEBUG(
+                                "Entity %s asking for activation - granted",
+                                entity->GetName().c_str());
+                        }
                         return true;
                     }
 
-                    AZ_Printf("DebugReplication", "entity %s asking for activation - waiting on the parent", entity->GetName().c_str());
+                    if (bg_debugHierarchyActivation)
+                    {
+                        AZLOG_DEBUG(
+                            "Entity %s asking for activation - waiting on the parent %u",
+                            entity->GetName().c_str(),
+                            aznumeric_cast<uint32_t>(parentId));
+                    }
                     return false;
                 }
-
-                AZ_Printf("DebugReplication", "entity %s asking for activation - parent not set", entity->GetName().c_str());
-            }
-            else
-            {
-                //AZ_Printf("DebugReplication", "entity %s asking for activation - missing network transform", entity->GetName().c_str());
             }
         }
 
-        //AZ_Printf("DebugReplication", "entity %s asking for activation - not in a hierarchy", entity->GetName().c_str());
         return true;
     }
 
