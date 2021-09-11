@@ -8,9 +8,9 @@
 #pragma once
 
 #include <AzCore/Component/ComponentApplicationBus.h>
+#include <AzCore/Time/ITime.h>
 #include <AzNetworking/ConnectionLayer/IConnectionListener.h>
 #include <AzTest/AzTest.h>
-#include <AzCore/Time/ITime.h>
 #include <Multiplayer/IMultiplayer.h>
 #include <Multiplayer/NetworkEntity/NetworkEntityRpcMessage.h>
 

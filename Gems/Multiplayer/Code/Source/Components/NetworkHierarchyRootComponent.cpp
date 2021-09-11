@@ -15,6 +15,8 @@
 #include <Multiplayer/Components/NetworkHierarchyChildComponent.h>
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 
+#pragma optimize("", off)
+
 namespace Multiplayer
 {
     void NetworkHierarchyRootComponent::Reflect(AZ::ReflectContext* context)
@@ -88,21 +90,27 @@ namespace Multiplayer
 
     void NetworkHierarchyRootComponent::OnChildAdded(AZ::EntityId child)
     {
-        if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(child))
+        AZStd::vector<AZ::EntityId> allChildren;
+        AZ::TransformBus::EventResult(allChildren, child, &AZ::TransformBus::Events::GetEntityAndAllDescendants);
+
+        for (AZ::EntityId newChildId : allChildren)
         {
-            if (auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>())
+            if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(newChildId))
             {
-                AZ::TransformNotificationBus::MultiHandler::BusConnect(child);
+                if (auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>())
+                {
+                    AZ::TransformNotificationBus::MultiHandler::BusConnect(child);
 
-                m_children.push_back(childEntity);
-                hierarchyChildComponent->SetHierarchyRoot(this);
-            }
-            else if (auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>())
-            {
-                // Do not listen for children of other roots, just stop at the root
+                    m_children.push_back(childEntity);
+                    hierarchyChildComponent->SetHierarchyRoot(this);
+                }
+                else if (auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>())
+                {
+                    // Do not listen for children of other roots, just stop at the root
 
-                m_children.push_back(childEntity);
-                hierarchyRootComponent->SetHierarchyRoot(this);
+                    m_children.push_back(childEntity);
+                    hierarchyRootComponent->SetHierarchyRoot(this);
+                }
             }
         }
     }
@@ -114,13 +122,20 @@ namespace Multiplayer
 
         for (AZ::EntityId childId : allChildren)
         {
-            if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(child))
-            {
-                if (const auto childIterator = AZStd::find(m_children.begin(), m_children.end(), childEntity))
+            if (const auto childIterator = AZStd::find_if(m_children.begin(), m_children.end(), [childId](const AZ::Entity* entity)
                 {
-                    m_children.erase(childIterator);
-                    AZ::TransformNotificationBus::MultiHandler::BusDisconnect(childId);
+                    return entity->GetId() == childId;
+                }))
+            {
+                const AZ::Entity* childEntity = *childIterator;
+
+                if (NetworkHierarchyChildComponent* childComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>())
+                {
+                    childComponent->SetHierarchyRoot(nullptr);
                 }
+
+                m_children.erase(childIterator);
+                AZ::TransformNotificationBus::MultiHandler::BusDisconnect(childId);
             }
         }
     }
