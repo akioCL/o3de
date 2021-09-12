@@ -12,6 +12,8 @@
 #include <AzCore/EBus/IEventScheduler.h>
 #include <AzFramework/Components/TransformComponent.h>
 
+#pragma optimize("", off)
+
 namespace Multiplayer
 {
     void NetworkTransformComponent::NetworkTransformComponent::Reflect(AZ::ReflectContext* context)
@@ -49,8 +51,11 @@ namespace Multiplayer
         ScaleAddEvent(m_scaleEventHandler);
         ResetCountAddEvent(m_resetCountEventHandler);
         ParentEntityIdAddEvent(m_parentIdChangedEventHandler);
+        if (GetNetBindComponent())
+        {
         GetNetBindComponent()->AddEntityPreRenderEventHandler(m_entityPreRenderEventHandler);
         GetNetBindComponent()->AddEntityCorrectionEventHandler(m_entityCorrectionEventHandler);
+        }
 
         // When coming into relevance, reset all blending factors so we don't interpolate to our start position
         OnResetCountChangedEvent();

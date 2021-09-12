@@ -10,6 +10,7 @@
 
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/TransformBus.h>
+#include <Source/AutoGen/NetworkHierarchyRootComponent.AutoComponent.h>
 
 namespace Multiplayer
 {
@@ -23,21 +24,21 @@ namespace Multiplayer
      * A root component marks either a top most root of a hierarchy, or an inner root of an attach hierarchy.
      */
     class NetworkHierarchyRootComponent final
-        : public AZ::Component
+        : public NetworkHierarchyRootComponentBase
         , protected AZ::TransformNotificationBus::MultiHandler
     {
     public:
-        AZ_COMPONENT(NetworkHierarchyRootComponent, "{2B124F70-B73A-43F2-A26E-D7B8C34E13B6}");
+        AZ_MULTIPLAYER_COMPONENT(Multiplayer::NetworkHierarchyRootComponent, s_networkHierarchyRootComponentConcreteUuid, Multiplayer::NetworkHierarchyRootComponentBase);
 
         static void Reflect(AZ::ReflectContext* context);
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
 
-        //! AZ::Component overrides.
         //! @{
-        void Activate() override;
-        void Deactivate() override;
+        void OnInit() override;
+        void OnActivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
+        void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
         //! @}
 
         //! Children are guaranteed to have either @NetworkHierarchyChildComponent or @NetworkHierarchyRootComponent
@@ -68,5 +69,17 @@ namespace Multiplayer
         bool RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount);
         //! @returns false if the maximum supported hierarchy size has been reached
         bool RecursiveAttachHierarchicalChild(AZ::EntityId entity, uint32_t& currentEntityCount);
+    };
+
+    class NetworkHierarchyRootComponentController
+        : public NetworkHierarchyRootComponentControllerBase
+    {
+    public:
+        NetworkHierarchyRootComponentController(NetworkHierarchyRootComponent& parent);
+
+        void OnActivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
+        void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
+        
+    protected:
     };
 }

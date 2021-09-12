@@ -19,10 +19,11 @@ namespace Multiplayer
 {
     void NetworkHierarchyChildComponent::Reflect(AZ::ReflectContext* context)
     {
-        if (AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context);
+        if (serializeContext)
         {
-            serializeContext->Class<NetworkHierarchyChildComponent, AZ::Component>()
-                ->Version(2);
+            serializeContext->Class<NetworkHierarchyChildComponent, NetworkHierarchyChildComponentBase>()
+                ->Version(1);
 
             if (AZ::EditContext* editContext = serializeContext->GetEditContext())
             {
@@ -34,6 +35,7 @@ namespace Multiplayer
                     ;
             }
         }
+        NetworkHierarchyChildComponentBase::Reflect(context);
     }
 
     void NetworkHierarchyChildComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
@@ -52,7 +54,11 @@ namespace Multiplayer
         incompatible.push_back(AZ_CRC_CE("NetworkHierarchyRootComponent"));
     }
 
-    void NetworkHierarchyChildComponent::Activate()
+    void NetworkHierarchyChildComponent::OnInit()
+    {
+    }
+
+    void NetworkHierarchyChildComponent::OnActivate([[maybe_unused]] EntityIsMigrating entityIsMigrating)
     {
         AZ::EntityId parentId;
         AZ::TransformBus::EventResult(parentId, GetEntityId(), &AZ::TransformBus::Events::GetParentId);
@@ -72,17 +78,35 @@ namespace Multiplayer
             actualParenHasHierarchy);
     }
 
-    void NetworkHierarchyChildComponent::Deactivate()
+    void NetworkHierarchyChildComponent::OnDeactivate([[maybe_unused]] EntityIsMigrating entityIsMigrating)
     {
     }
 
     void NetworkHierarchyChildComponent::SetTopLevelHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot)
     {
-        m_hierarchyRoot = hierarchyRoot;
+        m_hierarchyRootComponent = hierarchyRoot;
     }
 
-    NetworkHierarchyRootComponent* NetworkHierarchyChildComponent::GetTopLevelHierarchyRoot() const
+    const NetworkHierarchyRootComponent* NetworkHierarchyChildComponent::GetTopLevelHierarchyRoot() const
     {
-        return m_hierarchyRoot;
+        if (m_hierarchyRootComponent)
+        {
+            return m_hierarchyRootComponent;
+        }
+
+        const NetEntityId netRootId = GetHierarchyRoot();
+        const ConstNetworkEntityHandle rootHandle = GetNetworkEntityManager()->GetEntity(netRootId);
+        if (rootHandle.Exists())
+        {
+            return rootHandle.FindComponent<NetworkHierarchyRootComponent>();
+        }
+
+        return nullptr;
+    }
+
+    bool NetworkHierarchyChildComponent::IsInHierarchy() const
+    {
+        const NetEntityId netRootId = GetHierarchyRoot();
+        return netRootId != InvalidNetEntityId;
     }
 }

@@ -19,15 +19,16 @@
 #pragma optimize("", off)
 
 AZ_CVAR(uint32_t, bg_hierarchyEntityMaxLimit, 16, nullptr, AZ::ConsoleFunctorFlags::Null,
-    "Maximum allowed size of network entity hierarchies");
+    "Maximum allowed size of network entity hierarchies, including top level entity.");
 
 namespace Multiplayer
 {
     void NetworkHierarchyRootComponent::Reflect(AZ::ReflectContext* context)
     {
-        if (AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context);
+        if (serializeContext)
         {
-            serializeContext->Class<NetworkHierarchyRootComponent, AZ::Component>()
+            serializeContext->Class<NetworkHierarchyRootComponent, NetworkHierarchyRootComponentBase>()
                 ->Version(1);
 
             if (AZ::EditContext* editContext = serializeContext->GetEditContext())
@@ -40,6 +41,7 @@ namespace Multiplayer
                     ;
             }
         }
+        NetworkHierarchyRootComponentBase::Reflect(context);
     }
 
     void NetworkHierarchyRootComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
@@ -58,7 +60,11 @@ namespace Multiplayer
         incompatible.push_back(AZ_CRC_CE("NetworkHierarchyRootComponent"));
     }
 
-    void NetworkHierarchyRootComponent::Activate()
+    void NetworkHierarchyRootComponent::OnInit()
+    {
+    }
+
+    void NetworkHierarchyRootComponent::OnActivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
     {
         AZ::TransformNotificationBus::MultiHandler::BusConnect(GetEntityId());
 
@@ -76,7 +82,7 @@ namespace Multiplayer
             parentId.ToString().c_str(), actualParentEntity ? actualParentEntity->GetName().c_str() : "not-found", actualParenHasHierarchy);
     }
 
-    void NetworkHierarchyRootComponent::Deactivate()
+    void NetworkHierarchyRootComponent::OnDeactivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
     {
         AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
 
@@ -233,5 +239,20 @@ namespace Multiplayer
     const AZStd::vector<AZ::Entity*>& NetworkHierarchyRootComponent::GetHierarchyChildren() const
     {
         return m_children;
+    }
+
+    // Controller implementation
+
+    NetworkHierarchyRootComponentController::NetworkHierarchyRootComponentController(NetworkHierarchyRootComponent& parent)
+        : NetworkHierarchyRootComponentControllerBase(parent)
+    {
+    }
+
+    void NetworkHierarchyRootComponentController::OnActivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
+    {
+    }
+
+    void NetworkHierarchyRootComponentController::OnDeactivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
+    {
     }
 }

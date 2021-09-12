@@ -56,6 +56,8 @@ set(FILES
     Source/AutoGen/Multiplayer.AutoPackets.xml
     Source/AutoGen/MultiplayerEditor.AutoPackets.xml
     Source/AutoGen/NetworkTransformComponent.AutoComponent.xml
+    Source/AutoGen/NetworkHierarchyChildComponent.AutoComponent.xml
+    Source/AutoGen/NetworkHierarchyRootComponent.AutoComponent.xml
     Source/Components/LocalPredictionPlayerInputComponent.cpp
     Source/Components/MultiplayerComponent.cpp
     Source/Components/MultiplayerComponentRegistry.cpp

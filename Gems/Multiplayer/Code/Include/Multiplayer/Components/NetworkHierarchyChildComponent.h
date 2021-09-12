@@ -9,7 +9,7 @@
 #pragma once
 
 #include <AzCore/Component/Component.h>
-#include <AzCore/Component/TransformBus.h>
+#include <Source/AutoGen/NetworkHierarchyChildComponent.AutoComponent.h>
 
 namespace Multiplayer
 {
@@ -23,22 +23,22 @@ namespace Multiplayer
      * and one or more @NetworkHierarchyChildComponent on its child entities.
      */
     class NetworkHierarchyChildComponent final
-        : public AZ::Component
+        : public NetworkHierarchyChildComponentBase
     {
         friend class NetworkHierarchyRootComponent;
 
     public:
-        AZ_COMPONENT(NetworkHierarchyChildComponent, "{AB83BB6B-5BD5-4E84-9933-E30B79E36876}");
+        AZ_MULTIPLAYER_COMPONENT(Multiplayer::NetworkHierarchyChildComponent, s_networkHierarchyChildComponentConcreteUuid, Multiplayer::NetworkHierarchyChildComponentBase);
 
         static void Reflect(AZ::ReflectContext* context);
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
 
-        //! AZ::Component overrides.
         //! @{
-        void Activate() override;
-        void Deactivate() override;
+        void OnInit() override;
+        void OnActivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
+        void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
         //! @}
 
         //! @note if the return value is nullptr, then this entity is not part of any hierarchy.
@@ -46,13 +46,15 @@ namespace Multiplayer
         //! between this entity and the parent entity that has @NetworkHierarchyRootComponent on it.
         //!
         //! @returns top most @NetworkHierarchyRootComponent for the hierarchy
-        NetworkHierarchyRootComponent* GetTopLevelHierarchyRoot() const;
+        const NetworkHierarchyRootComponent* GetTopLevelHierarchyRoot() const;
+
+        bool IsInHierarchy() const;
 
     protected:
         //! Used by @NetworkHierarchyRootComponent
         void SetTopLevelHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
 
     private:
-        NetworkHierarchyRootComponent* m_hierarchyRoot = nullptr;
+        NetworkHierarchyRootComponent* m_hierarchyRootComponent = nullptr;
     };
 }

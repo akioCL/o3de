@@ -27,8 +27,6 @@ namespace Multiplayer
             NetBindComponent::CreateDescriptor(),
             NetBindMarkerComponent::CreateDescriptor(),
             NetworkSpawnableHolderComponent::CreateDescriptor(),
-            NetworkHierarchyChildComponent::CreateDescriptor(),
-            NetworkHierarchyRootComponent::CreateDescriptor(),
         });
 
         CreateComponentDescriptors(m_descriptors);

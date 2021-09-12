@@ -20,6 +20,8 @@
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/std/sort.h>
 
+#pragma optimize("", off)
+
 namespace Multiplayer
 {
     void NetBindComponent::Reflect(AZ::ReflectContext* context)
