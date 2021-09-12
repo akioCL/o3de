@@ -224,30 +224,49 @@ namespace Multiplayer
 
         struct EntityInfo
         {
-            EntityInfo(AZ::Entity& entity, NetEntityId netId)
+            enum class Role
+            {
+                Root,
+                Child,
+                None
+            };
+
+            EntityInfo(AZ::Entity& entity, NetEntityId netId, Role role)
                 : m_entity(entity)
                 , m_netId(netId)
+                , m_role(role)
             {
             }
 
             AZ::Entity& m_entity;
             NetEntityId m_netId;
             AZStd::unique_ptr<EntityReplicator> m_replicator;
+            Role m_role = Role::None;
         };
+
+        void PopulateHierarchicalEntity(const EntityInfo& entityInfo)
+        {
+            entityInfo.m_entity.CreateComponent<AzFramework::TransformComponent>();
+            entityInfo.m_entity.CreateComponent<NetBindComponent>();
+            entityInfo.m_entity.CreateComponent<NetworkTransformComponent>();
+            switch (entityInfo.m_role)
+            {
+            case EntityInfo::Role::Root:
+                entityInfo.m_entity.CreateComponent<NetworkHierarchyRootComponent>();
+                break;
+            case EntityInfo::Role::Child:
+                entityInfo.m_entity.CreateComponent<NetworkHierarchyChildComponent>();
+                break;
+            case EntityInfo::Role::None:
+                break;
+            }
+            entityInfo.m_entity.Init();
+        }
 
         void CreateSimpleHierarchy(EntityInfo& root, EntityInfo& child)
         {
-            root.m_entity.CreateComponent<AzFramework::TransformComponent>();
-            root.m_entity.CreateComponent<NetBindComponent>();
-            root.m_entity.CreateComponent<NetworkTransformComponent>();
-            root.m_entity.CreateComponent<NetworkHierarchyRootComponent>();
-            root.m_entity.Init();
-
-            child.m_entity.CreateComponent<AzFramework::TransformComponent>();
-            child.m_entity.CreateComponent<NetBindComponent>();
-            child.m_entity.CreateComponent<NetworkTransformComponent>();
-            child.m_entity.CreateComponent<NetworkHierarchyChildComponent>();
-            child.m_entity.Init();
+            PopulateHierarchicalEntity(root);
+            PopulateHierarchicalEntity(child);
 
             SetupEntity(root.m_entity, root.m_netId);
             SetupEntity(child.m_entity, child.m_netId);
@@ -271,23 +290,9 @@ namespace Multiplayer
 
         void CreateDeepHierarchy(EntityInfo& root, EntityInfo& child, EntityInfo& childOfChild)
         {
-            root.m_entity.CreateComponent<AzFramework::TransformComponent>();
-            root.m_entity.CreateComponent<NetBindComponent>();
-            root.m_entity.CreateComponent<NetworkTransformComponent>();
-            root.m_entity.CreateComponent<NetworkHierarchyRootComponent>();
-            root.m_entity.Init();
-
-            child.m_entity.CreateComponent<AzFramework::TransformComponent>();
-            child.m_entity.CreateComponent<NetBindComponent>();
-            child.m_entity.CreateComponent<NetworkTransformComponent>();
-            child.m_entity.CreateComponent<NetworkHierarchyChildComponent>();
-            child.m_entity.Init();
-
-            childOfChild.m_entity.CreateComponent<AzFramework::TransformComponent>();
-            childOfChild.m_entity.CreateComponent<NetBindComponent>();
-            childOfChild.m_entity.CreateComponent<NetworkTransformComponent>();
-            childOfChild.m_entity.CreateComponent<NetworkHierarchyChildComponent>();
-            childOfChild.m_entity.Init();
+            PopulateHierarchicalEntity(root);
+            PopulateHierarchicalEntity(child);
+            PopulateHierarchicalEntity(childOfChild);
 
             SetupEntity(root.m_entity, root.m_netId);
             SetupEntity(child.m_entity, child.m_netId);
@@ -392,6 +397,9 @@ namespace Multiplayer
         parentEntity.Deactivate();
     }
 
+    /*
+     * Parent -> Child
+     */
     class SimpleHierarchyTests : public HierarchyTests
     {
     public:
@@ -402,8 +410,8 @@ namespace Multiplayer
             m_rootEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(1), "root");
             m_childEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(2), "child");
 
-            m_rootEntityInfo = AZStd::make_unique<EntityInfo>(*m_rootEntity.get(), NetEntityId{ 1 });
-            m_childEntityInfo = AZStd::make_unique<EntityInfo>(*m_childEntity.get(), NetEntityId{ 2 });
+            m_rootEntityInfo = AZStd::make_unique<EntityInfo>(*m_rootEntity.get(), NetEntityId{ 1 }, EntityInfo::Role::Root);
+            m_childEntityInfo = AZStd::make_unique<EntityInfo>(*m_childEntity.get(), NetEntityId{ 2 }, EntityInfo::Role::Child);
 
             CreateSimpleHierarchy(*m_rootEntityInfo, *m_childEntityInfo);
 
@@ -471,6 +479,9 @@ namespace Multiplayer
         );
     }
 
+    /*
+     * Parent -> Child -> ChildOfChild
+     */
     class DeepHierarchyTests : public HierarchyTests
     {
     public:
@@ -482,9 +493,9 @@ namespace Multiplayer
             m_childEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(2), "child");
             m_childOfChildEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(3), "child of child");
 
-            m_rootEntityInfo = AZStd::make_unique<EntityInfo>(*m_rootEntity.get(), NetEntityId{ 1 });
-            m_childEntityInfo = AZStd::make_unique<EntityInfo>(*m_childEntity.get(), NetEntityId{ 2 });
-            m_childOfChildEntityInfo = AZStd::make_unique<EntityInfo>(*m_childOfChildEntity.get(), NetEntityId{ 3 });
+            m_rootEntityInfo = AZStd::make_unique<EntityInfo>(*m_rootEntity.get(), NetEntityId{ 1 }, EntityInfo::Role::Root);
+            m_childEntityInfo = AZStd::make_unique<EntityInfo>(*m_childEntity.get(), NetEntityId{ 2 }, EntityInfo::Role::Child);
+            m_childOfChildEntityInfo = AZStd::make_unique<EntityInfo>(*m_childOfChildEntity.get(), NetEntityId{ 3 }, EntityInfo::Role::Child);
 
             CreateDeepHierarchy(*m_rootEntityInfo, *m_childEntityInfo, *m_childOfChildEntityInfo);
 
@@ -630,10 +641,473 @@ namespace Multiplayer
     TEST_F(DeepHierarchyTests, Child_Of_Child_Clears_Reference_To_Root_After_Detached)
     {
         m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
-        
+
         EXPECT_EQ(
             m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
             nullptr
+        );
+    }
+
+    /*
+     * Sets up 2 deep hierarchies.
+     */
+    class HierarchyOfHierarchyTests : public DeepHierarchyTests
+    {
+    public:
+        void SetUp() override
+        {
+            DeepHierarchyTests::SetUp();
+
+            m_rootEntity2 = AZStd::make_unique<AZ::Entity>(AZ::EntityId(4), "root 2");
+            m_childEntity2 = AZStd::make_unique<AZ::Entity>(AZ::EntityId(5), "child 2");
+            m_childOfChildEntity2 = AZStd::make_unique<AZ::Entity>(AZ::EntityId(6), "child of child 2");
+
+            m_rootEntityInfo2 = AZStd::make_unique<EntityInfo>(*m_rootEntity2.get(), NetEntityId{ 4 }, EntityInfo::Role::Root);
+            m_childEntityInfo2 = AZStd::make_unique<EntityInfo>(*m_childEntity2.get(), NetEntityId{ 5 }, EntityInfo::Role::Child);
+            m_childOfChildEntityInfo2 = AZStd::make_unique<EntityInfo>(*m_childOfChildEntity2.get(), NetEntityId{ 6 }, EntityInfo::Role::Child);
+
+            CreateDeepHierarchy(*m_rootEntityInfo2, *m_childEntityInfo2, *m_childOfChildEntityInfo2);
+
+            m_childEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity2->GetId());
+            m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity2->GetId());
+            // now the entities are under one hierarchy
+        }
+
+        void TearDown() override
+        {
+            m_childOfChildEntityInfo2.reset();
+            m_childEntityInfo2.reset();
+            m_rootEntityInfo2.reset();
+
+            StopEntity(*m_childOfChildEntity2);
+            m_childOfChildEntity2->Deactivate();
+            m_childOfChildEntity2.reset();
+            StopEntity(*m_childEntity2);
+            m_childEntity2->Deactivate();
+            m_childEntity2.reset();
+            StopEntity(*m_rootEntity2);
+            m_rootEntity2->Deactivate();
+            m_rootEntity2.reset();
+
+            DeepHierarchyTests::TearDown();
+        }
+
+        AZStd::unique_ptr<AZ::Entity> m_rootEntity2;
+        AZStd::unique_ptr<AZ::Entity> m_childEntity2;
+        AZStd::unique_ptr<AZ::Entity> m_childOfChildEntity2;
+
+        AZStd::unique_ptr<EntityInfo> m_rootEntityInfo2;
+        AZStd::unique_ptr<EntityInfo> m_childEntityInfo2;
+        AZStd::unique_ptr<EntityInfo> m_childOfChildEntityInfo2;
+    };
+
+    TEST_F(HierarchyOfHierarchyTests, Hierarchies_Are_Not_Related)
+    {
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2
+        );
+
+        if (m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size() == 2)
+        {
+            EXPECT_EQ(
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[0],
+                m_childEntity.get()
+            );
+            EXPECT_EQ(
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[1],
+                m_childOfChildEntity.get()
+            );
+        }
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2
+        );
+
+        if (m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size() == 2)
+        {
+            EXPECT_EQ(
+                m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[0],
+                m_childEntity2.get()
+            );
+            EXPECT_EQ(
+                m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[1],
+                m_childOfChildEntity2.get()
+            );
+        }
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_References_All_When_Another_Hierarchy_Attached_At_Root)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_References_All_When_Another_Hierarchy_Attached_At_Child)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_References_All_When_Another_Hierarchy_Attached_At_Child_Of_Child)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_References_Top_Root_When_Another_Hierarchy_Attached_At_Root)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            true
+        );
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyRoot(),
+            m_rootEntity.get()
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_References_Top_Root_When_Another_Hierarchy_Attached_At_Child)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            true
+        );
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyRoot(),
+            m_rootEntity.get()
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_References_Top_Root_When_Another_Hierarchy_Attached_At_Child_Of_Child)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            true
+        );
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyRoot(),
+            m_rootEntity.get()
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_Doesnt_Keep_Child_References)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            0
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_Has_Child_References_After_Detachment_From_Top_Root)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+        // detach
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2
+        );
+        if (m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size() == 2)
+        {
+            EXPECT_EQ(
+                m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[0],
+                m_childEntity2.get()
+            );
+            EXPECT_EQ(
+                m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[1],
+                m_childOfChildEntity2.get()
+            );
+        }
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_Has_Child_References_After_Detachment_From_Child_Of_Child)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+        // detach
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Stress_Test_Inner_Root_Has_Child_References_After_Detachment_From_Child_Of_Child)
+    {
+        for (int i = 0; i < 100; ++i)
+        {
+            m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+            // detach
+            m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+        }
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_Updates_Child_References_After_Detachment_Of_Child_Of_Child_In_Inner_Hierarchy)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+        // detach
+        m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3 - 1
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_Updates_Child_References_After_Attachment_Of_Child_Of_Child_In_Inner_Hierarchy)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+        // detach
+        m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+        // re-connect
+        m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity2->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_Updates_Child_References_After_Child_Of_Child_Changed_Hierarchies)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+        // detach
+        m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        // connect to a different hierarchy
+        m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_Updates_Child_References_After_Detachment_Of_Child_In_Inner_Hierarchy)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+        // detach
+        m_childEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3 - 2
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Top_Root_Updates_Child_References_After_Child_Changed_Hierarchies)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+        // detach
+        m_childEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        // connect to a different hierarchy
+        m_childEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 + 3
+        );
+    }
+
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_Has_No_Child_References_After_All_Children_Moved_To_Another_Hierarchy)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+
+        m_childEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        // detach
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            0
+        );
+    }
+
+    /*
+     * Parent -> Child -> ChildOfChild (not marked as in a hierarchy)
+     */
+    class MixedDeepHierarchyTests : public HierarchyTests
+    {
+    public:
+        void SetUp() override
+        {
+            HierarchyTests::SetUp();
+
+            m_rootEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(1), "root");
+            m_childEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(2), "child");
+            m_childOfChildEntity = AZStd::make_unique<AZ::Entity>(AZ::EntityId(3), "child of child");
+
+            m_rootEntityInfo = AZStd::make_unique<EntityInfo>(*m_rootEntity.get(), NetEntityId{ 1 }, EntityInfo::Role::Root);
+            m_childEntityInfo = AZStd::make_unique<EntityInfo>(*m_childEntity.get(), NetEntityId{ 2 }, EntityInfo::Role::Child);
+            m_childOfChildEntityInfo = AZStd::make_unique<EntityInfo>(*m_childOfChildEntity.get(), NetEntityId{ 3 }, EntityInfo::Role::None);
+
+            CreateDeepHierarchy(*m_rootEntityInfo, *m_childEntityInfo, *m_childOfChildEntityInfo);
+
+            m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+            m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity->GetId());
+            // now the entities are under one hierarchy
+        }
+
+        void TearDown() override
+        {
+            m_childOfChildEntityInfo.reset();
+            m_childEntityInfo.reset();
+            m_rootEntityInfo.reset();
+
+            StopEntity(*m_childOfChildEntity);
+            m_childOfChildEntity->Deactivate();
+            m_childOfChildEntity.reset();
+            StopEntity(*m_childEntity);
+            m_childEntity->Deactivate();
+            m_childEntity.reset();
+            StopEntity(*m_rootEntity);
+            m_rootEntity->Deactivate();
+            m_rootEntity.reset();
+
+            HierarchyTests::TearDown();
+        }
+
+        AZStd::unique_ptr<AZ::Entity> m_rootEntity;
+        AZStd::unique_ptr<AZ::Entity> m_childEntity;
+        AZStd::unique_ptr<AZ::Entity> m_childOfChildEntity;
+
+        AZStd::unique_ptr<EntityInfo> m_rootEntityInfo;
+        AZStd::unique_ptr<EntityInfo> m_childEntityInfo;
+        AZStd::unique_ptr<EntityInfo> m_childOfChildEntityInfo;
+    };
+
+    TEST_F(MixedDeepHierarchyTests, Top_Root_Ignores_Non_Hierarchical_Entities)
+    {
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1
+        );
+    }
+
+    TEST_F(MixedDeepHierarchyTests, Detaching_Non_Hierarchical_Entity_Has_No_Effect_On_Top_Root)
+    {
+        m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1
+        );
+    }
+
+    TEST_F(MixedDeepHierarchyTests, Attaching_Non_Hierarchical_Entity_Has_No_Effect_On_Top_Root)
+    {
+        m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+        m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1
+        );
+    }
+
+    /*
+     * 1st hierarchy: Parent -> Child -> ChildOfChild (not marked as in a hierarchy)
+     * 2nd hierarchy: Parent2 -> Child2 (not marked as in a hierarchy) -> ChildOfChild2
+     */
+    class MixedHierarchyOfHierarchyTests : public MixedDeepHierarchyTests
+    {
+    public:
+        void SetUp() override
+        {
+            MixedDeepHierarchyTests::SetUp();
+
+            m_rootEntity2 = AZStd::make_unique<AZ::Entity>(AZ::EntityId(4), "root 2");
+            m_childEntity2 = AZStd::make_unique<AZ::Entity>(AZ::EntityId(5), "child 2");
+            m_childOfChildEntity2 = AZStd::make_unique<AZ::Entity>(AZ::EntityId(6), "child of child 2");
+
+            m_rootEntityInfo2 = AZStd::make_unique<EntityInfo>(*m_rootEntity2.get(), NetEntityId{ 4 }, EntityInfo::Role::Root);
+            m_childEntityInfo2 = AZStd::make_unique<EntityInfo>(*m_childEntity2.get(), NetEntityId{ 5 }, EntityInfo::Role::None);
+            m_childOfChildEntityInfo2 = AZStd::make_unique<EntityInfo>(*m_childOfChildEntity2.get(), NetEntityId{ 6 }, EntityInfo::Role::Child);
+
+            CreateDeepHierarchy(*m_rootEntityInfo2, *m_childEntityInfo2, *m_childOfChildEntityInfo2);
+
+            m_childEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity2->GetId());
+            m_childOfChildEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity2->GetId());
+            // now the entities are under one hierarchy
+        }
+
+        void TearDown() override
+        {
+            m_childOfChildEntityInfo2.reset();
+            m_childEntityInfo2.reset();
+            m_rootEntityInfo2.reset();
+
+            StopEntity(*m_childOfChildEntity2);
+            m_childOfChildEntity2->Deactivate();
+            m_childOfChildEntity2.reset();
+            StopEntity(*m_childEntity2);
+            m_childEntity2->Deactivate();
+            m_childEntity2.reset();
+            StopEntity(*m_rootEntity2);
+            m_rootEntity2->Deactivate();
+            m_rootEntity2.reset();
+
+            MixedDeepHierarchyTests::TearDown();
+        }
+
+        AZStd::unique_ptr<AZ::Entity> m_rootEntity2;
+        AZStd::unique_ptr<AZ::Entity> m_childEntity2;
+        AZStd::unique_ptr<AZ::Entity> m_childOfChildEntity2;
+
+        AZStd::unique_ptr<EntityInfo> m_rootEntityInfo2;
+        AZStd::unique_ptr<EntityInfo> m_childEntityInfo2;
+        AZStd::unique_ptr<EntityInfo> m_childOfChildEntityInfo2;
+    };
+
+    TEST_F(MixedHierarchyOfHierarchyTests, Sanity_Check_Ingore_Children_Without_Hierarchy_Components)
+    {
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1
+        );
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            0
+        );
+    }
+
+    TEST_F(MixedHierarchyOfHierarchyTests, Adding_Mixed_Hierarchy_Ingore_Children_Without_Hierarchy_Components)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2
         );
     }
 }

@@ -17,6 +17,9 @@
 
 #pragma optimize("", off)
 
+AZ_CVAR(uint32_t, bg_hierarchyEntityMaxLimit, 16, nullptr, AZ::ConsoleFunctorFlags::Null,
+    "Maximum allowed size of network entity hierarchies");
+
 namespace Multiplayer
 {
     void NetworkHierarchyRootComponent::Reflect(AZ::ReflectContext* context)
@@ -79,63 +82,132 @@ namespace Multiplayer
 
     void NetworkHierarchyRootComponent::OnParentChanged([[maybe_unused]] AZ::EntityId oldParent, AZ::EntityId newParent)
     {
+        const AZ::EntityId entityBusId = *AZ::TransformNotificationBus::GetCurrentBusId();
+        if (GetEntityId() != entityBusId)
+        {
+            return; // ignore parent changes of child entities
+        }
+
         if (AZ::Entity* parentEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(newParent))
         {
-            const ConstNetworkEntityHandle parentHandle(parentEntity, GetNetworkEntityTracker());
-            //parentHandle.GetNetEntityId()
+            if (parentEntity->FindComponent<NetworkHierarchyRootComponent>())
+            {
+                m_higherRoot = parentEntity;
+                m_children.clear();
+                AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
 
-            AZ_Printf("NetworkHierarchyRootComponent", "new parent %s", parentEntity->GetName().c_str());
+                // Should still listen for its events, such as when this root detaches
+                AZ::TransformNotificationBus::MultiHandler::BusConnect(GetEntityId());
+            }
+        }
+        else
+        {
+            // detached from parent
+            m_children.clear();
+            AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
+
+            AZ::TransformNotificationBus::MultiHandler::BusConnect(GetEntityId());
+
+            uint32_t currentEntityCount = 0;
+            AttachHierarchicalChild(GetEntityId(), currentEntityCount);
         }
     }
 
     void NetworkHierarchyRootComponent::OnChildAdded(AZ::EntityId child)
     {
+        uint32_t currentEntityCount = 0;
+
+        if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(child))
+        {
+            auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>();
+            auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>();
+
+            if (hierarchyChildComponent || hierarchyRootComponent)
+            {
+                AZ::TransformNotificationBus::MultiHandler::BusConnect(child);
+                m_children.push_back(childEntity);
+                ++currentEntityCount;
+
+                if (hierarchyChildComponent)
+                {
+                    hierarchyChildComponent->SetHierarchyRoot(this);
+                }
+                else if (hierarchyRootComponent)
+                {
+                    hierarchyRootComponent->SetHierarchyRoot(GetEntity());
+                }
+
+                AttachHierarchicalChild(child, currentEntityCount);
+            }
+        }
+    }
+
+    void NetworkHierarchyRootComponent::AttachHierarchicalChild(AZ::EntityId underEntity, uint32_t& currentEntityCount)
+    {
         AZStd::vector<AZ::EntityId> allChildren;
-        AZ::TransformBus::EventResult(allChildren, child, &AZ::TransformBus::Events::GetEntityAndAllDescendants);
+        AZ::TransformBus::EventResult(allChildren, underEntity, &AZ::TransformBus::Events::GetChildren);
 
         for (AZ::EntityId newChildId : allChildren)
         {
+            if (currentEntityCount >= bg_hierarchyEntityMaxLimit)
+            {
+                break;
+            }
+
             if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(newChildId))
             {
-                if (auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>())
-                {
-                    AZ::TransformNotificationBus::MultiHandler::BusConnect(child);
+                auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>();
+                auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>();
 
-                    m_children.push_back(childEntity);
-                    hierarchyChildComponent->SetHierarchyRoot(this);
-                }
-                else if (auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>())
+                if (hierarchyChildComponent || hierarchyRootComponent)
                 {
-                    // Do not listen for children of other roots, just stop at the root
-
+                    AZ::TransformNotificationBus::MultiHandler::BusConnect(newChildId);
                     m_children.push_back(childEntity);
-                    hierarchyRootComponent->SetHierarchyRoot(this);
+                    ++currentEntityCount;
+
+                    if (hierarchyChildComponent)
+                    {
+                        hierarchyChildComponent->SetHierarchyRoot(this);
+                    }
+                    else if (hierarchyRootComponent)
+                    {
+                        hierarchyRootComponent->SetHierarchyRoot(GetEntity());
+                    }
+
+                    AttachHierarchicalChild(newChildId, currentEntityCount);
                 }
             }
         }
     }
 
-    void NetworkHierarchyRootComponent::OnChildRemoved(AZ::EntityId child)
+    void NetworkHierarchyRootComponent::OnChildRemoved(AZ::EntityId childRemovedId)
     {
         AZStd::vector<AZ::EntityId> allChildren;
-        AZ::TransformBus::EventResult(allChildren, child, &AZ::TransformBus::Events::GetEntityAndAllDescendants);
+        AZ::TransformBus::EventResult(allChildren, childRemovedId, &AZ::TransformBus::Events::GetEntityAndAllDescendants);
 
         for (AZ::EntityId childId : allChildren)
         {
-            if (const auto childIterator = AZStd::find_if(m_children.begin(), m_children.end(), [childId](const AZ::Entity* entity)
-                {
-                    return entity->GetId() == childId;
-                }))
-            {
-                const AZ::Entity* childEntity = *childIterator;
+            AZ::TransformNotificationBus::MultiHandler::BusDisconnect(childId);
 
+            const AZ::Entity* childEntity = nullptr;
+
+            AZStd::erase_if(m_children, [childId, &childEntity](const AZ::Entity* entity)
+                {
+                    if (entity->GetId() == childId)
+                    {
+                        childEntity = entity;
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            if (childEntity)
+            {
                 if (NetworkHierarchyChildComponent* childComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>())
                 {
                     childComponent->SetHierarchyRoot(nullptr);
                 }
-
-                m_children.erase(childIterator);
-                AZ::TransformNotificationBus::MultiHandler::BusDisconnect(childId);
             }
         }
     }

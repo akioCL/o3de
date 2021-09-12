@@ -14,11 +14,11 @@
 namespace Multiplayer
 {
     //! @class NetworkHierarchyRootComponent
-    //! @brief Component that declares network dependency on the parent of this entity
+    //! @brief Component that declares the top level entity of a network hierarchy.
     /*
-     * When activated on the server, listens for parent changes and for the current parent, saves its parent dependency.
-     * During serialization EntityReplicator should make note of the dependency and send to clients.
-     * On a client, it should wait until that dependency has been activated.
+     * Call @GetHierarchyChildren to get the list of hierarchical entities.
+     *
+     * A root component marks either a top most root of a hierarchy, or an inner root of an attach hierarchy.
      */
     class NetworkHierarchyRootComponent final
         : public AZ::Component
@@ -42,21 +42,23 @@ namespace Multiplayer
         //! @{
         void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
         void OnChildAdded(AZ::EntityId child) override;
-        void OnChildRemoved(AZ::EntityId child) override;
+        void OnChildRemoved(AZ::EntityId childRemovedId) override;
         //! @}
 
         bool IsAttachedToAnotherHierarchy() const;
 
         const AZStd::vector<AZ::Entity*>& GetHierarchyChildren() const;
 
-        void SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot) { m_higherRoot = hierarchyRoot; }
+        void SetHierarchyRoot(AZ::Entity* hierarchyRoot) { m_higherRoot = hierarchyRoot; }
 
         // maybe null if this is the highest root in the hierarchy
         // non-null if this is an attached root
-        NetworkHierarchyRootComponent* GetHierarchyRoot() const { return m_higherRoot; }
+        AZ::Entity* GetHierarchyRoot() const { return m_higherRoot; }
 
     private:
-        NetworkHierarchyRootComponent* m_higherRoot = nullptr;
+        AZ::Entity* m_higherRoot = nullptr;
         AZStd::vector<AZ::Entity*> m_children;
+
+        void AttachHierarchicalChild(AZ::EntityId underEntity, uint32_t& currentEntityCount);
     };
 }

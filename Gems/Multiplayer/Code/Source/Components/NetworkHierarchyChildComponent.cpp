@@ -6,13 +6,13 @@
  *
  */
 
-#include <AzCore/Component/TransformBus.h>
 #include <AzCore/Component/Entity.h>
+#include <AzCore/Component/TransformBus.h>
 #include <AzCore/Interface/Interface.h>
 #include <AzCore/Math/ToString.h>
-#include <Multiplayer/Components/NetworkHierarchyChildComponent.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <Multiplayer/IMultiplayer.h>
+#include <Multiplayer/Components/NetworkHierarchyChildComponent.h>
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 
 namespace Multiplayer
@@ -54,8 +54,6 @@ namespace Multiplayer
 
     void NetworkHierarchyChildComponent::Activate()
     {
-        AZ::TransformNotificationBus::Handler::BusConnect(GetEntityId());
-
         AZ::EntityId parentId;
         AZ::TransformBus::EventResult(parentId, GetEntityId(), &AZ::TransformBus::Events::GetParentId);
 
@@ -76,22 +74,15 @@ namespace Multiplayer
 
     void NetworkHierarchyChildComponent::Deactivate()
     {
-        AZ::TransformNotificationBus::Handler::BusDisconnect();
-    }
-
-    void NetworkHierarchyChildComponent::OnParentChanged([[maybe_unused]] AZ::EntityId oldParent, AZ::EntityId newParent)
-    {
-        if (AZ::Entity* parentEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(newParent))
-        {
-            //const ConstNetworkEntityHandle parentHandle(parentEntity, GetNetworkEntityTracker());
-            //parentHandle.GetNetEntityId()
-
-            AZ_Printf("NetworkHierarchyChildComponent", "new parent %s", parentEntity->GetName().c_str());
-        }
     }
 
     void NetworkHierarchyChildComponent::SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot)
     {
         m_hierarchyRoot = hierarchyRoot;
+    }
+
+    NetworkHierarchyRootComponent* NetworkHierarchyChildComponent::GetHierarchyRoot() const
+    {
+        return m_hierarchyRoot;
     }
 }

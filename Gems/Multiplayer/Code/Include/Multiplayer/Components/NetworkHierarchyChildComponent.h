@@ -18,13 +18,12 @@ namespace Multiplayer
     //! @class NetworkHierarchyChildComponent
     //! @brief Component that declares network dependency on the parent of this entity
     /*
-     * When activated on the server, listens for parent changes and for the current parent, saves its parent dependency.
-     * During serialization EntityReplicator should make note of the dependency and send to clients.
-     * On a client, it should wait until that dependency has been activated.
+     * The parent of this entity should have @NetworkHierarchyChildComponent (or @NetworkHierarchyRootComponent).
+     * A network hierarchy is a collection of entities with one @NetworkHierarchyRootComponent at the top parent
+     * and one or more @NetworkHierarchyChildComponent on its child entities.
      */
     class NetworkHierarchyChildComponent final
         : public AZ::Component
-        , public AZ::TransformNotificationBus::Handler
     {
     public:
         AZ_COMPONENT(NetworkHierarchyChildComponent, "{AB83BB6B-5BD5-4E84-9933-E30B79E36876}");
@@ -40,13 +39,9 @@ namespace Multiplayer
         void Deactivate() override;
         //! @}
 
-        //! AZ::TransformNotificationBus::Handler overrides.
-        //! @{
-        void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
-        //! @}
-
         void SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
-        NetworkHierarchyRootComponent* GetHierarchyRoot() const { return m_hierarchyRoot; }
+        //! @returns top most @NetworkHierarchyRootComponent for the hierarchy
+        NetworkHierarchyRootComponent* GetHierarchyRoot() const;
 
     private:
         NetworkHierarchyRootComponent* m_hierarchyRoot = nullptr;
