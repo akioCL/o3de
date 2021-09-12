@@ -18,13 +18,13 @@ namespace Multiplayer
     /*
      * Call @GetHierarchyChildren to get the list of hierarchical entities.
      * A network hierarchy is meant to be a small group of entities. You can control the maximum supported size of
-     * a network hierarchy by modifying cvar @bg_hierarchyEntityMaxLimit.
+     * a network hierarchy by modifying CVar @bg_hierarchyEntityMaxLimit.
      *
      * A root component marks either a top most root of a hierarchy, or an inner root of an attach hierarchy.
      */
     class NetworkHierarchyRootComponent final
         : public AZ::Component
-        , public AZ::TransformNotificationBus::MultiHandler
+        , protected AZ::TransformNotificationBus::MultiHandler
     {
     public:
         AZ_COMPONENT(NetworkHierarchyRootComponent, "{2B124F70-B73A-43F2-A26E-D7B8C34E13B6}");
@@ -40,6 +40,17 @@ namespace Multiplayer
         void Deactivate() override;
         //! @}
 
+        //! Children are guaranteed to have either @NetworkHierarchyChildComponent or @NetworkHierarchyRootComponent
+        //! @returns all hierarchical children
+        const AZStd::vector<AZ::Entity*>& GetHierarchyChildren() const;
+
+        //! @returns the highest level root of the hierarchy if this root isn't one, nullptr otherwise.
+        AZ::Entity* GetTopLevelHierarchyRoot() const { return m_higherRoot; }
+
+        //! @returns true if this is an inner root, use @GetTopLevelHierarchyRoot to get top level root of the hierarchy.
+        bool IsAttachedToAnotherHierarchy() const;
+
+    protected:
         //! AZ::TransformNotificationBus::Handler overrides.
         //! @{
         void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
@@ -47,21 +58,15 @@ namespace Multiplayer
         void OnChildRemoved(AZ::EntityId childRemovedId) override;
         //! @}
 
-        bool IsAttachedToAnotherHierarchy() const;
-
-        const AZStd::vector<AZ::Entity*>& GetHierarchyChildren() const;
-
-        void SetHierarchyRoot(AZ::Entity* hierarchyRoot) { m_higherRoot = hierarchyRoot; }
-
-        // maybe null if this is the highest root in the hierarchy
-        // non-null if this is an attached root
-        AZ::Entity* GetHierarchyRoot() const { return m_higherRoot; }
+        void SetTopLevelHierarchyRoot(AZ::Entity* hierarchyRoot) { m_higherRoot = hierarchyRoot; }
 
     private:
         AZ::Entity* m_higherRoot = nullptr;
         AZStd::vector<AZ::Entity*> m_children;
-
-        void RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount);
-        void RecursiveAttachHierarchicalChild(AZ::EntityId entity, uint32_t& currentEntityCount);
+        
+        //! @returns false if the maximum supported hierarchy size has been reached
+        bool RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount);
+        //! @returns false if the maximum supported hierarchy size has been reached
+        bool RecursiveAttachHierarchicalChild(AZ::EntityId entity, uint32_t& currentEntityCount);
     };
 }

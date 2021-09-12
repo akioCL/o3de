@@ -41,16 +41,16 @@ namespace Multiplayer
         void Deactivate() override;
         //! @}
 
-        //! @note if the return value is nulltpr, then this entity is not part of any hierarchy.
-        //! One reason for that could be a missing @NetworkHierarchyChildComponent on an entities
+        //! @note if the return value is nullptr, then this entity is not part of any hierarchy.
+        //! One reason for that could be a missing @NetworkHierarchyChildComponent on an entity
         //! between this entity and the parent entity that has @NetworkHierarchyRootComponent on it.
         //!
         //! @returns top most @NetworkHierarchyRootComponent for the hierarchy
-        NetworkHierarchyRootComponent* GetHierarchyRoot() const;
+        NetworkHierarchyRootComponent* GetTopLevelHierarchyRoot() const;
 
     protected:
         //! Used by @NetworkHierarchyRootComponent
-        void SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
+        void SetTopLevelHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
 
     private:
         NetworkHierarchyRootComponent* m_hierarchyRoot = nullptr;

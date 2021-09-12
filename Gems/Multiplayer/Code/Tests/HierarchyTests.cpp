@@ -8,6 +8,7 @@
 #include <IMultiplayerConnectionMock.h>
 #include <MockInterfaces.h>
 #include <AzCore/Component/Entity.h>
+#include <AzCore/Console/Console.h>
 #include <AzCore/Name/Name.h>
 #include <AzCore/Name/NameDictionary.h>
 #include <AzCore/Serialization/SerializeContext.h>
@@ -93,10 +94,17 @@ namespace Multiplayer
             ON_CALL(*m_mockNetworkEntityManager, GetNetworkEntityAuthorityTracker()).WillByDefault(Return(m_networkEntityAuthorityTracker.get()));
 
             m_entityReplicationManager = AZStd::make_unique<EntityReplicationManager>(*m_mockConnection, *m_mockConnectionListener, EntityReplicationManager::Mode::LocalClientToRemoteServer);
+
+            m_console.reset(aznew AZ::Console());
+            AZ::Interface<AZ::IConsole>::Register(m_console.get());
+            m_console->LinkDeferredFunctors(AZ::ConsoleFunctorBase::GetDeferredHead());
         }
 
         void TearDown() override
         {
+            AZ::Interface<AZ::IConsole>::Unregister(m_console.get());
+            m_console.reset();
+
             m_entities.clear();
 
             m_entityReplicationManager.reset();
@@ -127,6 +135,8 @@ namespace Multiplayer
             AZ::NameDictionary::Destroy();
             TeardownAllocator();
         }
+
+        AZStd::unique_ptr<AZ::IConsole> m_console;
 
         AZStd::unique_ptr<NiceMock<MockComponentApplicationRequests>> m_mockComponentApplicationRequests;
         AZStd::unique_ptr<AZ::SerializeContext> m_serializeContext;
@@ -447,10 +457,18 @@ namespace Multiplayer
         AZStd::unique_ptr<EntityInfo> m_childEntityInfo;
     };
 
+    TEST_F(SimpleHierarchyTests, Root_Is_Top_Level_Root)
+    {
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            false
+        );
+    }
+
     TEST_F(SimpleHierarchyTests, Child_Has_Root_Set)
     {
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()
         );
     }
@@ -461,7 +479,7 @@ namespace Multiplayer
         m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
     }
@@ -492,7 +510,7 @@ namespace Multiplayer
         m_rootEntity.reset();
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
     }
@@ -555,6 +573,14 @@ namespace Multiplayer
         AZStd::unique_ptr<EntityInfo> m_childEntityInfo;
         AZStd::unique_ptr<EntityInfo> m_childOfChildEntityInfo;
     };
+
+    TEST_F(DeepHierarchyTests, Root_Is_Top_Level_Root)
+    {
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            false
+        );
+    }
 
     TEST_F(DeepHierarchyTests, Root_Has_Child_References)
     {
@@ -627,7 +653,7 @@ namespace Multiplayer
         m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childEntity->GetId());
 
         EXPECT_EQ(
-            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()
         );
     }
@@ -639,11 +665,11 @@ namespace Multiplayer
         m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()
         );
         EXPECT_EQ(
-            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()
         );
     }
@@ -653,11 +679,11 @@ namespace Multiplayer
         m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
         EXPECT_EQ(
-            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
     }
@@ -667,7 +693,7 @@ namespace Multiplayer
         m_childOfChildEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
 
         EXPECT_EQ(
-            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
     }
@@ -677,12 +703,12 @@ namespace Multiplayer
         StopAndDeleteEntity(m_rootEntity);
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
 
         EXPECT_EQ(
-            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetTopLevelHierarchyRoot(),
             nullptr
         );
     }
@@ -695,6 +721,35 @@ namespace Multiplayer
             m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
             1
         );
+    }
+
+    //TEST_F(DeepHierarchyTests, Sanity_Check_Illegal_Parent_Attachment)
+    //{
+    //    m_rootEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+
+    //    EXPECT_EQ(
+    //        m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+    //        2
+    //    );
+    //}
+
+    TEST_F(DeepHierarchyTests, Testing_Limiting_Hierarchy_Maximum_Size)
+    {
+        uint32_t currentMaxLimit = 0;
+        m_console->GetCvarValue<uint32_t>("bg_hierarchyEntityMaxLimit", currentMaxLimit);
+        m_console->PerformCommand("bg_hierarchyEntityMaxLimit 2");
+
+        // remake the hierarchy
+        m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+        m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1 /* limit is 2, and the root counts as 1, so there is space for only 1 child */
+        );
+
+        m_console->PerformCommand((AZStd::string("bg_hierarchyEntityMaxLimit ") + AZStd::to_string(currentMaxLimit)).c_str());
+        m_console->GetCvarValue<uint32_t>("bg_hierarchyEntityMaxLimit", currentMaxLimit);
     }
 
     /*
@@ -781,6 +836,20 @@ namespace Multiplayer
         }
     }
 
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_Is_Not_Top_Level_Root)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            false
+        );
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            true
+        );
+    }
+
     TEST_F(HierarchyOfHierarchyTests, Top_Root_References_All_When_Another_Hierarchy_Attached_At_Root)
     {
         m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
@@ -820,7 +889,7 @@ namespace Multiplayer
             true
         );
         EXPECT_EQ(
-            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyRoot(),
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity.get()
         );
     }
@@ -834,7 +903,7 @@ namespace Multiplayer
             true
         );
         EXPECT_EQ(
-            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyRoot(),
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity.get()
         );
     }
@@ -848,7 +917,7 @@ namespace Multiplayer
             true
         );
         EXPECT_EQ(
-            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyRoot(),
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->GetTopLevelHierarchyRoot(),
             m_rootEntity.get()
         );
     }
@@ -1008,6 +1077,32 @@ namespace Multiplayer
         );
     }
 
+    TEST_F(HierarchyOfHierarchyTests, Testing_Limiting_Hierarchy_Maximum_Size)
+    {
+        uint32_t currentMaxLimit = 0;
+        m_console->GetCvarValue<uint32_t>("bg_hierarchyEntityMaxLimit", currentMaxLimit);
+        m_console->PerformCommand("bg_hierarchyEntityMaxLimit 2");
+
+        // remake the top level hierarchy
+        m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(AZ::EntityId());
+        m_childEntity->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1 /* limit is 2, and the root counts as 1, so there is space for only 1 child */
+        );
+
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1 /* there should be no more space to add hierarchical children to */
+        );
+
+        m_console->PerformCommand((AZStd::string("bg_hierarchyEntityMaxLimit ") + AZStd::to_string(currentMaxLimit)).c_str());
+        m_console->GetCvarValue<uint32_t>("bg_hierarchyEntityMaxLimit", currentMaxLimit);
+    }
+
     /*
      * Parent -> Child -> ChildOfChild (not marked as in a hierarchy)
      */
@@ -1152,6 +1247,16 @@ namespace Multiplayer
         EXPECT_EQ(
             m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
             2
+        );
+    }
+
+    TEST_F(MixedHierarchyOfHierarchyTests, Attaching_Hierarchy_To_Non_Hierarchical_Entity_Does_Not_Merge_Hierarchies)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+
+        EXPECT_EQ(
+            m_rootEntity2->FindComponent<NetworkHierarchyRootComponent>()->IsAttachedToAnotherHierarchy(),
+            false
         );
     }
 }

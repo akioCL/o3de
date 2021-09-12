@@ -76,12 +76,12 @@ namespace Multiplayer
     {
     }
 
-    void NetworkHierarchyChildComponent::SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot)
+    void NetworkHierarchyChildComponent::SetTopLevelHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot)
     {
         m_hierarchyRoot = hierarchyRoot;
     }
 
-    NetworkHierarchyRootComponent* NetworkHierarchyChildComponent::GetHierarchyRoot() const
+    NetworkHierarchyRootComponent* NetworkHierarchyChildComponent::GetTopLevelHierarchyRoot() const
     {
         return m_hierarchyRoot;
     }
