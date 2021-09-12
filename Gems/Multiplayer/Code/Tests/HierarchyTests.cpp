@@ -76,7 +76,7 @@ namespace Multiplayer
 
             m_mockNetworkEntityManager = AZStd::make_unique<NiceMock<MockNetworkEntityManager>>();
 
-            m_mockTime = AZStd::make_unique<MockTime>();
+            m_mockTime = AZStd::make_unique<NiceMock<MockTime>>();
             AZ::Interface<AZ::ITime>::Register(m_mockTime.get());
 
             m_mockNetworkTime = AZStd::make_unique<NiceMock<MockNetworkTime>>();
@@ -138,7 +138,7 @@ namespace Multiplayer
 
         AZStd::unique_ptr<NiceMock<MockMultiplayer>> m_mockMultiplayer;
         AZStd::unique_ptr<NiceMock<MockNetworkEntityManager>> m_mockNetworkEntityManager;
-        AZStd::unique_ptr<MockTime> m_mockTime;
+        AZStd::unique_ptr<NiceMock<MockTime>> m_mockTime;
         AZStd::unique_ptr<NiceMock<MockNetworkTime>> m_mockNetworkTime;
 
         AZStd::unique_ptr<NiceMock<IMultiplayerConnectionMock>> m_mockConnection;
@@ -179,6 +179,16 @@ namespace Multiplayer
             const auto netBindComponent = entity.FindComponent<Multiplayer::NetBindComponent>();
             EXPECT_NE(netBindComponent, nullptr);
             netBindComponent->StopEntity();
+        }
+
+        void StopAndDeleteEntity(AZStd::unique_ptr<AZ::Entity>& entity)
+        {
+            if (entity)
+            {
+                StopEntity(*entity);
+                entity->Deactivate();
+                entity.reset();
+            }
         }
 
         void CreateEntityWithRootHierarchy(AZ::Entity& rootEntity)
@@ -424,12 +434,8 @@ namespace Multiplayer
             m_childEntityInfo.reset();
             m_rootEntityInfo.reset();
 
-            StopEntity(*m_childEntity);
-            m_childEntity->Deactivate();
-            m_childEntity.reset();
-            StopEntity(*m_rootEntity);
-            m_rootEntity->Deactivate();
-            m_rootEntity.reset();
+            StopAndDeleteEntity(m_childEntity);
+            StopAndDeleteEntity(m_rootEntity);
 
             HierarchyTests::TearDown();
         }
@@ -479,6 +485,30 @@ namespace Multiplayer
         );
     }
 
+    TEST_F(SimpleHierarchyTests, Root_Deactivates_Child_Has_No_References_To_Root)
+    {
+        StopEntity(*m_rootEntity);
+        m_rootEntity->Deactivate();
+        m_rootEntity.reset();
+
+        EXPECT_EQ(
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            nullptr
+        );
+    }
+
+    TEST_F(SimpleHierarchyTests, Child_Deactivates_Root_Has_No_References_To_Child)
+    {
+        StopEntity(*m_childEntity);
+        m_childEntity->Deactivate();
+        m_childEntity.reset();
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            0
+        );
+    }
+
     /*
      * Parent -> Child -> ChildOfChild
      */
@@ -510,15 +540,9 @@ namespace Multiplayer
             m_childEntityInfo.reset();
             m_rootEntityInfo.reset();
 
-            StopEntity(*m_childOfChildEntity);
-            m_childOfChildEntity->Deactivate();
-            m_childOfChildEntity.reset();
-            StopEntity(*m_childEntity);
-            m_childEntity->Deactivate();
-            m_childEntity.reset();
-            StopEntity(*m_rootEntity);
-            m_rootEntity->Deactivate();
-            m_rootEntity.reset();
+            StopAndDeleteEntity(m_childOfChildEntity);
+            StopAndDeleteEntity(m_childEntity);
+            StopAndDeleteEntity(m_rootEntity);
 
             HierarchyTests::TearDown();
         }
@@ -648,6 +672,31 @@ namespace Multiplayer
         );
     }
 
+    TEST_F(DeepHierarchyTests, Root_Deactivates_Children_Have_No_References_To_Root)
+    {
+        StopAndDeleteEntity(m_rootEntity);
+
+        EXPECT_EQ(
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            nullptr
+        );
+
+        EXPECT_EQ(
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRoot(),
+            nullptr
+        );
+    }
+
+    TEST_F(DeepHierarchyTests, Child_Of_Child_Deactivates_Root_Removes_References_To_It)
+    {
+        StopAndDeleteEntity(m_childOfChildEntity);
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            1
+        );
+    }
+
     /*
      * Sets up 2 deep hierarchies.
      */
@@ -679,15 +728,9 @@ namespace Multiplayer
             m_childEntityInfo2.reset();
             m_rootEntityInfo2.reset();
 
-            StopEntity(*m_childOfChildEntity2);
-            m_childOfChildEntity2->Deactivate();
-            m_childOfChildEntity2.reset();
-            StopEntity(*m_childEntity2);
-            m_childEntity2->Deactivate();
-            m_childEntity2.reset();
-            StopEntity(*m_rootEntity2);
-            m_rootEntity2->Deactivate();
-            m_rootEntity2.reset();
+            StopAndDeleteEntity(m_childOfChildEntity2);
+            StopAndDeleteEntity(m_childEntity2);
+            StopAndDeleteEntity(m_rootEntity2);
 
             DeepHierarchyTests::TearDown();
         }
@@ -953,6 +996,18 @@ namespace Multiplayer
         );
     }
 
+    TEST_F(HierarchyOfHierarchyTests, Inner_Root_Child_Deactivated_Top_Root_Has_No_Child_Reference_To_It)
+    {
+        m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_childOfChildEntity->GetId());
+
+        StopAndDeleteEntity(m_childEntity2);
+
+        EXPECT_EQ(
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
+            2 /* top hierarchy */ + 1 /* just the root of the inner hierarchy */
+        );
+    }
+
     /*
      * Parent -> Child -> ChildOfChild (not marked as in a hierarchy)
      */
@@ -984,15 +1039,9 @@ namespace Multiplayer
             m_childEntityInfo.reset();
             m_rootEntityInfo.reset();
 
-            StopEntity(*m_childOfChildEntity);
-            m_childOfChildEntity->Deactivate();
-            m_childOfChildEntity.reset();
-            StopEntity(*m_childEntity);
-            m_childEntity->Deactivate();
-            m_childEntity.reset();
-            StopEntity(*m_rootEntity);
-            m_rootEntity->Deactivate();
-            m_rootEntity.reset();
+            StopAndDeleteEntity(m_childOfChildEntity);
+            StopAndDeleteEntity(m_childEntity);
+            StopAndDeleteEntity(m_rootEntity);
 
             HierarchyTests::TearDown();
         }
@@ -1067,15 +1116,10 @@ namespace Multiplayer
             m_childEntityInfo2.reset();
             m_rootEntityInfo2.reset();
 
-            StopEntity(*m_childOfChildEntity2);
-            m_childOfChildEntity2->Deactivate();
-            m_childOfChildEntity2.reset();
-            StopEntity(*m_childEntity2);
-            m_childEntity2->Deactivate();
-            m_childEntity2.reset();
-            StopEntity(*m_rootEntity2);
-            m_rootEntity2->Deactivate();
-            m_rootEntity2.reset();
+
+            StopAndDeleteEntity(m_childOfChildEntity2);
+            StopAndDeleteEntity(m_childEntity2);
+            StopAndDeleteEntity(m_rootEntity2);
 
             MixedDeepHierarchyTests::TearDown();
         }
@@ -1101,7 +1145,7 @@ namespace Multiplayer
         );
     }
 
-    TEST_F(MixedHierarchyOfHierarchyTests, Adding_Mixed_Hierarchy_Ingore_Children_Without_Hierarchy_Components)
+    TEST_F(MixedHierarchyOfHierarchyTests, Adding_Mixed_Hierarchy_Ingores_Children_Without_Hierarchy_Components)
     {
         m_rootEntity2->FindComponent<AzFramework::TransformComponent>()->SetParent(m_rootEntity->GetId());
 

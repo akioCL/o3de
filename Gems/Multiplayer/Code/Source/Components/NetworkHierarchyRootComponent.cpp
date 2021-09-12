@@ -78,6 +78,24 @@ namespace Multiplayer
     void NetworkHierarchyRootComponent::Deactivate()
     {
         AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
+        
+        for (const AZ::Entity* childEntity : m_children)
+        {
+            auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>();
+            auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>();
+
+            if (hierarchyChildComponent)
+            {
+                hierarchyChildComponent->SetHierarchyRoot(nullptr);
+            }
+            if (hierarchyRootComponent)
+            {
+                hierarchyRootComponent->SetHierarchyRoot(nullptr);
+            }
+        }
+
+        m_children.clear();
+        m_higherRoot = nullptr;
     }
 
     void NetworkHierarchyRootComponent::OnParentChanged([[maybe_unused]] AZ::EntityId oldParent, AZ::EntityId newParent)
@@ -109,22 +127,42 @@ namespace Multiplayer
             AZ::TransformNotificationBus::MultiHandler::BusConnect(GetEntityId());
 
             uint32_t currentEntityCount = 0;
-            AttachHierarchicalChild(GetEntityId(), currentEntityCount);
+            RecursiveAttachHierarchicalEntities(GetEntityId(), currentEntityCount);
         }
     }
 
     void NetworkHierarchyRootComponent::OnChildAdded(AZ::EntityId child)
     {
         uint32_t currentEntityCount = 0;
+        RecursiveAttachHierarchicalChild(child, currentEntityCount);
+    }
 
-        if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(child))
+    void NetworkHierarchyRootComponent::RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount)
+    {
+        AZStd::vector<AZ::EntityId> allChildren;
+        AZ::TransformBus::EventResult(allChildren, underEntity, &AZ::TransformBus::Events::GetChildren);
+
+        for (const AZ::EntityId newChildId : allChildren)
+        {
+            if (currentEntityCount >= bg_hierarchyEntityMaxLimit)
+            {
+                break;
+            }
+
+            RecursiveAttachHierarchicalChild(newChildId, currentEntityCount);
+        }
+    }
+
+    void NetworkHierarchyRootComponent::RecursiveAttachHierarchicalChild(AZ::EntityId entity, uint32_t& currentEntityCount)
+    {
+        if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(entity))
         {
             auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>();
             auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>();
 
             if (hierarchyChildComponent || hierarchyRootComponent)
             {
-                AZ::TransformNotificationBus::MultiHandler::BusConnect(child);
+                AZ::TransformNotificationBus::MultiHandler::BusConnect(entity);
                 m_children.push_back(childEntity);
                 ++currentEntityCount;
 
@@ -137,45 +175,7 @@ namespace Multiplayer
                     hierarchyRootComponent->SetHierarchyRoot(GetEntity());
                 }
 
-                AttachHierarchicalChild(child, currentEntityCount);
-            }
-        }
-    }
-
-    void NetworkHierarchyRootComponent::AttachHierarchicalChild(AZ::EntityId underEntity, uint32_t& currentEntityCount)
-    {
-        AZStd::vector<AZ::EntityId> allChildren;
-        AZ::TransformBus::EventResult(allChildren, underEntity, &AZ::TransformBus::Events::GetChildren);
-
-        for (AZ::EntityId newChildId : allChildren)
-        {
-            if (currentEntityCount >= bg_hierarchyEntityMaxLimit)
-            {
-                break;
-            }
-
-            if (AZ::Entity* childEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(newChildId))
-            {
-                auto* hierarchyChildComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>();
-                auto* hierarchyRootComponent = childEntity->FindComponent<NetworkHierarchyRootComponent>();
-
-                if (hierarchyChildComponent || hierarchyRootComponent)
-                {
-                    AZ::TransformNotificationBus::MultiHandler::BusConnect(newChildId);
-                    m_children.push_back(childEntity);
-                    ++currentEntityCount;
-
-                    if (hierarchyChildComponent)
-                    {
-                        hierarchyChildComponent->SetHierarchyRoot(this);
-                    }
-                    else if (hierarchyRootComponent)
-                    {
-                        hierarchyRootComponent->SetHierarchyRoot(GetEntity());
-                    }
-
-                    AttachHierarchicalChild(newChildId, currentEntityCount);
-                }
+                RecursiveAttachHierarchicalEntities(entity, currentEntityCount);
             }
         }
     }

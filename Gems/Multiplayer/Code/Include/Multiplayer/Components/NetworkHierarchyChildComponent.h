@@ -25,6 +25,8 @@ namespace Multiplayer
     class NetworkHierarchyChildComponent final
         : public AZ::Component
     {
+        friend class NetworkHierarchyRootComponent;
+
     public:
         AZ_COMPONENT(NetworkHierarchyChildComponent, "{AB83BB6B-5BD5-4E84-9933-E30B79E36876}");
 
@@ -39,9 +41,16 @@ namespace Multiplayer
         void Deactivate() override;
         //! @}
 
-        void SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
+        //! @note if the return value is nulltpr, then this entity is not part of any hierarchy.
+        //! One reason for that could be a missing @NetworkHierarchyChildComponent on an entities
+        //! between this entity and the parent entity that has @NetworkHierarchyRootComponent on it.
+        //!
         //! @returns top most @NetworkHierarchyRootComponent for the hierarchy
         NetworkHierarchyRootComponent* GetHierarchyRoot() const;
+
+    protected:
+        //! Used by @NetworkHierarchyRootComponent
+        void SetHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
 
     private:
         NetworkHierarchyRootComponent* m_hierarchyRoot = nullptr;

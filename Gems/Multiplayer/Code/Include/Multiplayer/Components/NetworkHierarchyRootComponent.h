@@ -17,6 +17,8 @@ namespace Multiplayer
     //! @brief Component that declares the top level entity of a network hierarchy.
     /*
      * Call @GetHierarchyChildren to get the list of hierarchical entities.
+     * A network hierarchy is meant to be a small group of entities. You can control the maximum supported size of
+     * a network hierarchy by modifying cvar @bg_hierarchyEntityMaxLimit.
      *
      * A root component marks either a top most root of a hierarchy, or an inner root of an attach hierarchy.
      */
@@ -59,6 +61,7 @@ namespace Multiplayer
         AZ::Entity* m_higherRoot = nullptr;
         AZStd::vector<AZ::Entity*> m_children;
 
-        void AttachHierarchicalChild(AZ::EntityId underEntity, uint32_t& currentEntityCount);
+        void RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount);
+        void RecursiveAttachHierarchicalChild(AZ::EntityId entity, uint32_t& currentEntityCount);
     };
 }
