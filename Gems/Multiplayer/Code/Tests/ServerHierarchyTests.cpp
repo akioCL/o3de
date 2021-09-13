@@ -20,8 +20,6 @@
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 #include <NetworkEntity/EntityReplication/EntityReplicator.h>
 
-#pragma optimize("", off)
-
 namespace Multiplayer
 {
     using namespace testing;

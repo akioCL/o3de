@@ -14,8 +14,6 @@
 #include <AzCore/Console/IConsole.h>
 #include <AzCore/Console/ILogger.h>
 
-#pragma optimize("", off)
-
 namespace Multiplayer
 {
     ConstNetworkEntityHandle::ConstNetworkEntityHandle(AZ::Entity* entity, const NetworkEntityTracker* networkEntityTracker)

@@ -16,8 +16,6 @@
 #include <Multiplayer/Components/NetworkHierarchyChildComponent.h>
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 
-#pragma optimize("", off)
-
 AZ_CVAR(uint32_t, bg_hierarchyEntityMaxLimit, 16, nullptr, AZ::ConsoleFunctorFlags::Null,
     "Maximum allowed size of network entity hierarchies, including top level entity.");
 
