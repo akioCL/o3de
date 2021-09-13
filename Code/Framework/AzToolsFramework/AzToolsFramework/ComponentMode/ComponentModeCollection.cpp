@@ -9,7 +9,7 @@
 #include "ComponentModeCollection.h"
 
 #include <AzToolsFramework/Commands/ComponentModeCommand.h>
-#include <AzToolsFramework/API/EditorModeRequestsBus.h>
+#include <AzToolsFramework/API/ViewportEditorModeInterface.h>
 #include <AzCore/std/smart_ptr/make_shared.h>
 
 namespace AzToolsFramework
@@ -200,8 +200,7 @@ namespace AzToolsFramework
 
         void ComponentModeCollection::BeginComponentMode()
         {
-            AzToolsFramework::EditorModeRequestsBus::Broadcast(
-                &AzToolsFramework::EditorModeRequestsBus::Events::EnterMode, EditorMode::Component);
+            ViewportEditorModeInterfaceWrapper::Get()->EnterMode({}, EditorMode::Component);
 
             m_selectedComponentModeIndex = 0;
             m_componentMode = true;
@@ -266,8 +265,7 @@ namespace AzToolsFramework
 
         void ComponentModeCollection::EndComponentMode()
         {
-            AzToolsFramework::EditorModeRequestsBus::Broadcast(
-                &AzToolsFramework::EditorModeRequestsBus::Events::ExitMode, EditorMode::Component);
+            ViewportEditorModeInterfaceWrapper::Get()->ExitMode({}, EditorMode::Component);
 
             if (!UndoRedoOperationInProgress())
             {

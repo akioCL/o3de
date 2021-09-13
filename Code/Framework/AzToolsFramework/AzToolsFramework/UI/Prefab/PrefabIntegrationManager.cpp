@@ -192,7 +192,7 @@ namespace AzToolsFramework
                                 QAction* closeAction = menu->addAction(QObject::tr("Close Prefab"));
                                 closeAction->setToolTip(QObject::tr("Close the prefab focus mode."));
 
-                                QObject::connect(closeAction, &QAction::triggered, closeAction, [this] {
+                                QObject::connect(closeAction, &QAction::triggered, closeAction, [] {
                                     ContextMenu_ClosePrefab();
                                 });
                             }
