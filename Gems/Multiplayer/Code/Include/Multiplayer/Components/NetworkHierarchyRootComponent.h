@@ -46,7 +46,7 @@ namespace Multiplayer
         const AZStd::vector<AZ::Entity*>& GetHierarchyChildren() const;
 
         //! @returns the highest level root of the hierarchy if this root isn't one, nullptr otherwise.
-        AZ::Entity* GetTopLevelHierarchyRoot() const { return m_higherRoot; }
+        AZ::Entity* GetTopLevelHierarchyRootEntity() const;
 
         //! @returns true if this is an inner root, use @GetTopLevelHierarchyRoot to get top level root of the hierarchy.
         bool IsAttachedToAnotherHierarchy() const;
@@ -59,10 +59,10 @@ namespace Multiplayer
         void OnChildRemoved(AZ::EntityId childRemovedId) override;
         //! @}
 
-        void SetTopLevelHierarchyRoot(AZ::Entity* hierarchyRoot) { m_higherRoot = hierarchyRoot; }
+        void SetTopLevelHierarchyRootEntity(AZ::Entity* hierarchyRoot);
 
     private:
-        AZ::Entity* m_higherRoot = nullptr;
+        AZ::Entity* m_higherRootEntity = nullptr;
         AZStd::vector<AZ::Entity*> m_children;
         
         //! @returns false if the maximum supported hierarchy size has been reached

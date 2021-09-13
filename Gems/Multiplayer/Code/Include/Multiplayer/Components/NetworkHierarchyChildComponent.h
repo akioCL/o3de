@@ -35,6 +35,8 @@ namespace Multiplayer
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
 
+        NetworkHierarchyChildComponent();
+
         //! @{
         void OnInit() override;
         void OnActivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
@@ -46,15 +48,18 @@ namespace Multiplayer
         //! between this entity and the parent entity that has @NetworkHierarchyRootComponent on it.
         //!
         //! @returns top most @NetworkHierarchyRootComponent for the hierarchy
-        const NetworkHierarchyRootComponent* GetTopLevelHierarchyRoot() const;
+        const NetworkHierarchyRootComponent* GetHierarchyRootComponent() const;
 
         bool IsInHierarchy() const;
 
     protected:
         //! Used by @NetworkHierarchyRootComponent
-        void SetTopLevelHierarchyRoot(NetworkHierarchyRootComponent* hierarchyRoot);
+        void SetTopLevelHierarchyRootComponent(NetworkHierarchyRootComponent* hierarchyRoot);
 
     private:
-        NetworkHierarchyRootComponent* m_hierarchyRootComponent = nullptr;
+        const NetworkHierarchyRootComponent* m_hierarchyRootComponent = nullptr;
+
+        AZ::Event<NetEntityId>::Handler m_hierarchyRootNetIdChanged;
+        void OnHierarchyRootNetIdChanged(NetEntityId rootNetId);
     };
 }

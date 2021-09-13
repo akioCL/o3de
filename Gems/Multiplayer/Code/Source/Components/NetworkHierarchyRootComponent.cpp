@@ -13,6 +13,7 @@
 #include <AzCore/Math/ToString.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <Multiplayer/IMultiplayer.h>
+#include <Multiplayer/Components/NetBindComponent.h>
 #include <Multiplayer/Components/NetworkHierarchyChildComponent.h>
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 
@@ -93,16 +94,16 @@ namespace Multiplayer
 
             if (hierarchyChildComponent)
             {
-                hierarchyChildComponent->SetTopLevelHierarchyRoot(nullptr);
+                hierarchyChildComponent->SetTopLevelHierarchyRootComponent(nullptr);
             }
             if (hierarchyRootComponent)
             {
-                hierarchyRootComponent->SetTopLevelHierarchyRoot(nullptr);
+                hierarchyRootComponent->SetTopLevelHierarchyRootEntity(nullptr);
             }
         }
 
         m_children.clear();
-        m_higherRoot = nullptr;
+        m_higherRootEntity = nullptr;
     }
 
     void NetworkHierarchyRootComponent::OnParentChanged([[maybe_unused]] AZ::EntityId oldParent, AZ::EntityId newParent)
@@ -117,7 +118,7 @@ namespace Multiplayer
         {
             if (parentEntity->FindComponent<NetworkHierarchyRootComponent>())
             {
-                m_higherRoot = parentEntity;
+                m_higherRootEntity = parentEntity;
                 m_children.clear();
                 AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
 
@@ -182,11 +183,11 @@ namespace Multiplayer
 
                 if (hierarchyChildComponent)
                 {
-                    hierarchyChildComponent->SetTopLevelHierarchyRoot(this);
+                    hierarchyChildComponent->SetTopLevelHierarchyRootComponent(this);
                 }
                 else if (hierarchyRootComponent)
                 {
-                    hierarchyRootComponent->SetTopLevelHierarchyRoot(GetEntity());
+                    hierarchyRootComponent->SetTopLevelHierarchyRootEntity(GetEntity());
                 }
 
                 if (!RecursiveAttachHierarchicalEntities(entity, currentEntityCount))
@@ -225,15 +226,38 @@ namespace Multiplayer
             {
                 if (NetworkHierarchyChildComponent* childComponent = childEntity->FindComponent<NetworkHierarchyChildComponent>())
                 {
-                    childComponent->SetTopLevelHierarchyRoot(nullptr);
+                    childComponent->SetTopLevelHierarchyRootComponent(nullptr);
                 }
             }
         }
     }
 
+    void NetworkHierarchyRootComponent::SetTopLevelHierarchyRootEntity(AZ::Entity* hierarchyRoot)
+    {
+        m_higherRootEntity = hierarchyRoot;
+        if (HasController() && GetNetBindComponent()->GetNetEntityRole() == NetEntityRole::Authority)
+        {
+            NetworkHierarchyChildComponentController* controller = static_cast<NetworkHierarchyChildComponentController*>(GetController());
+            if (hierarchyRoot)
+            {
+                const NetEntityId netRootId = GetNetworkEntityManager()->GetNetEntityIdById(hierarchyRoot->GetId());
+                controller->SetHierarchyRoot(netRootId);
+            }
+            else
+            {
+                controller->SetHierarchyRoot(InvalidNetEntityId);
+            }
+        }
+    }
+
+    AZ::Entity* NetworkHierarchyRootComponent::GetTopLevelHierarchyRootEntity() const
+    {
+        return m_higherRootEntity;
+    }
+
     bool NetworkHierarchyRootComponent::IsAttachedToAnotherHierarchy() const
     {
-        return m_higherRoot != nullptr;
+        return m_higherRootEntity != nullptr;
     }
 
     const AZStd::vector<AZ::Entity*>& NetworkHierarchyRootComponent::GetHierarchyChildren() const
