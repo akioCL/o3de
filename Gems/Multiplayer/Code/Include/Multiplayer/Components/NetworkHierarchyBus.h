@@ -16,7 +16,10 @@ namespace Multiplayer
         : public AZ::ComponentBus
     {
     public:
+        //! Called when a hierarchy has been updated (a child added or removed, etc.)
         virtual void OnNetworkHierarchyUpdated([[maybe_unused]] const AZ::EntityId& rootEntityId) {}
+
+        //! Called when an entity has left a hierarchy
         virtual void OnLeavingNetworkHierarchy() {}
     };
 
@@ -26,9 +29,16 @@ namespace Multiplayer
         : public AZ::ComponentBus
     {
     public:
-        virtual const AZStd::vector<AZ::Entity*>& GetHierarchicalEntities() const = 0;
+        //! @returns hierarchical entities, the first element is the top level root
+        virtual AZStd::vector<AZ::Entity*> GetHierarchicalEntities() const = 0;
+
+        //! @returns the top level root of a hierarchy, or nullptr if this entity is not in a hierarchy
         virtual AZ::Entity* GetHierarchicalRoot() const = 0;
+
+        //! @return true if this entity is a child entity within a hierarchy
         virtual bool IsHierarchicalChild() const = 0;
+
+        //! @return true if this entity is the top level root of a hierarchy
         virtual bool IsHierarchicalRoot() const = 0;
     };
 

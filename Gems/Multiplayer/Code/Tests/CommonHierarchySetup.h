@@ -286,6 +286,7 @@ namespace Multiplayer
             // now the parent id is in the component
         }
 
+        template <typename Component>
         void SetHierarchyRootFieldOnNetworkHierarchyChild(const AZ::Entity& entity, NetEntityId value)
         {
             /* Derived from NetworkHierarchyChildComponent.AutoComponent.xml */
@@ -305,7 +306,7 @@ namespace Multiplayer
 
             NetworkOutputSerializer outSerializer(buffer.begin(), bufferSize);
 
-            entity.FindComponent<NetworkHierarchyChildComponent>()->SerializeStateDeltaMessage(currentRecord, outSerializer);
+            entity.FindComponent<Component>()->SerializeStateDeltaMessage(currentRecord, outSerializer);
             // now the parent id is in the component
         }
 

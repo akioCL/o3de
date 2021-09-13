@@ -52,12 +52,33 @@ namespace Multiplayer
 
         // we need a parent-id value to be present in NetworkTransformComponent (which is in client mode and doesn't have a controller)
         SetParentIdOnNetworkTransform(childEntity, NetEntityId{ 1 });
-        SetHierarchyRootFieldOnNetworkHierarchyChild(childEntity, NetEntityId{ 1 });
+        SetHierarchyRootFieldOnNetworkHierarchyChild<NetworkHierarchyChildComponent>(childEntity, NetEntityId{ 1 });
 
         // Create an entity replicator for the child entity
         const NetworkEntityHandle childHandle(&childEntity, m_networkEntityTracker.get());
         EntityReplicator entityReplicator(*m_entityReplicationManager, m_mockConnection.get(), NetEntityRole::Authority, childHandle);
         entityReplicator.Initialize(childHandle);
+
+        // Entity replicator should not be ready to activate the entity because its parent does not exist
+        EXPECT_EQ(entityReplicator.IsReadyToActivate(), false);
+    }
+
+    TEST_F(HierarchyTests, On_Client_EntityReplicator_DontActivate_Inner_Root_Before_Top_Root)
+    {
+        // Create a child entity that will be tested for activation inside a hierarchy
+        AZ::Entity innerRootEntity;
+        CreateEntityWithRootHierarchy(innerRootEntity);
+        SetupEntity(innerRootEntity, NetEntityId{ 2 }, NetEntityRole::Client);
+        // child entity is not activated on purpose here, we are about to test conditional activation check
+
+        // we need a parent-id value to be present in NetworkTransformComponent (which is in client mode and doesn't have a controller)
+        SetParentIdOnNetworkTransform(innerRootEntity, NetEntityId{ 1 });
+        SetHierarchyRootFieldOnNetworkHierarchyChild<NetworkHierarchyRootComponent>(innerRootEntity, NetEntityId{ 1 });
+
+        // Create an entity replicator for the child entity
+        const NetworkEntityHandle innerRootHandle(&innerRootEntity, m_networkEntityTracker.get());
+        EntityReplicator entityReplicator(*m_entityReplicationManager, m_mockConnection.get(), NetEntityRole::Authority, innerRootHandle);
+        entityReplicator.Initialize(innerRootHandle);
 
         // Entity replicator should not be ready to activate the entity because its parent does not exist
         EXPECT_EQ(entityReplicator.IsReadyToActivate(), false);
@@ -73,7 +94,7 @@ namespace Multiplayer
 
         // we need a parent-id value to be present in NetworkTransformComponent (which is in client mode and doesn't have a controller)
         SetParentIdOnNetworkTransform(childEntity, NetEntityId{ 1 });
-        SetHierarchyRootFieldOnNetworkHierarchyChild(childEntity, InvalidNetEntityId);
+        SetHierarchyRootFieldOnNetworkHierarchyChild<NetworkHierarchyChildComponent>(childEntity, InvalidNetEntityId);
 
         // Create an entity replicator for the child entity
         const NetworkEntityHandle childHandle(&childEntity, m_networkEntityTracker.get());
@@ -95,7 +116,7 @@ namespace Multiplayer
 
         // we need a parent-id value to be present in NetworkTransformComponent (which is in client mode and doesn't have a controller)
         SetParentIdOnNetworkTransform(childEntity, NetEntityId{ 1 });
-        SetHierarchyRootFieldOnNetworkHierarchyChild(childEntity, NetEntityId{ 1 });
+        SetHierarchyRootFieldOnNetworkHierarchyChild<NetworkHierarchyChildComponent>(childEntity, NetEntityId{ 1 });
 
         // Create an entity replicator for the child entity
         const NetworkEntityHandle childHandle(&childEntity, m_networkEntityTracker.get());
@@ -169,7 +190,7 @@ namespace Multiplayer
 
             // we need a parent-id value to be present in NetworkTransformComponent (which is in client mode and doesn't have a controller)
             SetParentIdOnNetworkTransform(child.m_entity, root.m_netId);
-            SetHierarchyRootFieldOnNetworkHierarchyChild(child.m_entity, root.m_netId);
+            SetHierarchyRootFieldOnNetworkHierarchyChild<NetworkHierarchyChildComponent>(child.m_entity, root.m_netId);
 
             // Create an entity replicator for the child entity
             const NetworkEntityHandle childHandle(&child.m_entity, m_networkEntityTracker.get());
@@ -231,8 +252,8 @@ namespace Multiplayer
         );
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRootComponent(),
-            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchicalRoot(),
+            m_rootEntity.get()
         );
 
         EXPECT_EQ(
@@ -263,7 +284,7 @@ namespace Multiplayer
             InvalidNetEntityId
         );
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRootComponent(),
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchicalRoot(),
             nullptr
         );
     }
@@ -303,7 +324,7 @@ namespace Multiplayer
 
             // we need a parent-id value to be present in NetworkTransformComponent (which is in client mode and doesn't have a controller)
             SetParentIdOnNetworkTransform(childOfChild.m_entity, m_childEntityInfo->m_netId);
-            SetHierarchyRootFieldOnNetworkHierarchyChild(childOfChild.m_entity, m_rootEntityInfo->m_netId);
+            SetHierarchyRootFieldOnNetworkHierarchyChild<NetworkHierarchyChildComponent>(childOfChild.m_entity, m_rootEntityInfo->m_netId);
 
             // Create an entity replicator for the child entity
             const NetworkEntityHandle childOfChildHandle(&childOfChild.m_entity, m_networkEntityTracker.get());
@@ -333,8 +354,8 @@ namespace Multiplayer
         );
 
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchyRootComponent(),
-            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchicalRoot(),
+            m_rootEntity.get()
         );
 
         EXPECT_EQ(

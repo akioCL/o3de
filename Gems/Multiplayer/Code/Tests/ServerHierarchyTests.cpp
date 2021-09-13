@@ -597,16 +597,16 @@ namespace Multiplayer
         }
 
         EXPECT_EQ(
-            m_child2Entity->FindComponent<NetworkHierarchyChildComponent>()->IsInHierarchy(),
-            true
+            m_child2Entity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchicalRoot(),
+            m_rootEntity.get()
         );
         EXPECT_EQ(
-            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->IsInHierarchy(),
-            false
+            m_childEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchicalRoot(),
+            nullptr
         );
         EXPECT_EQ(
-            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->IsInHierarchy(),
-            false
+            m_childOfChildEntity->FindComponent<NetworkHierarchyChildComponent>()->GetHierarchicalRoot(),
+            nullptr
         );
     }
 

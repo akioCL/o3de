@@ -26,8 +26,8 @@ namespace Multiplayer
      */
     class NetworkHierarchyRootComponent final
         : public NetworkHierarchyRootComponentBase
+        , public NetworkHierarchyRequestBus::Handler
         , protected AZ::TransformNotificationBus::MultiHandler
-        , public NetworkHierarchyRequestBus::MultiHandler
     {
     public:
         AZ_MULTIPLAYER_COMPONENT(Multiplayer::NetworkHierarchyRootComponent, s_networkHierarchyRootComponentConcreteUuid, Multiplayer::NetworkHierarchyRootComponentBase);
@@ -37,17 +37,18 @@ namespace Multiplayer
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
 
+        //! NetworkHierarchyRootComponentBase overrides.
         //! @{
         void OnInit() override;
         void OnActivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
         void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
         //! @}
 
-        //! NetworkHierarchyRequestBus
+        //! NetworkHierarchyRequestBus overrides.
         //! @{
         bool IsHierarchicalRoot() const override;
         bool IsHierarchicalChild() const override;
-        const AZStd::vector<AZ::Entity*>& GetHierarchicalEntities() const override;
+        AZStd::vector<AZ::Entity*> GetHierarchicalEntities() const override;
         AZ::Entity* GetHierarchicalRoot() const override;
         //! @}
 
@@ -71,17 +72,5 @@ namespace Multiplayer
         bool RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount);
         //! @returns false if the maximum supported hierarchy size has been reached
         bool RecursiveAttachHierarchicalChild(AZ::EntityId entity, uint32_t& currentEntityCount);
-    };
-
-    class NetworkHierarchyRootComponentController
-        : public NetworkHierarchyRootComponentControllerBase
-    {
-    public:
-        NetworkHierarchyRootComponentController(NetworkHierarchyRootComponent& parent);
-
-        void OnActivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
-        void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
-        
-    protected:
     };
 }

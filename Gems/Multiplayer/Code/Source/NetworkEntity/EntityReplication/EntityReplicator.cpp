@@ -423,7 +423,7 @@ namespace Multiplayer
             hierarchyRootComponent = entity->FindComponent<NetworkHierarchyRootComponent>();
         }
 
-        if ((hierarchyChildComponent && hierarchyChildComponent->IsInHierarchy())
+        if ((hierarchyChildComponent && hierarchyChildComponent->IsHierarchicalChild())
             || (hierarchyRootComponent && hierarchyRootComponent->IsHierarchicalChild()))
         {
             // if hierarchy is enabled for the entity, check if the parent is available

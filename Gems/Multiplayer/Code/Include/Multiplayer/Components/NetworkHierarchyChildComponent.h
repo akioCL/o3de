@@ -9,6 +9,7 @@
 #pragma once
 
 #include <AzCore/Component/Component.h>
+#include <Multiplayer/Components/NetworkHierarchyBus.h>
 #include <Source/AutoGen/NetworkHierarchyChildComponent.AutoComponent.h>
 
 namespace Multiplayer
@@ -24,6 +25,7 @@ namespace Multiplayer
      */
     class NetworkHierarchyChildComponent final
         : public NetworkHierarchyChildComponentBase
+        , public NetworkHierarchyRequestBus::Handler
     {
         friend class NetworkHierarchyRootComponent;
 
@@ -43,14 +45,13 @@ namespace Multiplayer
         void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
         //! @}
 
-        //! @note if the return value is nullptr, then this entity is not part of any hierarchy.
-        //! One reason for that could be a missing @NetworkHierarchyChildComponent on an entity
-        //! between this entity and the parent entity that has @NetworkHierarchyRootComponent on it.
-        //!
-        //! @returns top most @NetworkHierarchyRootComponent for the hierarchy
-        const NetworkHierarchyRootComponent* GetHierarchyRootComponent() const;
-
-        bool IsInHierarchy() const;
+        //! NetworkHierarchyRequestBus overrides
+        //! @{
+        bool IsHierarchicalChild() const override;
+        bool IsHierarchicalRoot() const override { return false; }
+        AZ::Entity* GetHierarchicalRoot() const override;
+        AZStd::vector<AZ::Entity*> GetHierarchicalEntities() const override;
+        //! @}
 
     protected:
         //! Used by @NetworkHierarchyRootComponent

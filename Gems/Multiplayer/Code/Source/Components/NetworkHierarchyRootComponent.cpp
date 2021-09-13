@@ -10,7 +10,6 @@
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Console/ILogger.h>
 #include <AzCore/Interface/Interface.h>
-#include <AzCore/Math/ToString.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <Multiplayer/IMultiplayer.h>
 #include <Multiplayer/Components/NetBindComponent.h>
@@ -69,25 +68,14 @@ namespace Multiplayer
     {
         m_hierarchicalEntities.push_back(GetEntity());
 
+        NetworkHierarchyRequestBus::Handler::BusConnect(GetEntityId());
         AZ::TransformNotificationBus::MultiHandler::BusConnect(GetEntityId());
-
-        AZ::EntityId parentId;
-        AZ::TransformBus::EventResult(parentId, GetEntityId(), &AZ::TransformBus::Events::GetParentId);
-
-        AZ::Vector3 worldPosition = AZ::Vector3::CreateZero();
-        AZ::TransformBus::EventResult(worldPosition, GetEntityId(), &AZ::TransformBus::Events::GetWorldTranslation);
-
-        AZ::Entity* actualParentEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(parentId);
-        const bool actualParenHasHierarchy = actualParentEntity ? actualParentEntity->FindComponent<NetworkHierarchyRootComponent>() != nullptr : false;
-
-        AZ_Printf("NetworkHierarchyRootComponent", "entity %s/[%s] activated @ %s, actual parent is %s/%s/%d",
-            GetEntityId().ToString().c_str(), GetEntity()->GetName().c_str(), AZ::ToString(worldPosition).c_str(),
-            parentId.ToString().c_str(), actualParentEntity ? actualParentEntity->GetName().c_str() : "not-found", actualParenHasHierarchy);
     }
 
     void NetworkHierarchyRootComponent::OnDeactivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
     {
         AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
+        NetworkHierarchyRequestBus::Handler::BusDisconnect();
 
         for (const AZ::Entity* childEntity : m_hierarchicalEntities)
         {
@@ -110,7 +98,7 @@ namespace Multiplayer
 
     bool NetworkHierarchyRootComponent::IsHierarchicalRoot() const
     {
-        if (m_higherRootEntity)
+        if (GetHierarchyRoot() != InvalidNetEntityId)
         {
             return false;
         }
@@ -123,7 +111,7 @@ namespace Multiplayer
         return !IsHierarchicalRoot();
     }
 
-    const AZStd::vector<AZ::Entity*>& NetworkHierarchyRootComponent::GetHierarchicalEntities() const
+    AZStd::vector<AZ::Entity*> NetworkHierarchyRootComponent::GetHierarchicalEntities() const
     {
         return m_hierarchicalEntities;
     }
@@ -287,20 +275,5 @@ namespace Multiplayer
                 controller->SetHierarchyRoot(InvalidNetEntityId);
             }
         }
-    }
-
-    // Controller implementation
-
-    NetworkHierarchyRootComponentController::NetworkHierarchyRootComponentController(NetworkHierarchyRootComponent& parent)
-        : NetworkHierarchyRootComponentControllerBase(parent)
-    {
-    }
-
-    void NetworkHierarchyRootComponentController::OnActivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
-    {
-    }
-
-    void NetworkHierarchyRootComponentController::OnDeactivate([[maybe_unused]] Multiplayer::EntityIsMigrating entityIsMigrating)
-    {
     }
 }

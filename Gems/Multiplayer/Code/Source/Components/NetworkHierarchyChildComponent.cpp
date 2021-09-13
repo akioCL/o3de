@@ -65,10 +65,37 @@ namespace Multiplayer
     void NetworkHierarchyChildComponent::OnActivate([[maybe_unused]] EntityIsMigrating entityIsMigrating)
     {
         HierarchyRootAddEvent(m_hierarchyRootNetIdChanged);
+        NetworkHierarchyRequestBus::Handler::BusConnect(GetEntityId());
     }
 
     void NetworkHierarchyChildComponent::OnDeactivate([[maybe_unused]] EntityIsMigrating entityIsMigrating)
     {
+        NetworkHierarchyRequestBus::Handler::BusDisconnect();
+    }
+
+    bool NetworkHierarchyChildComponent::IsHierarchicalChild() const
+    {
+        if (GetHierarchyRoot() != InvalidNetEntityId)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    AZ::Entity* NetworkHierarchyChildComponent::GetHierarchicalRoot() const
+    {
+        return m_hierarchyRootComponent ? m_hierarchyRootComponent->GetEntity() : nullptr;
+    }
+
+    AZStd::vector<AZ::Entity*> NetworkHierarchyChildComponent::GetHierarchicalEntities() const
+    {
+        if (m_hierarchyRootComponent)
+        {
+            return m_hierarchyRootComponent->GetHierarchicalEntities();
+        }
+
+        return {};
     }
 
     void NetworkHierarchyChildComponent::SetTopLevelHierarchyRootComponent(NetworkHierarchyRootComponent* hierarchyRoot)
@@ -103,28 +130,5 @@ namespace Multiplayer
         {
             m_hierarchyRootComponent = nullptr;
         }
-    }
-
-    const NetworkHierarchyRootComponent* NetworkHierarchyChildComponent::GetHierarchyRootComponent() const
-    {
-        if (m_hierarchyRootComponent)
-        {
-            return m_hierarchyRootComponent;
-        }
-
-        const NetEntityId netRootId = GetHierarchyRoot();
-        const ConstNetworkEntityHandle rootHandle = GetNetworkEntityManager()->GetEntity(netRootId);
-        if (rootHandle.Exists())
-        {
-            return rootHandle.FindComponent<NetworkHierarchyRootComponent>();
-        }
-
-        return nullptr;
-    }
-
-    bool NetworkHierarchyChildComponent::IsInHierarchy() const
-    {
-        const NetEntityId netRootId = GetHierarchyRoot();
-        return netRootId != InvalidNetEntityId;
     }
 }
