@@ -20,6 +20,7 @@ set(FILES
     Include/Multiplayer/Components/NetBindComponent.h
     Include/Multiplayer/Components/NetworkHierarchyChildComponent.h
     Include/Multiplayer/Components/NetworkHierarchyRootComponent.h
+    Include/Multiplayer/Components/NetworkHierarchyBus.h
     Include/Multiplayer/Components/NetworkTransformComponent.h
     Include/Multiplayer/ConnectionData/IConnectionData.h
     Include/Multiplayer/EntityDomains/IEntityDomain.h

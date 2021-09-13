@@ -424,7 +424,7 @@ namespace Multiplayer
         }
 
         if ((hierarchyChildComponent && hierarchyChildComponent->IsInHierarchy())
-            || (hierarchyRootComponent && hierarchyRootComponent->IsAttachedToAnotherHierarchy()))
+            || (hierarchyRootComponent && hierarchyRootComponent->IsHierarchicalChild()))
         {
             // if hierarchy is enabled for the entity, check if the parent is available
             if (const NetworkTransformComponent* networkTransform = entity->FindComponent<NetworkTransformComponent>())

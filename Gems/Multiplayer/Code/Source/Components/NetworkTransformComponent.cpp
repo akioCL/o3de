@@ -53,8 +53,8 @@ namespace Multiplayer
         ParentEntityIdAddEvent(m_parentIdChangedEventHandler);
         if (GetNetBindComponent())
         {
-        GetNetBindComponent()->AddEntityPreRenderEventHandler(m_entityPreRenderEventHandler);
-        GetNetBindComponent()->AddEntityCorrectionEventHandler(m_entityCorrectionEventHandler);
+            GetNetBindComponent()->AddEntityPreRenderEventHandler(m_entityPreRenderEventHandler);
+            GetNetBindComponent()->AddEntityCorrectionEventHandler(m_entityCorrectionEventHandler);
         }
 
         // When coming into relevance, reset all blending factors so we don't interpolate to our start position
@@ -89,6 +89,8 @@ namespace Multiplayer
 
     void NetworkTransformComponent::OnResetCountChangedEvent()
     {
+        OnParentIdChangedEvent(GetParentEntityId());
+
         m_targetTransform.SetRotation(GetRotation());
         m_targetTransform.SetTranslation(GetTranslation());
         m_targetTransform.SetUniformScale(GetScale());
@@ -97,11 +99,23 @@ namespace Multiplayer
 
     void NetworkTransformComponent::OnParentIdChangedEvent([[maybe_unused]] NetEntityId newParent)
     {
+        const ConstNetworkEntityHandle rootHandle = GetNetworkEntityManager()->GetEntity(newParent);
+        if (rootHandle.Exists())
+        {
+            const AZ::EntityId parentEntityId = rootHandle.GetEntity()->GetId();
+            if (AzFramework::TransformComponent* transformComponent = GetEntity()->FindComponent<AzFramework::TransformComponent>())
+            {
+                if (transformComponent->GetParentId() != parentEntityId)
+                {
+                    transformComponent->SetParent(parentEntityId);
+                }
+            }
+        }
     }
 
     void NetworkTransformComponent::UpdateTargetHostFrameId()
     {
-        HostFrameId currentHostFrameId = Multiplayer::GetNetworkTime()->GetHostFrameId();
+        const HostFrameId currentHostFrameId = Multiplayer::GetNetworkTime()->GetHostFrameId();
         if (currentHostFrameId > m_targetHostFrameId)
         {
             m_targetHostFrameId = currentHostFrameId;

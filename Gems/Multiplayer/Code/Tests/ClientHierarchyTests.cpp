@@ -236,13 +236,17 @@ namespace Multiplayer
         );
 
         EXPECT_EQ(
-            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
-            1
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities().size(),
+            2
         );
-        if (m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size() == 1)
+        if (m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities().size() == 2)
         {
             EXPECT_EQ(
-                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[0],
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities()[0],
+                m_rootEntity.get()
+            );
+            EXPECT_EQ(
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities()[1],
                 m_childEntity.get()
             );
         }
@@ -334,17 +338,21 @@ namespace Multiplayer
         );
 
         EXPECT_EQ(
-            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size(),
-            2
+            m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities().size(),
+            3
         );
-        if (m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren().size() == 2)
+        if (m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities().size() == 3)
         {
             EXPECT_EQ(
-                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[0],
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities()[0],
+                m_rootEntity.get()
+            );
+            EXPECT_EQ(
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities()[1],
                 m_childEntity.get()
             );
             EXPECT_EQ(
-                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchyChildren()[1],
+                m_rootEntity->FindComponent<NetworkHierarchyRootComponent>()->GetHierarchicalEntities()[2],
                 m_childOfChildEntity.get()
             );
         }

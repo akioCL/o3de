@@ -11,6 +11,7 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/TransformBus.h>
 #include <Source/AutoGen/NetworkHierarchyRootComponent.AutoComponent.h>
+#include <Multiplayer/Components/NetworkHierarchyBus.h>
 
 namespace Multiplayer
 {
@@ -26,6 +27,7 @@ namespace Multiplayer
     class NetworkHierarchyRootComponent final
         : public NetworkHierarchyRootComponentBase
         , protected AZ::TransformNotificationBus::MultiHandler
+        , public NetworkHierarchyRequestBus::MultiHandler
     {
     public:
         AZ_MULTIPLAYER_COMPONENT(Multiplayer::NetworkHierarchyRootComponent, s_networkHierarchyRootComponentConcreteUuid, Multiplayer::NetworkHierarchyRootComponentBase);
@@ -41,15 +43,13 @@ namespace Multiplayer
         void OnDeactivate(Multiplayer::EntityIsMigrating entityIsMigrating) override;
         //! @}
 
-        //! Children are guaranteed to have either @NetworkHierarchyChildComponent or @NetworkHierarchyRootComponent
-        //! @returns all hierarchical children
-        const AZStd::vector<AZ::Entity*>& GetHierarchyChildren() const;
-
-        //! @returns the highest level root of the hierarchy if this root isn't one, nullptr otherwise.
-        AZ::Entity* GetTopLevelHierarchyRootEntity() const;
-
-        //! @returns true if this is an inner root, use @GetTopLevelHierarchyRoot to get top level root of the hierarchy.
-        bool IsAttachedToAnotherHierarchy() const;
+        //! NetworkHierarchyRequestBus
+        //! @{
+        bool IsHierarchicalRoot() const override;
+        bool IsHierarchicalChild() const override;
+        const AZStd::vector<AZ::Entity*>& GetHierarchicalEntities() const override;
+        AZ::Entity* GetHierarchicalRoot() const override;
+        //! @}
 
     protected:
         //! AZ::TransformNotificationBus::Handler overrides.
@@ -63,8 +63,10 @@ namespace Multiplayer
 
     private:
         AZ::Entity* m_higherRootEntity = nullptr;
-        AZStd::vector<AZ::Entity*> m_children;
-        
+        AZStd::vector<AZ::Entity*> m_hierarchicalEntities;
+
+        void RebuildHierarchy();
+
         //! @returns false if the maximum supported hierarchy size has been reached
         bool RecursiveAttachHierarchicalEntities(AZ::EntityId underEntity, uint32_t& currentEntityCount);
         //! @returns false if the maximum supported hierarchy size has been reached

@@ -6,13 +6,10 @@
  *
  */
 
-#include <AzCore/Component/Entity.h>
-#include <AzCore/Component/TransformBus.h>
-#include <AzCore/Interface/Interface.h>
-#include <AzCore/Math/ToString.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <Multiplayer/IMultiplayer.h>
 #include <Multiplayer/Components/NetBindComponent.h>
+#include <Multiplayer/Components/NetworkHierarchyBus.h>
 #include <Multiplayer/Components/NetworkHierarchyChildComponent.h>
 #include <Multiplayer/Components/NetworkHierarchyRootComponent.h>
 
@@ -68,23 +65,6 @@ namespace Multiplayer
     void NetworkHierarchyChildComponent::OnActivate([[maybe_unused]] EntityIsMigrating entityIsMigrating)
     {
         HierarchyRootAddEvent(m_hierarchyRootNetIdChanged);
-
-        /*AZ::EntityId parentId;
-        AZ::TransformBus::EventResult(parentId, GetEntityId(), &AZ::TransformBus::Events::GetParentId);
-
-        AZ::Vector3 worldPosition = AZ::Vector3::CreateZero();
-        AZ::TransformBus::EventResult(worldPosition, GetEntityId(), &AZ::TransformBus::Events::GetWorldTranslation);
-
-        AZ::Entity* actualParentEntity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(parentId);
-        const bool actualParenHasHierarchy = actualParentEntity ? actualParentEntity->FindComponent<NetworkHierarchyRootComponent>() != nullptr : false;
-
-        AZ_Printf("NetworkHierarchyChildComponent", "entity %s/[%s] activated @ %s, actual parent is %s/%s/%d",
-            GetEntityId().ToString().c_str(),
-            GetEntity()->GetName().c_str(),
-            AZ::ToString(worldPosition).c_str(),
-            parentId.ToString().c_str(),
-            actualParentEntity ? actualParentEntity->GetName().c_str() : "not-found",
-            actualParenHasHierarchy);*/
     }
 
     void NetworkHierarchyChildComponent::OnDeactivate([[maybe_unused]] EntityIsMigrating entityIsMigrating)
@@ -101,10 +81,13 @@ namespace Multiplayer
             {
                 const NetEntityId netRootId = GetNetworkEntityManager()->GetNetEntityIdById(hierarchyRoot->GetEntityId());
                 controller->SetHierarchyRoot(netRootId);
+
+                NetworkHierarchyNotificationBus::Event(GetEntityId(), &NetworkHierarchyNotificationBus::Events::OnNetworkHierarchyUpdated, hierarchyRoot->GetEntityId());
             }
             else
             {
                 controller->SetHierarchyRoot(InvalidNetEntityId);
+                NetworkHierarchyNotificationBus::Event(GetEntityId(), &NetworkHierarchyNotificationBus::Events::OnLeavingNetworkHierarchy);
             }
         }
     }
