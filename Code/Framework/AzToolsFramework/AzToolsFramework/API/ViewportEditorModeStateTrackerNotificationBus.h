@@ -13,6 +13,7 @@
 
 namespace AzToolsFramework
 {
+    //! Enumeration of each viewport editor state.
     enum class EditorMode : AZ::u8
     {
         Default,
@@ -21,18 +22,21 @@ namespace AzToolsFramework
         Pick
     };
 
+    //! Viewport identifier and other relevant viewport data.
     struct ViewportEditorModeInfo
     {
         using IdType = AzFramework::ViewportId;
-        IdType m_id = ViewportUi::DefaultViewportId;
+        IdType m_id = ViewportUi::DefaultViewportId; //!< The unique identifier for a given viewport.
     };
 
+    //! Interface for the editor mode state of a given viewport.
     class EditorModeStateInterface
     {
     public:
-        virtual bool IsModeActive(EditorMode mode) const = 0;
+        virtual ~EditorModeStateInterface() = default;
 
-    private:
+        //! Returns true if the specified editor mode is active, otherwise false.
+        virtual bool IsModeActive(EditorMode mode) const = 0;
     };
 
     //! Provides a bus to notify when the different editor modes are entered/exit.
@@ -47,12 +51,12 @@ namespace AzToolsFramework
         using BusIdType = ViewportEditorModeInfo::IdType;
         //////////////////////////////////////////////////////////////////////////
 
-        //! Notifies the entering of the specified editor mode.
+        //! Notifiessubscribers of the a given viewport to the entering of the specified editor mode.
         virtual void OnEditorModeEnter([[maybe_unused]] const EditorModeStateInterface& editorModeState, [[maybe_unused]] EditorMode mode)
         {
         }
 
-        //! Notifies the exiting of the specified editor mode.
+        //! Notifies subscribers of the a given viewport to the exiting of the specified editor mode.
         virtual void OnEditorModeExit([[maybe_unused]] const EditorModeStateInterface& editorModeState, [[maybe_unused]] EditorMode mode)
         {
         }

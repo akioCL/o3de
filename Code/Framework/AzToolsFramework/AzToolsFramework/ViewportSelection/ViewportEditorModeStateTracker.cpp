@@ -45,27 +45,27 @@ namespace AzToolsFramework
 
     void ViewportEditorMode::RegisterInterface()
     {
-        ViewportEditorModeInterfaceWrapper::Register(this);
+        if (AZ::Interface<ViewportEditorModeInterface>::Get() == nullptr)
+        {
+            AZ::Interface<ViewportEditorModeInterface>::Register(this);
+        }
     }
 
     void ViewportEditorMode::UnregisterInterface()
     {
-        if (ViewportEditorModeInterfaceWrapper::Get() != nullptr)
+        if (AZ::Interface<ViewportEditorModeInterface>::Get() != nullptr)
         {
-            ViewportEditorModeInterfaceWrapper::Unregister(this);
+            AZ::Interface<ViewportEditorModeInterface>::Unregister(this);
         }
     }
 
     void ViewportEditorMode::EnterMode(const ViewportEditorModeInfo& viewportEditorModeInfo, EditorMode mode)
     {
         auto& editorModeStates = m_viewportEditorModeStates[viewportEditorModeInfo.m_id];
-        if (editorModeStates.IsModeActive(mode))
-        {
-            AZ_Warning(
-                ViewportEditorModeLogWindow, false,
+        AZ_Warning(
+                ViewportEditorModeLogWindow, !editorModeStates.IsModeActive(mode),
                 AZStd::string::format(
                     "Duplicate call to EnterMode for mode '%u' on id '%i'", static_cast<AZ::u32>(mode), viewportEditorModeInfo.m_id).c_str());
-        }
         editorModeStates.SetModeActive(mode);
         EditorModeNotificationsBus::Event(
             viewportEditorModeInfo.m_id, &EditorModeNotificationsBus::Events::OnEditorModeEnter, editorModeStates, mode);

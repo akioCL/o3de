@@ -16,28 +16,36 @@
 
 namespace AzToolsFramework
 {
+    //! The encapsulation of the editor modes for a given viewport.
     class EditorModeState
         : public EditorModeStateInterface
     {
     public:
+
+        //! The number of currently supported viewport editor modes.
         static constexpr AZ::u8 NumEditorModes = 4;
 
-
+        //! Sets the specified mode as active.
         void SetModeActive(EditorMode mode);
 
+        // Sets the specified mode as inactive.
         void SetModeInactive(EditorMode mode);
 
         // EditorModeStateInterface ...
         bool IsModeActive(EditorMode mode) const override;
     private:
-        AZStd::array<bool, NumEditorModes> m_editorModes{};
+        AZStd::array<bool, NumEditorModes> m_editorModes{}; //!< State flags to track active/inactive status of viewport editor modes.
     };
 
+    //! The implementation of the central editor mode state tracker for all viewports.
     class ViewportEditorMode
         : public ViewportEditorModeInterface
     {
     public:
+        //! Registers this object with the AZ::Interface.
         void RegisterInterface();
+
+        //! Unregisters this object with the AZ::Interface.
         void UnregisterInterface();
 
         // ViewportEditorModeInterface ...
@@ -48,6 +56,7 @@ namespace AzToolsFramework
         bool IsViewportStateBeingTracked(const ViewportEditorModeInfo& viewportEditorModeInfo) const override;
 
     private:
-        AZStd::unordered_map<typename ViewportEditorModeInfo::IdType, EditorModeState> m_viewportEditorModeStates;
+        using ViewportEditorModeStates = AZStd::unordered_map<typename ViewportEditorModeInfo::IdType, EditorModeState>;
+        ViewportEditorModeStates m_viewportEditorModeStates; //!< Editor mode state per viewport.
     };
 } // namespace AzToolsFramework
