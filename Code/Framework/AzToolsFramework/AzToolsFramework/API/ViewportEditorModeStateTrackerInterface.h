@@ -9,7 +9,7 @@
 #pragma once
 
 #include <AzCore/Interface/Interface.h>
-#include <AzToolsFramework/API/EditorModeNotificationBus.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerNotificationBus.h>
 
 namespace AzToolsFramework
 {

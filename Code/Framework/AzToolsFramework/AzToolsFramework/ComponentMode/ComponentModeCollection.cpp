@@ -9,7 +9,7 @@
 #include "ComponentModeCollection.h"
 
 #include <AzToolsFramework/Commands/ComponentModeCommand.h>
-#include <AzToolsFramework/API/ViewportEditorModeInterface.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerInterface.h>
 #include <AzCore/std/smart_ptr/make_shared.h>
 
 namespace AzToolsFramework

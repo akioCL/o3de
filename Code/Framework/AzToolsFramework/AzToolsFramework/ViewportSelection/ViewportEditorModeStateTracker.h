@@ -11,8 +11,8 @@
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/std/containers/array.h>
 #include <AzCore/std/containers/unordered_map.h>
-#include <AzToolsFramework/API/EditorModeNotificationBus.h>
-#include <AzToolsFramework/API/ViewportEditorModeInterface.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerNotificationBus.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerInterface.h>
 
 namespace AzToolsFramework
 {

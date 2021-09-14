@@ -9,7 +9,7 @@
 #include "EditorPickEntitySelection.h"
 
 #include <AzToolsFramework/ViewportSelection/EditorSelectionUtil.h>
-#include <AzToolsFramework/API/ViewportEditorModeInterface.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerInterface.h>
 #include <QApplication>
 
 namespace AzToolsFramework

@@ -11,7 +11,7 @@
 #include <AzCore/Component/Component.h>
 #include <AzToolsFramework/ViewportSelection/EditorInteractionSystemViewportSelectionRequestBus.h>
 #include <AzToolsFramework/ViewportSelection/EditorVisibleEntityDataCache.h>
-#include <AzToolsFramework/ViewportSelection/ViewportEditorMode.h>
+#include <AzToolsFramework/ViewportSelection/ViewportEditorModeStateTracker.h>
 
 namespace AzToolsFramework
 {

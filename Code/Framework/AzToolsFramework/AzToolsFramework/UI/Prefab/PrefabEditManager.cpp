@@ -13,7 +13,7 @@
 #include <AzToolsFramework/Commands/SelectionCommand.h>
 #include <AzToolsFramework/UI/Outliner/EntityOutlinerCacheBus.h>
 #include <AzToolsFramework/UI/Prefab/PrefabEditUndo.h>
-#include <AzToolsFramework/API/EditorModeNotificationBus.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerNotificationBus.h>
 
 namespace AzToolsFramework
 {

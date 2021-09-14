@@ -6,8 +6,8 @@
  *
  */
 
-#include <AzToolsFramework/API/EditorModeNotificationBus.h>
-#include <AzToolsFramework/ViewportSelection/ViewportEditorMode.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerNotificationBus.h>
+#include <AzToolsFramework/ViewportSelection/ViewportEditorModeStateTracker.h>
 
 namespace AzToolsFramework
 {

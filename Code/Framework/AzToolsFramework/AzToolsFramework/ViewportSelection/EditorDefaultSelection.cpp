@@ -12,7 +12,7 @@
 #include <AzToolsFramework/Manipulators/ManipulatorManager.h>
 #include <AzToolsFramework/Viewport/ViewportMessages.h>
 #include <AzToolsFramework/ViewportSelection/EditorSelectionUtil.h>
-#include <AzToolsFramework/API/ViewportEditorModeInterface.h>
+#include <AzToolsFramework/API/ViewportEditorModeStateTrackerInterface.h>
 #include <Entity/EditorEntityHelpers.h>
 #include <QGuiApplication>
 

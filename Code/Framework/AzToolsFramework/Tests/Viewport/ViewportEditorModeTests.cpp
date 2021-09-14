@@ -8,7 +8,7 @@
 
 #include <AzTest/AzTest.h>
 #include <AzToolsFramework/UnitTest/AzToolsFrameworkTestHelpers.h>
-#include <AzToolsFramework/ViewportSelection/ViewportEditorMode.h>
+#include <AzToolsFramework/ViewportSelection/ViewportEditorModeStateTracker.h>
 
 namespace UnitTest
 {
