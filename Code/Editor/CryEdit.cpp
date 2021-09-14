@@ -2122,7 +2122,7 @@ bool CCryEditApp::FixDanglingSharedMemory(const QString& sharedMemName) const
 // CCryEditApp message handlers
 
 
-int CCryEditApp::ExitInstance(int exitCode)
+int CCryEditApp::ExitInstance()
 {
     if (m_pEditor)
     {
@@ -2159,17 +2159,6 @@ int CCryEditApp::ExitInstance(int exitCode)
         }
 
         gEnv->pLog->FlushAndClose();
-
-        // note: the intention here is to quit immediately without processing anything further
-        // on linux and mac, _exit has that effect
-        // however, on windows, _exit() still invokes CRT functions, unloads, and destructors
-        // so on windows, we need to use TerminateProcess
-#if defined(AZ_PLATFORM_WINDOWS)
-       TerminateProcess(GetCurrentProcess(), exitCode);
-#else
-
-        _exit(exitCode);
-#endif
     }
 
     SAFE_DELETE(m_pConsoleDialog);
@@ -4166,8 +4155,6 @@ extern "C" int AZ_DLL_EXPORT CryEditMain(int argc, char* argv[])
         QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
     #endif
 
-        int exitCode = 0;
-
         bool didCryEditStart = CCryEditApp::instance()->InitInstance();
         AZ_Error("Editor", didCryEditStart, "O3DE Editor did not initialize correctly, and will close."
             "\nThis could be because of incorrectly configured components, or missing required gems."
@@ -4181,10 +4168,10 @@ extern "C" int AZ_DLL_EXPORT CryEditMain(int argc, char* argv[])
         }
         else
         {
-            exitCode = 1;
+            ret = 1;
         }
 
-        CCryEditApp::instance()->ExitInstance(exitCode);
+        CCryEditApp::instance()->ExitInstance();
 
     }
 

@@ -172,7 +172,7 @@ public:
     // ClassWizard generated virtual function overrides
 public:
     virtual bool InitInstance();
-    virtual int ExitInstance(int exitCode = 0);
+    virtual int ExitInstance();
     virtual bool OnIdle(LONG lCount);
     virtual CCryEditDoc* OpenDocumentFile(const char* lpszFileName);
 
