@@ -30,14 +30,14 @@ namespace AzToolsFramework
         m_manipulatorManager = AZStd::make_shared<AzToolsFramework::ManipulatorManager>(AzToolsFramework::g_mainManipulatorManagerId);
         m_transformComponentSelection = AZStd::make_unique<EditorTransformComponentSelection>(entityDataCache);
 
-        AZ::Interface<ViewportEditorModeInterface>::Get()->EnterMode({}, EditorMode::Default);
+        AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get()->EnterMode({}, ViewportEditorMode::Default);
     }
 
     EditorDefaultSelection::~EditorDefaultSelection()
     {
-        if (AZ::Interface<ViewportEditorModeInterface>::Get() != nullptr)
+        if (AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get() != nullptr)
         {
-            AZ::Interface<ViewportEditorModeInterface>::Get()->ExitMode({}, EditorMode::Default);
+            AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get()->ExitMode({}, ViewportEditorMode::Default);
         }
 
         ComponentModeFramework::ComponentModeSystemRequestBus::Handler::BusDisconnect();

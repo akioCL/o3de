@@ -15,7 +15,7 @@
 
 namespace AzToolsFramework
 {
-    class ViewportEditorMode;
+    class ViewportEditorModeStateTracker;
 
     //! System Component to wrap active input handler.
     //! EditorInteractionSystemComponent is notified of viewport mouse events from RenderViewport
@@ -57,6 +57,6 @@ namespace AzToolsFramework
         AZStd::unique_ptr<InternalViewportSelectionRequests> m_interactionRequests; //!< Hold a concrete implementation of
                                                                                     //!< ViewportSelectionRequests to handle viewport
                                                                                     //!< input and drawing for the Editor.
-        ViewportEditorMode m_viewportEditorMode;
+        ViewportEditorModeStateTracker m_viewportEditorMode;
     };
 } // namespace AzToolsFramework

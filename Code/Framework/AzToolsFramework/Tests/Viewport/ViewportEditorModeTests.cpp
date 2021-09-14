@@ -12,25 +12,25 @@
 
 namespace UnitTest
 {
-    using EditorMode = AzToolsFramework::EditorMode;
-    using EditorModeState = AzToolsFramework::EditorModeState;
     using ViewportEditorMode = AzToolsFramework::ViewportEditorMode;
+    using ViewportEditorModeState = AzToolsFramework::ViewportEditorModeState;
+    using ViewportEditorModeStateTracker = AzToolsFramework::ViewportEditorModeStateTracker;
     using ViewportEditorModeInfo = AzToolsFramework::ViewportEditorModeInfo;
     using ViewportId = ViewportEditorModeInfo::IdType;
-    using EditorModeStateInterface = AzToolsFramework::EditorModeStateInterface;
+    using ViewportEditorModeStateInterface = AzToolsFramework::ViewportEditorModeStateInterface;
 
     class EditorModeStateTestsFixture
         : public ::testing::Test
     {
     public:
-        using EditorMode = AzToolsFramework::EditorMode;
-        using EditorModeState = AzToolsFramework::EditorModeState;
-        EditorModeState m_editorModeState;
+        using ViewportEditorMode = AzToolsFramework::ViewportEditorMode;
+        using ViewportEditorModeState = AzToolsFramework::ViewportEditorModeState;
+        ViewportEditorModeState m_editorModeState;
     };
 
     class EditorModeStateTestsFixtureWithParams
         : public EditorModeStateTestsFixture
-        , public ::testing::WithParamInterface<AzToolsFramework::EditorMode>
+        , public ::testing::WithParamInterface<AzToolsFramework::ViewportEditorMode>
     {
     public:
         void SetUp() override
@@ -40,21 +40,21 @@ namespace UnitTest
 
          void SetAllModesActive()
         {
-            for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+            for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
             {
-                m_editorModeState.SetModeActive(static_cast<EditorMode>(mode));
+                m_editorModeState.SetModeActive(static_cast<ViewportEditorMode>(mode));
             }
         }
 
         void SetAllModesInactive()
         {
-            for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+            for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
             {
-                m_editorModeState.SetModeInactive(static_cast<EditorMode>(mode));
+                m_editorModeState.SetModeInactive(static_cast<ViewportEditorMode>(mode));
             }
         }
 
-        EditorMode m_editorMode;
+        ViewportEditorMode m_editorMode;
     };
 
     class ViewportEditorModeTestFixture
@@ -62,11 +62,11 @@ namespace UnitTest
         //, public ::testing::Test
     {
     public:
-        ViewportEditorMode m_viewportEditorMode;
+        ViewportEditorModeStateTracker m_viewportEditorMode;
     };
 
     class EditorModeNotificationsBusHandler
-        : private AzToolsFramework::EditorModeNotificationsBus::Handler
+        : private AzToolsFramework::ViewportEditorModeNotificationsBus::Handler
     {
      public:
         struct ReceivedEvents
@@ -75,17 +75,17 @@ namespace UnitTest
             bool m_onLeave = false;
         };
 
-        using EditModeTracker = AZStd::unordered_map<EditorMode, ReceivedEvents>;
+        using EditModeTracker = AZStd::unordered_map<ViewportEditorMode, ReceivedEvents>;
 
         EditorModeNotificationsBusHandler(ViewportId viewportId)
              : m_viewportSubscription(viewportId)
         {
-            AzToolsFramework::EditorModeNotificationsBus::Handler::BusConnect(m_viewportSubscription);
+            AzToolsFramework::ViewportEditorModeNotificationsBus::Handler::BusConnect(m_viewportSubscription);
         }
 
         ~EditorModeNotificationsBusHandler()
         {
-            AzToolsFramework::EditorModeNotificationsBus::Handler::BusDisconnect();
+            AzToolsFramework::ViewportEditorModeNotificationsBus::Handler::BusDisconnect();
         }
 
         ViewportId GetViewportSubscription() const
@@ -98,13 +98,13 @@ namespace UnitTest
             return m_editorModes;
         }
 
-        // EditorModeNotificationsBus ...
-        void OnEditorModeEnter([[maybe_unused]]const EditorModeStateInterface& editorModeState, EditorMode mode) override
+        // ViewportEditorModeNotificationsBus ...
+        void OnEditorModeEnter([[maybe_unused]]const ViewportEditorModeStateInterface& editorModeState, ViewportEditorMode mode) override
         {
             m_editorModes[mode].m_onEnter = true;
         }
 
-        virtual void OnEditorModeExit([[maybe_unused]] const EditorModeStateInterface& editorModeState, EditorMode mode) override
+        virtual void OnEditorModeExit([[maybe_unused]] const ViewportEditorModeStateInterface& editorModeState, ViewportEditorMode mode) override
         {
             m_editorModes[mode].m_onLeave = true;
         }
@@ -122,7 +122,7 @@ namespace UnitTest
 
         void SetUpEditorFixtureImpl() override
         {
-            for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+            for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
             {
                 m_editorModeHandlers[mode] = AZStd::make_unique<EditorModeNotificationsBusHandler>(mode);
             }
@@ -130,41 +130,41 @@ namespace UnitTest
 
         void TearDownEditorFixtureImpl() override
         {
-            for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+            for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
             {
                 m_editorModeHandlers[mode].reset();
             }
         }
 
-        AZStd::array<AZStd::unique_ptr<EditorModeNotificationsBusHandler>, EditorModeState::NumEditorModes> m_editorModeHandlers;
+        AZStd::array<AZStd::unique_ptr<EditorModeNotificationsBusHandler>, ViewportEditorModeState::NumEditorModes> m_editorModeHandlers;
     };
 
     TEST_F(EditorModeStateTestsFixture, NumberOfEditorModesIsEqualTo4)
     {
-        EXPECT_EQ(EditorModeState::NumEditorModes, 4);
+        EXPECT_EQ(ViewportEditorModeState::NumEditorModes, 4);
     }
 
     TEST_F(EditorModeStateTestsFixture, InitialEditorModeStateHasAllInactiveModes)
     {
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
-            EXPECT_FALSE(m_editorModeState.IsModeActive(static_cast<EditorMode>(mode)));
+            EXPECT_FALSE(m_editorModeState.IsModeActive(static_cast<ViewportEditorMode>(mode)));
         }
     }
 
     TEST_P(EditorModeStateTestsFixtureWithParams, SettingModeActiveActivatesOnlyThatMode)
     {
         m_editorModeState.SetModeActive(m_editorMode);
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
-            const auto editorMode = static_cast<EditorMode>(mode);
+            const auto editorMode = static_cast<ViewportEditorMode>(mode);
             if (editorMode == m_editorMode)
             {
-                EXPECT_TRUE(m_editorModeState.IsModeActive(static_cast<EditorMode>(editorMode)));
+                EXPECT_TRUE(m_editorModeState.IsModeActive(static_cast<ViewportEditorMode>(editorMode)));
             }
             else
             {
-                EXPECT_FALSE(m_editorModeState.IsModeActive(static_cast<EditorMode>(editorMode)));
+                EXPECT_FALSE(m_editorModeState.IsModeActive(static_cast<ViewportEditorMode>(editorMode)));
             }
         }
     }
@@ -173,9 +173,9 @@ namespace UnitTest
     {
         SetAllModesActive();
         m_editorModeState.SetModeInactive(m_editorMode);
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
-            const auto editorMode = static_cast<EditorMode>(mode);
+            const auto editorMode = static_cast<ViewportEditorMode>(mode);
             if (editorMode == m_editorMode)
             {
                 EXPECT_FALSE(m_editorModeState.IsModeActive(editorMode));
@@ -189,21 +189,21 @@ namespace UnitTest
 
     TEST_P(EditorModeStateTestsFixtureWithParams, SettingMultipleModesActiveActivatesAllThoseModesNonMutuallyExclusively)
     {
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes - 1; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes - 1; mode++)
         {
             SetAllModesInactive();
             m_editorModeState.SetModeActive(m_editorMode);
 
-            const auto editorMode = static_cast<EditorMode>(mode);
+            const auto editorMode = static_cast<ViewportEditorMode>(mode);
             if (editorMode == m_editorMode)
             {
                 continue;
             }
 
             m_editorModeState.SetModeActive(editorMode);
-            for (auto expectedMode = 0; expectedMode < EditorModeState::NumEditorModes; expectedMode++)
+            for (auto expectedMode = 0; expectedMode < ViewportEditorModeState::NumEditorModes; expectedMode++)
             {
-                const auto expectedEditorMode = static_cast<EditorMode>(expectedMode);
+                const auto expectedEditorMode = static_cast<ViewportEditorMode>(expectedMode);
                 if (expectedEditorMode == editorMode || expectedEditorMode == m_editorMode)
                 {
                     EXPECT_TRUE(m_editorModeState.IsModeActive(expectedEditorMode));
@@ -218,21 +218,21 @@ namespace UnitTest
 
     TEST_P(EditorModeStateTestsFixtureWithParams, SettingMultipleModesInactiveInactivatesAllThoseModesNonMutuallyExclusively)
     {
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes - 1; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes - 1; mode++)
         {
             SetAllModesActive();
             m_editorModeState.SetModeInactive(m_editorMode);
 
-            const auto editorMode = static_cast<EditorMode>(mode);
+            const auto editorMode = static_cast<ViewportEditorMode>(mode);
             if (editorMode == m_editorMode)
             {
                 continue;
             }
 
             m_editorModeState.SetModeInactive(editorMode);
-            for (auto expectedMode = 0; expectedMode < EditorModeState::NumEditorModes; expectedMode++)
+            for (auto expectedMode = 0; expectedMode < ViewportEditorModeState::NumEditorModes; expectedMode++)
             {
-                const auto expectedEditorMode = static_cast<EditorMode>(expectedMode);
+                const auto expectedEditorMode = static_cast<ViewportEditorMode>(expectedMode);
                 if (expectedEditorMode == editorMode || expectedEditorMode == m_editorMode)
                 {
                     EXPECT_FALSE(m_editorModeState.IsModeActive(expectedEditorMode));
@@ -249,22 +249,22 @@ namespace UnitTest
         AllEditorModes,
         EditorModeStateTestsFixtureWithParams,
         ::testing::Values(
-            AzToolsFramework::EditorMode::Default,
-            AzToolsFramework::EditorMode::Component,
-            AzToolsFramework::EditorMode::Focus,
-            AzToolsFramework::EditorMode::Pick));
+            AzToolsFramework::ViewportEditorMode::Default,
+            AzToolsFramework::ViewportEditorMode::Component,
+            AzToolsFramework::ViewportEditorMode::Focus,
+            AzToolsFramework::ViewportEditorMode::Pick));
 
     TEST_F(EditorModeStateTestsFixture, SettingOutOfBoundsModeActiveIssuesErrorMsg)
     {
         UnitTest::TestRunner::Instance().StartAssertTests();
-        m_editorModeState.SetModeActive(static_cast<EditorMode>(EditorModeState::NumEditorModes));
+        m_editorModeState.SetModeActive(static_cast<ViewportEditorMode>(ViewportEditorModeState::NumEditorModes));
         EXPECT_EQ(1, UnitTest::TestRunner::Instance().StopAssertTests());
     }
 
     TEST_F(EditorModeStateTestsFixture, SettingOutOfBoundsModeInactiveIssuesErrorMsg)
     {
         UnitTest::TestRunner::Instance().StartAssertTests();
-        m_editorModeState.SetModeInactive(static_cast<EditorMode>(EditorModeState::NumEditorModes));
+        m_editorModeState.SetModeInactive(static_cast<ViewportEditorMode>(ViewportEditorModeState::NumEditorModes));
         EXPECT_EQ(1, UnitTest::TestRunner::Instance().StopAssertTests());
     }
 
@@ -279,7 +279,7 @@ namespace UnitTest
         EXPECT_FALSE(m_viewportEditorMode.IsViewportStateBeingTracked({ viewportid }));
         EXPECT_EQ(m_viewportEditorMode.GetEditorModeState({ viewportid }), nullptr);
 
-        const auto editorMode = EditorMode::Default;
+        const auto editorMode = ViewportEditorMode::Default;
         m_viewportEditorMode.EnterMode({ viewportid }, editorMode);
         const auto* viewportEditorModeState = m_viewportEditorMode.GetEditorModeState({ viewportid });
 
@@ -294,7 +294,7 @@ namespace UnitTest
         EXPECT_FALSE(m_viewportEditorMode.IsViewportStateBeingTracked({ viewportid }));
         EXPECT_EQ(m_viewportEditorMode.GetEditorModeState({ viewportid }), nullptr);
 
-        const auto editorMode = EditorMode::Default;
+        const auto editorMode = ViewportEditorMode::Default;
         UnitTest::ErrorHandler errorHandler(AZStd::string::format(
             "Call to ExitMode for mode '%u' on id '%i' without precursor call to EnterMode", static_cast<AZ::u32>(editorMode), viewportid).c_str());
         m_viewportEditorMode.ExitMode({ viewportid }, editorMode);
@@ -319,7 +319,7 @@ namespace UnitTest
         EXPECT_FALSE(m_viewportEditorMode.IsViewportStateBeingTracked({ viewportid }));
         EXPECT_EQ(m_viewportEditorMode.GetEditorModeState({ viewportid }), nullptr);
 
-        const auto editorMode = EditorMode::Default;
+        const auto editorMode = ViewportEditorMode::Default;
         const auto expectedWarning = AZStd::string::format(
             "Duplicate call to EnterMode for mode '%u' on id '%i'", static_cast<AZ::u32>(editorMode), viewportid);
 
@@ -355,7 +355,7 @@ namespace UnitTest
         EXPECT_FALSE(m_viewportEditorMode.IsViewportStateBeingTracked({ viewportid }));
         EXPECT_EQ(m_viewportEditorMode.GetEditorModeState({ viewportid }), nullptr);
 
-        const auto editorMode = EditorMode::Default;
+        const auto editorMode = ViewportEditorMode::Default;
         const auto expectedWarning =
             AZStd::string::format("Duplicate call to ExitMode for mode '%u' on id '%i'", static_cast<AZ::u32>(editorMode), viewportid);
 
@@ -389,21 +389,21 @@ namespace UnitTest
         ViewportEditorModePublisherTestFixture,
         EnteringViewportEditorModeStateForExistingIdPublishesOnViewportEditorModeEnterEventForAllSubscribers)
     {
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
             EXPECT_EQ(m_editorModeHandlers[mode]->GetEditorModes().size(), 0);
         }
 
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
             const ViewportId viewportId = mode;
-            const EditorMode editorMode = static_cast<EditorMode>(mode);
+            const ViewportEditorMode editorMode = static_cast<ViewportEditorMode>(mode);
             m_viewportEditorMode.EnterMode({ mode }, editorMode);
         }
 
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
-            const EditorMode editorMode = static_cast<EditorMode>(mode);
+            const ViewportEditorMode editorMode = static_cast<ViewportEditorMode>(mode);
             const auto& editorModes = m_editorModeHandlers[mode]->GetEditorModes();
             EXPECT_EQ(editorModes.size(), 1);
             EXPECT_EQ(editorModes.count(editorMode), 1);
@@ -418,22 +418,22 @@ namespace UnitTest
         ViewportEditorModePublisherTestFixture,
         ExitingViewportEditorModeStateForExistingIdPublishesOnViewportEditorModeExitEventForAllSubscribers)
     {
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
             EXPECT_EQ(m_editorModeHandlers[mode]->GetEditorModes().size(), 0);
         }
 
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
             const ViewportId viewportId = mode;
-            const EditorMode editorMode = static_cast<EditorMode>(mode);
+            const ViewportEditorMode editorMode = static_cast<ViewportEditorMode>(mode);
             m_viewportEditorMode.EnterMode({ mode }, editorMode);
             m_viewportEditorMode.ExitMode({ mode }, editorMode);
         }
 
-        for (auto mode = 0; mode < EditorModeState::NumEditorModes; mode++)
+        for (auto mode = 0; mode < ViewportEditorModeState::NumEditorModes; mode++)
         {
-            const EditorMode editorMode = static_cast<EditorMode>(mode);
+            const ViewportEditorMode editorMode = static_cast<ViewportEditorMode>(mode);
             const auto& editorModes = m_editorModeHandlers[mode]->GetEditorModes();
             EXPECT_EQ(editorModes.size(), 1);
             EXPECT_EQ(editorModes.count(editorMode), 1);

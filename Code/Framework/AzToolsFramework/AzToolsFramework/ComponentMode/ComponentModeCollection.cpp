@@ -200,7 +200,7 @@ namespace AzToolsFramework
 
         void ComponentModeCollection::BeginComponentMode()
         {
-            AZ::Interface<ViewportEditorModeInterface>::Get()->EnterMode({}, EditorMode::Component);
+            AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get()->EnterMode({}, ViewportEditorMode::Component);
 
             m_selectedComponentModeIndex = 0;
             m_componentMode = true;
@@ -265,7 +265,7 @@ namespace AzToolsFramework
 
         void ComponentModeCollection::EndComponentMode()
         {
-            AZ::Interface<ViewportEditorModeInterface>::Get()->ExitMode({}, EditorMode::Component);
+            AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get()->ExitMode({}, ViewportEditorMode::Component);
 
             if (!UndoRedoOperationInProgress())
             {

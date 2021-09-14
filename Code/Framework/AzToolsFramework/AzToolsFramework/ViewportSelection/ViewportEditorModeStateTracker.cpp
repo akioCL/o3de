@@ -13,7 +13,7 @@ namespace AzToolsFramework
 {
     static constexpr const char* ViewportEditorModeLogWindow = "ViewportEditorMode";
 
-    void EditorModeState::SetModeActive(EditorMode mode)
+    void ViewportEditorModeState::SetModeActive(ViewportEditorMode mode)
     {
         if (const AZ::u32 modeIndex = static_cast<AZ::u32>(mode);
             modeIndex < NumEditorModes)
@@ -26,7 +26,7 @@ namespace AzToolsFramework
         }
     }
 
-    void EditorModeState::SetModeInactive(EditorMode mode)
+    void ViewportEditorModeState::SetModeInactive(ViewportEditorMode mode)
     {
         if (const AZ::u32 modeIndex = static_cast<AZ::u32>(mode); modeIndex < NumEditorModes)
         {
@@ -38,28 +38,28 @@ namespace AzToolsFramework
         }
     }
 
-    bool EditorModeState::IsModeActive(EditorMode mode) const
+    bool ViewportEditorModeState::IsModeActive(ViewportEditorMode mode) const
     {
         return m_editorModes[static_cast<AZ::u32>(mode)];
     }
 
-    void ViewportEditorMode::RegisterInterface()
+    void ViewportEditorModeStateTracker::RegisterInterface()
     {
-        if (AZ::Interface<ViewportEditorModeInterface>::Get() == nullptr)
+        if (AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get() == nullptr)
         {
-            AZ::Interface<ViewportEditorModeInterface>::Register(this);
+            AZ::Interface<ViewportEditorModeStateTrackerInterface>::Register(this);
         }
     }
 
-    void ViewportEditorMode::UnregisterInterface()
+    void ViewportEditorModeStateTracker::UnregisterInterface()
     {
-        if (AZ::Interface<ViewportEditorModeInterface>::Get() != nullptr)
+        if (AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get() != nullptr)
         {
-            AZ::Interface<ViewportEditorModeInterface>::Unregister(this);
+            AZ::Interface<ViewportEditorModeStateTrackerInterface>::Unregister(this);
         }
     }
 
-    void ViewportEditorMode::EnterMode(const ViewportEditorModeInfo& viewportEditorModeInfo, EditorMode mode)
+    void ViewportEditorModeStateTracker::EnterMode(const ViewportEditorModeInfo& viewportEditorModeInfo, ViewportEditorMode mode)
     {
         auto& editorModeStates = m_viewportEditorModeStates[viewportEditorModeInfo.m_id];
         AZ_Warning(
@@ -67,13 +67,13 @@ namespace AzToolsFramework
                 AZStd::string::format(
                     "Duplicate call to EnterMode for mode '%u' on id '%i'", static_cast<AZ::u32>(mode), viewportEditorModeInfo.m_id).c_str());
         editorModeStates.SetModeActive(mode);
-        EditorModeNotificationsBus::Event(
-            viewportEditorModeInfo.m_id, &EditorModeNotificationsBus::Events::OnEditorModeEnter, editorModeStates, mode);
+        ViewportEditorModeNotificationsBus::Event(
+            viewportEditorModeInfo.m_id, &ViewportEditorModeNotificationsBus::Events::OnEditorModeEnter, editorModeStates, mode);
     }
 
-    void ViewportEditorMode::ExitMode(const ViewportEditorModeInfo& viewportEditorModeInfo, EditorMode mode)
+    void ViewportEditorModeStateTracker::ExitMode(const ViewportEditorModeInfo& viewportEditorModeInfo, ViewportEditorMode mode)
     {
-        EditorModeState* editorModeStates = nullptr;
+        ViewportEditorModeState* editorModeStates = nullptr;
         if (m_viewportEditorModeStates.count(viewportEditorModeInfo.m_id))
         {
             editorModeStates = &m_viewportEditorModeStates.at(viewportEditorModeInfo.m_id);
@@ -92,11 +92,11 @@ namespace AzToolsFramework
         }
 
         editorModeStates->SetModeInactive(mode);
-        EditorModeNotificationsBus::Event(
-            viewportEditorModeInfo.m_id, &EditorModeNotificationsBus::Events::OnEditorModeExit, *editorModeStates, mode);
+        ViewportEditorModeNotificationsBus::Event(
+            viewportEditorModeInfo.m_id, &ViewportEditorModeNotificationsBus::Events::OnEditorModeExit, *editorModeStates, mode);
     }
 
-    const EditorModeStateInterface* ViewportEditorMode::GetEditorModeState(const ViewportEditorModeInfo& viewportEditorModeInfo) const
+    const ViewportEditorModeStateInterface* ViewportEditorModeStateTracker::GetEditorModeState(const ViewportEditorModeInfo& viewportEditorModeInfo) const
     {
         if (auto editorModeStates = m_viewportEditorModeStates.find(viewportEditorModeInfo.m_id);
             editorModeStates != m_viewportEditorModeStates.end())
@@ -109,12 +109,12 @@ namespace AzToolsFramework
         }
     }
 
-    size_t ViewportEditorMode::GetNumTrackedViewports() const
+    size_t ViewportEditorModeStateTracker::GetNumTrackedViewports() const
     {
         return m_viewportEditorModeStates.size();
     }
 
-    bool ViewportEditorMode::IsViewportStateBeingTracked(const ViewportEditorModeInfo& viewportEditorModeInfo) const
+    bool ViewportEditorModeStateTracker::IsViewportStateBeingTracked(const ViewportEditorModeInfo& viewportEditorModeInfo) const
     {
         return m_viewportEditorModeStates.count(viewportEditorModeInfo.m_id) > 0;
     }

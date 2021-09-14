@@ -19,12 +19,12 @@ namespace AzToolsFramework
     EditorPickEntitySelection::EditorPickEntitySelection(const EditorVisibleEntityDataCache* entityDataCache)
         : m_editorHelpers(AZStd::make_unique<EditorHelpers>(entityDataCache))
     {
-        AZ::Interface<ViewportEditorModeInterface>::Get()->EnterMode({}, EditorMode::Pick);
+        AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get()->EnterMode({}, ViewportEditorMode::Pick);
     }
 
     EditorPickEntitySelection::~EditorPickEntitySelection()
     {
-        AZ::Interface<ViewportEditorModeInterface>::Get()->ExitMode({}, EditorMode::Pick);
+        AZ::Interface<ViewportEditorModeStateTrackerInterface>::Get()->ExitMode({}, ViewportEditorMode::Pick);
 
         if (m_hoveredEntityId.IsValid())
         {

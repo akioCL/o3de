@@ -14,7 +14,7 @@
 namespace AzToolsFramework
 {
     //! Enumeration of each viewport editor state.
-    enum class EditorMode : AZ::u8
+    enum class ViewportEditorMode : AZ::u8
     {
         Default,
         Component,
@@ -30,17 +30,17 @@ namespace AzToolsFramework
     };
 
     //! Interface for the editor mode state of a given viewport.
-    class EditorModeStateInterface
+    class ViewportEditorModeStateInterface
     {
     public:
-        virtual ~EditorModeStateInterface() = default;
+        virtual ~ViewportEditorModeStateInterface() = default;
 
         //! Returns true if the specified editor mode is active, otherwise false.
-        virtual bool IsModeActive(EditorMode mode) const = 0;
+        virtual bool IsModeActive(ViewportEditorMode mode) const = 0;
     };
 
     //! Provides a bus to notify when the different editor modes are entered/exit.
-    class EditorModeNotifications
+    class ViewportEditorModeNotifications
         : public AZ::EBusTraits
     {
     public:
@@ -51,15 +51,15 @@ namespace AzToolsFramework
         using BusIdType = ViewportEditorModeInfo::IdType;
         //////////////////////////////////////////////////////////////////////////
 
-        //! Notifiessubscribers of the a given viewport to the entering of the specified editor mode.
-        virtual void OnEditorModeEnter([[maybe_unused]] const EditorModeStateInterface& editorModeState, [[maybe_unused]] EditorMode mode)
+        //! Notifies subscribers of the a given viewport to the entering of the specified editor mode.
+        virtual void OnEditorModeEnter([[maybe_unused]] const ViewportEditorModeStateInterface& editorModeState, [[maybe_unused]] ViewportEditorMode mode)
         {
         }
 
         //! Notifies subscribers of the a given viewport to the exiting of the specified editor mode.
-        virtual void OnEditorModeExit([[maybe_unused]] const EditorModeStateInterface& editorModeState, [[maybe_unused]] EditorMode mode)
+        virtual void OnEditorModeExit([[maybe_unused]] const ViewportEditorModeStateInterface& editorModeState, [[maybe_unused]] ViewportEditorMode mode)
         {
         }
     };
-    using EditorModeNotificationsBus = AZ::EBus<EditorModeNotifications>;
+    using ViewportEditorModeNotificationsBus = AZ::EBus<ViewportEditorModeNotifications>;
 }
