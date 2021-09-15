@@ -1,7 +1,5 @@
-#FROM mcr.microsoft.com/windows/servercore:ltsc2019
-FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019
 
-# SHELL ["powershell", "-command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019
 
 # Install Chocolatey package manager
 ENV ChocolateyUseWindowsCompression false
@@ -37,38 +35,38 @@ RUN choco install -fy nuget.commandline
 COPY Windows /
 COPY Common /
 
-# Install Visual Studio Build Tools with MSVC workload
-# RUN ["choco", "install", "visualstudio2019buildtools", "--package-parameters", "\"--config c:\temp\vs2019bt.vsconfig \""]
-# RUN choco install visualstudio2019buildtools --package-parameters "\"--config .\vs2019bt.vsconfig\""
-
-# RUN ["choco", "install", "visualstudio2017buildtools", "--package-parameters", "'--config C:\\temp\\vs2017bt.vsconfig'"]
-
 # Download the Build Tools bootstrapper.
 RUN curl -SL --output vs_buildtools.exe https://aka.ms/vs/16/release/vs_buildtools.exe
 
 # Restore the default Windows shell for correct batch processing.
 # SHELL ["cmd", "/S", "/C"]
 
-# Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN cmd /c "vs_buildtools.exe --quiet --wait --norestart --nocache modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools" --config vs2019bt.vsconfig || IF "%ERRORLEVEL%"=="3010" EXIT 0 && del /q vs_buildtools.exe"
+# Modify existing Visual Studio Build Tools with MSVC workload
+#RUN cmd /c "vs_buildtools.exe --quiet --wait --norestart --nocache modify --installPath `"%ProgramFiles%\Microsoft Visual Studio\2019\BuildTools`" --config vs2019bt.vsconfig || if `"%ERRORLEVEL%`"==`"3010`" EXIT 0 && del /q vs_buildtools.exe"
+RUN cmd /c "vs_buildtools.exe modify --quiet --wait --norestart --nocache modify --installPath 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools' \
+    --add Microsoft.Component.MSBuild \
+    --add Microsoft.VisualStudio.Component.CoreBuildTools \
+    --add Microsoft.VisualStudio.Component.VC.CoreBuildTools \
+    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+    --add Microsoft.VisualStudio.Component.Windows10SDK \
+    --add Microsoft.VisualStudio.Component.Windows10SDK.18362 \
+    --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Core \
+    --add Microsoft.VisualStudio.ComponentGroup.UWP.BuildTools \
+    --add Microsoft.VisualStudio.Workload.MSBuildTools \
+    --add Microsoft.VisualStudio.Workload.UniversalBuildTools \
+    --add Microsoft.VisualStudio.Workload.VCTools"
 
 # Install Windows 10 SDK (Not part of the VS tools)
 RUN choco install windows-sdk-10.1
 
 # Install Windows Installer XML toolkit (WiX)
-RUN choco install -f wixtoolset
+#RUN choco install -f wixtoolset
 
 # Install Python and associated dependancies
-RUN choco install -f python3
+RUN choco install -f python3 --version=3.7.9
 RUN pip3 install -r requirements.txt
 
 RUN mkdir -p C:\ProgramData\AWSCodeBuild\bin ; mkdir -p C:\ProgramData\AWSCodeBuild\features
-
-# F# support
-RUN choco install -f visualfsharptools
-
-# Portable Library support
-RUN choco install -f netfx-pcl-reference-assemblies-4.6
 
 # Configure SSH
 #COPY ssh_config /Users/ContainerAdministrator/.ssh/config
