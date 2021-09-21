@@ -1203,13 +1203,14 @@ namespace AzToolsFramework
                 PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance deletion");
                 command->Capture(instanceDomBefore, instanceDomAfter, commonOwningInstance->get().GetTemplateId());
                 command->SetParent(selCommand);
+                command->Redo(commonOwningInstance);
             }
 
-            selCommand->SetParent(undoBatch.GetUndoBatch());
+            /*selCommand->SetParent(undoBatch.GetUndoBatch());
             {
                 AZ_PROFILE_SCOPE(AzToolsFramework, "Internal::DeleteEntities:RunRedo");
                 selCommand->RunRedo();
-            }
+            }*/
 
             return AZ::Success();
         }

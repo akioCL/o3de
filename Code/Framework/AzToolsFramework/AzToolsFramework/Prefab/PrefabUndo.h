@@ -53,6 +53,8 @@ namespace AzToolsFramework
 
             void Undo() override;
             void Redo() override;
+            //! Overload to allow to apply the change, but prevent instanceToExclude from being refreshed.
+            void Redo(InstanceOptionalConstReference instanceToExclude);
         };
 
         //! handles entity updates, such as when the values on an entity change

@@ -51,6 +51,10 @@ namespace AzToolsFramework
             m_instanceToTemplateInterface->PatchTemplate(m_redoPatch, m_templateId);
         }
 
+        void PrefabUndoInstance::Redo(InstanceOptionalConstReference instanceToExclude)
+        {
+            m_instanceToTemplateInterface->PatchTemplate(m_redoPatch, m_templateId, instanceToExclude);
+        }
 
         //PrefabEntityUpdateUndo
         PrefabUndoEntityUpdate::PrefabUndoEntityUpdate(const AZStd::string& undoOperationName)
