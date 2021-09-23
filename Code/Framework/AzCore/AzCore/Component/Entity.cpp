@@ -320,7 +320,7 @@ namespace AZ
     {
         AZ_Assert(component != nullptr, "Invalid component!");
         AZ_Assert(CanAddRemoveComponents(), "Can't add component while the entity is active!");
-        AZ_Assert(component->GetEntity() == nullptr, "Component is already added to entity %p [0x%llx]", component->m_entity, component->m_entity->GetId());
+        AZ_Assert(component->GetEntity() == nullptr, "Component is already added to entity %p [0x%llx]", component->m_entity, component->m_entity != nullptr ? component->m_entity->GetId() : AZ::EntityId());
         if (!CanAddRemoveComponents())
         {
             return false;

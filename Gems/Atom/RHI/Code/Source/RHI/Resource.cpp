@@ -29,7 +29,7 @@ namespace AZ
             AZ_Assert(
                 GetPool() == nullptr,
                 "Resource '%s' is still registered on pool. %s",
-                GetName().GetCStr(), GetPool()->GetName().GetCStr());
+                GetName().GetCStr(), GetPool() ? GetPool()->GetName().GetCStr() : "no pool");
         }
 
         bool Resource::IsAttachment() const
