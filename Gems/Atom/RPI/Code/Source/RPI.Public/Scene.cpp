@@ -44,6 +44,9 @@ namespace AZ
             {
                 auto shaderAsset = RPISystemInterface::Get()->GetCommonShaderAssetForSrgs();
                 scene->m_srg = ShaderResourceGroup::Create(shaderAsset, sceneSrgLayout->GetName());
+                
+                // Set value for constants defined in SceneTimeSrg.azsli
+                scene->m_timeInputIndex = scene->m_srg->FindShaderInputConstantIndex(Name{ "m_time" });
             }
             
             return ScenePtr(scene);
@@ -348,11 +351,11 @@ namespace AZ
             return nullptr;
         }
 
-        void Scene::Simulate([[maybe_unused]] const TickTimeInfo& tickInfo, RHI::JobPolicy jobPolicy)
+        void Scene::Simulate(RHI::JobPolicy jobPolicy, float simulationTime)
         {
             AZ_PROFILE_SCOPE(RPI, "Scene: Simulate");
 
-            m_simulationTime = tickInfo.m_currentGameTime;
+            m_simulationTime = simulationTime;
 
             // If previous simulation job wasn't done, wait for it to finish.
             WaitAndCleanCompletionJob(m_simulationCompletion);
@@ -406,11 +409,9 @@ namespace AZ
         {
             if (m_srg)
             {
-                // Set value for constants defined in SceneTimeSrg.azsli
-                RHI::ShaderInputConstantIndex timeIndex = m_srg->FindShaderInputConstantIndex(Name{ "m_time" });
-                if (timeIndex.IsValid())
+                if (m_timeInputIndex.IsValid())
                 {
-                    m_srg->SetConstant(timeIndex, m_simulationTime);
+                    m_srg->SetConstant(m_timeInputIndex, m_simulationTime);
                 }
 
                 // signal any handlers to update values for their partial scene srg
@@ -420,7 +421,7 @@ namespace AZ
             }
         }
 
-        void Scene::PrepareRender([[maybe_unused]]const TickTimeInfo& tickInfo, RHI::JobPolicy jobPolicy)
+        void Scene::PrepareRender(RHI::JobPolicy jobPolicy)
         {
             AZ_PROFILE_SCOPE(RPI, "Scene: PrepareRender");
 

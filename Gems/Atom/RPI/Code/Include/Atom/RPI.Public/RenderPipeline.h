@@ -32,7 +32,6 @@ namespace AZ
     namespace RPI
     {
         class Scene;
-        struct TickTimeInfo;
         class ShaderResourceGroup;
         class AnyAsset;
         class WindowContext;
