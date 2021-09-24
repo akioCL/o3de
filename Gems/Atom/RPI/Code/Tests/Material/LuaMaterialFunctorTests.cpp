@@ -1192,4 +1192,40 @@ namespace UnitTest
         EXPECT_TRUE(testData.GetMaterial()->Compile());
         errorMessageFinder.CheckExpectedErrorsFound();
     }
+
+
+    TEST_F(LuaMaterialFunctorTests, LuaMaterialFunctor_RuntimeContext_SetRenderStatesOnInvalidShader_Error)
+    {
+        using namespace AZ::RPI;
+
+        // In particular, this is a regression test for crash that occurred when accessing a render state after an invalid shader lookup.
+
+        const char* functorScript =
+            R"(
+                function GetMaterialPropertyDependencies()
+                    return {"general.MyBool"}
+                end
+
+                function Process(context)
+                    local boolValue = context:GetMaterialPropertyValue_bool("general.MyBool")
+                    if(boolValue) then
+                        context:GetShaderByTag("DoesNotExist"):GetRenderStatesOverride():SetCullMode(CullMode_None)
+                    else
+                        context:GetShaderByTag("DoesNotExist"):GetRenderStatesOverride():ClearCullMode()
+                    end
+                end
+            )";
+
+        TestMaterialData testData;
+        testData.Setup(MaterialPropertyDataType::Bool, "general.MyBool", functorScript);
+        
+        ErrorMessageFinder errorMessageFinder;
+        errorMessageFinder.AddExpectedErrorMessage("Could not find a shader");
+
+        testData.GetMaterial()->SetPropertyValue(testData.GetMaterialPropertyIndex(), MaterialPropertyValue{true});
+        EXPECT_TRUE(testData.GetMaterial()->Compile());
+
+        errorMessageFinder.CheckExpectedErrorsFound();
+    }
+
 }

@@ -661,7 +661,7 @@ namespace AZ
 
         LuaMaterialFunctorRenderStates LuaMaterialFunctorShaderItem::GetRenderStatesOverride()
         {
-            if (m_context->CheckPsoChangesAllowed() && m_shaderItem)
+            if (m_shaderItem && m_context && m_context->CheckPsoChangesAllowed())
             {
                 return LuaMaterialFunctorRenderStates{m_shaderItem->GetRenderStatesOverlay()};
             }
