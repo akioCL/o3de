@@ -203,7 +203,7 @@ namespace AZ
             McppBinder mcpp(outputData, collectDiagnostics);
 
             // create the argc/argv
-            const char* processName = "builder";
+            const char* processName = "mcpp";
             const char* inputPath = fullPath.c_str();
             // let's create the equivalent of that expression but in dynamic form:
             //const char* argv[] = { processName, szInPath, "-C", "-+", "-D macro1"..., "-I path"..., NULL };
