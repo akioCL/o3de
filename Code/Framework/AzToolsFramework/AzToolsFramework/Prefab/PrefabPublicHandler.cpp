@@ -1038,7 +1038,7 @@ namespace AzToolsFramework
                 DuplicateNestedEntitiesInInstance(commonOwningInstance->get(),
                     entities, instanceDomAfter, duplicatedEntityAndInstanceIds, duplicateEntityAliasMap);
 
-                PrefabUndoInstance* command = aznew PrefabUndoInstance("Entity/Instance duplication");
+                PrefabUndoInstance* command = aznew PrefabUndoInstance("Entity/Instance duplication", AZStd::nullopt);
                 command->SetParent(undoBatch.GetUndoBatch());
                 command->Capture(instanceDomBefore, instanceDomAfter, commonOwningInstance->get().GetTemplateId());
                 command->Redo();
@@ -1205,17 +1205,16 @@ namespace AzToolsFramework
                 Prefab::PrefabDom instanceDomAfter;
                 m_instanceToTemplateInterface->GenerateDomForInstance(instanceDomAfter, commonOwningInstance->get());
 
-                PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance deletion");
+                PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance deletion", commonOwningInstance);
                 command->Capture(instanceDomBefore, instanceDomAfter, commonOwningInstance->get().GetTemplateId());
                 command->SetParent(selCommand);
-                command->Redo(commonOwningInstance);
             }
 
-            /*selCommand->SetParent(undoBatch.GetUndoBatch());
+            selCommand->SetParent(undoBatch.GetUndoBatch());
             {
                 AZ_PROFILE_SCOPE(AzToolsFramework, "Internal::DeleteEntities:RunRedo");
                 selCommand->RunRedo();
-            }*/
+            }
 
             return AZ::Success();
         }
@@ -1298,7 +1297,7 @@ namespace AzToolsFramework
                     Prefab::PrefabDom instanceDomAfter;
                     m_instanceToTemplateInterface->GenerateDomForInstance(instanceDomAfter, parentInstance);
 
-                    PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance detachment");
+                    PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance detachment", AZStd::nullopt);
                     command->Capture(instanceDomBefore, instanceDomAfter, parentTemplateId);
                     command->SetParent(undoBatch.GetUndoBatch());
                     {

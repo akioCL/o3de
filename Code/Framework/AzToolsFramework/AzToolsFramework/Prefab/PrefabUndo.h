@@ -44,7 +44,7 @@ namespace AzToolsFramework
             : public PrefabUndoBase
         {
         public:
-            explicit PrefabUndoInstance(const AZStd::string& undoOperationName);
+            PrefabUndoInstance(const AZStd::string& undoOperationName, InstanceOptionalConstReference instance);
 
             void Capture(
                 const PrefabDom& initialState,
@@ -53,8 +53,9 @@ namespace AzToolsFramework
 
             void Undo() override;
             void Redo() override;
-            //! Overload to allow to apply the change, but prevent instanceToExclude from being refreshed.
-            void Redo(InstanceOptionalConstReference instanceToExclude);
+
+        private:
+            InstanceOptionalConstReference m_instance;
         };
 
         //! handles entity updates, such as when the values on an entity change

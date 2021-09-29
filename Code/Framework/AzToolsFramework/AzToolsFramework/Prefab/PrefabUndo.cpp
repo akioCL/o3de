@@ -24,9 +24,9 @@ namespace AzToolsFramework
             AZ_Assert(m_instanceToTemplateInterface, "Failed to grab instance to template interface");
         }
 
-        //PrefabInstanceUndo
-        PrefabUndoInstance::PrefabUndoInstance(const AZStd::string& undoOperationName)
+        PrefabUndoInstance::PrefabUndoInstance(const AZStd::string& undoOperationName, InstanceOptionalConstReference instance)
             : PrefabUndoBase(undoOperationName)
+            , m_instance(instance)
         {
         }
 
@@ -48,12 +48,7 @@ namespace AzToolsFramework
 
         void PrefabUndoInstance::Redo()
         {
-            m_instanceToTemplateInterface->PatchTemplate(m_redoPatch, m_templateId);
-        }
-
-        void PrefabUndoInstance::Redo(InstanceOptionalConstReference instanceToExclude)
-        {
-            m_instanceToTemplateInterface->PatchTemplate(m_redoPatch, m_templateId, instanceToExclude);
+            m_instanceToTemplateInterface->PatchTemplate(m_redoPatch, m_templateId, m_instance);
         }
 
         //PrefabEntityUpdateUndo
