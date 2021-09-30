@@ -1620,8 +1620,11 @@ namespace AZ::IO
         strBindRoot = !bindRoot.empty() ? bindRoot : szFullPath->ParentPath().Native();
 
         // Check if archive file disk exist on disk.
-        const bool pakOnDisk = FileIOBase::GetDirectInstance()->Exists(szFullPath->c_str());
-        if (!pakOnDisk && (nFactoryFlags & ZipDir::CacheFactory::FLAGS_READ_ONLY))
+
+        const bool archiveInAnotherArchive = FindPakFileEntry(szFullPath->Native());
+        const bool archiveLooseOnDisk = !archiveInAnotherArchive ? IO::FileIOBase::GetDirectInstance()->Exists(szFullPath->c_str()) : false;
+        const bool foundPak = archiveInAnotherArchive || archiveLooseOnDisk;
+        if (!foundPak && (nFactoryFlags & ZipDir::CacheFactory::FLAGS_READ_ONLY))
         {
             // Archive file not found.
             if (az_archive_verbosity)
@@ -1631,6 +1634,10 @@ namespace AZ::IO
             return nullptr;
         }
 
+        if (archiveInAnotherArchive)
+        {
+            nFactoryFlags |= ZipDir::CacheFactory::FLAGS_READ_INSIDE_PAK;
+        }
         ZipDir::CacheFactory factory(ZipDir::ZD_INIT_FAST, nFactoryFlags);
 
         ZipDir::CachePtr cache = factory.New(szFullPath->c_str());
@@ -2127,7 +2134,7 @@ namespace AZ::IO
             }
 
             currentDirPattern = currentDir + AZ_FILESYSTEM_SEPARATOR_WILDCARD;
-            currentFilePattern = currentDir + AZ_CORRECT_FILESYSTEM_SEPARATOR_STRING + "levels.pak";
+            currentFilePattern = currentDir + AZ_CORRECT_FILESYSTEM_SEPARATOR_STRING + "level.pak";
 
             ZipDir::FileEntry* fileEntry = findFile.FindExact(currentFilePattern.c_str());
             if (fileEntry)
