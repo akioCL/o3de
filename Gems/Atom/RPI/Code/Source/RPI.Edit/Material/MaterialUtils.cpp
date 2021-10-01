@@ -62,7 +62,7 @@ namespace AZ
                 return true;
             }
 
-            AZ::Outcome<MaterialTypeSourceData> LoadMaterialTypeSourceData(const AZStd::string& filePath, const rapidjson::Value* document)
+            AZ::Outcome<MaterialTypeSourceData> LoadMaterialTypeSourceData(const AZStd::string& filePath, const rapidjson::Value* document, bool* wasLegacyFormat)
             {
                 AZ::Outcome<rapidjson::Document, AZStd::string> loadOutcome;
                 if (document == nullptr)
@@ -90,6 +90,12 @@ namespace AZ
                 settings.m_metadata.Add(fileLoadContext);
 
                 JsonSerialization::Load(materialType, *document, settings);
+
+                if (wasLegacyFormat)
+                {
+                    *wasLegacyFormat = !materialType.GetPropertyLayout().m_propertiesOld.empty() || !materialType.GetPropertyLayout().m_groupsOld.empty();
+                }
+
                 materialType.ConvertToNewDataFormat();
                 materialType.ResolveUvEnums();
 

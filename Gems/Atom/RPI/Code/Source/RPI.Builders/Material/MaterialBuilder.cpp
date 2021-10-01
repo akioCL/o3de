@@ -260,24 +260,6 @@ namespace AZ
             response.m_result = AssetBuilderSDK::CreateJobsResultCode::Success;
         }
 
-        AZ::Data::Asset<MaterialTypeAsset> CreateMaterialTypeAsset(AZStd::string_view materialTypeSourceFilePath, const rapidjson::Value& json)
-        {
-            auto materialType = MaterialUtils::LoadMaterialTypeSourceData(materialTypeSourceFilePath, &json);
-
-            if (!materialType.IsSuccess())
-            {
-                return  {};
-            }
-
-            auto materialTypeAssetOutcome = materialType.GetValue().CreateMaterialTypeAsset(Uuid::CreateRandom(), materialTypeSourceFilePath, true);
-            if (!materialTypeAssetOutcome.IsSuccess())
-            {
-                return  {};
-            }
-
-            return materialTypeAssetOutcome.GetValue();
-        }
-
         AZ::Data::Asset<MaterialAsset> CreateMaterialAsset(AZStd::string_view materialSourceFilePath, const rapidjson::Value& json)
         {
             auto material = LoadSourceData<MaterialSourceData>(json, materialSourceFilePath);
@@ -335,14 +317,52 @@ namespace AZ
             if (isMaterialTypeFile)
             {
                 // Load the material type file and create the MaterialTypeAsset object
-                AZ::Data::Asset<MaterialTypeAsset> materialTypeAsset;
-                materialTypeAsset = CreateMaterialTypeAsset(request.m_sourceFile, document);
 
-                if (!materialTypeAsset)
+                bool wasLegacyFormat = false;
+                auto materialTypeSourceDataOutcome = MaterialUtils::LoadMaterialTypeSourceData(request.m_sourceFile, &document, &wasLegacyFormat);
+                if (!materialTypeSourceDataOutcome.IsSuccess())
                 {
                     // Errors will have been reported above
                     return;
                 }
+
+                MaterialTypeSourceData materialTypeSourceData = materialTypeSourceDataOutcome.TakeValue();
+
+                if (auto settingsRegistry = AZ::SettingsRegistry::Get(); settingsRegistry != nullptr)
+                {
+                    // If this registry setting is enabled, then any old-format .materialtype that is processed will be replaced
+                    // with the updated format automatically. This will not necessarily produce the *ideal* updated format (for
+                    // example, functors will still be in the global functor section, not moved to the individual property sets),
+                    // but it should be a helpful starting point for developers who want to modernize old .materialtype files.
+                    // Normally asset builders are not supposed to write to source folders, so again this is just a convenience
+                    // to give developers help getting started with .materialtype upgrades. It is not recommended that you permanently
+                    // apply this setting; turn it on, run the AP, make it to reprocess your .materialtype files, and then turn it off. And of course, when
+                    // making new .materialtype files, be sure to follow the latest spec.
+                    bool upgradeMaterialTypes = false;
+                    settingsRegistry->Get(upgradeMaterialTypes, "/O3DE/Atom/RPI/MaterialBuilder/UpgradeMaterialTypes");
+                    if (upgradeMaterialTypes)
+                    {
+                        AZ_Warning("MaterialDocument", false,
+                            "UpgradeMaterialTypes should be considered 'experimental' and should be disabled after you finish updating your material type files.");
+
+                        if (wasLegacyFormat)
+                        {
+                            if (!AZ::RPI::JsonUtils::SaveObjectToFile(request.m_fullPath, materialTypeSourceData))
+                            {
+                                AZ_Warning("MaterialDocument", false, "Upgraded .materialtype document could not be saved: '%s'.", request.m_sourceFile.c_str());
+                            }
+                        }
+                    }
+                }
+                
+                auto materialTypeAssetOutcome = materialTypeSourceData.CreateMaterialTypeAsset(Uuid::CreateRandom(), request.m_sourceFile, true);
+                if (!materialTypeAssetOutcome.IsSuccess())
+                {
+                    // Errors will have been reported above
+                    return;
+                }
+                
+                AZ::Data::Asset<MaterialTypeAsset> materialTypeAsset = materialTypeAssetOutcome.TakeValue();
 
                 // [ATOM-13190] Change this back to ST_BINARY. It's ST_XML temporarily for debugging.
                 if (!AZ::Utils::SaveObjectToFile(materialProductPath, AZ::DataStream::ST_XML, materialTypeAsset.Get()))

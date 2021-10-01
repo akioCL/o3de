@@ -419,6 +419,15 @@ namespace AZ
 
             const MaterialPropertyVisibility defaultVisibility = MaterialPropertyVisibility::Default;
             result.Combine(ContinueStoringToJsonObjectField(outputValue, Field::visibility, &property->m_visibility, &defaultVisibility, azrtti_typeid(property->m_visibility), context));
+            
+            // Enum list
+            if (property->m_enumValues.size() > 0)
+            {
+                result.Combine(ContinueStoringToJsonObjectField(outputValue, Field::enumValues, &property->m_enumValues, nullptr, azrtti_typeid(property->m_enumValues), context));
+            }
+
+            const bool defaultEnumIsUv = false;
+            result.Combine(ContinueStoringToJsonObjectField(outputValue, Field::enumIsUv, &property->m_enumIsUv, &defaultEnumIsUv, azrtti_typeid(property->m_enumIsUv), context));
 
             // Support loading a "connection" property as a single entry in m_outputConnections
             MaterialTypeSourceData::PropertyConnection defaultConnection;
@@ -430,15 +439,6 @@ namespace AZ
             {
                 result.Combine(ContinueStoringToJsonObjectField(outputValue, Field::connection, &property->m_outputConnections, &defaultConnection, azrtti_typeid(property->m_outputConnections), context));
             }
-
-            // Enum list
-            if (property->m_enumValues.size() > 0)
-            {
-                result.Combine(ContinueStoringToJsonObjectField(outputValue, Field::enumValues, &property->m_enumValues, nullptr, azrtti_typeid(property->m_enumValues), context));
-            }
-
-            const bool defaultEnumIsUv = false;
-            result.Combine(ContinueStoringToJsonObjectField(outputValue, Field::enumIsUv, &property->m_enumIsUv, &defaultEnumIsUv, azrtti_typeid(property->m_enumIsUv), context));
 
             if (result.GetProcessing() == JsonSerializationResult::Processing::Completed)
             {
