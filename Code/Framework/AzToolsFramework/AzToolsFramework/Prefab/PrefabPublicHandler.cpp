@@ -1038,10 +1038,10 @@ namespace AzToolsFramework
                 DuplicateNestedEntitiesInInstance(commonOwningInstance->get(),
                     entities, instanceDomAfter, duplicatedEntityAndInstanceIds, duplicateEntityAliasMap);
 
-                PrefabUndoInstance* command = aznew PrefabUndoInstance("Entity/Instance duplication", AZStd::nullopt);
+                PrefabUndoInstance* command = aznew PrefabUndoInstance("Entity/Instance duplication");
                 command->SetParent(undoBatch.GetUndoBatch());
                 command->Capture(instanceDomBefore, instanceDomAfter, commonOwningInstance->get().GetTemplateId());
-                command->Redo();
+                command->RedoBatched();
 
                 DuplicateNestedInstancesInInstance(commonOwningInstance->get(),
                     instances, instanceDomAfter, duplicatedEntityAndInstanceIds, newInstanceAliasToOldInstanceMap);
@@ -1205,7 +1205,7 @@ namespace AzToolsFramework
                 Prefab::PrefabDom instanceDomAfter;
                 m_instanceToTemplateInterface->GenerateDomForInstance(instanceDomAfter, commonOwningInstance->get());
 
-                PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance deletion", commonOwningInstance);
+                PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance deletion");
                 command->Capture(instanceDomBefore, instanceDomAfter, commonOwningInstance->get().GetTemplateId());
                 command->SetParent(selCommand);
             }
@@ -1297,7 +1297,7 @@ namespace AzToolsFramework
                     Prefab::PrefabDom instanceDomAfter;
                     m_instanceToTemplateInterface->GenerateDomForInstance(instanceDomAfter, parentInstance);
 
-                    PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance detachment", AZStd::nullopt);
+                    PrefabUndoInstance* command = aznew PrefabUndoInstance("Instance detachment");
                     command->Capture(instanceDomBefore, instanceDomAfter, parentTemplateId);
                     command->SetParent(undoBatch.GetUndoBatch());
                     {
