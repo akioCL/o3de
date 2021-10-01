@@ -49,13 +49,14 @@ namespace AzToolsFramework
             void Capture(
                 const PrefabDom& initialState,
                 const PrefabDom& endState,
-                const TemplateId& templateId);
+                TemplateId templateId);
 
             void Undo() override;
             void Redo() override;
 
         private:
             InstanceOptionalConstReference m_instance;
+            void RedoBatched();
         };
 
         //! handles entity updates, such as when the values on an entity change
@@ -98,8 +99,8 @@ namespace AzToolsFramework
 
             //capture for add/remove
             void Capture(
-                const TemplateId& targetId,
-                const TemplateId& sourceId,
+                TemplateId targetId,
+                TemplateId sourceId,
                 const InstanceAlias& instanceAlias,
                 PrefabDom linkPatches = PrefabDom(),
                 const LinkId linkId = InvalidLinkId);
