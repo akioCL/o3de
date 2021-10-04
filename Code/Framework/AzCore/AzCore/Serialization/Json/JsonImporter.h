@@ -17,6 +17,8 @@
 
 namespace AZ
 {
+    class StackedString;
+
     class BaseJsonImporter
     {
     public:
@@ -24,14 +26,13 @@ namespace AZ
 
         virtual JsonSerializationResult::ResultCode Load(rapidjson::Value& importedValueOut, const rapidjson::Value& importDirective, rapidjson::Pointer pathToImportDirective, rapidjson::Document::AllocatorType& allocator);
         virtual JsonSerializationResult::ResultCode Store(rapidjson::Value& importDirectiveOut, const rapidjson::Value& importedValue, rapidjson::Pointer pathToImportDirective, rapidjson::Document::AllocatorType& allocator, AZStd::string& importFilename);
-        virtual void SetLoadedJsonPath(AZStd::string& loadedJsonPath);
+        virtual void SetLoadedJsonPath(const AZStd::string& loadedJsonPath);
 
         virtual ~BaseJsonImporter() = default;
 
     protected:
         IO::FixedMaxPath m_loadedJsonPath;
     };
-
 
     class JsonImportResolver final
     {

@@ -17,6 +17,8 @@ namespace AZ
 {
     struct Uuid;
 
+    class JsonDeserializerContext;
+
     class JsonDeserializer final
     {
         friend class JsonSerialization;

@@ -8,26 +8,34 @@
 
 #include <AzCore/Serialization/Json/JsonImporter.h>
 #include <AzCore/Serialization/Json/JsonUtils.h>
+#include <AzCore/Serialization/Json/StackedString.h>
+#include <AzCore/Serialization/Json/JsonSerializationResult.h>
 
 namespace AZ
 {
     bool JsonImportResolver::LoadImports(rapidjson::Value& jsonDoc, StackedString& element, rapidjson::Document::AllocatorType& allocator)
     {
+        bool result = true;
+
         if (jsonDoc.IsObject())
         {
             for (auto& field : jsonDoc.GetObject())
             {
-                if(strcmp(field.name.GetString(), "$import") == 0)
+                if (strcmp(field.name.GetString(), "$import") == 0)
                 {
                     rapidjson::Value importedValue;
                     rapidjson::Pointer path(element.Get().data(), element.Get().size());
-                    m_importerObj->Load(jsonDoc, field.value, path, allocator);
+                    JsonSerializationResult::ResultCode jsonResultCode = m_importerObj->Load(jsonDoc, field.value, path, allocator);
+                    if (jsonResultCode.GetOutcome() != JsonSerializationResult::Outcomes::Success)
+                    {
+                        result = false;
+                    }
                     m_importPaths.emplace_back(AZStd::make_pair(path, field.value.GetString()));
                 }
                 else if (field.value.IsObject() || field.value.IsArray())
                 {
                     ScopedStackedString entryName(element, AZStd::string_view(field.name.GetString(), field.name.GetStringLength()));
-                    LoadImports(field.value, element, allocator);
+                    result = LoadImports(field.value, element, allocator) && result;
                 }
             }
         }
@@ -42,14 +50,14 @@ namespace AZ
                 }
                 AZStd::string indexStr = AZStd::to_string(index);
                 ScopedStackedString entryName(element, AZStd::string_view(indexStr.c_str(), indexStr.size()));
-                LoadImports(*elem, element, allocator);
+                result = LoadImports(*elem, element, allocator) && result;
             }
         }
 
-        return true;
+        return result;
     }
 
-    bool JsonImportResolver::StoreImports(rapidjson::Value& jsonDoc, StackedString& element, rapidjson::Document::AllocatorType& allocator)
+    bool JsonImportResolver::StoreImports(rapidjson::Value& jsonDoc, StackedString& /*element*/, rapidjson::Document::AllocatorType& allocator)
     {
         if (jsonDoc.IsObject())
         {
@@ -76,8 +84,11 @@ namespace AZ
 
     JsonSerializationResult::ResultCode BaseJsonImporter::Load(rapidjson::Value& importedValueOut, const rapidjson::Value& importDirective, rapidjson::Pointer pathToImportDirective, rapidjson::Document::AllocatorType& allocator)
     {
-        JsonSerializationResult::ResultCode resultCode(JsonSerializationResult::Tasks::Import);
-        AZ::IO::FixedMaxPath filePath = m_loadedJsonPath.RemoveFilename();
+        namespace JSR = JsonSerializationResult;
+
+        JSR::ResultCode resultCode(JSR::Tasks::Import);
+        AZ::IO::FixedMaxPath filePath = m_loadedJsonPath;
+        filePath.RemoveFilename();
         rapidjson::Value patch;
         bool hasPatch = false;
         if (importDirective.IsObject())
@@ -108,6 +119,13 @@ namespace AZ
                 AZ::JsonSerialization::ApplyPatch(importedDoc, allocator, patch, JsonMergeApproach::JsonMergePatch);
             }
             importedValueOut.CopyFrom(importedDoc, allocator);
+            resultCode.Combine(JSR::ResultCode(JSR::Tasks::Import, JSR::Outcomes::Success));
+        }
+        else
+        {
+            // TODO: Use a JsonDeserializerContext to report this error
+            AZ_Error("JSON", false, "Could not read JSON file '%s'", filePath.Native().c_str());
+            resultCode.Combine(JSR::ResultCode(JSR::Tasks::Import, JSR::Outcomes::Catastrophic));
         }
 
         return resultCode;
@@ -135,8 +153,9 @@ namespace AZ
         return resultCode;
     }
 
-    void BaseJsonImporter::SetLoadedJsonPath(AZStd::string& loadedJsonPath)
+    void BaseJsonImporter::SetLoadedJsonPath(const AZStd::string& loadedJsonPath)
     {
         m_loadedJsonPath = loadedJsonPath;
     }
+
 } // namespace AZ
