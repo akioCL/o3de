@@ -19,6 +19,7 @@
 #include <AzCore/Serialization/Json/JsonUtils.h>
 #include <AzCore/Serialization/Json/BaseJsonSerializer.h>
 #include <AzCore/Serialization/Json/JsonSerializationResult.h>
+#include <AzCore/Serialization/Json/JsonImporter.h>
 
 #include <AzCore/std/string/string.h>
 
@@ -62,7 +63,7 @@ namespace AZ
                 return true;
             }
 
-            AZ::Outcome<MaterialTypeSourceData> LoadMaterialTypeSourceData(const AZStd::string& filePath, const rapidjson::Value* document)
+            AZ::Outcome<MaterialTypeSourceData> LoadMaterialTypeSourceData(const AZStd::string& filePath, rapidjson::Document* document)
             {
                 AZ::Outcome<rapidjson::Document, AZStd::string> loadOutcome;
                 if (document == nullptr)
@@ -75,6 +76,15 @@ namespace AZ
                     }
 
                     document = &loadOutcome.GetValue();
+                }
+
+                AZStd::string filePathCopy = filePath;
+                AZ::JsonImportResolver importResolver(filePathCopy);
+                AZ::StackedString pathLoad(AZ::StackedString::Format::JsonPointer);
+                if (!importResolver.LoadImports(document->GetObject(), pathLoad, document->GetAllocator()))
+                {
+                    AZ_Error("AZ::RPI::JsonUtils", false, "Could not load '%s' due to failed import.", filePath.c_str());
+                    return AZ::Failure();
                 }
 
                 MaterialTypeSourceData materialType;

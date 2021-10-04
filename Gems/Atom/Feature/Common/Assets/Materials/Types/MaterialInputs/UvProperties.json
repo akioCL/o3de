@@ -1,0 +1,67 @@
+{
+    "name": "uv",
+    "displayName": "UVs",
+    "description": "Properties for configuring UV transforms.",
+    "properties": [
+        {
+            "name": "center",
+            "displayName": "Center",
+            "description": "Center point for scaling and rotation transformations.",
+            "type": "vector2",
+            "vectorLabels": [ "U", "V" ],
+            "defaultValue": [ 0.5, 0.5 ]
+        },
+        {
+            "name": "tileU",
+            "displayName": "Tile U",
+            "description": "Scales texture coordinates in U.",
+            "type": "float",
+            "defaultValue": 1.0,
+            "step": 0.1
+        },
+        {
+            "name": "tileV",
+            "displayName": "Tile V",
+            "description": "Scales texture coordinates in V.",
+            "type": "float",
+            "defaultValue": 1.0,
+            "step": 0.1
+        },
+        {
+            "name": "offsetU",
+            "displayName": "Offset U",
+            "description": "Offsets texture coordinates in the U direction.",
+            "type": "float",
+            "defaultValue": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "offsetV",
+            "displayName": "Offset V",
+            "description": "Offsets texture coordinates in the V direction.",
+            "type": "float",
+            "defaultValue": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "rotateDegrees",
+            "displayName": "Rotate",
+            "description": "Rotates the texture coordinates (degrees).",
+            "type": "float",
+            "defaultValue": 0.0,
+            "min": -180.0,
+            "max": 180.0,
+            "step": 1.0
+        },
+        {
+            "name": "scale",
+            "displayName": "Scale",
+            "description": "Scales texture coordinates in both U and V.",
+            "type": "float",
+            "defaultValue": 1.0,
+            "step": 0.1
+        }
+    ]
+}

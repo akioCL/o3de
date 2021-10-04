@@ -40,8 +40,9 @@ namespace AZ
             //! Load material type from a json file. If the file path is relative, the loaded json document must be provided.
             //! Otherwise, it will use the passed in document first if not null, or load the json document from the path.
             //! @param filePath a relative path if document is provided, an absolute path if document is not provided.
-            //! @param document the loaded json document.
-            AZ::Outcome<MaterialTypeSourceData> LoadMaterialTypeSourceData(const AZStd::string& filePath, const rapidjson::Value* document = nullptr);
+            //! @param document the loaded json document. Note that this may be modified by the function if the document has $import directives,
+            //!                 replacing these with values imported from another JSON file.
+            AZ::Outcome<MaterialTypeSourceData> LoadMaterialTypeSourceData(const AZStd::string& filePath, rapidjson::Document* document = nullptr);
 
             //! Utility function for custom JSON serializers to report results as "Skipped" when encountering keys that aren't recognized
             //! as part of the custom format.
