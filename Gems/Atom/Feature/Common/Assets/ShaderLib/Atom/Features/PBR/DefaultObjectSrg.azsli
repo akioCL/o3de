@@ -30,7 +30,7 @@ ShaderResourceGroup ObjectSrg : SRG_PerObject
     //[GFX TODO][ATOM-15280] Move wrinkle mask data from the default object srg into something specific to the Skin shader
     uint m_wrinkle_mask_count;
     float4 m_wrinkle_mask_weights[4];
-    Texture2D m_wrinkle_masks[16];
+    //Texture2D m_wrinkle_masks[16];
 
     float GetWrinkleMaskWeight(uint index)
     {

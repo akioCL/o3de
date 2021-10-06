@@ -212,7 +212,7 @@ PbrLightingOutput SkinPS_Common(VSOutput IN)
     float4 wrinkleBlendFactors = float4(0.0, 0.0, 0.0, 0.0);
     for(uint wrinkleMaskIndex = 0; wrinkleMaskIndex < ObjectSrg::m_wrinkle_mask_count; ++wrinkleMaskIndex)
     {
-        wrinkleBlendFactors += ObjectSrg::m_wrinkle_masks[wrinkleMaskIndex].Sample(MaterialSrg::m_sampler, normalUv) * ObjectSrg::GetWrinkleMaskWeight(wrinkleMaskIndex);
+        //wrinkleBlendFactors += ObjectSrg::m_wrinkle_masks[wrinkleMaskIndex].Sample(MaterialSrg::m_sampler, normalUv) * ObjectSrg::GetWrinkleMaskWeight(wrinkleMaskIndex);
     }
 
     // If texture based morph target driven masks are being used, use those values instead of the per-vertex colors

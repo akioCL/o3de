@@ -8,7 +8,7 @@
         "RootPassTemplate": "MainPipeline",
         "RenderSettings": {
             "MultisampleState": {
-                "samples": 4
+                "samples": 1
             }
         }
     }
