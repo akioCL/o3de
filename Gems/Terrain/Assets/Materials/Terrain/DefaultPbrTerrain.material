@@ -5,21 +5,21 @@
     "propertyLayoutVersion": 1,
     "properties": {
         "macroColor": {
-            "useTexture": false,
+            "useTexture": true,
             "textureMap": "Assets/Terrain/QuadSpinner-Gaea/Canyon_s2k_single/macro_t8k_b16_basecolor.png"
         },
         "macroNormal": {
-            "useTexture": false,
+            "useTexture": true,
             "textureMap": "Assets/Terrain/QuadSpinner-Gaea/Canyon_s2k_single/macro_t8k_b16_normals.png"
         },
         "baseColor": {
-            "useTexture": false,
+            "useTexture": true,
 			"color": [0.6, 0.6, 0.6],
             "textureBlendMode": "Multiply",
             "textureMap": "Assets/Textures/TiledDirt4Desaturated.png"
         },
         "normal": {
-            "useTexture": false,
+            "useTexture": true,
             "textureMap": "Assets/Textures/TiledDirt3Normals.png"
         },
         "roughness": {
