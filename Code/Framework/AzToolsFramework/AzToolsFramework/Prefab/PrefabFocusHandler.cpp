@@ -90,7 +90,7 @@ namespace AzToolsFramework::Prefab
 
         InstanceOptionalReference instance = m_instanceEntityMapperInterface->FindOwningInstance(entityId);
 
-        return instance.has_value() && (&instance->get() == &m_focusedInstance->get());
+        return instance.has_value() && m_focusedInstance.has_value() && (&instance->get() == &m_focusedInstance->get());
     }
 
 } // namespace AzToolsFramework::Prefab
