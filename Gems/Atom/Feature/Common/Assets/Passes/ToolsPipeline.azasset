@@ -1,0 +1,15 @@
+{
+    "Type": "JsonSerialization",
+    "Version": 1,
+    "ClassName": "RenderPipelineDescriptor",
+    "ClassData": {
+        "Name": "ToolsPipeline",
+        "MainViewTag": "MainCamera",
+        "RootPassTemplate": "ToolsPipelineTemplate",
+        "RenderSettings": {
+            "MultisampleState": {
+                "samples": 4
+            }
+        }
+    }
+}

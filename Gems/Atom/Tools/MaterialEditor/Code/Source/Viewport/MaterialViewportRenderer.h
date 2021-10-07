@@ -82,7 +82,7 @@ namespace MaterialEditor
         using DirectionalLightHandle = AZ::Render::DirectionalLightFeatureProcessorInterface::LightHandle;
 
         AZ::Data::Instance<AZ::RPI::SwapChainPass> m_swapChainPass;
-        AZStd::string m_defaultPipelineAssetPath = "passes/MainRenderPipeline.azasset";
+        AZStd::string m_defaultPipelineAssetPath = "passes/ToolsPipeline.azasset";
         AZStd::shared_ptr<AZ::RPI::WindowContext> m_windowContext;
         AZ::RPI::RenderPipelinePtr m_renderPipeline;
         AZ::RPI::ScenePtr m_scene;

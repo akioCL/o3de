@@ -79,6 +79,9 @@ namespace MaterialEditor
         AZ_Assert(mainScene, "Main scenes missing during system component initialization");
         mainScene->SetSubsystem(m_scene);
 
+        // Register the scene with the RPI so that it's available to the passes
+        AZ::RPI::RPISystemInterface::Get()->RegisterScene(m_scene);
+
         // Create a render pipeline from the specified asset for the window context and add the pipeline to the scene
         AZ::Data::Asset<AZ::RPI::AnyAsset> pipelineAsset = AZ::RPI::AssetUtils::LoadAssetByProductPath<AZ::RPI::AnyAsset>(m_defaultPipelineAssetPath.c_str(), AZ::RPI::AssetUtils::TraceLevel::Error);
         m_renderPipeline = AZ::RPI::RenderPipeline::CreateRenderPipelineForWindow(pipelineAsset, *m_windowContext.get());
@@ -98,8 +101,6 @@ namespace MaterialEditor
         // Currently the scene has to be activated after render pipeline was added so some feature processors (i.e. imgui) can be initialized properly 
         // with pipeline's pass information. 
         m_scene->Activate();
-
-        AZ::RPI::RPISystemInterface::Get()->RegisterScene(m_scene);
 
         AzFramework::EntityContextId entityContextId;
         AzFramework::GameEntityContextRequestBus::BroadcastResult(entityContextId, &AzFramework::GameEntityContextRequestBus::Events::GetGameEntityContextId);

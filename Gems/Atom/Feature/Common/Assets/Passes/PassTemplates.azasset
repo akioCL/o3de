@@ -61,6 +61,10 @@
                 "Path": "Passes/MainPipelineRenderToTexture.pass"
             },
             {
+                "Name": "ToolsPipelineTemplate",
+                "Path": "Passes/ToolsPipeline.pass"
+            },
+            {
                 "Name": "CascadedShadowmapsTemplate",
                 "Path": "Passes/CascadedShadowmaps.pass"
             },
