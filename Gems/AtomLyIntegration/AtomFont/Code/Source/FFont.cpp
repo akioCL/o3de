@@ -17,6 +17,7 @@
 #include <AzCore/Math/Matrix4x4.h>
 #include <AzCore/Math/MatrixUtils.h>
 #include <AzCore/Casting/numeric_cast.h>
+#include <AzCore/std/smart_ptr/unique_ptr.h>
 
 #include <AzFramework/Viewport/ViewportScreen.h>
 #include <AzFramework/Viewport/ScreenGeometry.h>
@@ -398,8 +399,22 @@ Vec2 AZ::FFont::GetTextSizeUInternal(
     const size_t fxIdx = ctx.m_fxIdx < fxSize ? ctx.m_fxIdx : 0;
     const FontEffect& fx = m_effects[fxIdx];
 
-    AZStd::wstring strW;
-    AZStd::to_wstring(strW, str);
+    AZStd::unique_ptr<AZStd::wstring> strW; // use unique ptr so it autodeallocates
+    AZStd::fixed_wstring<128> strWFixed;
+    const wchar_t* pStr = nullptr;
+    size_t stringLen = strlen(str);
+    if (stringLen <= 128)
+    {
+        AZStd::to_wstring(strWFixed, str);
+        pStr = strWFixed.c_str();
+    }
+    else
+    {
+        strW = AZStd::make_unique<AZStd::wstring>(stringLen+2);
+        AZStd::to_wstring(strW.get(), str);
+        pStr = strW->c_str();
+    }
+
 
     for (size_t i = 0, numPasses = fx.m_passes.size(); i < numPasses; ++i)
     {
@@ -418,7 +433,7 @@ Vec2 AZ::FFont::GetTextSizeUInternal(
 
         // parse the string, ignoring control characters
         uint32_t nextCh = 0;
-        const wchar_t* pChar = strW.c_str();
+        const wchar_t* pChar = pStr;
         while (uint32_t ch = *pChar)
         {
             ++pChar;
@@ -548,8 +563,21 @@ uint32_t AZ::FFont::GetNumQuadsForText(const char* str, const bool asciiMultiLin
     const size_t fxIdx = ctx.m_fxIdx < fxSize ? ctx.m_fxIdx : 0;
     const FontEffect& fx = m_effects[fxIdx];
 
-    AZStd::wstring strW;
-    AZStd::to_wstring(strW, str);
+    AZStd::unique_ptr<AZStd::wstring> strW; // use unique ptr so it autodeallocates
+    AZStd::fixed_wstring<128> strWFixed;
+    const wchar_t* pWStr = nullptr;
+    size_t stringLen = strlen(str);
+    if (stringLen <= 128)
+    {
+        AZStd::to_wstring(strWFixed, str);
+        pWStr = strWFixed.c_str();
+    }
+    else
+    {
+        strW = AZStd::make_unique<AZStd::wstring>(stringLen+2);
+        AZStd::to_wstring(strW.get(), str);
+        pWStr = strW->c_str();
+    }
 
     for (size_t j = 0, numPasses = fx.m_passes.size(); j < numPasses; ++j)
     {
@@ -562,7 +590,7 @@ uint32_t AZ::FFont::GetNumQuadsForText(const char* str, const bool asciiMultiLin
         }
 
         uint32_t nextCh = 0;
-        const wchar_t* pChar = strW.c_str();
+        const wchar_t* pChar = pWStr;
         while (uint32_t ch = *pChar)
         {
             ++pChar;
@@ -857,12 +885,24 @@ int AZ::FFont::CreateQuadsForText(const RHI::Viewport& viewport, float x, float 
             }
         }
 
-        AZStd::wstring strW;
-        AZStd::to_wstring(strW, str);
+        AZStd::unique_ptr<AZStd::wstring> strW; // use unique ptr so it autodeallocates
+        AZStd::fixed_wstring<128> strWFixed;
+        const wchar_t* pChar = nullptr;
+        size_t stringLen = strlen(str);
+        if (stringLen <= 128)
+        (
+            AZStd::to_wstring(strWFixed, str);
+            pChar =  strWFixed.c_str();
+        )
+        else
+        {
+            strW = AZStd::make_unique<AZStd::wstring>(stringLen+2);
+            AZStd::to_wstring(strW.get(), str);
+            pChar = strW->c_str();
+        }
 
         // parse the string, ignoring control characters
         uint32_t nextCh = 0;
-        const wchar_t* pChar = strW.c_str();
         while (uint32_t ch = *pChar)
         {
             ++pChar;
@@ -1195,9 +1235,22 @@ void AZ::FFont::WrapText(AZStd::string& result, float maxWidth, const char* str,
     float widthSum = 0.0f;
 
     int curChar = 0;
-    AZStd::wstring resultW;
-    AZStd::to_wstring(resultW, result.c_str());
-    const wchar_t* pChar = resultW.c_str();
+    AZStd::unique_ptr<AZStd::wstring> strW; // use unique ptr so it autodeallocates
+    AZStd::fixed_wstring<128> strWFixed;
+    const wchar_t* pChar = nullptr, *pStartingChar;
+    size_t stringLen = strlen(str);
+    if (stringLen <= 128)
+    {
+        AZStd::to_wstring(strWFixed, str);
+        pChar =  strWFixed.c_str();
+    }
+    else
+    {
+        strW = AZStd::make_unique<AZStd::wstring>(stringLen+2);
+        AZStd::to_wstring(strW.get(), str);
+        pChar = strW->c_str();
+    }
+
     while (uint32_t ch = *pChar)
     {
         // Dollar sign escape codes.  The following scenarios can happen with dollar signs embedded in a string.
