@@ -134,8 +134,6 @@ namespace Terrain
             m_terrainFeatureProcessor = scene->EnableFeatureProcessor<Terrain::TerrainFeatureProcessor>();
         }
         m_terrainRendererActive = true;
-
-        OnTerrainDataChanged(AZ::Aabb::CreateNull(), TerrainDataChangedMask::HeightData);
     }
 
     void TerrainWorldRendererComponent::Deactivate()
