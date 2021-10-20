@@ -466,11 +466,6 @@ namespace
 
                 categoryPath = details.Category;
 
-                if (categoryPath == "UI")
-                {
-                    __debugbreak();
-                }
-
                 if (categoryPath.empty())
                 {
                     categoryPath = GetCategoryPath(behaviorClass->m_attributes, behaviorContext);
