@@ -942,6 +942,7 @@ namespace ScriptCanvasDeveloperEditor
                 {
                     continue;
                 }
+            }
 
                 TranslationFormat translationRoot;
 
