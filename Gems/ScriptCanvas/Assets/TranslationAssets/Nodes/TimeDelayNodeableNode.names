@@ -1,0 +1,44 @@
+{
+    "entries": [
+        {
+            "key": "{D3629902-02E9-AE59-0424-F366D342B433}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "TimeDelay",
+                "category": "Nodeables",
+                "tooltip": "Delays all incoming execution for the specified number of ticks"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "Start"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Delay"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On Start"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "Done",
+                        "tooltip": "Signaled after waiting for the specified amount of times."
+                    }
+                }
+            ]
+        }
+    ]
+}

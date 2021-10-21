@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{B81632B7-AE9E-50D1-9F19-00F92F77B580}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "ToLower",
+                "category": "String",
+                "tooltip": "Makes all the characters in the string lower case"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "String: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Result: String"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

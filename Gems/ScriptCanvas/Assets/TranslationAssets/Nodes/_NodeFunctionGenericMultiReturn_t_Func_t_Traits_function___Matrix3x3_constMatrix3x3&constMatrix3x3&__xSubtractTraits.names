@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{36F01867-D157-5540-ADB8-3E71F96D2187}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Subtract",
+                "category": "k_categoryName /Deprecated",
+                "tooltip": "This node is deprecated, use Subtract (-), it provides contextual type and slots"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Matrix3x3",
+                        "details": {
+                            "name": "Matrix3x3: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Matrix3x3",
+                        "details": {
+                            "name": "Matrix3x3: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Matrix3x3",
+                        "details": {
+                            "name": "Result: Matrix3x3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{DFDC391C-782D-58D9-BF81-C7B13A0F4CFC}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromValues",
+                "category": "Math/Vector4",
+                "tooltip": "returns a vector from elements"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: X"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Y"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Z"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_4",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: W"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Result: Vector4"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

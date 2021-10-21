@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{8F7532AC-DABD-5EE6-8D84-A063032A82D4}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "RandomPointInBox",
+                "category": "Math/Random",
+                "tooltip": "returns a random point in a box"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Dimensions"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Result: Vector3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

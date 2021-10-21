@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{C1B42FEC-0545-4511-9FAC-11E0387FEDF0}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Add (+)",
+                "category": "Math",
+                "tooltip": "Adds two or more values"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Result"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

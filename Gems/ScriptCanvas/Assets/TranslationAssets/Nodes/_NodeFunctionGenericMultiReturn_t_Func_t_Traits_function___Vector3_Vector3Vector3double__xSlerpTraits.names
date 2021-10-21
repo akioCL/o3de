@@ -1,0 +1,64 @@
+{
+    "entries": [
+        {
+            "key": "{55EA4F53-2789-54B2-9CC7-4DB62B2CB270}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Slerp",
+                "category": "Math/Vector3",
+                "tooltip": "returns a vector that is the spherical linear interpolation T, between From and To"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: From"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: To"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: T"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Result: Vector3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

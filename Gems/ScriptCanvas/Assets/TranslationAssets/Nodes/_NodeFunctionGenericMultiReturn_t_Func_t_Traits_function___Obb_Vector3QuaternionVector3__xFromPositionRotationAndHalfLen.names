@@ -1,0 +1,64 @@
+{
+    "entries": [
+        {
+            "key": "{6F7A0335-C2D2-53A3-BF18-B3735DBFF8AA}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromPositionRotationAndHalfLengths",
+                "category": "Math/OBB",
+                "tooltip": "returns an OBB from the position, rotation and half lengths"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Position"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Quaternion: Rotation"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: HalfLengths"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "OBB",
+                        "details": {
+                            "name": "Result: OBB"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

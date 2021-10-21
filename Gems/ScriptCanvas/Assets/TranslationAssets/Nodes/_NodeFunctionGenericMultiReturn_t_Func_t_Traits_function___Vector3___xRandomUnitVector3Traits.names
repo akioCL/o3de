@@ -1,0 +1,37 @@
+{
+    "entries": [
+        {
+            "key": "{D0A2F62C-EB98-51CC-A482-80F9623CE128}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "RandomUnitVector3",
+                "category": "Math/Random",
+                "tooltip": "returns a random Vector3 direction"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Result: Vector3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

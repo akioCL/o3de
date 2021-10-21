@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{68B65AD0-B42F-5C85-B194-4FC6C31AD237}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "GetDiagonal",
+                "category": "Math/Matrix3x3",
+                "tooltip": "returns vector of matrix diagonal values"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Matrix3x3",
+                        "details": {
+                            "name": "Matrix3x3: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Result: Vector3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

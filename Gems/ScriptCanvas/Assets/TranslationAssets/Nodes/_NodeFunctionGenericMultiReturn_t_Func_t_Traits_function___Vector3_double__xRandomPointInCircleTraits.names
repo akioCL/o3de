@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{90F4E470-10AB-5D78-9B20-100132F0BEA9}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "RandomPointInCircle",
+                "category": "Math/Random",
+                "tooltip": "returns a random point inside the area of a circle"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Radius"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Result: Vector3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

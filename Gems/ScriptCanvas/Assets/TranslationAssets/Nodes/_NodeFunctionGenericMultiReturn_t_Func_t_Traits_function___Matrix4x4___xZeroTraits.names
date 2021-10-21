@@ -1,0 +1,37 @@
+{
+    "entries": [
+        {
+            "key": "{9BCEE0D6-B0A0-5944-AC25-7A8111798704}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Zero",
+                "category": "Math/Matrix4x4",
+                "tooltip": "returns the zero matrix"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Matrix4x4",
+                        "details": {
+                            "name": "Result: Matrix4x4"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

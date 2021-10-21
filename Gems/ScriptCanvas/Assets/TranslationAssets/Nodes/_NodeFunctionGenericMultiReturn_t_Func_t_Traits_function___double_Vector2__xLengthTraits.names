@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{AD0A51F8-F87B-504E-84F0-8C60927D3798}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Length",
+                "category": "Math/Vector2",
+                "tooltip": "returns the magnitude of source"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Vector2: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Result: Number"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "entries": [
+        {
+            "key": "{6C52B2D1-3526-4855-A217-5106D54F6B90}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Add",
+                "category": "Math/Number/Deprecated",
+                "tooltip": "Add"
+            }
+        }
+    ]
+}

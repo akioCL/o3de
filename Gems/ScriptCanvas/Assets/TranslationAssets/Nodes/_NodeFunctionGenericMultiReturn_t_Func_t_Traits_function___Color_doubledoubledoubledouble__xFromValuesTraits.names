@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{84F9B63C-F6F5-58AD-8669-C25287CDC037}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromValues",
+                "category": "Math/Color",
+                "tooltip": "returns a Color from the R, G, B, A inputs"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: R"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: G"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_4",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Color",
+                        "details": {
+                            "name": "Result: Color"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

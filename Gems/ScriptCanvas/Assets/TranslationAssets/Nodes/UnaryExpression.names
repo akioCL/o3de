@@ -1,0 +1,54 @@
+{
+    "entries": [
+        {
+            "key": "{70FF2162-3D01-41F1-B009-7DC071A38471}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "UnaryExpression",
+                "tooltip": "UnaryExpression"
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Result"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Signal to perform the evaluation when desired."
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "True",
+                        "tooltip": "Signaled if the result of the operation is true."
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "False",
+                        "tooltip": "Signaled if the result of the operation is false."
+                    }
+                }
+            ]
+        }
+    ]
+}

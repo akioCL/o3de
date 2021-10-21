@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{1373DA97-B94D-5DBB-9F0C-175CAE46851A}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "RotationZDegrees",
+                "category": "Math/Quaternion",
+                "tooltip": "creates a rotation of Degrees around the z-axis"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Degrees"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Result: Quaternion"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{6DE350DE-4FB9-5D7C-816A-48A3371613F3}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "GetEntityRight",
+                "category": "Entity/Entity",
+                "tooltip": "returns the right direction vector from the specified entity's world transform, scaled by a given value (O3DE uses Z up, right handed)"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "EntityID",
+                        "details": {
+                            "name": "EntityID: EntityId"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Scale"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Result: Vector3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

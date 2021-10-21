@@ -1,0 +1,13 @@
+{
+    "entries": [
+        {
+            "key": "{02A3A3E6-9D80-432B-8AF5-F3AF24CF6959}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Equal To (==)",
+                "tooltip": "Checks if Value A and Value B are equal to each other"
+            }
+        }
+    ]
+}

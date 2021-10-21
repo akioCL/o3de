@@ -1,0 +1,28 @@
+{
+    "entries": [
+        {
+            "key": "{9F0A9171-A7E0-4973-5658-F7470E5DD51F}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "PropertyExample",
+                "category": "Tests",
+                "tooltip": "Example of using properties."
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On In"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{D8A27091-3685-5A4B-9C40-0F430531FFF1}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Subtract",
+                "category": "k_categoryName /Deprecated",
+                "tooltip": "This node is deprecated, use Subtract (-), it provides contextual type and slots"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Quaternion: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Quaternion: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Result: Quaternion"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

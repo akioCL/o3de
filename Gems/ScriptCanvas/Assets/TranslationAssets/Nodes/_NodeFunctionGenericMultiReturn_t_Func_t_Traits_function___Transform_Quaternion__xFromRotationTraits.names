@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{B5BCF19E-2EF2-584E-B4B6-0FC7E9FEE99B}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromRotation",
+                "category": "Math/Transform",
+                "tooltip": "returns a transform from the rotation and with the translation set to zero"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Quaternion: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Result: Transform"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

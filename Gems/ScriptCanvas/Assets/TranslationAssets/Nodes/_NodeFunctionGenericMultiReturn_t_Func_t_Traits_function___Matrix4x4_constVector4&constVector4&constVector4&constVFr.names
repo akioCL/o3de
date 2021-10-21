@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{B17F2D7F-22DF-512D-BF2A-98890D337661}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromColumns",
+                "category": "Math/Matrix4x4",
+                "tooltip": "returns a rotation matrix based on angle around Z axis"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Column1"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Column2"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Column3"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_4",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Column4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Matrix4x4",
+                        "details": {
+                            "name": "Result: Matrix4x4"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

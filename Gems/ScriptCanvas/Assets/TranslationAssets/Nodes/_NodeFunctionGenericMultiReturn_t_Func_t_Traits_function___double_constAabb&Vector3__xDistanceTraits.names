@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{6D65A9E0-733D-5277-B7CA-983E1468A40A}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Distance",
+                "category": "Math/AABB",
+                "tooltip": "returns the shortest distance from Point to Source, or zero of Point is contained in Source"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Point"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Result: Number"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

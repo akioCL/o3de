@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{2F3E079E-23F9-5BC4-9B1A-DD2FAFBF921F}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromTransform",
+                "category": "Math/Quaternion",
+                "tooltip": "returns a rotation created from the rotation part of the transform source"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Transform: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Result: Quaternion"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

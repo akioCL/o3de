@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{65B35991-D740-5DE6-815D-4FF5A24F08FD}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "MultiplyByTransform",
+                "category": "k_categoryName /Deprecated",
+                "tooltip": "This node is deprecated, use Multiply (*), it provides contextual type and slots"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Transform: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Transform: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Result: Transform"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

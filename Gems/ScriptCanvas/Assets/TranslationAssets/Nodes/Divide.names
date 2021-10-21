@@ -1,0 +1,14 @@
+{
+    "entries": [
+        {
+            "key": "{7379D5B4-787B-4C46-9394-288F16E5BF3A}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Divide",
+                "category": "Math/Number/Deprecated",
+                "tooltip": "Divide"
+            }
+        }
+    ]
+}

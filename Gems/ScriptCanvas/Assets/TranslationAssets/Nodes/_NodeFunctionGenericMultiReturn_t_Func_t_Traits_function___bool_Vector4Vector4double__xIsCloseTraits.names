@@ -1,0 +1,64 @@
+{
+    "entries": [
+        {
+            "key": "{DD9F50A6-AC60-59E1-8C63-C6C392DA8C15}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "IsClose",
+                "category": "Math/Vector4",
+                "tooltip": "returns true if the difference between A and B is less than tolerance, else false"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Tolerance"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Result: Boolean"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

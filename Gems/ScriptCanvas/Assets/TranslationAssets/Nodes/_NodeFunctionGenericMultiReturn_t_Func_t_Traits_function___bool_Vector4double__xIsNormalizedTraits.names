@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{B2EE1FD3-D33D-5348-AC29-E2D08C1E3363}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "IsNormalized",
+                "category": "Math/Vector4",
+                "tooltip": "returns true if the length of the source is within tolerance of 1.0, else false"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Tolerance"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Result: Boolean"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

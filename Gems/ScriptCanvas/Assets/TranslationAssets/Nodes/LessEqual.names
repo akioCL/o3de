@@ -1,0 +1,13 @@
+{
+    "entries": [
+        {
+            "key": "{73F6E302-A2E9-4BE6-A88F-98F81A24100D}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Less Than or Equal To (<=)",
+                "tooltip": "Checks if Value A is less than or equal to Value B"
+            }
+        }
+    ]
+}

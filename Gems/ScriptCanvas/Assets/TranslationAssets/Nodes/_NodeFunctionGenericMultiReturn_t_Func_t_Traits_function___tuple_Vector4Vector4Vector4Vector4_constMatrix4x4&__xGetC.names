@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{A2A41479-B90B-5615-A72E-AAB3A6D0332E}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "GetColumns",
+                "category": "Math/Matrix4x4",
+                "tooltip": "returns all columns from matrix"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Matrix4x4",
+                        "details": {
+                            "name": "Matrix4x4: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Column1: Vector4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_2",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Column2: Vector4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_3",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Column3: Vector4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_4",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Column4: Vector4"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

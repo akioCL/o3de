@@ -1,0 +1,97 @@
+{
+    "entries": [
+        {
+            "key": "{32B1B2DB-59E6-88D7-14A3-9C5366A39A81}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "InputMethodSharedDataSlotExample",
+                "category": "Tests",
+                "tooltip": "Input Method Shared Data"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "Append Hello"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "str"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On Append Hello"
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Output"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "Concatenate Two"
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "a"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_4",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "b"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "On Concatenate Two"
+                    }
+                },
+                {
+                    "key": "Input_5",
+                    "details": {
+                        "name": "Concatenate Three"
+                    }
+                },
+                {
+                    "key": "DataInput_6",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "c"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_3",
+                    "details": {
+                        "name": "On Concatenate Three"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+{
+    "entries": [
+        {
+            "key": "{121E5B89-5A8A-4477-A3B7-078B0F1B36FD}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Join",
+                "category": "String",
+                "tooltip": "."
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Array<String>",
+                        "details": {
+                            "name": "String Array"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Separator"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "String"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Input signal"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "Out"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{BAA9A44B-EC0E-536B-B64A-EA652596F40A}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Angle",
+                "category": "Math/Vector2",
+                "tooltip": "returns a unit length vector from an angle in radians"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Angle"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Result: Vector2"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

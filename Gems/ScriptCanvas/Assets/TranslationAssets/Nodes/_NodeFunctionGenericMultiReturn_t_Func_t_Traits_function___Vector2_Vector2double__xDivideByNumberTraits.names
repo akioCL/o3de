@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{9E25C5A1-D548-5E2A-B8AB-62FD44709A81}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "DivideByNumber",
+                "category": "k_categoryName /Deprecated",
+                "tooltip": "returns the source with each element divided by Divisor"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Vector2: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: Divisor"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Result: Vector2"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

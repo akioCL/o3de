@@ -1,0 +1,79 @@
+{
+    "entries": [
+        {
+            "key": "{FAEADF5A-F7D9-415A-A3E8-F534BD379B9A}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Delay",
+                "tooltip": "Counts down time from a specified value."
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Time"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Loop"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Hold"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Elapsed"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_3",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "When signaled, execution is delayed at this node according to the specified properties."
+                    }
+                },
+                {
+                    "key": "Input_4",
+                    "details": {
+                        "name": "Cancel",
+                        "tooltip": "Cancels the delay."
+                    }
+                },
+                {
+                    "key": "Input_5",
+                    "details": {
+                        "name": "Reset",
+                        "tooltip": "Resets the delay."
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "Out",
+                        "tooltip": "Signaled when the delay reaches zero."
+                    }
+                }
+            ]
+        }
+    ]
+}

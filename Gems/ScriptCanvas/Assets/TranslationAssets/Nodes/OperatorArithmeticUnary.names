@@ -1,0 +1,54 @@
+{
+    "entries": [
+        {
+            "key": "{4B68DF49-35DE-48CF-BCE3-F892CCF2639D}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "OperatorArithmeticUnary",
+                "category": "Operators/Math"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Result"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

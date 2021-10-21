@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{D0C69C1C-1653-54A4-8A5A-1ECB3500D9C1}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "ToDeterminant",
+                "category": "Math/Matrix3x3",
+                "tooltip": "returns determinant of Matrix"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Matrix3x3",
+                        "details": {
+                            "name": "Matrix3x3: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Determinant: Number"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

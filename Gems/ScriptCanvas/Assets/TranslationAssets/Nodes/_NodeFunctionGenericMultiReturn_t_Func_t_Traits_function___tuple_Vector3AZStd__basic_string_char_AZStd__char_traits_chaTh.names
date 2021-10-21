@@ -1,0 +1,82 @@
+{
+    "entries": [
+        {
+            "key": "{9E334D28-CBB3-53AF-AFA1-8223F50312CE}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "ThreeGeneric",
+                "category": "Math",
+                "tooltip": "returns all columns from matrix"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: One"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "String: Two"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Boolean: Three"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "One: Vector3"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_2",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Two: String"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_3",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Three: Boolean"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

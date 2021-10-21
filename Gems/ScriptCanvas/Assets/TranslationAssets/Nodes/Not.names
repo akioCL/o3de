@@ -1,0 +1,54 @@
+{
+    "entries": [
+        {
+            "key": "{EF6BA813-9AF9-45CF-A8A4-7F800D7B7CB0}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Not",
+                "tooltip": "An execution flow gate that continues True if the Boolean is False, otherwise continues False if the Boolean is True"
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Result"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Signal to perform the evaluation when desired."
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "True",
+                        "tooltip": "Signaled if the result of the operation is true."
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "False",
+                        "tooltip": "Signaled if the result of the operation is false."
+                    }
+                }
+            ]
+        }
+    ]
+}

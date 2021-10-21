@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{BFF80CFD-5A54-5ADA-83FF-3849FD4E675D}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "IsFinite",
+                "category": "Math/Transform",
+                "tooltip": "returns true if every row of source is finite, else false"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Transform: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Result: Boolean"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

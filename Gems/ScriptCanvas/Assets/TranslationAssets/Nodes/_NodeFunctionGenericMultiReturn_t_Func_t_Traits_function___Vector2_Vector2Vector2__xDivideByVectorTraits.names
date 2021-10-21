@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{BF611396-3B1B-5C30-B478-608E2AFE1690}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "DivideByVector",
+                "category": "k_categoryName /Deprecated",
+                "tooltip": "This node is deprecated, use Divide (/), it provides contextual type and slots"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Vector2: Numerator"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Vector2: Divisor"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector2",
+                        "details": {
+                            "name": "Result: Vector2"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

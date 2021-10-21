@@ -1,0 +1,102 @@
+{
+    "entries": [
+        {
+            "key": "{58AF538D-021A-4D0C-A3F1-866C2FFF382E}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Lerp Between",
+                "category": "Math",
+                "tooltip": "Performs a lerp between the two specified sources using the speed specified or in the amount of time specified, or the minimum of the two"
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Maximum Duration"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Percent"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "Cancel"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "Tick",
+                        "tooltip": "Signalled at each step of the lerp"
+                    }
+                },
+                {
+                    "key": "Output_3",
+                    "details": {
+                        "name": "Lerp Complete",
+                        "tooltip": "Output signal"
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Value",
+                        "details": {
+                            "name": "Start"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_4",
+                    "data": {
+                        "typeId": "Value",
+                        "details": {
+                            "name": "Stop"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_5",
+                    "data": {
+                        "typeId": "Value",
+                        "details": {
+                            "name": "Speed"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_4",
+                    "data": {
+                        "typeId": "Value",
+                        "details": {
+                            "name": "Step"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

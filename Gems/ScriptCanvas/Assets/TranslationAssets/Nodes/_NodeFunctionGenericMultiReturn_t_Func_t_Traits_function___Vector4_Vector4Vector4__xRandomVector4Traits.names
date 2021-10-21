@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{1C8987BF-7EA0-58CF-A4CC-2A998C9ADA68}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "RandomVector4",
+                "category": "Math/Random",
+                "tooltip": "returns a random Vector4"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Min"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Max"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Result: Vector4"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,79 @@
+{
+    "entries": [
+        {
+            "key": "{42CC5090-BE28-E017-8704-FD732475CECD}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "InputTypeExample",
+                "category": "Tests",
+                "tooltip": "Example of passing as input by value, pointer and reference."
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "Clear By Value"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Value Input"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On Clear By Value"
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "Clear By Pointer"
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Pointer Input"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "On Clear By Pointer"
+                    }
+                },
+                {
+                    "key": "Input_4",
+                    "details": {
+                        "name": "Clear By Reference"
+                    }
+                },
+                {
+                    "key": "DataInput_5",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Reference Input"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "On Clear By Reference"
+                    }
+                }
+            ]
+        }
+    ]
+}

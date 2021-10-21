@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{9F5030EF-15D1-5AEC-988E-8BE2D9C6DD64}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "GetPlaneEquationCoefficients",
+                "category": "Math/Plane",
+                "tooltip": "returns Source's coefficient's (A, B, C, D) in the equation Ax + By + Cz + D = 0"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Plane",
+                        "details": {
+                            "name": "Plane: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "A: Number"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "B: Number"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_3",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "C: Number"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_4",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "D: Number"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

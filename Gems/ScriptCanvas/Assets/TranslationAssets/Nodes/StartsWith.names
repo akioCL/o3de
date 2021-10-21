@@ -1,0 +1,62 @@
+{
+    "entries": [
+        {
+            "key": "{60EB479A-CF31-4734-B2E5-422828A54A46}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Starts With",
+                "category": "String",
+                "tooltip": "."
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Pattern"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Case Sensitive"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_3",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Input signal"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "True"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "False"
+                    }
+                }
+            ]
+        }
+    ]
+}

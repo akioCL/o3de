@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{1D87EFAE-3FC2-5D8A-931D-7D56DB4E3123}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromQuaternion",
+                "category": "Math/Matrix3x3",
+                "tooltip": "returns a rotation matrix using the supplied quaternion"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Quaternion",
+                        "details": {
+                            "name": "Quaternion: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Matrix3x3",
+                        "details": {
+                            "name": "Result: Matrix3x3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

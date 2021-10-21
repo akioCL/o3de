@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{91E89FD2-F929-5491-BD2A-4B83D2455AAB}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Dot3",
+                "category": "Math/Color",
+                "tooltip": "returns the 3-element dot product of A and B, using only the R, G, B elements"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Color",
+                        "details": {
+                            "name": "Color: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Color",
+                        "details": {
+                            "name": "Color: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Result: Number"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

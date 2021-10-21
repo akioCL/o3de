@@ -1,0 +1,60 @@
+{
+    "entries": [
+        {
+            "key": "{670FCD62-BAA8-4812-9CF2-C3F2EC5F54F5}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Is Empty",
+                "category": "Containers",
+                "tooltip": "Returns whether the container is empty"
+            },
+            "slots": [
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Is Empty"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "True",
+                        "tooltip": "The container is empty"
+                    }
+                },
+                {
+                    "key": "Output_3",
+                    "details": {
+                        "name": "False",
+                        "tooltip": "The container is not empty"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Container",
+                        "details": {
+                            "name": "Source"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

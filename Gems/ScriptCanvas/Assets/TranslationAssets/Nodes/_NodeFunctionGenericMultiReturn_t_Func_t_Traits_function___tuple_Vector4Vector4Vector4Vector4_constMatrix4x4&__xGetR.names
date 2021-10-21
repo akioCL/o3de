@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{3A69C35B-287E-5F0F-A372-713B77B0CBC6}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "GetRows",
+                "category": "Math/Matrix4x4",
+                "tooltip": "returns all rows from matrix"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Matrix4x4",
+                        "details": {
+                            "name": "Matrix4x4: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Row1: Vector4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_2",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Row2: Vector4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_3",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Row3: Vector4"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_4",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Row4: Vector4"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

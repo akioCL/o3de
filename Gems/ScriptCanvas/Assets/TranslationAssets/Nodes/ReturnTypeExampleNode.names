@@ -1,0 +1,79 @@
+{
+    "entries": [
+        {
+            "key": "{97C6661E-069C-877B-4FBC-AD14CCCBB43D}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "ReturnTypeExample",
+                "category": "Tests",
+                "tooltip": "Example of returning by value, pointer and reference."
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "Return By Value"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On Return By Value"
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Value"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "Return By Pointer"
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "On Return By Pointer"
+                    }
+                },
+                {
+                    "key": "DataOutput_3",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Pointer"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "Return By Reference"
+                    }
+                },
+                {
+                    "key": "Output_4",
+                    "details": {
+                        "name": "On Return By Reference"
+                    }
+                },
+                {
+                    "key": "DataOutput_5",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Reference"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

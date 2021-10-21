@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{8B033820-B205-560A-A735-8BBED0B02DDD}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromMinMax",
+                "category": "Math/AABB",
+                "tooltip": "returns the AABB from Min and Max if Min <= Max, else returns FromPoint(max)"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Min"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Max"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "Result: AABB"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

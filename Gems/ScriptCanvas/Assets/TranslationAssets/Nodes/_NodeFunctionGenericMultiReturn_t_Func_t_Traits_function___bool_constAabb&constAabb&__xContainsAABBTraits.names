@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{A0A7B5F1-F191-52A8-838A-DB39AADBA457}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "ContainsAABB",
+                "category": "Math/AABB",
+                "tooltip": "returns true if Source contains all of the bounds of Candidate, else false"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: Candidate"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Result: Boolean"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

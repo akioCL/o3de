@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{52D4803F-6273-4A4E-96CC-F2892CFE433B}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Expect Less Than Equal",
+                "tooltip": "Expects lhs to be greater than rhs"
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Report"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Input signal"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Candidate"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Any",
+                        "details": {
+                            "name": "Reference"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{2FEFADF8-0D3F-5796-BB6B-C7B8758A5751}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "AddPoint",
+                "category": "Math/AABB",
+                "tooltip": "returns the AABB that is the (min(min(Source), Point), max(max(Source), Point))"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Point"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "Result: AABB"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

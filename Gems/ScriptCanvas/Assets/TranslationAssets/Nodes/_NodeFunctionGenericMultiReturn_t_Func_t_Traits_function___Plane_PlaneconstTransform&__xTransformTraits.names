@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{43FB92F5-CBC4-553E-982B-714EA2226D42}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Transform",
+                "category": "Math/Plane",
+                "tooltip": "returns Source transformed by Transform"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Plane",
+                        "details": {
+                            "name": "Plane: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Transform",
+                        "details": {
+                            "name": "Transform: Transform"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Plane",
+                        "details": {
+                            "name": "Result: Plane"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

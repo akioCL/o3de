@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{8B74AC3B-2089-5D55-BD66-3F57B3212D57}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Expand",
+                "category": "Math/AABB",
+                "tooltip": "returns the Source expanded in each axis by the absolute value of each axis in Delta"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Delta"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "Result: AABB"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

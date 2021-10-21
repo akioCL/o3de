@@ -1,0 +1,13 @@
+{
+    "entries": [
+        {
+            "key": "{B13F8DE1-E017-484D-9910-BABFB355D72E}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "ArithmeticExpression",
+                "tooltip": "ArithmeticExpression"
+            }
+        }
+    ]
+}

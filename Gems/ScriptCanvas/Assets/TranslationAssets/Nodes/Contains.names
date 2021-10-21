@@ -1,0 +1,82 @@
+{
+    "entries": [
+        {
+            "key": "{8481E892-DE37-4CCF-86AA-E4770DE90643}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Contains String",
+                "category": "String",
+                "tooltip": "Checks if a string contains an instance of a specified string, if true, it returns the index to the first instance matched."
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Pattern"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Search From End"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Case Sensitive"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_0",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Index"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_4",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Input signal"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "True",
+                        "tooltip": "The string contains the provided pattern."
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "False",
+                        "tooltip": "The string did not contain the provided pattern."
+                    }
+                }
+            ]
+        }
+    ]
+}

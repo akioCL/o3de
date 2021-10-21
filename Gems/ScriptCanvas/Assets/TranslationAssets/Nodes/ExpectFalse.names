@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{3838E12C-CEAB-4CED-9958-B6C0399FCD92}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Expect False",
+                "tooltip": "Expects a value to be false"
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Boolean",
+                        "details": {
+                            "name": "Candidate"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Report"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Input signal"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                }
+            ]
+        }
+    ]
+}

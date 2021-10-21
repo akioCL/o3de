@@ -1,0 +1,26 @@
+{
+    "entries" : [
+        {
+            "key": "Globals",
+            "details": {
+                "name": "Globals"
+            },
+            "methods": [
+                {
+                    "key": "EBusSenderBusId",
+                    "details": {
+                        "name": "Source",
+                        "tooltip": "Identifies the sender of the event"
+                    }
+                },
+                {
+                    "key": "EBusHandlerBusId",
+                    "details": {
+                        "name": "Source",
+                        "tooltip": "Will handle the event sent to this identifier"
+                    }  
+                }
+            ]
+        }
+    ]
+}

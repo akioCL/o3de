@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{26DDC284-BD01-471E-BA8F-36C3A1ADA169}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Clear All Elements",
+                "category": "Containers",
+                "tooltip": "Eliminates all the elements in the container"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Container",
+                        "details": {
+                            "name": "Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Container",
+                        "details": {
+                            "name": "Container"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

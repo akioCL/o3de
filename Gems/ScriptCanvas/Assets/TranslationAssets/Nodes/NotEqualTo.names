@@ -1,0 +1,13 @@
+{
+    "entries": [
+        {
+            "key": "{C8D7A10F-A919-4467-96B1-F1852C282628}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Not Equal To (!=)",
+                "tooltip": "Checks if Value A is not equal to Value B"
+            }
+        }
+    ]
+}

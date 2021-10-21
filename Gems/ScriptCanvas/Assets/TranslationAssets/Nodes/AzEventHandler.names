@@ -1,0 +1,50 @@
+{
+    "entries": [
+        {
+            "key": "{38B808C5-152C-4643-A08C-463EBED55E19}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "AZ Event Handler",
+                "tooltip": "Handler for an AZ::Event returned from a BehaviorContent method."
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "Connect",
+                        "tooltip": "Connect the AZ Event to this AZ Event Handler."
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "Disconnect",
+                        "tooltip": "Disconnect current AZ Event from this AZ Event Handler."
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On Connected",
+                        "tooltip": "Signaled when a connection has taken place."
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "On Disconnected",
+                        "tooltip": "Signaled when this event handler is disconnected."
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "OnEvent",
+                        "tooltip": "Triggered when the AZ Event invokes Signal() function."
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{E578074B-7D9E-5339-A2CC-1A23B32E27B5}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromPoint",
+                "category": "Math/AABB",
+                "tooltip": "returns the AABB with min and max set to Source"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector3",
+                        "details": {
+                            "name": "Vector3: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "Result: AABB"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

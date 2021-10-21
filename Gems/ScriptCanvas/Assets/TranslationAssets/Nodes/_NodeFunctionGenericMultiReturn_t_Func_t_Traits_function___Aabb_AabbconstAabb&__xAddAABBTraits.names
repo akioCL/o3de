@@ -1,0 +1,55 @@
+{
+    "entries": [
+        {
+            "key": "{0C1257A0-DB57-5E29-9CA4-595B3AE8BA87}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "AddAABB",
+                "category": "Math/AABB",
+                "tooltip": "returns the AABB that is the (min(min(A), min(B)), max(max(A), max(B)))"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "AABB: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "AABB",
+                        "details": {
+                            "name": "Result: AABB"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

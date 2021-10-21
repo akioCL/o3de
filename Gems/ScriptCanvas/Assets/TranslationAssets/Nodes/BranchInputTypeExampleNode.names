@@ -1,0 +1,82 @@
+{
+    "entries": [
+        {
+            "key": "{FDD3D684-2C9A-0C05-D2A3-FD67685D8F26}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "BranchInputTypeExample",
+                "category": "Tests",
+                "tooltip": "Example of branch passing as input by value, pointer and reference."
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "Get Internal Vector"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "On Get Internal Vector"
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Result"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_1",
+                    "details": {
+                        "name": "Branches On Input Type"
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "String",
+                        "details": {
+                            "name": "Input Type"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "By Value"
+                    }
+                },
+                {
+                    "key": "DataOutput_3",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Value Input"
+                        }
+                    }
+                },
+                {
+                    "key": "Output_4",
+                    "details": {
+                        "name": "By Pointer"
+                    }
+                },
+                {
+                    "key": "DataOutput_5",
+                    "data": {
+                        "typeId": "Array<Number>",
+                        "details": {
+                            "name": "Pointer Input"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

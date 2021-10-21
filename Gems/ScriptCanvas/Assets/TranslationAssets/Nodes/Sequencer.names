@@ -1,0 +1,103 @@
+{
+    "entries": [
+        {
+            "key": "{CB98B828-BF86-4623-BF73-396A68FA386A}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "Sequencer",
+                "tooltip": "Trigger one of the outputs in sequential order for each input activation."
+            },
+            "slots": [
+                {
+                    "key": "DataInput_0",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Index"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Order"
+                        }
+                    }
+                },
+                {
+                    "key": "Input_2",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Input signal"
+                    }
+                },
+                {
+                    "key": "Input_3",
+                    "details": {
+                        "name": "Next",
+                        "tooltip": "When next is activated, it enables the next output"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out0",
+                        "tooltip": "Output 0"
+                    }
+                },
+                {
+                    "key": "Output_1",
+                    "details": {
+                        "name": "Out1",
+                        "tooltip": "Output 1"
+                    }
+                },
+                {
+                    "key": "Output_2",
+                    "details": {
+                        "name": "Out2",
+                        "tooltip": "Output 2"
+                    }
+                },
+                {
+                    "key": "Output_3",
+                    "details": {
+                        "name": "Out3",
+                        "tooltip": "Output 3"
+                    }
+                },
+                {
+                    "key": "Output_4",
+                    "details": {
+                        "name": "Out4",
+                        "tooltip": "Output 4"
+                    }
+                },
+                {
+                    "key": "Output_5",
+                    "details": {
+                        "name": "Out5",
+                        "tooltip": "Output 5"
+                    }
+                },
+                {
+                    "key": "Output_6",
+                    "details": {
+                        "name": "Out6",
+                        "tooltip": "Output 6"
+                    }
+                },
+                {
+                    "key": "Output_7",
+                    "details": {
+                        "name": "Out7",
+                        "tooltip": "Output 7"
+                    }
+                }
+            ]
+        }
+    ]
+}

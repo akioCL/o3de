@@ -1,0 +1,46 @@
+{
+    "entries": [
+        {
+            "key": "{4DFB1966-BDE3-55C3-A0B4-0D04926AB732}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "LengthSquared",
+                "category": "Math/Vector4",
+                "tooltip": "returns the magnitude squared of the source, generally faster than getting the exact length"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Vector4",
+                        "details": {
+                            "name": "Vector4: Source"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Result: Number"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

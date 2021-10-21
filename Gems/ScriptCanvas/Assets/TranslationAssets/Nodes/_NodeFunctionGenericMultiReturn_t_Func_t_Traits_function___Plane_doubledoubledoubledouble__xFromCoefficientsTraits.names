@@ -1,0 +1,73 @@
+{
+    "entries": [
+        {
+            "key": "{C281152D-1617-52B6-BB82-8146F881CCA5}",
+            "context": "ScriptCanvas::Node",
+            "variant": "",
+            "details": {
+                "name": "FromCoefficients",
+                "category": "Math/Plane",
+                "tooltip": "returns the plane that satisfies the equation Ax + By + Cz + D = 0"
+            },
+            "slots": [
+                {
+                    "key": "Input_0",
+                    "details": {
+                        "name": "In"
+                    }
+                },
+                {
+                    "key": "Output_0",
+                    "details": {
+                        "name": "Out"
+                    }
+                },
+                {
+                    "key": "DataInput_1",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: A"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_2",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: B"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_3",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: C"
+                        }
+                    }
+                },
+                {
+                    "key": "DataInput_4",
+                    "data": {
+                        "typeId": "Number",
+                        "details": {
+                            "name": "Number: D"
+                        }
+                    }
+                },
+                {
+                    "key": "DataOutput_1",
+                    "data": {
+                        "typeId": "Plane",
+                        "details": {
+                            "name": "Result: Plane"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
