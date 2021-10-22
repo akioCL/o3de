@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "DeferredFogRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "DEFERREDFOGREQUESTSBUS_NAME",
-                "category": "DEFERREDFOGREQUESTSBUS_CATEGORY"
+                "name": "DeferredFogRequestsBus"
             },
             "methods": [
                 {

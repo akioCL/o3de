@@ -10,29 +10,26 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Condition"
-                        }
+                    "key": "DataInput_Condition",
+                    "details": {
+                        "name": "Condition"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signalled if the condition is false, or if the loop calls the break node"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Loop",
                     "details": {
                         "name": "Loop",
                         "tooltip": "Signalled if the condition is true, and every time the last node of 'Loop' finishes"

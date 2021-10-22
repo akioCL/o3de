@@ -11,51 +11,39 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "String: Source"
-                        }
+                    "key": "DataInput_String: Source",
+                    "details": {
+                        "name": "String: Source"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: From"
-                        }
+                    "key": "DataInput_Number: From",
+                    "details": {
+                        "name": "Number: From"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Length"
-                        }
+                    "key": "DataInput_Number: Length",
+                    "details": {
+                        "name": "Number: Length"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Result: String"
-                        }
+                    "key": "DataOutput_Result: String",
+                    "details": {
+                        "name": "Result: String"
                     }
                 }
             ]

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "AtomToolsMainWindowRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "ATOMTOOLSMAINWINDOWREQUESTBUS_NAME",
-                "category": "ATOMTOOLSMAINWINDOWREQUESTBUS_CATEGORY"
+                "name": "AtomToolsMainWindowRequestBus"
             },
             "methods": [
                 {

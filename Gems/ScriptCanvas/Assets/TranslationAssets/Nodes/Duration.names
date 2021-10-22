@@ -10,39 +10,33 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Duration"
-                        }
+                    "key": "DataInput_Duration",
+                    "details": {
+                        "name": "Duration"
                     }
                 },
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Elapsed"
-                        }
+                    "key": "DataOutput_Elapsed",
+                    "details": {
+                        "name": "Elapsed"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Start",
                     "details": {
                         "name": "Start",
                         "tooltip": "Starts the countdown"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled every frame while the duration is active."
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_Done",
                     "details": {
                         "name": "Done",
                         "tooltip": "Signaled once the duration is complete."

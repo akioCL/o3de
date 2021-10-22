@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "SsaoRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SSAOREQUESTBUS_NAME",
-                "category": "SSAOREQUESTBUS_CATEGORY"
+                "name": "SsaoRequestBus"
             },
             "methods": [
                 {

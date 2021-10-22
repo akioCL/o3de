@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiTextBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Text",
+                "name": "UiTextBus",
                 "category": "UI"
             },
             "methods": [

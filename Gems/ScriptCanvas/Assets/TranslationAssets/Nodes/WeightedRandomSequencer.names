@@ -11,7 +11,19 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "DataInput_Weight 1",
+                    "details": {
+                        "name": "Weight 1"
+                    }
+                },
+                {
+                    "key": "Output_Out 1",
+                    "details": {
+                        "name": "Out 1"
+                    }
+                },
+                {
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"

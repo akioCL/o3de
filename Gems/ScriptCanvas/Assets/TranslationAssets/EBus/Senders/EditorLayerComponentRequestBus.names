@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorLayerComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORLAYERCOMPONENTREQUESTBUS_NAME",
-                "category": "EDITORLAYERCOMPONENTREQUESTBUS_CATEGORY"
+                "name": "EditorLayerComponentRequestBus"
             },
             "methods": [
                 {

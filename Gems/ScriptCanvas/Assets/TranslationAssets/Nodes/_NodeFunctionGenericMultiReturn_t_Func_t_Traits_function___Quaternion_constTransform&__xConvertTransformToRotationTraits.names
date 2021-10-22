@@ -10,33 +10,27 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Transform",
-                        "details": {
-                            "name": "Transform: Transform"
-                        }
+                    "key": "DataInput_Transform: Transform",
+                    "details": {
+                        "name": "Transform: Transform"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Quaternion",
-                        "details": {
-                            "name": "Result: Quaternion"
-                        }
+                    "key": "DataOutput_Result: Quaternion",
+                    "details": {
+                        "name": "Result: Quaternion"
                     }
                 }
             ]

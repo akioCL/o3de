@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiInteractableBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Interactable",
+                "name": "UiInteractableBus",
                 "category": "UI"
             },
             "methods": [

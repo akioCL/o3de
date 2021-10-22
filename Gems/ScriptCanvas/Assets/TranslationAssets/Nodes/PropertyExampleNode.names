@@ -11,13 +11,13 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On In",
                     "details": {
                         "name": "On In"
                     }

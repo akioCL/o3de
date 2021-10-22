@@ -11,26 +11,23 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "When signaled assigns property values using the supplied source input"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled after all property haves have been pushed to the output slots"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Value",
-                        "details": {
-                            "name": "Source"
-                        }
+                    "key": "DataInput_Source",
+                    "details": {
+                        "name": "Source"
                     }
                 }
             ]

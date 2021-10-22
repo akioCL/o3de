@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "DecalRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "DECALREQUESTBUS_NAME",
-                "category": "DECALREQUESTBUS_CATEGORY"
+                "name": "DecalRequestBus"
             },
             "methods": [
                 {

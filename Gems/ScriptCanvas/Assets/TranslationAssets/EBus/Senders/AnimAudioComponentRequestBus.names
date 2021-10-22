@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "AnimAudioComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "ANIMAUDIOCOMPONENTREQUESTBUS_NAME",
-                "category": "ANIMAUDIOCOMPONENTREQUESTBUS_CATEGORY"
+                "name": "AnimAudioComponentRequestBus"
             },
             "methods": [
                 {

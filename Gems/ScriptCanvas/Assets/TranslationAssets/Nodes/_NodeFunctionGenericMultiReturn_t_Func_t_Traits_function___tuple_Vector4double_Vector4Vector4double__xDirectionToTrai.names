@@ -11,60 +11,45 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Vector4: From"
-                        }
+                    "key": "DataInput_Vector4: From",
+                    "details": {
+                        "name": "Vector4: From"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Vector4: To"
-                        }
+                    "key": "DataInput_Vector4: To",
+                    "details": {
+                        "name": "Vector4: To"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Scale"
-                        }
+                    "key": "DataInput_Number: Scale",
+                    "details": {
+                        "name": "Number: Scale"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Result: Vector4"
-                        }
+                    "key": "DataOutput_Result: Vector4",
+                    "details": {
+                        "name": "Result: Vector4"
                     }
                 },
                 {
-                    "key": "DataOutput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Result: Number"
-                        }
+                    "key": "DataOutput_Result: Number",
+                    "details": {
+                        "name": "Result: Number"
                     }
                 }
             ]

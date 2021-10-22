@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "SurfaceSlopeGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SURFACESLOPEGRADIENTREQUESTBUS_NAME",
-                "category": "SURFACESLOPEGRADIENTREQUESTBUS_CATEGORY"
+                "name": "SurfaceSlopeGradientRequestBus"
             },
             "methods": [
                 {

@@ -10,39 +10,33 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Event Name"
-                        }
+                    "key": "DataInput_Event Name",
+                    "details": {
+                        "name": "Event Name"
                     }
                 },
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Value"
-                        }
+                    "key": "DataOutput_Value",
+                    "details": {
+                        "name": "Value"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Pressed",
                     "details": {
                         "name": "Pressed",
                         "tooltip": "Signaled when the input event begins."
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_Held",
                     "details": {
                         "name": "Held",
                         "tooltip": "Signaled while the input event is active."
                     }
                 },
                 {
-                    "key": "Output_3",
+                    "key": "Output_Released",
                     "details": {
                         "name": "Released",
                         "tooltip": "Signaled when the input event ends."

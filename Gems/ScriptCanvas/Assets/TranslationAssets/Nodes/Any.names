@@ -10,7 +10,13 @@
             },
             "slots": [
                 {
-                    "key": "Output_0",
+                    "key": "Input_Input 0",
+                    "details": {
+                        "name": "Input 0"
+                    }
+                },
+                {
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled when the node receives a signal from the selected index"

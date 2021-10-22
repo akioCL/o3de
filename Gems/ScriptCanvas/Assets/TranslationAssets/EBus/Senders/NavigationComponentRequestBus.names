@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "NavigationComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Navigation",
+                "name": "NavigationComponentRequestBus",
                 "category": "AI"
             },
             "methods": [

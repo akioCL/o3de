@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "RandomGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "RANDOMGRADIENTREQUESTBUS_NAME",
-                "category": "RANDOMGRADIENTREQUESTBUS_CATEGORY"
+                "name": "RandomGradientRequestBus"
             },
             "methods": [
                 {

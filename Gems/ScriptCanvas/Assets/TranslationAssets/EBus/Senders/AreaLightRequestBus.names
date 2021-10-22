@@ -2,35 +2,12 @@
     "entries": [
         {
             "key": "AreaLightRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "AREALIGHTREQUESTBUS_NAME",
-                "category": "AREALIGHTREQUESTBUS_CATEGORY"
+                "name": "AreaLightRequestBus"
             },
             "methods": [
-                {
-                    "key": "GetPcfMethod",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetPcfMethod"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetPcfMethod is invoked"
-                    },
-                    "details": {
-                        "name": "GetPcfMethod"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{ECA0B403-C4F8-4B86-95FC-81688D046E40}",
-                            "details": {
-                                "name": "unsigned short"
-                            }
-                        }
-                    ]
-                },
                 {
                     "key": "SetFilteringSampleCount",
                     "entry": {
@@ -76,28 +53,6 @@
                     ]
                 },
                 {
-                    "key": "SetPcfMethod",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetPcfMethod"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetPcfMethod is invoked"
-                    },
-                    "details": {
-                        "name": "SetPcfMethod"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{ECA0B403-C4F8-4B86-95FC-81688D046E40}",
-                            "details": {
-                                "name": "unsigned short"
-                            }
-                        }
-                    ]
-                },
-                {
                     "key": "SetEsmExponent",
                     "entry": {
                         "name": "In",
@@ -115,50 +70,6 @@
                             "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
                             "details": {
                                 "name": "float"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetEnableShadow",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetEnableShadow"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetEnableShadow is invoked"
-                    },
-                    "details": {
-                        "name": "GetEnableShadow"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
-                            "details": {
-                                "name": "bool"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetFilteringSampleCount",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetFilteringSampleCount"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetFilteringSampleCount is invoked"
-                    },
-                    "details": {
-                        "name": "GetFilteringSampleCount"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
-                            "details": {
-                                "name": "unsigned int"
                             }
                         }
                     ]
@@ -203,6 +114,28 @@
                             "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
                             "details": {
                                 "name": "float"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "key": "SetColor",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke SetColor"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after SetColor is invoked"
+                    },
+                    "details": {
+                        "name": "SetColor"
+                    },
+                    "params": [
+                        {
+                            "typeid": "{7894072A-9050-4F0F-901B-34B1A0D29417}",
+                            "details": {
+                                "name": "Color"
                             }
                         }
                     ]
@@ -362,6 +295,50 @@
                     ]
                 },
                 {
+                    "key": "GetFilteringSampleCount",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke GetFilteringSampleCount"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after GetFilteringSampleCount is invoked"
+                    },
+                    "details": {
+                        "name": "GetFilteringSampleCount"
+                    },
+                    "results": [
+                        {
+                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
+                            "details": {
+                                "name": "unsigned int"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "key": "GetEnableShadow",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke GetEnableShadow"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after GetEnableShadow is invoked"
+                    },
+                    "details": {
+                        "name": "GetEnableShadow"
+                    },
+                    "results": [
+                        {
+                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
+                            "details": {
+                                "name": "bool"
+                            }
+                        }
+                    ]
+                },
+                {
                     "key": "GetShadowFilterMethod",
                     "entry": {
                         "name": "In",
@@ -401,28 +378,6 @@
                             "typeid": "{3AB0037F-AF8D-48CE-BCA0-A170D18B2C03}",
                             "details": {
                                 "name": "char"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "SetPredictionSampleCount",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetPredictionSampleCount"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetPredictionSampleCount is invoked"
-                    },
-                    "details": {
-                        "name": "SetPredictionSampleCount"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
-                            "details": {
-                                "name": "unsigned int"
                             }
                         }
                     ]
@@ -511,72 +466,6 @@
                             "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
                             "details": {
                                 "name": "bool"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "SetSofteningBoundaryWidthAngle",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetSofteningBoundaryWidthAngle"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetSofteningBoundaryWidthAngle is invoked"
-                    },
-                    "details": {
-                        "name": "SetSofteningBoundaryWidthAngle"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
-                            "details": {
-                                "name": "float"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetSofteningBoundaryWidthAngle",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetSofteningBoundaryWidthAngle"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetSofteningBoundaryWidthAngle is invoked"
-                    },
-                    "details": {
-                        "name": "GetSofteningBoundaryWidthAngle"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
-                            "details": {
-                                "name": "float"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "SetColor",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetColor"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetColor is invoked"
-                    },
-                    "details": {
-                        "name": "SetColor"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{7894072A-9050-4F0F-901B-34B1A0D29417}",
-                            "details": {
-                                "name": "Color"
                             }
                         }
                     ]
@@ -687,28 +576,6 @@
                             "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
                             "details": {
                                 "name": "float"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetPredictionSampleCount",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetPredictionSampleCount"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetPredictionSampleCount is invoked"
-                    },
-                    "details": {
-                        "name": "GetPredictionSampleCount"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
-                            "details": {
-                                "name": "unsigned int"
                             }
                         }
                     ]

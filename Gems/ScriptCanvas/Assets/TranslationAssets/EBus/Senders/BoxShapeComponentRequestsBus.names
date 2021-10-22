@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "BoxShapeComponentRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Box Shape",
+                "name": "BoxShapeComponentRequestsBus",
                 "category": "Shape"
             },
             "methods": [

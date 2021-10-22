@@ -11,33 +11,27 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: Scale"
-                        }
+                    "key": "DataInput_Vector3: Scale",
+                    "details": {
+                        "name": "Vector3: Scale"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Matrix4x4",
-                        "details": {
-                            "name": "Result: Matrix4x4"
-                        }
+                    "key": "DataOutput_Result: Matrix4x4",
+                    "details": {
+                        "name": "Result: Matrix4x4"
                     }
                 }
             ]

@@ -10,51 +10,39 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Multiplicand"
-                        }
+                    "key": "DataInput_Number: Multiplicand",
+                    "details": {
+                        "name": "Number: Multiplicand"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Multiplier"
-                        }
+                    "key": "DataInput_Number: Multiplier",
+                    "details": {
+                        "name": "Number: Multiplier"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Addend"
-                        }
+                    "key": "DataInput_Number: Addend",
+                    "details": {
+                        "name": "Number: Addend"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Result: Number"
-                        }
+                    "key": "DataOutput_Result: Number",
+                    "details": {
+                        "name": "Result: Number"
                     }
                 }
             ]

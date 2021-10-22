@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "BloomRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "BLOOMREQUESTBUS_NAME",
-                "category": "BLOOMREQUESTBUS_CATEGORY"
+                "name": "BloomRequestBus"
             },
             "methods": [
                 {

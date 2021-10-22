@@ -7,7 +7,36 @@
             "details": {
                 "name": "BooleanExpression",
                 "tooltip": "BooleanExpression"
-            }
+            },
+            "slots": [
+                {
+                    "key": "DataOutput_Result",
+                    "details": {
+                        "name": "Result"
+                    }
+                },
+                {
+                    "key": "Input_In",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Signal to perform the evaluation when desired."
+                    }
+                },
+                {
+                    "key": "Output_True",
+                    "details": {
+                        "name": "True",
+                        "tooltip": "Signaled if the result of the operation is true."
+                    }
+                },
+                {
+                    "key": "Output_False",
+                    "details": {
+                        "name": "False",
+                        "tooltip": "Signaled if the result of the operation is false."
+                    }
+                }
+            ]
         }
     ]
 }

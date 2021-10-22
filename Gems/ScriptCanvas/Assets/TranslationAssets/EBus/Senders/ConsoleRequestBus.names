@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "ConsoleRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Console",
+                "name": "ConsoleRequestBus",
                 "category": "Utilities"
             },
             "methods": [

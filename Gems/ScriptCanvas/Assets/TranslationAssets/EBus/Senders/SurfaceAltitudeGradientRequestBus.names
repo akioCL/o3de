@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "SurfaceAltitudeGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SURFACEALTITUDEGRADIENTREQUESTBUS_NAME",
-                "category": "SURFACEALTITUDEGRADIENTREQUESTBUS_CATEGORY"
+                "name": "SurfaceAltitudeGradientRequestBus"
             },
             "methods": [
                 {

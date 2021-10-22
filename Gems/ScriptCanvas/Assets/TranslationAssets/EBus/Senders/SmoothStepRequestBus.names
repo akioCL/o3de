@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "SmoothStepRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SMOOTHSTEPREQUESTBUS_NAME",
-                "category": "SMOOTHSTEPREQUESTBUS_CATEGORY"
+                "name": "SmoothStepRequestBus"
             },
             "methods": [
                 {

@@ -11,42 +11,33 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: From"
-                        }
+                    "key": "DataInput_Vector3: From",
+                    "details": {
+                        "name": "Vector3: From"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: To"
-                        }
+                    "key": "DataInput_Vector3: To",
+                    "details": {
+                        "name": "Vector3: To"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Quaternion",
-                        "details": {
-                            "name": "Result: Quaternion"
-                        }
+                    "key": "DataOutput_Result: Quaternion",
+                    "details": {
+                        "name": "Result: Quaternion"
                     }
                 }
             ]

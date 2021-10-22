@@ -10,35 +10,35 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Connect",
                     "details": {
                         "name": "Connect",
                         "tooltip": "Connect the AZ Event to this AZ Event Handler."
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Disconnect",
                     "details": {
                         "name": "Disconnect",
                         "tooltip": "Disconnect current AZ Event from this AZ Event Handler."
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Connected",
                     "details": {
                         "name": "On Connected",
                         "tooltip": "Signaled when a connection has taken place."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_On Disconnected",
                     "details": {
                         "name": "On Disconnected",
                         "tooltip": "Signaled when this event handler is disconnected."
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_OnEvent",
                     "details": {
                         "name": "OnEvent",
                         "tooltip": "Triggered when the AZ Event invokes Signal() function."

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiSpawnerBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Spawner",
+                "name": "UiSpawnerBus",
                 "category": "UI"
             },
             "methods": [

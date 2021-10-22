@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "ActorComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Actor",
+                "name": "ActorComponentRequestBus",
                 "category": "Animation"
             },
             "methods": [
@@ -44,6 +44,28 @@
                     "details": {
                         "name": "Detach From Entity"
                     }
+                },
+                {
+                    "key": "GetRenderActorVisible",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke GetRenderActorVisible"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after GetRenderActorVisible is invoked"
+                    },
+                    "details": {
+                        "name": "GetRenderActorVisible"
+                    },
+                    "results": [
+                        {
+                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
+                            "details": {
+                                "name": "bool"
+                            }
+                        }
+                    ]
                 },
                 {
                     "key": "AttachToEntity",

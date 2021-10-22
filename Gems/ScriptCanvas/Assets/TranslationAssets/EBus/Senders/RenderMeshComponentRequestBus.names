@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "RenderMeshComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "RENDERMESHCOMPONENTREQUESTBUS_NAME",
-                "category": "RENDERMESHCOMPONENTREQUESTBUS_CATEGORY"
+                "name": "RenderMeshComponentRequestBus"
             },
             "methods": [
                 {

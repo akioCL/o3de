@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ConstantGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "CONSTANTGRADIENTREQUESTBUS_NAME",
-                "category": "CONSTANTGRADIENTREQUESTBUS_CATEGORY"
+                "name": "ConstantGradientRequestBus"
             },
             "methods": [
                 {

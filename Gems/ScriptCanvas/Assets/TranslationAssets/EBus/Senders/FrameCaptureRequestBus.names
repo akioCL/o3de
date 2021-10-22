@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "FrameCaptureRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "FRAMECAPTUREREQUESTBUS_NAME",
-                "category": "FRAMECAPTUREREQUESTBUS_CATEGORY"
+                "name": "FrameCaptureRequestBus"
             },
             "methods": [
                 {

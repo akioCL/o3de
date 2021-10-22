@@ -10,39 +10,33 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Value"
-                        }
+                    "key": "DataInput_Value",
+                    "details": {
+                        "name": "Value"
                     }
                 },
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Result"
-                        }
+                    "key": "DataOutput_Result",
+                    "details": {
+                        "name": "Result"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Signal to perform the evaluation when desired."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_True",
                     "details": {
                         "name": "True",
                         "tooltip": "Signaled if the result of the operation is true."
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_False",
                     "details": {
                         "name": "False",
                         "tooltip": "Signaled if the result of the operation is false."

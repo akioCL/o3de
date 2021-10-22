@@ -2,25 +2,24 @@
     "entries": [
         {
             "key": "ProfilingCaptureRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "PROFILINGCAPTUREREQUESTBUS_NAME",
-                "category": "PROFILINGCAPTUREREQUESTBUS_CATEGORY"
+                "name": "ProfilingCaptureRequestBus"
             },
             "methods": [
                 {
-                    "key": "CaptureCpuProfilingStatistics",
+                    "key": "CapturePassTimestamp",
                     "entry": {
                         "name": "In",
-                        "tooltip": "When signaled, this will invoke CaptureCpuProfilingStatistics"
+                        "tooltip": "When signaled, this will invoke CapturePassTimestamp"
                     },
                     "exit": {
                         "name": "Out",
-                        "tooltip": "Signaled after CaptureCpuProfilingStatistics is invoked"
+                        "tooltip": "Signaled after CapturePassTimestamp is invoked"
                     },
                     "details": {
-                        "name": "CaptureCpuProfilingStatistics"
+                        "name": "CapturePassTimestamp"
                     },
                     "params": [
                         {
@@ -51,36 +50,6 @@
                     },
                     "details": {
                         "name": "CaptureCpuFrameTime"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{03AAAB3F-5C47-5A66-9EBC-D5FA4DB353C9}",
-                            "details": {
-                                "name": "AZStd::string"
-                            }
-                        }
-                    ],
-                    "results": [
-                        {
-                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
-                            "details": {
-                                "name": "bool"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "CapturePassTimestamp",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke CapturePassTimestamp"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after CapturePassTimestamp is invoked"
-                    },
-                    "details": {
-                        "name": "CapturePassTimestamp"
                     },
                     "params": [
                         {

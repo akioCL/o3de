@@ -11,33 +11,27 @@
             },
             "slots": [
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Length"
-                        }
+                    "key": "DataOutput_Length",
+                    "details": {
+                        "name": "Length"
                     }
                 },
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Value",
-                        "details": {
-                            "name": "Source"
-                        }
+                    "key": "DataInput_Source",
+                    "details": {
+                        "name": "Source"
                     }
                 }
             ]

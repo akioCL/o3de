@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ViewportRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "VIEWPORTREQUESTBUS_NAME",
-                "category": "VIEWPORTREQUESTBUS_CATEGORY"
+                "name": "ViewportRequestBus"
             },
             "methods": [
                 {

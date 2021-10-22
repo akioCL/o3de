@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "NonUniformScaleRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Non-uniform Scale",
+                "name": "NonUniformScaleRequestBus",
                 "category": "Entity"
             },
             "methods": [

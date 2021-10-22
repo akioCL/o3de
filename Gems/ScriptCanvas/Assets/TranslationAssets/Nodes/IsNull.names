@@ -10,21 +10,33 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "DataInput_Reference",
+                    "details": {
+                        "name": "Reference"
+                    }
+                },
+                {
+                    "key": "DataOutput_Is Null",
+                    "details": {
+                        "name": "Is Null"
+                    }
+                },
+                {
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_True",
                     "details": {
                         "name": "True",
                         "tooltip": "Signaled if the reference provided is null."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_False",
                     "details": {
                         "name": "False",
                         "tooltip": "Signaled if the reference provided is not null."

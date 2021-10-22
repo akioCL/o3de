@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "MixedGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "MIXEDGRADIENTREQUESTBUS_NAME",
-                "category": "MIXEDGRADIENTREQUESTBUS_CATEGORY"
+                "name": "MixedGradientRequestBus"
             },
             "methods": [
                 {

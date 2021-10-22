@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "WindRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Wind",
+                "name": "WindRequestsBus",
                 "category": "PhysX"
             },
             "methods": [

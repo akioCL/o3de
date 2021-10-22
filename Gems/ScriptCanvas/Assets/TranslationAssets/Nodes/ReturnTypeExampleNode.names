@@ -11,66 +11,57 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Return By Value",
                     "details": {
                         "name": "Return By Value"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Return By Value",
                     "details": {
                         "name": "On Return By Value"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Array<Number>",
-                        "details": {
-                            "name": "Value"
-                        }
+                    "key": "DataOutput_Value",
+                    "details": {
+                        "name": "Value"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Return By Pointer",
                     "details": {
                         "name": "Return By Pointer"
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_On Return By Pointer",
                     "details": {
                         "name": "On Return By Pointer"
                     }
                 },
                 {
-                    "key": "DataOutput_3",
-                    "data": {
-                        "typeId": "Array<Number>",
-                        "details": {
-                            "name": "Pointer"
-                        }
+                    "key": "DataOutput_Pointer",
+                    "details": {
+                        "name": "Pointer"
                     }
                 },
                 {
-                    "key": "Input_2",
+                    "key": "Input_Return By Reference",
                     "details": {
                         "name": "Return By Reference"
                     }
                 },
                 {
-                    "key": "Output_4",
+                    "key": "Output_On Return By Reference",
                     "details": {
                         "name": "On Return By Reference"
                     }
                 },
                 {
-                    "key": "DataOutput_5",
-                    "data": {
-                        "typeId": "Array<Number>",
-                        "details": {
-                            "name": "Reference"
-                        }
+                    "key": "DataOutput_Reference",
+                    "details": {
+                        "name": "Reference"
                     }
                 }
             ]

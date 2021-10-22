@@ -11,78 +11,57 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: Origin"
-                        }
+                    "key": "DataInput_Vector3: Origin",
+                    "details": {
+                        "name": "Vector3: Origin"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: Direction"
-                        }
+                    "key": "DataInput_Vector3: Direction",
+                    "details": {
+                        "name": "Vector3: Direction"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: Normal"
-                        }
+                    "key": "DataInput_Vector3: Normal",
+                    "details": {
+                        "name": "Vector3: Normal"
                     }
                 },
                 {
-                    "key": "DataInput_4",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Radius"
-                        }
+                    "key": "DataInput_Number: Radius",
+                    "details": {
+                        "name": "Number: Radius"
                     }
                 },
                 {
-                    "key": "DataInput_5",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Height"
-                        }
+                    "key": "DataInput_Number: Height",
+                    "details": {
+                        "name": "Number: Height"
                     }
                 },
                 {
-                    "key": "DataInput_6",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Angle"
-                        }
+                    "key": "DataInput_Number: Angle",
+                    "details": {
+                        "name": "Number: Angle"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Result: Vector3"
-                        }
+                    "key": "DataOutput_Result: Vector3",
+                    "details": {
+                        "name": "Result: Vector3"
                     }
                 }
             ]

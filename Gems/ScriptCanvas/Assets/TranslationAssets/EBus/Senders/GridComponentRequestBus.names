@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "GridComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "GRIDCOMPONENTREQUESTBUS_NAME",
-                "category": "GRIDCOMPONENTREQUESTBUS_CATEGORY"
+                "name": "GridComponentRequestBus"
             },
             "methods": [
                 {

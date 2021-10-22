@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "TagComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Tag",
+                "name": "TagComponentRequestBus",
                 "category": "Gameplay"
             },
             "methods": [

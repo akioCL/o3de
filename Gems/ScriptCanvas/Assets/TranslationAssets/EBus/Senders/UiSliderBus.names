@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiSliderBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Slider",
+                "name": "UiSliderBus",
                 "category": "UI"
             },
             "methods": [

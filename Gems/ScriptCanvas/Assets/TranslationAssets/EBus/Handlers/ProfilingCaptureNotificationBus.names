@@ -69,26 +69,6 @@
                     ]
                 },
                 {
-                    "key": "OnCaptureCpuProfilingStatisticsFinished",
-                    "details": {
-                        "name": "OnCaptureCpuProfilingStatisticsFinished"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
-                            "details": {
-                                "name": "bool"
-                            }
-                        },
-                        {
-                            "typeid": "{03AAAB3F-5C47-5A66-9EBC-D5FA4DB353C9}",
-                            "details": {
-                                "name": "AZStd::string"
-                            }
-                        }
-                    ]
-                },
-                {
                     "key": "OnCaptureBenchmarkMetadataFinished",
                     "details": {
                         "name": "OnCaptureBenchmarkMetadataFinished"

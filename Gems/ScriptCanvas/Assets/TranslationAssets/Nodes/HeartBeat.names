@@ -11,30 +11,27 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Start",
                     "details": {
                         "name": "Start"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Stop",
                     "details": {
                         "name": "Stop"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Pulse",
                     "details": {
                         "name": "Pulse"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Interval"
-                        }
+                    "key": "DataInput_Interval",
+                    "details": {
+                        "name": "Interval"
                     }
                 }
             ]

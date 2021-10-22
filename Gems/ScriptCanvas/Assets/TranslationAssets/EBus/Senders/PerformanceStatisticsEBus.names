@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "PerformanceStatisticsEBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "PERFORMANCESTATISTICSEBUS_NAME",
-                "category": "PERFORMANCESTATISTICSEBUS_CATEGORY"
+                "name": "PerformanceStatisticsEBus"
             },
             "methods": [
                 {

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "CameraRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Camera",
+                "name": "CameraRequestBus",
                 "category": "Camera"
             },
             "methods": [

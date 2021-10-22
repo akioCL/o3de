@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "TubeShapeComponentRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "TUBESHAPECOMPONENTREQUESTSBUS_NAME",
-                "category": "TUBESHAPECOMPONENTREQUESTSBUS_CATEGORY"
+                "name": "TubeShapeComponentRequestsBus"
             },
             "methods": [
                 {

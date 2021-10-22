@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "AudioRtpcComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Audio RTPC",
+                "name": "AudioRtpcComponentRequestBus",
                 "category": "Audio"
             },
             "methods": [

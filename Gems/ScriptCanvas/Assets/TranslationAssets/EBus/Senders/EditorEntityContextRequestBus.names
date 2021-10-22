@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorEntityContextRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORENTITYCONTEXTREQUESTBUS_NAME",
-                "category": "EDITORENTITYCONTEXTREQUESTBUS_CATEGORY"
+                "name": "EditorEntityContextRequestBus"
             },
             "methods": [
                 {

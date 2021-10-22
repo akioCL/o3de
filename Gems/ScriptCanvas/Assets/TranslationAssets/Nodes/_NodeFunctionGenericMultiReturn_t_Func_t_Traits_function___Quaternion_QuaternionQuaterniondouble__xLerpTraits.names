@@ -11,51 +11,39 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Quaternion",
-                        "details": {
-                            "name": "Quaternion: From"
-                        }
+                    "key": "DataInput_Quaternion: From",
+                    "details": {
+                        "name": "Quaternion: From"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Quaternion",
-                        "details": {
-                            "name": "Quaternion: To"
-                        }
+                    "key": "DataInput_Quaternion: To",
+                    "details": {
+                        "name": "Quaternion: To"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: T"
-                        }
+                    "key": "DataInput_Number: T",
+                    "details": {
+                        "name": "Number: T"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Quaternion",
-                        "details": {
-                            "name": "Result: Quaternion"
-                        }
+                    "key": "DataOutput_Result: Quaternion",
+                    "details": {
+                        "name": "Result: Quaternion"
                     }
                 }
             ]

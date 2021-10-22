@@ -2,53 +2,30 @@
     "entries": [
         {
             "key": "DirectionalLightRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "DIRECTIONALLIGHTREQUESTBUS_NAME",
-                "category": "DIRECTIONALLIGHTREQUESTBUS_CATEGORY"
+                "name": "DirectionalLightRequestBus"
             },
             "methods": [
                 {
-                    "key": "GetFilteringSampleCount",
+                    "key": "GetShadowBias",
                     "entry": {
                         "name": "In",
-                        "tooltip": "When signaled, this will invoke GetFilteringSampleCount"
+                        "tooltip": "When signaled, this will invoke GetShadowBias"
                     },
                     "exit": {
                         "name": "Out",
-                        "tooltip": "Signaled after GetFilteringSampleCount is invoked"
+                        "tooltip": "Signaled after GetShadowBias is invoked"
                     },
                     "details": {
-                        "name": "GetFilteringSampleCount"
+                        "name": "GetShadowBias"
                     },
                     "results": [
                         {
-                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
+                            "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
                             "details": {
-                                "name": "unsigned int"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetPredictionSampleCount",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetPredictionSampleCount"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetPredictionSampleCount is invoked"
-                    },
-                    "details": {
-                        "name": "GetPredictionSampleCount"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
-                            "details": {
-                                "name": "unsigned int"
+                                "name": "float"
                             }
                         }
                     ]
@@ -89,6 +66,28 @@
                         "name": "GetShadowFarClipDistance"
                     },
                     "results": [
+                        {
+                            "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
+                            "details": {
+                                "name": "float"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "key": "SetShadowBias",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke SetShadowBias"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after SetShadowBias is invoked"
+                    },
+                    "details": {
+                        "name": "SetShadowBias"
+                    },
+                    "params": [
                         {
                             "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
                             "details": {
@@ -142,23 +141,23 @@
                     ]
                 },
                 {
-                    "key": "SetPcfMethod",
+                    "key": "GetFilteringSampleCount",
                     "entry": {
                         "name": "In",
-                        "tooltip": "When signaled, this will invoke SetPcfMethod"
+                        "tooltip": "When signaled, this will invoke GetFilteringSampleCount"
                     },
                     "exit": {
                         "name": "Out",
-                        "tooltip": "Signaled after SetPcfMethod is invoked"
+                        "tooltip": "Signaled after GetFilteringSampleCount is invoked"
                     },
                     "details": {
-                        "name": "SetPcfMethod"
+                        "name": "GetFilteringSampleCount"
                     },
-                    "params": [
+                    "results": [
                         {
-                            "typeid": "{ECA0B403-C4F8-4B86-95FC-81688D046E40}",
+                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
                             "details": {
-                                "name": "unsigned short"
+                                "name": "unsigned int"
                             }
                         }
                     ]
@@ -204,28 +203,6 @@
                             "details": {
                                 "name": "EntityId",
                                 "tooltip": "Entity Unique Id"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "SetPredictionSampleCount",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetPredictionSampleCount"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetPredictionSampleCount is invoked"
-                    },
-                    "details": {
-                        "name": "SetPredictionSampleCount"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{43DA906B-7DEF-4CA8-9790-854106D3F983}",
-                            "details": {
-                                "name": "unsigned int"
                             }
                         }
                     ]
@@ -452,6 +429,50 @@
                     ]
                 },
                 {
+                    "key": "SetSplitAutomatic",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke SetSplitAutomatic"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after SetSplitAutomatic is invoked"
+                    },
+                    "details": {
+                        "name": "SetSplitAutomatic"
+                    },
+                    "params": [
+                        {
+                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
+                            "details": {
+                                "name": "bool"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "key": "SetCascadeFarDepth",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke SetCascadeFarDepth"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after SetCascadeFarDepth is invoked"
+                    },
+                    "details": {
+                        "name": "SetCascadeFarDepth"
+                    },
+                    "params": [
+                        {
+                            "typeid": "{0CE9FA36-1E3A-4C06-9254-B7C73A732053}",
+                            "details": {
+                                "name": "Vector4"
+                            }
+                        }
+                    ]
+                },
+                {
                     "key": "GetSplitAutomatic",
                     "entry": {
                         "name": "In",
@@ -584,28 +605,6 @@
                     ]
                 },
                 {
-                    "key": "SetSofteningBoundaryWidth",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetSofteningBoundaryWidth"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetSofteningBoundaryWidth is invoked"
-                    },
-                    "details": {
-                        "name": "SetSofteningBoundaryWidth"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
-                            "details": {
-                                "name": "float"
-                            }
-                        }
-                    ]
-                },
-                {
                     "key": "GetShadowmapSize",
                     "entry": {
                         "name": "In",
@@ -689,94 +688,6 @@
                             "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
                             "details": {
                                 "name": "bool"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetSofteningBoundaryWidth",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetSofteningBoundaryWidth"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetSofteningBoundaryWidth is invoked"
-                    },
-                    "details": {
-                        "name": "GetSofteningBoundaryWidth"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{EA2C3E90-AFBE-44D4-A90D-FAAF79BAF93D}",
-                            "details": {
-                                "name": "float"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "SetSplitAutomatic",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetSplitAutomatic"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetSplitAutomatic is invoked"
-                    },
-                    "details": {
-                        "name": "SetSplitAutomatic"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
-                            "details": {
-                                "name": "bool"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "SetCascadeFarDepth",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke SetCascadeFarDepth"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after SetCascadeFarDepth is invoked"
-                    },
-                    "details": {
-                        "name": "SetCascadeFarDepth"
-                    },
-                    "params": [
-                        {
-                            "typeid": "{0CE9FA36-1E3A-4C06-9254-B7C73A732053}",
-                            "details": {
-                                "name": "Vector4"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "key": "GetPcfMethod",
-                    "entry": {
-                        "name": "In",
-                        "tooltip": "When signaled, this will invoke GetPcfMethod"
-                    },
-                    "exit": {
-                        "name": "Out",
-                        "tooltip": "Signaled after GetPcfMethod is invoked"
-                    },
-                    "details": {
-                        "name": "GetPcfMethod"
-                    },
-                    "results": [
-                        {
-                            "typeid": "{ECA0B403-C4F8-4B86-95FC-81688D046E40}",
-                            "details": {
-                                "name": "unsigned short"
                             }
                         }
                     ]

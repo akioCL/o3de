@@ -11,7 +11,7 @@
             },
             "slots": [
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled when the entity that owns this graph is fully activated."

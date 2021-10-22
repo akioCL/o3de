@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "PostFxLayerRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "POSTFXLAYERREQUESTBUS_NAME",
-                "category": "POSTFXLAYERREQUESTBUS_CATEGORY"
+                "name": "PostFxLayerRequestBus"
             },
             "methods": [
                 {

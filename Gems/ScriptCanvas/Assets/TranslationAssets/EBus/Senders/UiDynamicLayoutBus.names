@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiDynamicLayoutBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Dynamic Layout",
+                "name": "UiDynamicLayoutBus",
                 "category": "UI"
             },
             "methods": [

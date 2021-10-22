@@ -10,53 +10,47 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Connect Event",
                     "details": {
                         "name": "Connect Event",
                         "tooltip": "Connect to input event name as defined in an input binding asset."
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Event Name"
-                        }
+                    "key": "DataInput_Event Name",
+                    "details": {
+                        "name": "Event Name"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Connect Event",
                     "details": {
                         "name": "On Connect Event",
                         "tooltip": "Connect to input event name as defined in an input binding asset."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Pressed",
                     "details": {
                         "name": "Pressed",
                         "tooltip": "Signaled when the input event begins."
                     }
                 },
                 {
-                    "key": "DataOutput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "value"
-                        }
+                    "key": "DataOutput_value",
+                    "details": {
+                        "name": "value"
                     }
                 },
                 {
-                    "key": "Output_3",
+                    "key": "Output_Held",
                     "details": {
                         "name": "Held",
                         "tooltip": "Signaled while the input event is active."
                     }
                 },
                 {
-                    "key": "Output_4",
+                    "key": "Output_Released",
                     "details": {
                         "name": "Released",
                         "tooltip": "Signaled when the input event ends."

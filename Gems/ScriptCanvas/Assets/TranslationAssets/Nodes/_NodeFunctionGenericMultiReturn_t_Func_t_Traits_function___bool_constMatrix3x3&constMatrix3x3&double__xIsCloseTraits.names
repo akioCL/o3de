@@ -11,51 +11,39 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Matrix3x3",
-                        "details": {
-                            "name": "Matrix3x3: A"
-                        }
+                    "key": "DataInput_Matrix3x3: A",
+                    "details": {
+                        "name": "Matrix3x3: A"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Matrix3x3",
-                        "details": {
-                            "name": "Matrix3x3: B"
-                        }
+                    "key": "DataInput_Matrix3x3: B",
+                    "details": {
+                        "name": "Matrix3x3: B"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Tolerance"
-                        }
+                    "key": "DataInput_Number: Tolerance",
+                    "details": {
+                        "name": "Number: Tolerance"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Result: Boolean"
-                        }
+                    "key": "DataOutput_Result: Boolean",
+                    "details": {
+                        "name": "Result: Boolean"
                     }
                 }
             ]

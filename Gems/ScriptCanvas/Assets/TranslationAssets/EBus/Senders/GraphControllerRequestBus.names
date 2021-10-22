@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "GraphControllerRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "GRAPHCONTROLLERREQUESTBUS_NAME",
-                "category": "GRAPHCONTROLLERREQUESTBUS_CATEGORY"
+                "name": "GraphControllerRequestBus"
             },
             "methods": [
                 {

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiCustomImageBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Custom Image",
+                "name": "UiCustomImageBus",
                 "category": "UI/LyShine Examples"
             },
             "methods": [

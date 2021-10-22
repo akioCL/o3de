@@ -10,28 +10,28 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Reset",
                     "details": {
                         "name": "Reset",
                         "tooltip": "Reset signal"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Output signal"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_On Reset",
                     "details": {
                         "name": "On Reset",
                         "tooltip": "Triggered when Reset"

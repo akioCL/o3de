@@ -10,23 +10,20 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Report"
-                        }
+                    "key": "DataInput_Report",
+                    "details": {
+                        "name": "Report"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }

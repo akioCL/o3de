@@ -10,14 +10,14 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "When signaled sends the variable referenced by this node to a Data Output slot"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled after the referenced variable has been pushed to the Data Output slot"

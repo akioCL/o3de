@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiParticleEmitterBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Particle Emitter",
+                "name": "UiParticleEmitterBus",
                 "category": "UI"
             },
             "methods": [

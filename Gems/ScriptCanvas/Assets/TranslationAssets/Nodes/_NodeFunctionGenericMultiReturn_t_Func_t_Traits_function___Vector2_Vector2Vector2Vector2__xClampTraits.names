@@ -11,51 +11,39 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector2",
-                        "details": {
-                            "name": "Vector2: Source"
-                        }
+                    "key": "DataInput_Vector2: Source",
+                    "details": {
+                        "name": "Vector2: Source"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector2",
-                        "details": {
-                            "name": "Vector2: Min"
-                        }
+                    "key": "DataInput_Vector2: Min",
+                    "details": {
+                        "name": "Vector2: Min"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Vector2",
-                        "details": {
-                            "name": "Vector2: Max"
-                        }
+                    "key": "DataInput_Vector2: Max",
+                    "details": {
+                        "name": "Vector2: Max"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Vector2",
-                        "details": {
-                            "name": "Result: Vector2"
-                        }
+                    "key": "DataOutput_Result: Vector2",
+                    "details": {
+                        "name": "Result: Vector2"
                     }
                 }
             ]

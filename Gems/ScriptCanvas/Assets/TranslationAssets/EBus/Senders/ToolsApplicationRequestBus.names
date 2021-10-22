@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ToolsApplicationRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "TOOLSAPPLICATIONREQUESTBUS_NAME",
-                "category": "TOOLSAPPLICATIONREQUESTBUS_CATEGORY"
+                "name": "ToolsApplicationRequestBus"
             },
             "methods": [
                 {
@@ -361,6 +360,37 @@
                             "details": {
                                 "name": "EntityId",
                                 "tooltip": "Entity Unique Id"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "key": "EntityExists",
+                    "entry": {
+                        "name": "In",
+                        "tooltip": "When signaled, this will invoke EntityExists"
+                    },
+                    "exit": {
+                        "name": "Out",
+                        "tooltip": "Signaled after EntityExists is invoked"
+                    },
+                    "details": {
+                        "name": "EntityExists"
+                    },
+                    "params": [
+                        {
+                            "typeid": "{6383F1D3-BB27-4E6B-A49A-6409B2059EAA}",
+                            "details": {
+                                "name": "EntityId",
+                                "tooltip": "Entity Unique Id"
+                            }
+                        }
+                    ],
+                    "results": [
+                        {
+                            "typeid": "{A0CA880C-AFE4-43CB-926C-59AC48496112}",
+                            "details": {
+                                "name": "bool"
                             }
                         }
                     ]

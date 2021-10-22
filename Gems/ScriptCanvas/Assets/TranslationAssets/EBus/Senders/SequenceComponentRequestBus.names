@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "SequenceComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Sequence",
+                "name": "SequenceComponentRequestBus",
                 "category": "Animation"
             },
             "methods": [

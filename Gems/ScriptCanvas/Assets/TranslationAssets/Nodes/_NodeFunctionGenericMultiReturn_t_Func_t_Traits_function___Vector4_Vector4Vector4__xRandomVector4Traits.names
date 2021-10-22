@@ -11,42 +11,33 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Vector4: Min"
-                        }
+                    "key": "DataInput_Vector4: Min",
+                    "details": {
+                        "name": "Vector4: Min"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Vector4: Max"
-                        }
+                    "key": "DataInput_Vector4: Max",
+                    "details": {
+                        "name": "Vector4: Max"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Result: Vector4"
-                        }
+                    "key": "DataOutput_Result: Vector4",
+                    "details": {
+                        "name": "Result: Vector4"
                     }
                 }
             ]

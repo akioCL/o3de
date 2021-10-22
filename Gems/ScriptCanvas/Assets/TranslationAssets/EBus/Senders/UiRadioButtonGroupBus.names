@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiRadioButtonGroupBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Radio Button Group",
+                "name": "UiRadioButtonGroupBus",
                 "category": "UI"
             },
             "methods": [

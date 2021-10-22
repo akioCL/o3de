@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "GameEntityContextRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Game Entity",
+                "name": "GameEntityContextRequestBus",
                 "category": "Entity"
             },
             "methods": [

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorCameraRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORCAMERAREQUESTBUS_NAME",
-                "category": "EDITORCAMERAREQUESTBUS_CATEGORY"
+                "name": "EditorCameraRequestBus"
             },
             "methods": [
                 {

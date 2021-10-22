@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "TickRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Tick",
+                "name": "TickRequestBus",
                 "category": "Timing"
             },
             "methods": [

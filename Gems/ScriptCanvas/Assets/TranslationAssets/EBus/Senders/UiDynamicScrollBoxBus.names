@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiDynamicScrollBoxBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Dynamic Scroll Box",
+                "name": "UiDynamicScrollBoxBus",
                 "category": "UI"
             },
             "methods": [

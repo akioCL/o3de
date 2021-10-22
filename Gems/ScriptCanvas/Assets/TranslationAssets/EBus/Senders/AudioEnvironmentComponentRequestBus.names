@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "AudioEnvironmentComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Audio Environment",
+                "name": "AudioEnvironmentComponentRequestBus",
                 "category": "Audio"
             },
             "methods": [

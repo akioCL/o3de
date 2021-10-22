@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "SurfaceMaskGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SURFACEMASKGRADIENTREQUESTBUS_NAME",
-                "category": "SURFACEMASKGRADIENTREQUESTBUS_CATEGORY"
+                "name": "SurfaceMaskGradientRequestBus"
             },
             "methods": [
                 {

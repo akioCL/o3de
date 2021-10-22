@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "PolygonPrismShapeComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "POLYGONPRISMSHAPECOMPONENTREQUESTBUS_NAME",
-                "category": "POLYGONPRISMSHAPECOMPONENTREQUESTBUS_CATEGORY"
+                "name": "PolygonPrismShapeComponentRequestBus"
             },
             "methods": [
                 {

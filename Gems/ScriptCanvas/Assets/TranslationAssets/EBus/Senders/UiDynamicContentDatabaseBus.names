@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiDynamicContentDatabaseBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Dynamic Content Database",
+                "name": "UiDynamicContentDatabaseBus",
                 "category": "UI/LyShine Examples"
             },
             "methods": [

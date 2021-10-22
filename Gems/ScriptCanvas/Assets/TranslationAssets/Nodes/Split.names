@@ -11,41 +11,32 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Source"
-                        }
+                    "key": "DataInput_Source",
+                    "details": {
+                        "name": "Source"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Delimiters"
-                        }
+                    "key": "DataInput_Delimiters",
+                    "details": {
+                        "name": "Delimiters"
                     }
                 },
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Array<String>",
-                        "details": {
-                            "name": "String Array"
-                        }
+                    "key": "DataOutput_String Array",
+                    "details": {
+                        "name": "String Array"
                     }
                 },
                 {
-                    "key": "Input_2",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }

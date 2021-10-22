@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorLayerTrackViewRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORLAYERTRACKVIEWREQUESTBUS_NAME",
-                "category": "EDITORLAYERTRACKVIEWREQUESTBUS_CATEGORY"
+                "name": "EditorLayerTrackViewRequestBus"
             },
             "methods": [
                 {

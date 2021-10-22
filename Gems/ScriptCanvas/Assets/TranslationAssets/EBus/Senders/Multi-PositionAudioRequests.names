@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "Multi-Position Audio Requests",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "MULTI-POSITION AUDIO REQUESTS_NAME",
-                "category": "MULTI-POSITION AUDIO REQUESTS_CATEGORY"
+                "name": "Multi-Position Audio Requests"
             },
             "methods": [
                 {

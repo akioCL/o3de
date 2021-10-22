@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ImageGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "IMAGEGRADIENTREQUESTBUS_NAME",
-                "category": "IMAGEGRADIENTREQUESTBUS_CATEGORY"
+                "name": "ImageGradientRequestBus"
             },
             "methods": [
                 {

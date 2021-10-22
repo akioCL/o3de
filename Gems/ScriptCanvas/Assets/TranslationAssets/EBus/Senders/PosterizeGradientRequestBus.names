@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "PosterizeGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "POSTERIZEGRADIENTREQUESTBUS_NAME",
-                "category": "POSTERIZEGRADIENTREQUESTBUS_CATEGORY"
+                "name": "PosterizeGradientRequestBus"
             },
             "methods": [
                 {

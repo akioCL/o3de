@@ -11,82 +11,67 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Append Hello",
                     "details": {
                         "name": "Append Hello"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "str"
-                        }
+                    "key": "DataInput_str",
+                    "details": {
+                        "name": "str"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Append Hello",
                     "details": {
                         "name": "On Append Hello"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Output"
-                        }
+                    "key": "DataOutput_Output",
+                    "details": {
+                        "name": "Output"
                     }
                 },
                 {
-                    "key": "Input_2",
+                    "key": "Input_Concatenate Two",
                     "details": {
                         "name": "Concatenate Two"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "a"
-                        }
+                    "key": "DataInput_a",
+                    "details": {
+                        "name": "a"
                     }
                 },
                 {
-                    "key": "DataInput_4",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "b"
-                        }
+                    "key": "DataInput_b",
+                    "details": {
+                        "name": "b"
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_On Concatenate Two",
                     "details": {
                         "name": "On Concatenate Two"
                     }
                 },
                 {
-                    "key": "Input_5",
+                    "key": "Input_Concatenate Three",
                     "details": {
                         "name": "Concatenate Three"
                     }
                 },
                 {
-                    "key": "DataInput_6",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "c"
-                        }
+                    "key": "DataInput_c",
+                    "details": {
+                        "name": "c"
                     }
                 },
                 {
-                    "key": "Output_3",
+                    "key": "Output_On Concatenate Three",
                     "details": {
                         "name": "On Concatenate Three"
                     }

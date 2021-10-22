@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorEntityAPIBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORENTITYAPIBUS_NAME",
-                "category": "EDITORENTITYAPIBUS_CATEGORY"
+                "name": "EditorEntityAPIBus"
             },
             "methods": [
                 {

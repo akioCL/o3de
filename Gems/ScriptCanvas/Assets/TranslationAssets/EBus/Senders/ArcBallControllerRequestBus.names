@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ArcBallControllerRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "ARCBALLCONTROLLERREQUESTBUS_NAME",
-                "category": "ARCBALLCONTROLLERREQUESTBUS_CATEGORY"
+                "name": "ArcBallControllerRequestBus"
             },
             "methods": [
                 {

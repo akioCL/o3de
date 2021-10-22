@@ -11,12 +11,9 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Delay"
-                        }
+                    "key": "DataInput_Delay",
+                    "details": {
+                        "name": "Delay"
                     }
                 }
             ]

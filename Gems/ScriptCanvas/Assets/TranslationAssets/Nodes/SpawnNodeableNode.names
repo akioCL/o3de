@@ -11,57 +11,45 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Request Spawn",
                     "details": {
                         "name": "Request Spawn"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Translation"
-                        }
+                    "key": "DataInput_Translation",
+                    "details": {
+                        "name": "Translation"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Rotation"
-                        }
+                    "key": "DataInput_Rotation",
+                    "details": {
+                        "name": "Rotation"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Scale"
-                        }
+                    "key": "DataInput_Scale",
+                    "details": {
+                        "name": "Scale"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Spawn Requested",
                     "details": {
                         "name": "Spawn Requested"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_On Spawn",
                     "details": {
                         "name": "On Spawn"
                     }
                 },
                 {
-                    "key": "DataOutput_2",
-                    "data": {
-                        "typeId": "Array<EntityId>",
-                        "details": {
-                            "name": "SpawnedEntitiesList"
-                        }
+                    "key": "DataOutput_SpawnedEntitiesList",
+                    "details": {
+                        "name": "SpawnedEntitiesList"
                     }
                 }
             ]

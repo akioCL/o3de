@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "SimpleMotionComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Simple Motion",
+                "name": "SimpleMotionComponentRequestBus",
                 "category": "Animation"
             },
             "methods": [

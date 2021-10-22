@@ -10,35 +10,35 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Connect",
                     "details": {
                         "name": "Connect",
                         "tooltip": "Connect this event handler to the specified entity."
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Disconnect",
                     "details": {
                         "name": "Disconnect",
                         "tooltip": "Disconnect this event handler."
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_OnConnected",
                     "details": {
                         "name": "OnConnected",
                         "tooltip": "Signaled when a connection has taken place."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_OnDisconnected",
                     "details": {
                         "name": "OnDisconnected",
                         "tooltip": "Signaled when this event handler is disconnected."
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_OnFailure",
                     "details": {
                         "name": "OnFailure",
                         "tooltip": "Signaled when it is not possible to connect this handler."

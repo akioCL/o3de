@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "CameraSystemRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "CAMERASYSTEMREQUESTBUS_NAME",
-                "category": "CAMERASYSTEMREQUESTBUS_CATEGORY"
+                "name": "CameraSystemRequestBus"
             },
             "methods": [
                 {

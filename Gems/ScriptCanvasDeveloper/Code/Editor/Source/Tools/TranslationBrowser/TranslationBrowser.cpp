@@ -838,8 +838,9 @@ namespace ScriptCanvasDeveloper
             );
 
 
-        if (AZ::IO::FileIOBase::GetInstance()->Exists(found.c_str()))
+        if (!found.empty() && AZ::IO::FileIOBase::GetInstance()->Exists(found.c_str()))
         {
+            m_ui->btnOpenInExplorer->setEnabled(true);
             m_selection = found;
 
             AZ::IO::FileIOBase* fileIO = AZ::IO::FileIOBase::GetInstance();
@@ -891,6 +892,10 @@ namespace ScriptCanvasDeveloper
                 }
             }
 
+        }
+        else
+        {
+            m_ui->btnOpenInExplorer->setEnabled(false);
         }
 
     }

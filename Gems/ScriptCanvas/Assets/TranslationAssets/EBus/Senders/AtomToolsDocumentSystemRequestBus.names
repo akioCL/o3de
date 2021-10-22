@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "AtomToolsDocumentSystemRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "ATOMTOOLSDOCUMENTSYSTEMREQUESTBUS_NAME",
-                "category": "ATOMTOOLSDOCUMENTSYSTEMREQUESTBUS_CATEGORY"
+                "name": "AtomToolsDocumentSystemRequestBus"
             },
             "methods": [
                 {

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "DiskShapeComponentRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "DISKSHAPECOMPONENTREQUESTSBUS_NAME",
-                "category": "DISKSHAPECOMPONENTREQUESTSBUS_CATEGORY"
+                "name": "DiskShapeComponentRequestsBus"
             },
             "methods": [
                 {

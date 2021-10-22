@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiCanvasAssetRefBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Canvas Asset Ref",
+                "name": "UiCanvasAssetRefBus",
                 "category": "UI"
             },
             "methods": [

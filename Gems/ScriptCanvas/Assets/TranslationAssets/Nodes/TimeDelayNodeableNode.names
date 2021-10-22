@@ -11,28 +11,25 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Start",
                     "details": {
                         "name": "Start"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Delay"
-                        }
+                    "key": "DataInput_Delay",
+                    "details": {
+                        "name": "Delay"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Start",
                     "details": {
                         "name": "On Start"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Done",
                     "details": {
                         "name": "Done",
                         "tooltip": "Signaled after waiting for the specified amount of times."

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorTransformComponentSelectionRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORTRANSFORMCOMPONENTSELECTIONREQUESTBUS_NAME",
-                "category": "EDITORTRANSFORMCOMPONENTSELECTIONREQUESTBUS_CATEGORY"
+                "name": "EditorTransformComponentSelectionRequestBus"
             },
             "methods": [
                 {

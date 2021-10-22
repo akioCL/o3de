@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "AudioPreloadComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Audio Preload",
+                "name": "AudioPreloadComponentRequestBus",
                 "category": "Audio"
             },
             "methods": [

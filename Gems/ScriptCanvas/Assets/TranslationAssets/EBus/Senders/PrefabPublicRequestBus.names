@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "PrefabPublicRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "PREFABPUBLICREQUESTBUS_NAME",
-                "category": "PREFABPUBLICREQUESTBUS_CATEGORY"
+                "name": "PrefabPublicRequestBus"
             },
             "methods": [
                 {
@@ -38,7 +37,7 @@
                     ],
                     "results": [
                         {
-                            "typeid": "{0D5A4347-BCEC-58D6-A2D5-259F78FA0BF0}",
+                            "typeid": "{0E9C062F-96E1-58E9-BCE0-AB93C4C425A1}",
                             "details": {
                                 "name": ""
                             }

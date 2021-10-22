@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "EditorToolsApplicationRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EDITORTOOLSAPPLICATIONREQUESTBUS_NAME",
-                "category": "EDITORTOOLSAPPLICATIONREQUESTBUS_CATEGORY"
+                "name": "EditorToolsApplicationRequestBus"
             },
             "methods": [
                 {

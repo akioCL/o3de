@@ -11,42 +11,33 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "AABB",
-                        "details": {
-                            "name": "AABB: A"
-                        }
+                    "key": "DataInput_AABB: A",
+                    "details": {
+                        "name": "AABB: A"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "AABB",
-                        "details": {
-                            "name": "AABB: B"
-                        }
+                    "key": "DataInput_AABB: B",
+                    "details": {
+                        "name": "AABB: B"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "AABB",
-                        "details": {
-                            "name": "Result: AABB"
-                        }
+                    "key": "DataOutput_Result: AABB",
+                    "details": {
+                        "name": "Result: AABB"
                     }
                 }
             ]

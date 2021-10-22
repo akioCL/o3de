@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiCursorBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Cursor",
+                "name": "UiCursorBus",
                 "category": "UI"
             },
             "methods": [

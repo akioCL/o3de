@@ -1,7 +1,7 @@
 {
     "entries": [
         {
-            "key": "AZStd::vector<AZ::Uuid, allocator>",
+            "key": "AZStd::vector<Asset<RuntimeAsset>, allocator>",
             "context": "BehaviorClass",
             "variant": "",
             "details": {
@@ -22,14 +22,14 @@
                         "tooltip": "Signaled after Size is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Size",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Size",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ],
@@ -54,22 +54,22 @@
                         "tooltip": "Signaled after Front is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Front",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Front",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         }
                     ],
                     "results": [
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "AZ::Uuid&"
+                                "name": "Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -86,14 +86,14 @@
                         "tooltip": "Signaled after HasKey is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Has Key",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Has Key",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         },
                         {
@@ -124,14 +124,14 @@
                         "tooltip": "Signaled after Resize is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Resize",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Resize",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
@@ -154,14 +154,14 @@
                         "tooltip": "Signaled after at is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::at",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::at",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
@@ -173,9 +173,9 @@
                     ],
                     "results": [
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "AZ::Uuid&"
+                                "name": "Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -192,22 +192,22 @@
                         "tooltip": "Signaled after Back is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Back",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Back",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         }
                     ],
                     "results": [
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "AZ::Uuid&"
+                                "name": "Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -224,14 +224,14 @@
                         "tooltip": "Signaled after pop_back is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::pop_back",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::pop_back",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         }
                     ]
@@ -248,14 +248,14 @@
                         "tooltip": "Signaled after size is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::size",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::size",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ],
@@ -280,14 +280,14 @@
                         "tooltip": "Signaled after At is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::At",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::At",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
@@ -299,9 +299,9 @@
                     ],
                     "results": [
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "AZ::Uuid&"
+                                "name": "Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -318,14 +318,14 @@
                         "tooltip": "Signaled after Empty is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Empty",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Empty",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         }
                     ],
@@ -350,20 +350,20 @@
                         "tooltip": "Signaled after Swap is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Swap",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Swap",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ]
@@ -380,20 +380,20 @@
                         "tooltip": "Signaled after push_back is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::push_back",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::push_back",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "const AZ::Uuid&"
+                                "name": "const Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -410,28 +410,28 @@
                         "tooltip": "Signaled after PushBack_VM is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::PushBack_VM",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::PushBack_VM",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         },
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "const AZ::Uuid&"
+                                "name": "const Asset<RuntimeAsset>&"
                             }
                         }
                     ],
                     "results": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ]
@@ -448,14 +448,14 @@
                         "tooltip": "Signaled after AtUnchecked is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::AtUnchecked",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::AtUnchecked",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
@@ -467,9 +467,9 @@
                     ],
                     "results": [
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "AZ::Uuid&"
+                                "name": "Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -486,14 +486,14 @@
                         "tooltip": "Signaled after clear is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::clear",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::clear",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         }
                     ]
@@ -510,14 +510,14 @@
                         "tooltip": "Signaled after NotEmpty is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::NotEmpty",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::NotEmpty",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ],
@@ -542,14 +542,14 @@
                         "tooltip": "Signaled after Erase_VM is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Erase_VM",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Erase_VM",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         },
                         {
@@ -561,9 +561,9 @@
                     ],
                     "results": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ]
@@ -580,14 +580,14 @@
                         "tooltip": "Signaled after EraseCheck_VM is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::EraseCheck_VM",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::EraseCheck_VM",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         },
                         {
@@ -618,14 +618,14 @@
                         "tooltip": "Signaled after Capacity is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Capacity",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Capacity",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         }
                     ],
@@ -650,22 +650,22 @@
                         "tooltip": "Signaled after Clear is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Clear",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Clear",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ],
                     "results": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ]
@@ -682,14 +682,14 @@
                         "tooltip": "Signaled after AssignAt is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::AssignAt",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::AssignAt",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         },
                         {
@@ -699,9 +699,9 @@
                             }
                         },
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "AZ::Uuid&"
+                                "name": "Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -718,14 +718,14 @@
                         "tooltip": "Signaled after GetSize is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::GetSize",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::GetSize",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ],
@@ -750,14 +750,14 @@
                         "tooltip": "Signaled after Insert is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Insert",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Insert",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         },
                         {
@@ -767,17 +767,17 @@
                             }
                         },
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "const AZ::Uuid&"
+                                "name": "const Asset<RuntimeAsset>&"
                             }
                         }
                     ],
                     "results": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ]
@@ -794,20 +794,20 @@
                         "tooltip": "Signaled after PushBack is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::PushBack",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::PushBack",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
-                            "typeid": "{E152C105-A133-4D03-BBF8-3D4B2FBA3E2A}",
+                            "typeid": "{C73A5FA9-295B-57F8-97D0-947B74603D96}",
                             "details": {
-                                "name": "const AZ::Uuid&"
+                                "name": "const Asset<RuntimeAsset>&"
                             }
                         }
                     ]
@@ -824,14 +824,14 @@
                         "tooltip": "Signaled after Reserve is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Reserve",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Reserve",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>*"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>*"
                             }
                         },
                         {
@@ -854,22 +854,22 @@
                         "tooltip": "Signaled after Iterate_VM is invoked"
                     },
                     "details": {
-                        "name": "AZStd::vector<AZ::Uuid, allocator>::Iterate_VM",
+                        "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>::Iterate_VM",
                         "category": "Array"
                     },
                     "params": [
                         {
-                            "typeid": "{3A9E52F9-1A46-5FC6-822A-249BBFB50C90}",
+                            "typeid": "{5600E444-1E66-5CB4-81A9-053AD1F4453E}",
                             "details": {
-                                "name": "AZStd::vector<AZ::Uuid, allocator>&"
+                                "name": "AZStd::vector<Asset<RuntimeAsset>, allocator>&"
                             }
                         }
                     ],
                     "results": [
                         {
-                            "typeid": "{C796F74B-8496-5018-9303-F525A8B22E4F}",
+                            "typeid": "{92764AA6-ABDB-51CC-8318-0BDE24A094CE}",
                             "details": {
-                                "name": "Iterator_VM<AZStd::vector<AZ::Uuid, allocator>>"
+                                "name": "Iterator_VM<AZStd::vector<Asset<RuntimeAsset>, allocator>>"
                             }
                         }
                     ]

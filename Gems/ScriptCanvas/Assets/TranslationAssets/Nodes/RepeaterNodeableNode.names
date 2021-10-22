@@ -11,44 +11,38 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Start",
                     "details": {
                         "name": "Start"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Repetitions"
-                        }
+                    "key": "DataInput_Repetitions",
+                    "details": {
+                        "name": "Repetitions"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Interval"
-                        }
+                    "key": "DataInput_Interval",
+                    "details": {
+                        "name": "Interval"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Start",
                     "details": {
                         "name": "On Start"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Complete",
                     "details": {
                         "name": "Complete",
                         "tooltip": "Signaled upon node exit"
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_Action",
                     "details": {
                         "name": "Action",
                         "tooltip": "Signaled every repetition"

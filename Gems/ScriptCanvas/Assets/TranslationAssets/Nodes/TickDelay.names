@@ -10,32 +10,26 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Ticks"
-                        }
+                    "key": "DataInput_Ticks",
+                    "details": {
+                        "name": "Ticks"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Tick Order"
-                        }
+                    "key": "DataInput_Tick Order",
+                    "details": {
+                        "name": "Tick Order"
                     }
                 },
                 {
-                    "key": "Input_2",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "When signaled, execution is delayed at this node for the specified amount of frames."
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled after waiting for the specified amount of frames."

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "SmoothStepGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SMOOTHSTEPGRADIENTREQUESTBUS_NAME",
-                "category": "SMOOTHSTEPGRADIENTREQUESTBUS_CATEGORY"
+                "name": "SmoothStepGradientRequestBus"
             },
             "methods": [
                 {

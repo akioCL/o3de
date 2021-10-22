@@ -10,32 +10,26 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Candidate"
-                        }
+                    "key": "DataInput_Candidate",
+                    "details": {
+                        "name": "Candidate"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Report"
-                        }
+                    "key": "DataInput_Report",
+                    "details": {
+                        "name": "Report"
                     }
                 },
                 {
-                    "key": "Input_2",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }

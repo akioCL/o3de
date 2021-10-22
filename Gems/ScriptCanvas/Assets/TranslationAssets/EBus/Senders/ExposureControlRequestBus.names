@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ExposureControlRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "EXPOSURECONTROLREQUESTBUS_NAME",
-                "category": "EXPOSURECONTROLREQUESTBUS_CATEGORY"
+                "name": "ExposureControlRequestBus"
             },
             "methods": [
                 {

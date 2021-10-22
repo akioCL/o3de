@@ -11,60 +11,45 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: X"
-                        }
+                    "key": "DataInput_Number: X",
+                    "details": {
+                        "name": "Number: X"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Y"
-                        }
+                    "key": "DataInput_Number: Y",
+                    "details": {
+                        "name": "Number: Y"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: Z"
-                        }
+                    "key": "DataInput_Number: Z",
+                    "details": {
+                        "name": "Number: Z"
                     }
                 },
                 {
-                    "key": "DataInput_4",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Number: W"
-                        }
+                    "key": "DataInput_Number: W",
+                    "details": {
+                        "name": "Number: W"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Vector4",
-                        "details": {
-                            "name": "Result: Vector4"
-                        }
+                    "key": "DataOutput_Result: Vector4",
+                    "details": {
+                        "name": "Result: Vector4"
                     }
                 }
             ]

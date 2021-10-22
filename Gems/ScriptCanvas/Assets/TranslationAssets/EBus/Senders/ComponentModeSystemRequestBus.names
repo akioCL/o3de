@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ComponentModeSystemRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "COMPONENTMODESYSTEMREQUESTBUS_NAME",
-                "category": "COMPONENTMODESYSTEMREQUESTBUS_CATEGORY"
+                "name": "ComponentModeSystemRequestBus"
             },
             "methods": [
                 {

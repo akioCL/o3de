@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "InputSystemRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "INPUTSYSTEMREQUESTBUS_NAME",
-                "category": "INPUTSYSTEMREQUESTBUS_CATEGORY"
+                "name": "InputSystemRequestBus"
             },
             "methods": [
                 {

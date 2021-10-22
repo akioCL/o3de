@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "AttachmentComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Attachment",
+                "name": "AttachmentComponentRequestBus",
                 "category": "Animation"
             },
             "methods": [

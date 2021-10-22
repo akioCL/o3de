@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "DitherGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "DITHERGRADIENTREQUESTBUS_NAME",
-                "category": "DITHERGRADIENTREQUESTBUS_CATEGORY"
+                "name": "DitherGradientRequestBus"
             },
             "methods": [
                 {

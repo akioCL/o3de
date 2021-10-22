@@ -542,6 +542,9 @@ namespace ScriptCanvasDeveloperEditor
                         value.SetString(slotSource.m_key.c_str(), document.GetAllocator());
                         theSlot.AddMember("key", value, document.GetAllocator());
 
+                        //value.SetString(slotSource.m_context.c_str(), document.GetAllocator());
+                        //theSlot.AddMember("context", value, document.GetAllocator());
+
                         rapidjson::Value sloDetails(rapidjson::kObjectType);
                         if (!slotSource.m_details.m_name.empty())
                         {
@@ -552,14 +555,14 @@ namespace ScriptCanvasDeveloperEditor
 
                         if (!slotSource.m_data.m_details.m_name.empty())
                         {
-                            rapidjson::Value slotData(rapidjson::kObjectType);
-                            WriteString(slotData, "typeId", slotSource.m_data.m_typeId, document);
+                            //rapidjson::Value slotData(rapidjson::kObjectType);
+                            //WriteString(slotData, "typeId", slotSource.m_data.m_typeId, document);
 
                             rapidjson::Value slotDataDetails(rapidjson::kObjectType);
                             WriteString(slotDataDetails, "name", slotSource.m_data.m_details.m_name, document);
-                            slotData.AddMember("details", slotDataDetails, document.GetAllocator());
+                            theSlot.AddMember("details", slotDataDetails, document.GetAllocator());
 
-                            theSlot.AddMember("data", slotData, document.GetAllocator());
+                            //theSlot.AddMember("data", slotData, document.GetAllocator());
                         }
 
                         slotsArray.PushBack(theSlot, document.GetAllocator());
@@ -573,7 +576,7 @@ namespace ScriptCanvasDeveloperEditor
 
             document.AddMember("entries", entries, document.GetAllocator());
 
-            AZStd::string translationOutputFolder = AZStd::string::format("@devroot@/TranslationAssets");
+            AZStd::string translationOutputFolder = AZStd::string::format("@engroot@/TranslationAssets");
             AZStd::string outputFileName = AZStd::string::format("%s/%s.names", translationOutputFolder.c_str(), filename.c_str());
 
             outputFileName = GraphCanvas::TranslationKey::Sanitize(outputFileName);
@@ -699,6 +702,7 @@ namespace ScriptCanvasDeveloperEditor
 
                     if (ScriptCanvas::Node* nodeComponent = reinterpret_cast<ScriptCanvas::Node*>(classData->m_factory->Create(classData->m_name)))
                     {
+                        nodeComponent->Init();
                         nodeComponent->Configure();
 
                         int inputIndex = 0;
@@ -713,7 +717,9 @@ namespace ScriptCanvasDeveloperEditor
                             {
                                 if (slot->GetDescriptor().IsInput())
                                 {
-                                    slotEntry.m_key = AZStd::string::format("Input_%d", inputIndex);
+                                    slotEntry.m_key = AZStd::string::format("Input_%s", slot->GetName().c_str());
+                                    //slotEntry.m_key = slot->GetName().c_str();
+                                    //slotEntry.m_context = "Input";
                                     inputIndex++;
 
                                     slotEntry.m_details.m_name = slot->GetName();
@@ -721,7 +727,10 @@ namespace ScriptCanvasDeveloperEditor
                                 }
                                 else if (slot->GetDescriptor().IsOutput())
                                 {
-                                    slotEntry.m_key = AZStd::string::format("Output_%d", outputIndex);
+                                    //slotEntry.m_key = AZStd::string::format("Output_%d", outputIndex);
+                                    slotEntry.m_key = AZStd::string::format("Output_%s", slot->GetName().c_str());
+                                    //slotEntry.m_key = slot->GetName().c_str();
+                                    //slotEntry.m_context = "Output";
                                     outputIndex++;
 
                                     slotEntry.m_details.m_name = slot->GetName();
@@ -761,7 +770,10 @@ namespace ScriptCanvasDeveloperEditor
 
                                 if (slot->GetDescriptor().IsInput())
                                 {
-                                    slotEntry.m_key = AZStd::string::format("DataInput_%d", inputIndex);
+                                    //slotEntry.m_key = AZStd::string::format("DataInput_%d", inputIndex);
+                                    slotEntry.m_key = AZStd::string::format("DataInput_%s", slot->GetName().c_str());
+                                    //slotEntry.m_key = slot->GetName().c_str();
+                                    //slotEntry.m_context = "DataInput";
                                     inputIndex++;
 
                                     AZStd::string argumentKey = slotTypeKey;
@@ -775,7 +787,10 @@ namespace ScriptCanvasDeveloperEditor
                                 }
                                 else if (slot->GetDescriptor().IsOutput())
                                 {
-                                    slotEntry.m_key = AZStd::string::format("DataOutput_%d", outputIndex);
+                                    //slotEntry.m_key = AZStd::string::format("DataOutput_%d", outputIndex);
+                                    slotEntry.m_key = AZStd::string::format("DataOutput_%s", slot->GetName().c_str());
+                                    //slotEntry.m_key = slot->GetName().c_str();
+                                    //slotEntry.m_context = "DataOutput";
                                     outputIndex++;
 
                                     AZStd::string resultKey = slotTypeKey;
@@ -1432,7 +1447,7 @@ namespace ScriptCanvasDeveloperEditor
 
 
             char buffer[AZ_MAX_PATH_LEN];
-            AZ::IO::FileIOBase::GetInstance()->ResolvePath("@devroot@/TranslationAssets", buffer, sizeof(buffer));
+            AZ::IO::FileIOBase::GetInstance()->ResolvePath("@engroot@/TranslationAssets", buffer, sizeof(buffer));
             AZ_TracePrintf("Script Canvas", AZStd::string::format("Translation Database Generation Complete, see: %s", buffer).c_str());
         }
     } // TranslationGenerator

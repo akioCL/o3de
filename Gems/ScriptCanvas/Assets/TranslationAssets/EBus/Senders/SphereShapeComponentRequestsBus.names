@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "SphereShapeComponentRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Sphere Shape",
+                "name": "SphereShapeComponentRequestsBus",
                 "category": "Shape"
             },
             "methods": [

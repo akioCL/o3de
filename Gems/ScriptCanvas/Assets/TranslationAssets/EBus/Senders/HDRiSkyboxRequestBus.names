@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "HDRiSkyboxRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "HDRISKYBOXREQUESTBUS_NAME",
-                "category": "HDRISKYBOXREQUESTBUS_CATEGORY"
+                "name": "HDRiSkyboxRequestBus"
             },
             "methods": [
                 {

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "RandomTimedSpawnerRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "RANDOMTIMEDSPAWNERREQUESTBUS_NAME",
-                "category": "RANDOMTIMEDSPAWNERREQUESTBUS_CATEGORY"
+                "name": "RandomTimedSpawnerRequestBus"
             },
             "methods": [
                 {

@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ImageBasedLightComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "IMAGEBASEDLIGHTCOMPONENTREQUESTBUS_NAME",
-                "category": "IMAGEBASEDLIGHTCOMPONENTREQUESTBUS_CATEGORY"
+                "name": "ImageBasedLightComponentRequestBus"
             },
             "methods": [
                 {

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiLayoutRowBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Layout Row",
+                "name": "UiLayoutRowBus",
                 "category": "UI"
             },
             "methods": [

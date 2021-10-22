@@ -11,24 +11,21 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "AABB",
-                        "details": {
-                            "name": "Result: AABB"
-                        }
+                    "key": "DataOutput_Result: AABB",
+                    "details": {
+                        "name": "Result: AABB"
                     }
                 }
             ]

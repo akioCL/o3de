@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiCanvasManagerBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Canvas Manager",
+                "name": "UiCanvasManagerBus",
                 "category": "UI"
             },
             "methods": [

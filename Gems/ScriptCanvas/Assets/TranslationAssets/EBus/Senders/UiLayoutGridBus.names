@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiLayoutGridBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Layout Grid",
+                "name": "UiLayoutGridBus",
                 "category": "UI"
             },
             "methods": [

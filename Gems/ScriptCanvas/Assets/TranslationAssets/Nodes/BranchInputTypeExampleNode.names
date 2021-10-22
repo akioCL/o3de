@@ -11,69 +11,57 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_Get Internal Vector",
                     "details": {
                         "name": "Get Internal Vector"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_On Get Internal Vector",
                     "details": {
                         "name": "On Get Internal Vector"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Array<Number>",
-                        "details": {
-                            "name": "Result"
-                        }
+                    "key": "DataOutput_Result",
+                    "details": {
+                        "name": "Result"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_Branches On Input Type",
                     "details": {
                         "name": "Branches On Input Type"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Input Type"
-                        }
+                    "key": "DataInput_Input Type",
+                    "details": {
+                        "name": "Input Type"
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_By Value",
                     "details": {
                         "name": "By Value"
                     }
                 },
                 {
-                    "key": "DataOutput_3",
-                    "data": {
-                        "typeId": "Array<Number>",
-                        "details": {
-                            "name": "Value Input"
-                        }
+                    "key": "DataOutput_Value Input",
+                    "details": {
+                        "name": "Value Input"
                     }
                 },
                 {
-                    "key": "Output_4",
+                    "key": "Output_By Pointer",
                     "details": {
                         "name": "By Pointer"
                     }
                 },
                 {
-                    "key": "DataOutput_5",
-                    "data": {
-                        "typeId": "Array<Number>",
-                        "details": {
-                            "name": "Pointer Input"
-                        }
+                    "key": "DataOutput_Pointer Input",
+                    "details": {
+                        "name": "Pointer Input"
                     }
                 }
             ]

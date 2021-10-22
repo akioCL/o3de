@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "GradientSurfaceDataRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "GRADIENTSURFACEDATAREQUESTBUS_NAME",
-                "category": "GRADIENTSURFACEDATAREQUESTBUS_CATEGORY"
+                "name": "GradientSurfaceDataRequestBus"
             },
             "methods": [
                 {

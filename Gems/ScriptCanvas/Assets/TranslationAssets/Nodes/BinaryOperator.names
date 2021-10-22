@@ -7,7 +7,16 @@
             "details": {
                 "name": "BinaryOperator",
                 "tooltip": "BinaryOperator"
-            }
+            },
+            "slots": [
+                {
+                    "key": "Input_In",
+                    "details": {
+                        "name": "In",
+                        "tooltip": "Signal to perform the evaluation when desired."
+                    }
+                }
+            ]
         }
     ]
 }

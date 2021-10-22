@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "ShapeAreaFalloffGradientRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "SHAPEAREAFALLOFFGRADIENTREQUESTBUS_NAME",
-                "category": "SHAPEAREAFALLOFFGRADIENTREQUESTBUS_CATEGORY"
+                "name": "ShapeAreaFalloffGradientRequestBus"
             },
             "methods": [
                 {

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiTooltipDisplayBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Tooltip Display",
+                "name": "UiTooltipDisplayBus",
                 "category": "UI"
             },
             "methods": [

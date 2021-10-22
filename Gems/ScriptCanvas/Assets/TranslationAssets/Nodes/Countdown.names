@@ -10,64 +10,52 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Time"
-                        }
+                    "key": "DataInput_Time",
+                    "details": {
+                        "name": "Time"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Loop"
-                        }
+                    "key": "DataInput_Loop",
+                    "details": {
+                        "name": "Loop"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Hold"
-                        }
+                    "key": "DataInput_Hold",
+                    "details": {
+                        "name": "Hold"
                     }
                 },
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Elapsed"
-                        }
+                    "key": "DataOutput_Elapsed",
+                    "details": {
+                        "name": "Elapsed"
                     }
                 },
                 {
-                    "key": "Input_3",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "When signaled, execution is delayed at this node according to the specified properties."
                     }
                 },
                 {
-                    "key": "Input_4",
+                    "key": "Input_Cancel",
                     "details": {
                         "name": "Cancel",
                         "tooltip": "Cancels the delay."
                     }
                 },
                 {
-                    "key": "Input_5",
+                    "key": "Input_Reset",
                     "details": {
                         "name": "Reset",
                         "tooltip": "Resets the delay."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled when the delay reaches zero."

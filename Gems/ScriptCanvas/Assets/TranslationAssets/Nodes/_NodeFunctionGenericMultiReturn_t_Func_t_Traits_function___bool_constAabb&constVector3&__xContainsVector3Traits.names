@@ -11,42 +11,33 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "AABB",
-                        "details": {
-                            "name": "AABB: Source"
-                        }
+                    "key": "DataInput_AABB: Source",
+                    "details": {
+                        "name": "AABB: Source"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: Candidate"
-                        }
+                    "key": "DataInput_Vector3: Candidate",
+                    "details": {
+                        "name": "Vector3: Candidate"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Result: Boolean"
-                        }
+                    "key": "DataOutput_Result: Boolean",
+                    "details": {
+                        "name": "Result: Boolean"
                     }
                 }
             ]

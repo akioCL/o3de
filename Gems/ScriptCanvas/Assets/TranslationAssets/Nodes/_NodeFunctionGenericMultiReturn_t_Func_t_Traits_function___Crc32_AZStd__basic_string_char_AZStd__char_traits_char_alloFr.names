@@ -11,33 +11,27 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "String: Value"
-                        }
+                    "key": "DataInput_String: Value",
+                    "details": {
+                        "name": "String: Value"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "CRC",
-                        "details": {
-                            "name": "Result: CRC"
-                        }
+                    "key": "DataOutput_Result: CRC",
+                    "details": {
+                        "name": "Result: CRC"
                     }
                 }
             ]

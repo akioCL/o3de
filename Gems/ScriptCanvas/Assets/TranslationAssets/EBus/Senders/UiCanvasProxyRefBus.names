@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiCanvasProxyRefBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Canvas Proxy Ref",
+                "name": "UiCanvasProxyRefBus",
                 "category": "UI"
             },
             "methods": [

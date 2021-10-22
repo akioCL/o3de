@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "PythonEditorBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "PYTHONEDITORBUS_NAME",
-                "category": "PYTHONEDITORBUS_CATEGORY"
+                "name": "PythonEditorBus"
             },
             "methods": [
                 {
@@ -602,9 +601,9 @@
                     ],
                     "results": [
                         {
-                            "typeid": "{3AB0037F-AF8D-48CE-BCA0-A170D18B2C03}",
+                            "typeid": "{88E0A40F-3085-4CAB-8B11-EF5A2659C71A}",
                             "details": {
-                                "name": "char"
+                                "name": "AZ::IO::Path"
                             }
                         }
                     ]

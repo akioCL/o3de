@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "QuadShapeComponentRequestsBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "QUADSHAPECOMPONENTREQUESTSBUS_NAME",
-                "category": "QUADSHAPECOMPONENTREQUESTSBUS_CATEGORY"
+                "name": "QuadShapeComponentRequestsBus"
             },
             "methods": [
                 {

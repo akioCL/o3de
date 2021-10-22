@@ -11,47 +11,41 @@
             },
             "slots": [
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Is Empty"
-                        }
+                    "key": "DataOutput_Is Empty",
+                    "details": {
+                        "name": "Is Empty"
                     }
                 },
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_True",
                     "details": {
                         "name": "True",
                         "tooltip": "The container is empty"
                     }
                 },
                 {
-                    "key": "Output_3",
+                    "key": "Output_False",
                     "details": {
                         "name": "False",
                         "tooltip": "The container is not empty"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Container",
-                        "details": {
-                            "name": "Source"
-                        }
+                    "key": "DataInput_Source",
+                    "details": {
+                        "name": "Source"
                     }
                 }
             ]

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiCheckboxBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Checkbox",
+                "name": "UiCheckboxBus",
                 "category": "UI"
             },
             "methods": [

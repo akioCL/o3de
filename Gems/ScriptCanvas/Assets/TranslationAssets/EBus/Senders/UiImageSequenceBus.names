@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiImageSequenceBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Image Sequence",
+                "name": "UiImageSequenceBus",
                 "category": "UI"
             },
             "methods": [

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "CollisionFilteringBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Collision Filtering",
+                "name": "CollisionFilteringBus",
                 "category": "PhysX"
             },
             "methods": [

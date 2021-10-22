@@ -11,33 +11,27 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "AABB",
-                        "details": {
-                            "name": "AABB: Source"
-                        }
+                    "key": "DataInput_AABB: Source",
+                    "details": {
+                        "name": "AABB: Source"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Result: Number"
-                        }
+                    "key": "DataOutput_Result: Number",
+                    "details": {
+                        "name": "Result: Number"
                     }
                 }
             ]

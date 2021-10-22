@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiLayoutCellBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Layout Cell",
+                "name": "UiLayoutCellBus",
                 "category": "UI"
             },
             "methods": [

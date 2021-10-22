@@ -11,69 +11,51 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "Vector3: One"
-                        }
+                    "key": "DataInput_Vector3: One",
+                    "details": {
+                        "name": "Vector3: One"
                     }
                 },
                 {
-                    "key": "DataInput_2",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "String: Two"
-                        }
+                    "key": "DataInput_String: Two",
+                    "details": {
+                        "name": "String: Two"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Boolean: Three"
-                        }
+                    "key": "DataInput_Boolean: Three",
+                    "details": {
+                        "name": "Boolean: Three"
                     }
                 },
                 {
-                    "key": "DataOutput_1",
-                    "data": {
-                        "typeId": "Vector3",
-                        "details": {
-                            "name": "One: Vector3"
-                        }
+                    "key": "DataOutput_One: Vector3",
+                    "details": {
+                        "name": "One: Vector3"
                     }
                 },
                 {
-                    "key": "DataOutput_2",
-                    "data": {
-                        "typeId": "String",
-                        "details": {
-                            "name": "Two: String"
-                        }
+                    "key": "DataOutput_Two: String",
+                    "details": {
+                        "name": "Two: String"
                     }
                 },
                 {
-                    "key": "DataOutput_3",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Three: Boolean"
-                        }
+                    "key": "DataOutput_Three: Boolean",
+                    "details": {
+                        "name": "Three: Boolean"
                     }
                 }
             ]

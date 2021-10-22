@@ -11,89 +11,71 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Maximum Duration"
-                        }
+                    "key": "DataInput_Maximum Duration",
+                    "details": {
+                        "name": "Maximum Duration"
                     }
                 },
                 {
-                    "key": "DataOutput_0",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Percent"
-                        }
+                    "key": "DataOutput_Percent",
+                    "details": {
+                        "name": "Percent"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_In",
                     "details": {
                         "name": "In"
                     }
                 },
                 {
-                    "key": "Input_2",
+                    "key": "Input_Cancel",
                     "details": {
                         "name": "Cancel"
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out"
                     }
                 },
                 {
-                    "key": "Output_2",
+                    "key": "Output_Tick",
                     "details": {
                         "name": "Tick",
                         "tooltip": "Signalled at each step of the lerp"
                     }
                 },
                 {
-                    "key": "Output_3",
+                    "key": "Output_Lerp Complete",
                     "details": {
                         "name": "Lerp Complete",
                         "tooltip": "Output signal"
                     }
                 },
                 {
-                    "key": "DataInput_3",
-                    "data": {
-                        "typeId": "Value",
-                        "details": {
-                            "name": "Start"
-                        }
+                    "key": "DataInput_Start",
+                    "details": {
+                        "name": "Start"
                     }
                 },
                 {
-                    "key": "DataInput_4",
-                    "data": {
-                        "typeId": "Value",
-                        "details": {
-                            "name": "Stop"
-                        }
+                    "key": "DataInput_Stop",
+                    "details": {
+                        "name": "Stop"
                     }
                 },
                 {
-                    "key": "DataInput_5",
-                    "data": {
-                        "typeId": "Value",
-                        "details": {
-                            "name": "Speed"
-                        }
+                    "key": "DataInput_Speed",
+                    "details": {
+                        "name": "Speed"
                     }
                 },
                 {
-                    "key": "DataOutput_4",
-                    "data": {
-                        "typeId": "Value",
-                        "details": {
-                            "name": "Step"
-                        }
+                    "key": "DataOutput_Step",
+                    "details": {
+                        "name": "Step"
                     }
                 }
             ]

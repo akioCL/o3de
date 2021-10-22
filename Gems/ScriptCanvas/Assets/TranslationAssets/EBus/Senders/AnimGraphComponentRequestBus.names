@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "AnimGraphComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Anim Graph",
+                "name": "AnimGraphComponentRequestBus",
                 "category": "Animation"
             },
             "methods": [

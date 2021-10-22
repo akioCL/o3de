@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "SplineComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Spline",
+                "name": "SplineComponentRequestBus",
                 "category": "Shape"
             },
             "methods": [

@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "SimpleStateComponentRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "Simple State",
+                "name": "SimpleStateComponentRequestBus",
                 "category": "Gameplay"
             },
             "methods": [

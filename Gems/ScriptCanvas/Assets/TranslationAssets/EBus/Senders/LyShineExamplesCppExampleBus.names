@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "LyShineExamplesCppExampleBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "LyShine Cpp Example",
+                "name": "LyShineExamplesCppExampleBus",
                 "category": "UI/LyShine Examples"
             },
             "methods": [

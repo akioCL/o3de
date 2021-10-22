@@ -10,26 +10,23 @@
             },
             "slots": [
                 {
-                    "key": "Input_0",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "When signaled, execution is delayed at this node for the specified amount of times."
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_Out",
                     "details": {
                         "name": "Out",
                         "tooltip": "Signaled after waiting for the specified amount of times."
                     }
                 },
                 {
-                    "key": "DataInput_1",
-                    "data": {
-                        "typeId": "Number",
-                        "details": {
-                            "name": "Delay"
-                        }
+                    "key": "DataInput_Delay",
+                    "details": {
+                        "name": "Delay"
                     }
                 }
             ]

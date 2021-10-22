@@ -10,30 +10,27 @@
             },
             "slots": [
                 {
-                    "key": "DataInput_0",
-                    "data": {
-                        "typeId": "Boolean",
-                        "details": {
-                            "name": "Condition"
-                        }
+                    "key": "DataInput_Condition",
+                    "details": {
+                        "name": "Condition"
                     }
                 },
                 {
-                    "key": "Input_1",
+                    "key": "Input_In",
                     "details": {
                         "name": "In",
                         "tooltip": "Input signal"
                     }
                 },
                 {
-                    "key": "Output_0",
+                    "key": "Output_True",
                     "details": {
                         "name": "True",
                         "tooltip": "Signaled if the condition provided evaluates to true."
                     }
                 },
                 {
-                    "key": "Output_1",
+                    "key": "Output_False",
                     "details": {
                         "name": "False",
                         "tooltip": "Signaled if the condition provided evaluates to false."

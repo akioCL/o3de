@@ -2,11 +2,10 @@
     "entries": [
         {
             "key": "LookModificationRequestBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "LOOKMODIFICATIONREQUESTBUS_NAME",
-                "category": "LOOKMODIFICATIONREQUESTBUS_CATEGORY"
+                "name": "LookModificationRequestBus"
             },
             "methods": [
                 {

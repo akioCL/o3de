@@ -2,10 +2,10 @@
     "entries": [
         {
             "key": "UiScrollerBus",
-            "context": "",
+            "context": "EBusSender",
             "variant": "",
             "details": {
-                "name": "UI Scroller",
+                "name": "UiScrollerBus",
                 "category": "UI"
             },
             "methods": [
