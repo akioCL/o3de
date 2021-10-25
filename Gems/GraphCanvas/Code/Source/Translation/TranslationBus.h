@@ -97,6 +97,7 @@ namespace GraphCanvas
             AZ::StringFunc::Replace(result, "<", "_");
             AZ::StringFunc::Replace(result, ",", "_");
             AZ::StringFunc::Replace(result, ">", " ");
+            AZ::StringFunc::Replace(result, "/", "");
             AZ::StringFunc::Strip(result, " ");
             AZ::StringFunc::Path::Normalize(result);
             return result;

@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Timer",
+                "category": "Timing",
                 "tooltip": "Provides a time value."
             },
             "slots": [

@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Sequencer",
+                "category": "Logic",
                 "tooltip": "Trigger one of the outputs in sequential order for each input activation."
             },
             "slots": [

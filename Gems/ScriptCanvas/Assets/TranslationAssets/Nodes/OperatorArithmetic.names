@@ -6,7 +6,8 @@
             "variant": "",
             "details": {
                 "name": "OperatorArithmetic",
-                "category": "Operators"
+                "category": "Operators",
+                "subtitle": "Operators"
             },
             "slots": [
                 {

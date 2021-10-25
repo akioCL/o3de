@@ -7,7 +7,8 @@
             "details": {
                 "name": "Indexer",
                 "category": "Logic/Deprecated",
-                "tooltip": "An execution flow gate that activates each input flow in sequential order"
+                "tooltip": "An execution flow gate that activates each input flow in sequential order",
+                "subtitle": "Deprecated"
             },
             "slots": [
                 {

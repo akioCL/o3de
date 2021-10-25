@@ -1,57 +1,20 @@
 {
     "entries": [
         {
-            "key": "{58AF538D-021A-4D0C-A3F1-866C2FFF382E}",
+            "key": "{A4CFB2F2-4045-47ED-AE73-ED60C2072EE4}",
             "context": "ScriptCanvas::Node",
             "variant": "",
             "details": {
                 "name": "Lerp Between",
                 "category": "Math",
-                "tooltip": "Performs a lerp between the two specified sources using the speed specified or in the amount of time specified, or the minimum of the two"
+                "subtitle": "Math"
             },
             "slots": [
                 {
-                    "key": "DataInput_Maximum Duration",
-                    "details": {
-                        "name": "Maximum Duration"
-                    }
-                },
-                {
-                    "key": "DataOutput_Percent",
-                    "details": {
-                        "name": "Percent"
-                    }
-                },
-                {
                     "key": "Input_In",
                     "details": {
-                        "name": "In"
-                    }
-                },
-                {
-                    "key": "Input_Cancel",
-                    "details": {
-                        "name": "Cancel"
-                    }
-                },
-                {
-                    "key": "Output_Out",
-                    "details": {
-                        "name": "Out"
-                    }
-                },
-                {
-                    "key": "Output_Tick",
-                    "details": {
-                        "name": "Tick",
-                        "tooltip": "Signalled at each step of the lerp"
-                    }
-                },
-                {
-                    "key": "Output_Lerp Complete",
-                    "details": {
-                        "name": "Lerp Complete",
-                        "tooltip": "Output signal"
+                        "name": "In",
+                        "tooltip": "Starts the lerp action from the beginning."
                     }
                 },
                 {
@@ -73,9 +36,56 @@
                     }
                 },
                 {
+                    "key": "DataInput_Maximum Duration",
+                    "details": {
+                        "name": "Maximum Duration"
+                    }
+                },
+                {
+                    "key": "Output_Out",
+                    "details": {
+                        "name": "Out",
+                        "tooltip": "Executes immediately after the lerp action is started."
+                    }
+                },
+                {
+                    "key": "Input_Cancel",
+                    "details": {
+                        "name": "Cancel",
+                        "tooltip": "Stops the lerp action immediately."
+                    }
+                },
+                {
+                    "key": "Output_Canceled",
+                    "details": {
+                        "name": "Canceled",
+                        "tooltip": "Executes immediately after the operation is canceled."
+                    }
+                },
+                {
+                    "key": "Output_Tick",
+                    "details": {
+                        "name": "Tick",
+                        "tooltip": "Signaled at each step of the lerp."
+                    }
+                },
+                {
                     "key": "DataOutput_Step",
                     "details": {
                         "name": "Step"
+                    }
+                },
+                {
+                    "key": "DataOutput_Percent",
+                    "details": {
+                        "name": "Percent"
+                    }
+                },
+                {
+                    "key": "Output_Lerp Complete",
+                    "details": {
+                        "name": "Lerp Complete",
+                        "tooltip": "Signaled after the last Tick, when the lerp is complete"
                     }
                 }
             ]

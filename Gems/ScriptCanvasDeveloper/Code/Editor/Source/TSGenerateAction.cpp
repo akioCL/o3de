@@ -44,6 +44,11 @@
 
 #include <Editor/Assets/ScriptCanvasAssetTrackerBus.h>
 #include <ScriptCanvas/Bus/EditorScriptCanvasBus.h>
+#include <GraphCanvas/Components/Nodes/NodeConfiguration.h>
+
+#include <ScriptCanvas/Libraries/Libraries.h>
+#include <ScriptCanvas/Libraries/Core/GetVariable.h>
+#include <ScriptCanvas/Libraries/Core/SetVariable.h>
 
 #pragma optimize("", off)
 
@@ -52,6 +57,153 @@ namespace ScriptCanvasDeveloperEditor
 {
     namespace TranslationGenerator
     {
+        AZStd::string GetContextName(const AZ::SerializeContext::ClassData& classData)
+        {
+            if (auto editorDataElement = classData.m_editData ? classData.m_editData->FindElementData(AZ::Edit::ClassElements::EditorData) : nullptr)
+            {
+                if (auto attribute = editorDataElement->FindAttribute(AZ::Edit::Attributes::Category))
+                {
+                    if (auto data = azrtti_cast<AZ::Edit::AttributeData<const char*>*>(attribute))
+                    {
+                        AZStd::string fullCategoryName = data->Get(nullptr);
+                        if (!fullCategoryName.empty())
+                        {
+                            AZStd::string delimiter = "/";
+                            AZStd::vector<AZStd::string> results;
+                            AZStd::tokenize(fullCategoryName, delimiter, results);
+                            return results.back();
+                        }
+                    }
+                }
+            }
+
+            return {};
+        }
+
+        AZStd::string GetLibraryCategory(const AZ::SerializeContext& serializeContext, const AZStd::string& nodeName)
+        {
+            AZStd::string category;
+
+            // Get all the types.
+            auto EnumerateLibraryDefintionNodes = [&nodeName, &category , &serializeContext](
+                const AZ::SerializeContext::ClassData* classData, const AZ::Uuid&) -> bool
+            {
+
+                AZStd::string categoryPath = classData->m_editData ? classData->m_editData->m_name : classData->m_name;
+
+                if (classData->m_editData)
+                {
+                    auto editorElementData = classData->m_editData->FindElementData(AZ::Edit::ClassElements::EditorData);
+                    if (editorElementData)
+                    {
+                        if (auto categoryAttribute = editorElementData->FindAttribute(AZ::Edit::Attributes::Category))
+                        {
+                            if (auto categoryAttributeData = azdynamic_cast<const AZ::Edit::AttributeData<const char*>*>(categoryAttribute))
+                            {
+                                categoryPath = categoryAttributeData->Get(nullptr);
+                            }
+                        }
+
+                        /*if (auto categoryStyleAttribute = editorElementData->FindAttribute(AZ::Edit::Attributes::CategoryStyle))
+                        {
+                            if (auto categoryAttributeData = azdynamic_cast<const AZ::Edit::AttributeData<const char*>*>(categoryStyleAttribute))
+                            {
+                                categoryInfo.m_styleOverride = categoryAttributeData->Get(nullptr);
+                            }
+                        }
+
+                        if (auto titlePaletteAttribute = editorElementData->FindAttribute(ScriptCanvas::Attributes::Node::TitlePaletteOverride))
+                        {
+                            if (auto categoryAttributeData = azdynamic_cast<const AZ::Edit::AttributeData<const char*>*>(titlePaletteAttribute))
+                            {
+                                categoryInfo.m_paletteOverride = categoryAttributeData->Get(nullptr);
+                            }
+                        }*/
+                    }
+                }
+
+                // Children
+                for (auto& node : ScriptCanvas::Library::LibraryDefinition::GetNodes(classData->m_typeId))
+                {
+                    //if (HasExcludeFromNodeListAttribute(&serializeContext, node.first))
+                    //{
+                    //    continue;
+                    //}
+
+                    // Pass in the associated class data so we can do more intensive lookups?
+                    const AZ::SerializeContext::ClassData* nodeClassData = serializeContext.FindClassData(node.first);
+
+                    if (nodeClassData == nullptr)
+                    {
+                        continue;
+                    }
+
+                    // Skip over some of our more dynamic nodes that we want to populate using different means
+                    else if (nodeClassData->m_azRtti && nodeClassData->m_azRtti->IsTypeOf<ScriptCanvas::Nodes::Core::GetVariableNode>())
+                    {
+                        continue;
+                    }
+                    else if (nodeClassData->m_azRtti && nodeClassData->m_azRtti->IsTypeOf<ScriptCanvas::Nodes::Core::SetVariableNode>())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if (node.second == nodeName)
+                        {
+                            category = categoryPath;
+                            return false;
+                        }
+                        //nodePaletteModel.RegisterCustomNode(categoryPath, node.first, node.second, nodeClassData);
+                    }
+                }
+
+                return true;
+            };
+
+            const AZ::TypeId& libraryDefTypeId = azrtti_typeid<ScriptCanvas::Library::LibraryDefinition>();
+            serializeContext.EnumerateDerived(EnumerateLibraryDefintionNodes, libraryDefTypeId, libraryDefTypeId);
+
+            return category;
+        }
+
+        AZStd::string GetCategoryName(const AZ::SerializeContext::ClassData& classData)
+        {
+            if (auto editorDataElement = classData.m_editData->FindElementData(AZ::Edit::ClassElements::EditorData))
+            {
+                if (auto attribute = editorDataElement->FindAttribute(AZ::Edit::Attributes::Category))
+                {
+                    if (auto data = azrtti_cast<AZ::Edit::AttributeData<const char*>*>(attribute))
+                    {
+                        return data->Get(nullptr);
+                    }
+                }
+            }
+
+            return {};
+        }
+
+        AZStd::string GetCategory(const AZ::SerializeContext::ClassData* classData)
+        {
+            AZStd::string categoryPath;
+
+            if (classData->m_editData)
+            {
+                auto editorElementData = classData->m_editData->FindElementData(AZ::Edit::ClassElements::EditorData);
+                if (editorElementData)
+                {
+                    if (auto categoryAttribute = editorElementData->FindAttribute(AZ::Edit::Attributes::Category))
+                    {
+                        if (auto categoryAttributeData = azdynamic_cast<const AZ::Edit::AttributeData<const char*>*>(categoryAttribute))
+                        {
+                            categoryPath = categoryAttributeData->Get(nullptr);
+                        }
+                    }
+                }
+            }
+
+            return categoryPath;
+        }
 
         void OpenTranslationBrowser(QWidget* parent = nullptr)
         {
@@ -143,7 +295,7 @@ namespace ScriptCanvasDeveloperEditor
             {
                 if (classData->m_editData)
                 {
-                    outName = classData->m_editData->m_name ? classData->m_editData->m_name : "";
+                    outName = classData->m_editData->m_name ? classData->m_editData->m_name : classData->m_name;
                     outDescription = classData->m_editData->m_description ? classData->m_editData->m_description : "";
                 }
                 else
@@ -415,6 +567,7 @@ namespace ScriptCanvasDeveloperEditor
 
                 WriteString(details, "category", entrySource.m_details.m_category, document);
                 WriteString(details, "tooltip", entrySource.m_details.m_tooltip, document);
+                WriteString(details, "subtitle", entrySource.m_details.m_subtitle, document);
 
                 entry.AddMember("details", details, document.GetAllocator());
 
@@ -542,9 +695,6 @@ namespace ScriptCanvasDeveloperEditor
                         value.SetString(slotSource.m_key.c_str(), document.GetAllocator());
                         theSlot.AddMember("key", value, document.GetAllocator());
 
-                        //value.SetString(slotSource.m_context.c_str(), document.GetAllocator());
-                        //theSlot.AddMember("context", value, document.GetAllocator());
-
                         rapidjson::Value sloDetails(rapidjson::kObjectType);
                         if (!slotSource.m_details.m_name.empty())
                         {
@@ -555,14 +705,9 @@ namespace ScriptCanvasDeveloperEditor
 
                         if (!slotSource.m_data.m_details.m_name.empty())
                         {
-                            //rapidjson::Value slotData(rapidjson::kObjectType);
-                            //WriteString(slotData, "typeId", slotSource.m_data.m_typeId, document);
-
                             rapidjson::Value slotDataDetails(rapidjson::kObjectType);
                             WriteString(slotDataDetails, "name", slotSource.m_data.m_details.m_name, document);
                             theSlot.AddMember("details", slotDataDetails, document.GetAllocator());
-
-                            //theSlot.AddMember("data", slotData, document.GetAllocator());
                         }
 
                         slotsArray.PushBack(theSlot, document.GetAllocator());
@@ -579,8 +724,6 @@ namespace ScriptCanvasDeveloperEditor
             AZStd::string translationOutputFolder = AZStd::string::format("@engroot@/TranslationAssets");
             AZStd::string outputFileName = AZStd::string::format("%s/%s.names", translationOutputFolder.c_str(), filename.c_str());
 
-            outputFileName = GraphCanvas::TranslationKey::Sanitize(outputFileName);
-
             AZStd::string endPath;
             AZ::StringFunc::Path::GetFolderPath(outputFileName.c_str(), endPath);
 
@@ -592,7 +735,6 @@ namespace ScriptCanvasDeveloperEditor
                     return;
                 }
             }
-
 
             char resolvedBuffer[AZ_MAX_PATH_LEN] = { 0 };
             AZ::IO::FileIOBase::GetInstance()->ResolvePath(outputFileName.c_str(), resolvedBuffer, AZ_MAX_PATH_LEN);
@@ -689,15 +831,46 @@ namespace ScriptCanvasDeveloperEditor
                     }
 
                     // Find the category
-                    details.m_category = GraphCanvasAttributeHelper::GetStringAttribute(classData, AZ::Script::Attributes::Category);
-                    if (details.m_category.empty() && classData->m_editData)
+                    AZStd::string translationContext;
+                    AZStd::string subtitleFallback;
+                    auto nodeContext = GetContextName(*classData);
+                    GraphCanvas::TranslationKeyedString subtitleKeyedString(nodeContext, translationContext);
+                    subtitleKeyedString.m_key = ScriptCanvasEditor::TranslationHelper::GetUserDefinedNodeKey(nodeContext, subtitleFallback, ScriptCanvasEditor::TranslationKeyId::Category);
+
+                    GraphCanvas::TranslationKeyedString categoryKeyedString(GetCategoryName(*classData), nodeContext);
+                    categoryKeyedString.m_key = ScriptCanvasEditor::TranslationHelper::GetKey(ScriptCanvasEditor::TranslationContextGroup::ClassMethod, nodeContext, classData->m_editData->m_name, ScriptCanvasEditor::TranslationItemType::Node, ScriptCanvasEditor::TranslationKeyId::Category);
+                    details.m_category = categoryKeyedString.GetDisplayString();
+
+
+                    details.m_subtitle = subtitleKeyedString.GetDisplayString();
+                    if (details.m_subtitle.empty())
                     {
-                        auto elementData = classData->m_editData->FindElementData(AZ::Edit::ClassElements::EditorData);
-                        const AZStd::string categoryAttribute = GraphCanvasAttributeHelper::ReadStringAttribute(elementData->m_attributes, AZ::Script::Attributes::Category);
-                        if (!categoryAttribute.empty())
+                        details.m_subtitle = details.m_category;
+                    }
+
+                    if (details.m_category.empty())
+                    {
+                        details.m_category = GraphCanvasAttributeHelper::GetStringAttribute(classData, AZ::Script::Attributes::Category);
+                        if (details.m_category.empty() && classData->m_editData)
                         {
-                            details.m_category = categoryAttribute;
+                            details.m_category = GetCategory(classData);
+
+                            if (details.m_category.empty())
+                            {
+                                auto elementData = classData->m_editData->FindElementData(AZ::Edit::ClassElements::EditorData);
+                                const AZStd::string categoryAttribute = GraphCanvasAttributeHelper::ReadStringAttribute(elementData->m_attributes, AZ::Script::Attributes::Category);
+                                if (!categoryAttribute.empty())
+                                {
+                                    details.m_category = categoryAttribute;
+                                }
+                            }
                         }
+                    }
+
+                    if (details.m_category.empty())
+                    {
+                        // Get the library's name as the category
+                        details.m_category = GetLibraryCategory(*serializeContext, classData->m_name);
                     }
 
                     if (ScriptCanvas::Node* nodeComponent = reinterpret_cast<ScriptCanvas::Node*>(classData->m_factory->Create(classData->m_name)))
@@ -718,8 +891,6 @@ namespace ScriptCanvasDeveloperEditor
                                 if (slot->GetDescriptor().IsInput())
                                 {
                                     slotEntry.m_key = AZStd::string::format("Input_%s", slot->GetName().c_str());
-                                    //slotEntry.m_key = slot->GetName().c_str();
-                                    //slotEntry.m_context = "Input";
                                     inputIndex++;
 
                                     slotEntry.m_details.m_name = slot->GetName();
@@ -727,10 +898,7 @@ namespace ScriptCanvasDeveloperEditor
                                 }
                                 else if (slot->GetDescriptor().IsOutput())
                                 {
-                                    //slotEntry.m_key = AZStd::string::format("Output_%d", outputIndex);
                                     slotEntry.m_key = AZStd::string::format("Output_%s", slot->GetName().c_str());
-                                    //slotEntry.m_key = slot->GetName().c_str();
-                                    //slotEntry.m_context = "Output";
                                     outputIndex++;
 
                                     slotEntry.m_details.m_name = slot->GetName();
@@ -770,10 +938,7 @@ namespace ScriptCanvasDeveloperEditor
 
                                 if (slot->GetDescriptor().IsInput())
                                 {
-                                    //slotEntry.m_key = AZStd::string::format("DataInput_%d", inputIndex);
                                     slotEntry.m_key = AZStd::string::format("DataInput_%s", slot->GetName().c_str());
-                                    //slotEntry.m_key = slot->GetName().c_str();
-                                    //slotEntry.m_context = "DataInput";
                                     inputIndex++;
 
                                     AZStd::string argumentKey = slotTypeKey;
@@ -787,10 +952,7 @@ namespace ScriptCanvasDeveloperEditor
                                 }
                                 else if (slot->GetDescriptor().IsOutput())
                                 {
-                                    //slotEntry.m_key = AZStd::string::format("DataOutput_%d", outputIndex);
                                     slotEntry.m_key = AZStd::string::format("DataOutput_%s", slot->GetName().c_str());
-                                    //slotEntry.m_key = slot->GetName().c_str();
-                                    //slotEntry.m_context = "DataOutput";
                                     outputIndex++;
 
                                     AZStd::string resultKey = slotTypeKey;
@@ -809,8 +971,11 @@ namespace ScriptCanvasDeveloperEditor
                         delete nodeComponent;
                     }
 
+
+                    AZStd::string filename = GraphCanvas::TranslationKey::Sanitize(details.m_name);
+
                     translationRoot.m_entries.push_back(entry);
-                    AZStd::string fileName = AZStd::string::format("Nodes/%s", classData->m_name);
+                    AZStd::string fileName = AZStd::string::format("Nodes/%s", filename.c_str());
 
                     SaveJSONData(fileName, translationRoot);
 
@@ -1102,26 +1267,6 @@ namespace ScriptCanvasDeveloperEditor
                     SaveJSONData(AZStd::string::format("EBus/Handlers/%s", ebus->m_name.c_str()), translationRoot);
                 }
             }
-        }
-
-        AZStd::string GetContextName(const AZ::SerializeContext::ClassData& classData)
-        {
-            if (auto editorDataElement = classData.m_editData ? classData.m_editData->FindElementData(AZ::Edit::ClassElements::EditorData) : nullptr)
-            {
-                if (auto attribute = editorDataElement->FindAttribute(AZ::Edit::Attributes::Category))
-                {
-                    if (auto data = azrtti_cast<AZ::Edit::AttributeData<const char*>*>(attribute))
-                    {
-                        AZStd::string fullCategoryName = data->Get(nullptr);
-                        AZStd::string delimiter = "/";
-                        AZStd::vector<AZStd::string> results;
-                        AZStd::tokenize(fullCategoryName, delimiter, results);
-                        return results.back();
-                    }
-                }
-            }
-
-            return {};
         }
 
         bool MethodHasAttribute(const AZ::BehaviorMethod* method, AZ::Crc32 attribute)

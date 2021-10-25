@@ -7,7 +7,8 @@
             "details": {
                 "name": "HeartBeat",
                 "category": "Timing",
-                "tooltip": "While active, will signal the output at the given interval."
+                "tooltip": "While active, will signal the output at the given interval.",
+                "subtitle": "Timing"
             },
             "slots": [
                 {

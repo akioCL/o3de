@@ -7,7 +7,8 @@
             "details": {
                 "name": "Math Expression",
                 "category": "Math",
-                "tooltip": "Will evaluate a series of math operations, allowing users to specify inputs using {}."
+                "tooltip": "Will evaluate a series of math operations, allowing users to specify inputs using {}.",
+                "subtitle": "Math"
             },
             "slots": [
                 {

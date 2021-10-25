@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Receive Script Event",
+                "category": "Core",
                 "tooltip": "Allows you to handle a event."
             },
             "slots": [

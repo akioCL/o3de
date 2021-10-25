@@ -7,7 +7,8 @@
             "details": {
                 "name": "BaseTimerNode",
                 "category": "Utilities",
-                "tooltip": "Provides a basic interaction layer for all time based nodes for users(handles swapping between ticks and seconds)."
+                "tooltip": "Provides a basic interaction layer for all time based nodes for users(handles swapping between ticks and seconds).",
+                "subtitle": "Utilities"
             },
             "slots": [
                 {

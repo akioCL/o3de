@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Expect False",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "Expects a value to be false"
             },
             "slots": [

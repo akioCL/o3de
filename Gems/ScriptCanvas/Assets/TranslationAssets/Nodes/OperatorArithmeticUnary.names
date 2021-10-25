@@ -6,7 +6,8 @@
             "variant": "",
             "details": {
                 "name": "OperatorArithmeticUnary",
-                "category": "Operators/Math"
+                "category": "Operators/Math",
+                "subtitle": "Math"
             },
             "slots": [
                 {

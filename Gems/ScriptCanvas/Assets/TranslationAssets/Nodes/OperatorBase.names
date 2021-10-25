@@ -6,7 +6,8 @@
             "variant": "",
             "details": {
                 "name": "OperatorBase",
-                "category": "Operators"
+                "category": "Operators",
+                "subtitle": "Operators"
             },
             "slots": [
                 {

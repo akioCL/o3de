@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Multiplexer",
+                "category": "Logic",
                 "tooltip": "Selects one of the [In#] inputs using [Index] and sends it to [Out]"
             },
             "slots": [

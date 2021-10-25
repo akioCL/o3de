@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Method",
+                "category": "Core",
                 "tooltip": "Method"
             }
         }

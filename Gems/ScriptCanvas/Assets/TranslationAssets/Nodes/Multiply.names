@@ -7,7 +7,8 @@
             "details": {
                 "name": "Multiply",
                 "category": "Math/Number/Deprecated",
-                "tooltip": "Multiply"
+                "tooltip": "Multiply",
+                "subtitle": "Deprecated"
             },
             "slots": [
                 {

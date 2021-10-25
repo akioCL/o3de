@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Any",
+                "category": "Logic",
                 "tooltip": "Will trigger the Out pin whenever any of the In pins get triggered"
             },
             "slots": [

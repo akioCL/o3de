@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Not",
+                "category": "Logic",
                 "tooltip": "An execution flow gate that continues True if the Boolean is False, otherwise continues False if the Boolean is True"
             },
             "slots": [

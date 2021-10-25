@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Mock",
+                "category": "Developer",
                 "tooltip": "Node for mocking node visuals"
             }
         }

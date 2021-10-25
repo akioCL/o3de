@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Checkpoint",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "Add a progress checkpoint for test debugging"
             },
             "slots": [

@@ -7,7 +7,8 @@
             "details": {
                 "name": "StringFormatted",
                 "category": "Internal",
-                "tooltip": "Base class for any nodes that use string formatting capabilities."
+                "tooltip": "Base class for any nodes that use string formatting capabilities.",
+                "subtitle": "Internal"
             },
             "slots": [
                 {

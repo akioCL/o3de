@@ -159,7 +159,7 @@ namespace ScriptCanvasEditor::Nodes
         graphCanvasEntity->SetName(AZStd::string::format("GC-Node(%s)", details.Name.c_str()));
 
         GraphCanvas::NodeTitleRequestBus::Event(graphCanvasEntity->GetId(), &GraphCanvas::NodeTitleRequests::SetTitle, details.Name);
-        GraphCanvas::NodeTitleRequestBus::Event(graphCanvasEntity->GetId(), &GraphCanvas::NodeTitleRequests::SetSubTitle, details.Subtitle);
+        GraphCanvas::NodeTitleRequestBus::Event(graphCanvasEntity->GetId(), &GraphCanvas::NodeTitleRequests::SetSubTitle, details.Category);
         GraphCanvas::NodeRequestBus::Event(graphCanvasEntity->GetId(), &GraphCanvas::NodeRequests::SetTooltip, details.Tooltip);
 
         if (!nodeConfiguration.m_titlePalette.empty())
@@ -204,6 +204,9 @@ namespace ScriptCanvasEditor::Nodes
 
             nodeConfiguration.m_titleFallback = (classData->m_editData && classData->m_editData->m_name) ? classData->m_editData->m_name : classData->m_name;
             nodeConfiguration.m_tooltipFallback = (classData->m_editData && classData->m_editData->m_description) ? classData->m_editData->m_description : "";
+
+            //HERE
+
 
             GraphCanvas::TranslationKeyedString subtitleKeyedString(nodeContext, nodeConfiguration.m_translationContext);
             subtitleKeyedString.m_key = TranslationHelper::GetUserDefinedNodeKey(nodeContext, nodeConfiguration.m_titleFallback, ScriptCanvasEditor::TranslationKeyId::Category);
@@ -842,6 +845,7 @@ namespace ScriptCanvasEditor::Nodes
         {
             AZ_Error("Script Canvas", false, "Script Canvas Function asset (%s) is not loaded, unable to display the node.", functionNode->GetAssetId().ToString<AZStd::string>().c_str());
 
+            // TODO-LS: Move these strings to the globals part of the translation
             GraphCanvas::TranslationKeyedString errorTitle("ERROR!");
             GraphCanvas::TranslationKeyedString errorSubstring("Missing Script Canvas Function Asset!");
 

@@ -7,7 +7,8 @@
             "details": {
                 "name": "Print",
                 "category": "Utilities/Debug",
-                "tooltip": "Formats and prints the provided text in the debug console.\nAny word within {} will create a data pin on this node."
+                "tooltip": "Formats and prints the provided text in the debug console.\nAny word within {} will create a data pin on this node.",
+                "subtitle": "Debug"
             },
             "slots": [
                 {

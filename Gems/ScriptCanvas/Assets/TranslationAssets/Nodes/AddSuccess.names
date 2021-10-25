@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Add Success",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "adds a success directly to the unit testing framework"
             },
             "slots": [

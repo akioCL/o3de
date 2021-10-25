@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Expect Equal",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "Expects lhs equal to rhs"
             },
             "slots": [

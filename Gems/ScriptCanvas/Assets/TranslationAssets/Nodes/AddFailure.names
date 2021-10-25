@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Add Failure",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "adds a failure directly to the unit testing framework"
             },
             "slots": [

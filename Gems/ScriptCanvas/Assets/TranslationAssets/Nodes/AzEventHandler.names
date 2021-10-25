@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "AZ Event Handler",
+                "category": "Core",
                 "tooltip": "Handler for an AZ::Event returned from a BehaviorContent method."
             },
             "slots": [

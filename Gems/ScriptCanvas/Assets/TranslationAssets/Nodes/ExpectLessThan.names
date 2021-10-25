@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Expect Less Than",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "Expects lhs to be less than rhs"
             },
             "slots": [

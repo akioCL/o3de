@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Mark Complete",
+                "category": "Utilities/Unit Testing",
                 "tooltip": "reports that the graph completed to the unit testing framework"
             },
             "slots": [

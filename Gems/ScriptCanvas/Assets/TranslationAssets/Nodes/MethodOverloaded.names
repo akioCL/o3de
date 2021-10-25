@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "MethodOverloaded",
+                "category": "Core",
                 "tooltip": "MethodOverloaded"
             }
         }

@@ -27,6 +27,7 @@ namespace ScriptCanvasDeveloperEditor
             AZStd::string m_name;
             AZStd::string m_tooltip;
             AZStd::string m_category;
+            AZStd::string m_subtitle;
         };
         using EntryDetailsList = AZStd::vector<EntryDetails>;
 
@@ -88,6 +89,8 @@ namespace ScriptCanvasDeveloperEditor
         //! The Qt action that will start the database generation
         QAction* TranslationDatabaseFileAction(QMenu* mainMenu, QWidget* mainWindow);
 
-        
+        AZStd::string GetContextName(const AZ::SerializeContext::ClassData& classData);
+
+        AZStd::string GetLibraryCategory(const AZ::SerializeContext& serializeContext, const AZStd::string& nodeName);
     };
 }

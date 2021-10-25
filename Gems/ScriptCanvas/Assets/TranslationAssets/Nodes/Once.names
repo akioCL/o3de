@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Once",
+                "category": "Logic",
                 "tooltip": "An execution flow gate that will only activate once. The gate will reopen if it receives a Reset pulse."
             },
             "slots": [

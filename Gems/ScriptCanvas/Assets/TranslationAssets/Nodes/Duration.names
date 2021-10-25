@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Duration",
+                "category": "Timing",
                 "tooltip": "Triggers a signal every frame during the specified duration."
             },
             "slots": [

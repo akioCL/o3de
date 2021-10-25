@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "And",
+                "category": "Logic",
                 "tooltip": "An execution flow gate that signals True if both Boolean A and Boolean B are True, otherwise signals False"
             },
             "slots": [

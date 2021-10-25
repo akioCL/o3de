@@ -6,7 +6,8 @@
             "variant": "",
             "details": {
                 "name": "Cycle",
-                "category": "Logic"
+                "category": "Logic",
+                "subtitle": "Logic"
             },
             "slots": [
                 {

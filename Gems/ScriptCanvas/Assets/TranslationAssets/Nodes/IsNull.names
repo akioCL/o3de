@@ -6,6 +6,7 @@
             "variant": "",
             "details": {
                 "name": "Is Null",
+                "category": "Logic",
                 "tooltip": "Evaluates reference types for null."
             },
             "slots": [

@@ -1,15 +1,22 @@
 {
     "entries": [
         {
-            "key": "{0A38EDCA-0571-48F0-9199-F6168C1EAAF0}",
+            "key": "{AB587027-2270-4CA6-242F-6069C6D9BBB6}",
             "context": "ScriptCanvas::Node",
             "variant": "",
             "details": {
                 "name": "Repeater",
-                "category": "Utilities",
-                "tooltip": "Repeats the output signal the given number of times using the specified delay to space the signals out"
+                "category": "Nodeables",
+                "tooltip": "Repeats the output signal the given number of times using the specified delay to space the signals out.",
+                "subtitle": "Nodeables"
             },
             "slots": [
+                {
+                    "key": "Input_Start",
+                    "details": {
+                        "name": "Start"
+                    }
+                },
                 {
                     "key": "DataInput_Repetitions",
                     "details": {
@@ -17,10 +24,15 @@
                     }
                 },
                 {
-                    "key": "Input_In",
+                    "key": "DataInput_Interval",
                     "details": {
-                        "name": "In",
-                        "tooltip": "Input signal"
+                        "name": "Interval"
+                    }
+                },
+                {
+                    "key": "Output_On Start",
+                    "details": {
+                        "name": "On Start"
                     }
                 },
                 {
@@ -34,13 +46,7 @@
                     "key": "Output_Action",
                     "details": {
                         "name": "Action",
-                        "tooltip": "The signal that will be repeated"
-                    }
-                },
-                {
-                    "key": "DataInput_Interval",
-                    "details": {
-                        "name": "Interval"
+                        "tooltip": "Signaled every repetition"
                     }
                 }
             ]

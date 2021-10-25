@@ -7,7 +7,8 @@
             "details": {
                 "name": "Ends With",
                 "category": "String",
-                "tooltip": "."
+                "tooltip": ".",
+                "subtitle": "String"
             },
             "slots": [
                 {
