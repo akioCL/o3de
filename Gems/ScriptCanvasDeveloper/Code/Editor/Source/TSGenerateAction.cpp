@@ -437,6 +437,10 @@ namespace ScriptCanvasDeveloperEditor
                     methodEntry.m_details.m_tooltip = "";
                     methodEntry.m_details.m_name = event.m_name;
 
+                    AZStd::string translatedName = ScriptCanvasEditor::TranslationHelper::GetKeyTranslation(ScriptCanvasEditor::TranslationContextGroup::EbusHandler, ebus->m_name, event.m_name, ScriptCanvasEditor::TranslationItemType::Node, ScriptCanvasEditor::TranslationKeyId::Name);
+                    AZStd::string translatedTooltip = ScriptCanvasEditor::TranslationHelper::GetKeyTranslation(ScriptCanvasEditor::TranslationContextGroup::EbusHandler, ebus->m_name, event.m_name, ScriptCanvasEditor::TranslationItemType::Node, ScriptCanvasEditor::TranslationKeyId::Tooltip);
+
+
                     AZStd::string oldEventName = event.m_name;
                     AZStd::to_upper(oldEventName.begin(), oldEventName.end());
                     AZStd::string oldEventKey = AZStd::string::format("%s_NAME", oldEventName.c_str());
@@ -445,8 +449,8 @@ namespace ScriptCanvasDeveloperEditor
                     GraphCanvas::TranslationKeyedString translatedEventName(cleanName, translationContextHandler, oldEventKey);
                     GraphCanvas::TranslationKeyedString translatedEventTooltip("", translationContextHandler, oldEventTooltipKey);
 
-                    methodEntry.m_details.m_name = translatedEventName.GetDisplayString();
-                    methodEntry.m_details.m_tooltip = translatedEventTooltip.GetDisplayString();
+                    methodEntry.m_details.m_name = !translatedName.empty() ? translatedName.c_str() : translatedEventName.GetDisplayString();
+                    methodEntry.m_details.m_tooltip = !translatedTooltip.empty() ? translatedTooltip.c_str() : translatedEventTooltip.GetDisplayString();
 
                     // Arguments (Input Slots)
                     if (!event.m_parameters.empty())
@@ -971,13 +975,19 @@ namespace ScriptCanvasDeveloperEditor
                         delete nodeComponent;
                     }
 
+                    translationRoot.m_entries.push_back(entry);
 
+                    if (details.m_category.empty())
+                    {
+                        details.m_category = "Uncategorized";
+                    }
+
+                    AZStd::string prefix = GraphCanvas::TranslationKey::Sanitize(details.m_category);
                     AZStd::string filename = GraphCanvas::TranslationKey::Sanitize(details.m_name);
 
-                    translationRoot.m_entries.push_back(entry);
-                    AZStd::string fileName = AZStd::string::format("Nodes/%s", filename.c_str());
+                    AZStd::string targetFile = AZStd::string::format("Nodes/%s_%s", prefix.c_str(), filename.c_str());
 
-                    SaveJSONData(fileName, translationRoot);
+                    SaveJSONData(targetFile, translationRoot);
 
                     translationRoot.m_entries.clear();
 

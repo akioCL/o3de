@@ -12,7 +12,8 @@
                 {
                     "key": "OnDropdownOptionSelected",
                     "details": {
-                        "name": "OnDropdownOptionSelected"
+                        "name": "On Dropdown Option Selected",
+                        "tooltip": "Executes when the dropdown option was selected"
                     }
                 }
             ]

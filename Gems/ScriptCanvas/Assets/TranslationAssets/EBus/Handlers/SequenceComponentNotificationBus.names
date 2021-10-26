@@ -12,7 +12,7 @@
                 {
                     "key": "OnStart",
                     "details": {
-                        "name": "OnStart"
+                        "name": "On Start"
                     },
                     "params": [
                         {
@@ -26,7 +26,7 @@
                 {
                     "key": "OnStop",
                     "details": {
-                        "name": "OnStop"
+                        "name": "On Stop"
                     },
                     "params": [
                         {
@@ -40,19 +40,19 @@
                 {
                     "key": "OnPause",
                     "details": {
-                        "name": "OnPause"
+                        "name": "On Pause"
                     }
                 },
                 {
                     "key": "OnResume",
                     "details": {
-                        "name": "OnResume"
+                        "name": "On Resume"
                     }
                 },
                 {
                     "key": "OnAbort",
                     "details": {
-                        "name": "OnAbort"
+                        "name": "On Abort"
                     },
                     "params": [
                         {
@@ -66,7 +66,7 @@
                 {
                     "key": "OnUpdate",
                     "details": {
-                        "name": "OnUpdate"
+                        "name": "On Update"
                     },
                     "params": [
                         {
@@ -80,7 +80,7 @@
                 {
                     "key": "OnTrackEventTriggered",
                     "details": {
-                        "name": "OnTrackEventTriggered"
+                        "name": "On Track Event Triggered"
                     },
                     "params": [
                         {

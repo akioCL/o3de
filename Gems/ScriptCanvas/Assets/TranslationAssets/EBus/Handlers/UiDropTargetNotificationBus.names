@@ -12,7 +12,8 @@
                 {
                     "key": "OnDropHoverStart",
                     "details": {
-                        "name": "OnDropHoverStart"
+                        "name": "On Drop Hover Start",
+                        "tooltip": "Executes when the focus starts to be on the drop target during dragging"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnDropHoverEnd",
                     "details": {
-                        "name": "OnDropHoverEnd"
+                        "name": "On Drop Hover End",
+                        "tooltip": "Executes when the focus stops being on the drop target during dragging"
                     },
                     "params": [
                         {
@@ -42,7 +44,8 @@
                 {
                     "key": "OnDrop",
                     "details": {
-                        "name": "OnDrop"
+                        "name": "On Drop",
+                        "tooltip": "Executes when a draggable element is dropped on the drop target. Implement the game logic of what should happen on drag and drop here"
                     },
                     "params": [
                         {

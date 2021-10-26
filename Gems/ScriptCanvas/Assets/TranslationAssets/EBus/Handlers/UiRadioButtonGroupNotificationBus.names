@@ -12,7 +12,8 @@
                 {
                     "key": "OnRadioButtonGroupStateChange",
                     "details": {
-                        "name": "OnRadioButtonGroupStateChange"
+                        "name": "On Radio Button Group State Change",
+                        "tooltip": "Executes when the radio button group state has changed"
                     },
                     "params": [
                         {

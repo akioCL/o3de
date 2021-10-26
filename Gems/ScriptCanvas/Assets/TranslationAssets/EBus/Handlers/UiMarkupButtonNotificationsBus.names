@@ -12,7 +12,8 @@
                 {
                     "key": "OnHoverStart",
                     "details": {
-                        "name": "OnHoverStart"
+                        "name": "On Hover Start",
+                        "tooltip": "Executes when the button has become hovered"
                     },
                     "params": [
                         {
@@ -41,7 +42,8 @@
                 {
                     "key": "OnHoverEnd",
                     "details": {
-                        "name": "OnHoverEnd"
+                        "name": "On Hover End",
+                        "tooltip": "Executes when the button is no longer hovered"
                     },
                     "params": [
                         {
@@ -70,7 +72,8 @@
                 {
                     "key": "OnPressed",
                     "details": {
-                        "name": "OnPressed"
+                        "name": "On Pressed",
+                        "tooltip": "Executes when the button receives a press event"
                     },
                     "params": [
                         {
@@ -99,7 +102,8 @@
                 {
                     "key": "OnReleased",
                     "details": {
-                        "name": "OnReleased"
+                        "name": "On Released",
+                        "tooltip": "Executes when the button receives a release event"
                     },
                     "params": [
                         {
@@ -128,7 +132,8 @@
                 {
                     "key": "OnClick",
                     "details": {
-                        "name": "OnClick"
+                        "name": "On Click",
+                        "tooltip": "Executes when the button is clicked (a release on the button following a press on the button)"
                     },
                     "params": [
                         {

@@ -12,7 +12,8 @@
                 {
                     "key": "OnEntityTagAdded",
                     "details": {
-                        "name": "OnEntityTagAdded"
+                        "name": "On Entity Tag Added",
+                        "tooltip": "Executes when the specified source tag is added to any entity"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnEntityTagRemoved",
                     "details": {
-                        "name": "OnEntityTagRemoved"
+                        "name": "On Entity Tag Removed",
+                        "tooltip": "Executes when the specified source tag is removed from any entity"
                     },
                     "params": [
                         {

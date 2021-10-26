@@ -12,31 +12,36 @@
                 {
                     "key": "OnHoverStart",
                     "details": {
-                        "name": "OnHoverStart"
+                        "name": "On Hover Start",
+                        "tooltip": "Executes when the interactive element starts being hovered"
                     }
                 },
                 {
                     "key": "OnHoverEnd",
                     "details": {
-                        "name": "OnHoverEnd"
+                        "name": "On Hover End",
+                        "tooltip": "Executes when the interactive element ends being hovered"
                     }
                 },
                 {
                     "key": "OnPressed",
                     "details": {
-                        "name": "OnPressed"
+                        "name": "On Pressed",
+                        "tooltip": "Executes when the interactive element has been pressed"
                     }
                 },
                 {
                     "key": "OnReleased",
                     "details": {
-                        "name": "OnReleased"
+                        "name": "On Released",
+                        "tooltip": "Executes when the interactive element has been released"
                     }
                 },
                 {
                     "key": "OnReceivedHoverByNavigatingFromDescendant",
                     "details": {
-                        "name": "OnReceivedHoverByNavigatingFromDescendant"
+                        "name": "On Received Hover By Navigating From Descendant",
+                        "tooltip": "Executes when the interactive element receives the hover by being navigated to from a descendant"
                     },
                     "params": [
                         {

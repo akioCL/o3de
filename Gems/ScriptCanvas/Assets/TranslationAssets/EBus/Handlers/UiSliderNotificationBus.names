@@ -12,7 +12,8 @@
                 {
                     "key": "OnSliderValueChanging",
                     "details": {
-                        "name": "OnSliderValueChanging"
+                        "name": "On Slider Value Changing",
+                        "tooltip": "Executes when the slider value is changing"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnSliderValueChanged",
                     "details": {
-                        "name": "OnSliderValueChanged"
+                        "name": "On Slider Value Changed",
+                        "tooltip": "Executes when the slider value has finished changing"
                     },
                     "params": [
                         {

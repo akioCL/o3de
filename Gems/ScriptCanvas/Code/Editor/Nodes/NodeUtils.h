@@ -71,18 +71,6 @@ namespace ScriptCanvasEditor
             AZStd::string m_titlePalette;
             AZStd::vector< AZ::Uuid > m_customComponents;
 
-            // Translation Information for the Node
-            AZStd::string m_translationContext;
-
-            AZStd::string m_translationKeyName;
-            AZStd::string m_translationKeyContext;
-
-            TranslationContextGroup m_translationGroup;
-
-            AZStd::string m_titleFallback;
-            AZStd::string m_subtitleFallback;
-            AZStd::string m_tooltipFallback;
-
             AZ::EntityId  m_scriptCanvasId;
         };
 

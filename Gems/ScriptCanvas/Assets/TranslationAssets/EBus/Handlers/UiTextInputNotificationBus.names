@@ -12,7 +12,8 @@
                 {
                     "key": "OnTextInputChange",
                     "details": {
-                        "name": "OnTextInputChange"
+                        "name": "On Text Input Change",
+                        "tooltip": "Executes when a character is added, removed, or changed"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnTextInputEndEdit",
                     "details": {
-                        "name": "OnTextInputEndEdit"
+                        "name": "On Text Input End Edit",
+                        "tooltip": "Executes when edit of text is completed"
                     },
                     "params": [
                         {
@@ -42,7 +44,8 @@
                 {
                     "key": "OnTextInputEnter",
                     "details": {
-                        "name": "OnTextInputEnter"
+                        "name": "On Text Input Enter",
+                        "tooltip": "Executes when \"Enter\" is pressed on the keyboard"
                     },
                     "params": [
                         {

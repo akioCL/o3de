@@ -12,7 +12,8 @@
                 {
                     "key": "OnCanvasPrimaryPressed",
                     "details": {
-                        "name": "OnCanvasPrimaryPressed"
+                        "name": "On Canvas Primary Pressed",
+                        "tooltip": "Executes on a positional input press"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnCanvasPrimaryReleased",
                     "details": {
-                        "name": "OnCanvasPrimaryReleased"
+                        "name": "On Canvas Primary Released",
+                        "tooltip": "Executes on a positional input release"
                     },
                     "params": [
                         {
@@ -42,7 +44,8 @@
                 {
                     "key": "OnCanvasMultiTouchPressed",
                     "details": {
-                        "name": "OnCanvasMultiTouchPressed"
+                        "name": "On Canvas Multi-touch Pressed",
+                        "tooltip": "Executes on a positional input press"
                     },
                     "params": [
                         {
@@ -64,7 +67,8 @@
                 {
                     "key": "OnCanvasMultiTouchReleased",
                     "details": {
-                        "name": "OnCanvasMultiTouchReleased"
+                        "name": "On Canvas Multi-touch Released",
+                        "tooltip": "Executes on a positional input release"
                     },
                     "params": [
                         {
@@ -86,7 +90,8 @@
                 {
                     "key": "OnCanvasHoverStart",
                     "details": {
-                        "name": "OnCanvasHoverStart"
+                        "name": "On Canvas Hover Start",
+                        "tooltip": "Executes when an element starts being hovered"
                     },
                     "params": [
                         {
@@ -101,7 +106,8 @@
                 {
                     "key": "OnCanvasHoverEnd",
                     "details": {
-                        "name": "OnCanvasHoverEnd"
+                        "name": "On Canvas Hover End",
+                        "tooltip": "Executes when an element ends being hovered"
                     },
                     "params": [
                         {
@@ -116,7 +122,8 @@
                 {
                     "key": "OnCanvasEnterPressed",
                     "details": {
-                        "name": "OnCanvasEnterPressed"
+                        "name": "On Canvas Enter Pressed",
+                        "tooltip": "Executes when the “enter” key is pressed"
                     },
                     "params": [
                         {
@@ -131,7 +138,8 @@
                 {
                     "key": "OnCanvasEnterReleased",
                     "details": {
-                        "name": "OnCanvasEnterReleased"
+                        "name": "On Canvas Enter Released",
+                        "tooltip": "Executes when the enter key is released"
                     },
                     "params": [
                         {

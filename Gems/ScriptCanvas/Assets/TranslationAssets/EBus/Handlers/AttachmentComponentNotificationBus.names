@@ -12,7 +12,8 @@
                 {
                     "key": "OnAttached",
                     "details": {
-                        "name": "OnAttached"
+                        "name": "On Attached",
+                        "tooltip": "Notifies when the entity is attached"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnDetached",
                     "details": {
-                        "name": "OnDetached"
+                        "name": "On Detached",
+                        "tooltip": "Notifies when the entity is detached"
                     },
                     "params": [
                         {

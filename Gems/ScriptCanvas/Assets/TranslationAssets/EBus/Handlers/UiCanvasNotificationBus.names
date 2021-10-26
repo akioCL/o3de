@@ -12,7 +12,8 @@
                 {
                     "key": "OnAction",
                     "details": {
-                        "name": "OnAction"
+                        "name": "On Action",
+                        "tooltip": "Executes when the canvas sends an action"
                     },
                     "params": [
                         {

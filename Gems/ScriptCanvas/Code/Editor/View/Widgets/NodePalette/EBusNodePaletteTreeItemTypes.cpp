@@ -302,23 +302,19 @@ namespace ScriptCanvasEditor
         , m_busId(busId)
         , m_eventId(eventId)
     {
-        AZStd::string displayEventName = TranslationHelper::GetKeyTranslation(TranslationContextGroup::EbusHandler, m_busName.c_str(), m_eventName.c_str(), TranslationItemType::Node, TranslationKeyId::Name);
+        GraphCanvas::TranslationKey key;
+        key << "EBusHandler" << busName << "methods" << eventName << "details";
 
-        if (displayEventName.empty())
+        GraphCanvas::TranslationRequests::Details details;
+        details.Name = m_eventName;
+        GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);
+        if (details.Name.empty())
         {
-            SetName(m_eventName.c_str());
-        }
-        else
-        {
-            SetName(displayEventName.c_str());
+            details.Name = m_eventName;
         }
 
-        AZStd::string displayEventTooltip = TranslationHelper::GetKeyTranslation(TranslationContextGroup::EbusHandler, m_busName.c_str(), m_eventName.c_str(), TranslationItemType::Node, TranslationKeyId::Tooltip);
-
-        if (!displayEventTooltip.empty())
-        {
-            SetToolTip(displayEventTooltip.c_str());
-        }
+        SetName(details.Name.c_str());
+        SetToolTip(details.Tooltip.c_str());
 
         SetTitlePalette("HandlerNodeTitlePalette");
     }

@@ -12,7 +12,8 @@
                 {
                     "key": "OnSpawnBegin",
                     "details": {
-                        "name": "OnSpawnBegin"
+                        "name": "On Spawn Begin",
+                        "tooltip": "Notifies when the spawn starts"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnSpawnEnd",
                     "details": {
-                        "name": "OnSpawnEnd"
+                        "name": "On Spawn End",
+                        "tooltip": "Notifies when the spawn completes"
                     },
                     "params": [
                         {
@@ -42,7 +44,8 @@
                 {
                     "key": "OnEntitySpawned",
                     "details": {
-                        "name": "OnEntitySpawned"
+                        "name": "On Entity Spawned",
+                        "tooltip": "Notify that an entity has spawned, will be called once for each entity spawned in a slice"
                     },
                     "params": [
                         {

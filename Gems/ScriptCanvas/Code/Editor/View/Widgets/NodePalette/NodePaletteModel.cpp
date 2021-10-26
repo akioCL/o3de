@@ -1088,7 +1088,7 @@ namespace ScriptCanvasEditor
             handlerInformation->m_eventId = forwardEvent.m_eventId;
 
             GraphCanvas::TranslationKey key;
-            key << "EBusHandler" << busName << "details";
+            key << "EBusHandler" << busName << "methods" << eventName << "details";
 
             GraphCanvas::TranslationRequests::Details details;
             GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);
@@ -1130,7 +1130,7 @@ namespace ScriptCanvasEditor
             senderInformation->m_eventId = eventId;
 
             GraphCanvas::TranslationKey key;
-            key << "EBusSender" << busName << "details";
+            key << "EBusSender" << busName << "methods" << eventName << "details";
 
             GraphCanvas::TranslationRequests::Details details;
             GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);

@@ -12,7 +12,8 @@
                 {
                     "key": "OnTriggerFinished",
                     "details": {
-                        "name": "OnTriggerFinished"
+                        "name": "On Trigger Finished",
+                        "tooltip": "Executes when an audio trigger has finished playing (the sound has ended)."
                     },
                     "params": [
                         {

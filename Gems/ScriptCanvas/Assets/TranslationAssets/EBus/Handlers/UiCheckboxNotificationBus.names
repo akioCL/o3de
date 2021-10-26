@@ -12,7 +12,8 @@
                 {
                     "key": "OnCheckboxStateChange",
                     "details": {
-                        "name": "OnCheckboxStateChange"
+                        "name": "On Checkbox State Change",
+                        "tooltip": "Executes when the checkbox state has changed"
                     },
                     "params": [
                         {

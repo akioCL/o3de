@@ -12,7 +12,7 @@
                 {
                     "key": "OnMotionEvent",
                     "details": {
-                        "name": "OnMotionEvent"
+                        "name": "On Motion Event"
                     },
                     "params": [
                         {
@@ -26,7 +26,7 @@
                 {
                     "key": "OnMotionLoop",
                     "details": {
-                        "name": "OnMotionLoop"
+                        "name": "On Motion Loop"
                     },
                     "params": [
                         {
@@ -40,7 +40,7 @@
                 {
                     "key": "OnStateEntering",
                     "details": {
-                        "name": "OnStateEntering"
+                        "name": "On State Entering"
                     },
                     "params": [
                         {
@@ -54,7 +54,7 @@
                 {
                     "key": "OnStateEntered",
                     "details": {
-                        "name": "OnStateEntered"
+                        "name": "On State Entered"
                     },
                     "params": [
                         {
@@ -68,7 +68,7 @@
                 {
                     "key": "OnStateExiting",
                     "details": {
-                        "name": "OnStateExiting"
+                        "name": "On State Exiting"
                     },
                     "params": [
                         {
@@ -82,7 +82,7 @@
                 {
                     "key": "OnStateExited",
                     "details": {
-                        "name": "OnStateExited"
+                        "name": "On State Exited"
                     },
                     "params": [
                         {
@@ -96,7 +96,7 @@
                 {
                     "key": "OnStateTransitionStart",
                     "details": {
-                        "name": "OnStateTransitionStart"
+                        "name": "On State Transition Start"
                     },
                     "params": [
                         {
@@ -116,7 +116,7 @@
                 {
                     "key": "OnStateTransitionEnd",
                     "details": {
-                        "name": "OnStateTransitionEnd"
+                        "name": "On State Transition End"
                     },
                     "params": [
                         {

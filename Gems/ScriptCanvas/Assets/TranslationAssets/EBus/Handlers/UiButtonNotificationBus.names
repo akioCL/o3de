@@ -12,7 +12,8 @@
                 {
                     "key": "OnButtonClick",
                     "details": {
-                        "name": "OnButtonClick"
+                        "name": "On Button Click",
+                        "tooltip": "Executes when the button has been clicked"
                     }
                 }
             ]

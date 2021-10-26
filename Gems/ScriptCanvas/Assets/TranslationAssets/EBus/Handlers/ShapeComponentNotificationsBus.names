@@ -12,7 +12,7 @@
                 {
                     "key": "OnShapeChanged",
                     "details": {
-                        "name": "OnShapeChanged"
+                        "name": "On Shape Changed"
                     },
                     "params": [
                         {

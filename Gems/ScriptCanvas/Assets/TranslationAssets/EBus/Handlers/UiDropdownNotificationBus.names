@@ -12,19 +12,22 @@
                 {
                     "key": "OnDropdownExpanded",
                     "details": {
-                        "name": "OnDropdownExpanded"
+                        "name": "On Dropdown Expanded",
+                        "tooltip": "Executes when the dropdown is expanded"
                     }
                 },
                 {
                     "key": "OnDropdownCollapsed",
                     "details": {
-                        "name": "OnDropdownCollapsed"
+                        "name": "On Dropdown Collapsed",
+                        "tooltip": "Executes when the dropdown is collapsed"
                     }
                 },
                 {
                     "key": "OnDropdownValueChanged",
                     "details": {
-                        "name": "OnDropdownValueChanged"
+                        "name": "On Dropdown Value Changed",
+                        "tooltip": "Executes when an option is selected"
                     },
                     "params": [
                         {

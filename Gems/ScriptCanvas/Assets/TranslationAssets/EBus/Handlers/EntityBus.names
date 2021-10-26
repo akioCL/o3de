@@ -12,7 +12,8 @@
                 {
                     "key": "OnEntityActivated",
                     "details": {
-                        "name": "OnEntityActivated"
+                        "name": "On Entity Activated",
+                        "tooltip": "Signals that an entity was activated"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnEntityDeactivated",
                     "details": {
-                        "name": "OnEntityDeactivated"
+                        "name": "On Entity Deactivated",
+                        "tooltip": "Signals that an entity is being deactivated"
                     },
                     "params": [
                         {

@@ -12,7 +12,8 @@
                 {
                     "key": "OnUiAnimationEvent",
                     "details": {
-                        "name": "OnUiAnimationEvent"
+                        "name": "On Animation Event",
+                        "tooltip": "Executes when an animation event occurs"
                     },
                     "params": [
                         {

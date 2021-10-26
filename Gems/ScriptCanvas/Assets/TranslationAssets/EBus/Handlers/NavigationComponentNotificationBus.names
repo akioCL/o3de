@@ -12,7 +12,8 @@
                 {
                     "key": "OnSearchingForPath",
                     "details": {
-                        "name": "OnSearchingForPath"
+                        "name": "On Searching For Path",
+                        "tooltip": "Executes when the pathfinding request has been submitted to the navigation system"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnTraversalStarted",
                     "details": {
-                        "name": "OnTraversalStarted"
+                        "name": "On Traversal Started",
+                        "tooltip": "Executes when the traversal for the indicated request has started"
                     },
                     "params": [
                         {
@@ -71,7 +73,8 @@
                 {
                     "key": "OnTraversalInProgress",
                     "details": {
-                        "name": "OnTraversalInProgress"
+                        "name": "On Traversal In Progress",
+                        "tooltip": "Executes when the traversal for the indicated request is in progress"
                     },
                     "params": [
                         {
@@ -93,7 +96,8 @@
                 {
                     "key": "OnTraversalComplete",
                     "details": {
-                        "name": "OnTraversalComplete"
+                        "name": "On Traversal Complete",
+                        "tooltip": "Executes when the traversal for the indicated request has completed successfully"
                     },
                     "params": [
                         {
@@ -108,7 +112,8 @@
                 {
                     "key": "OnTraversalCancelled",
                     "details": {
-                        "name": "OnTraversalCancelled"
+                        "name": "On Traversal Cancelled",
+                        "tooltip": "Executes when the traversal for the indicated request was canceled before successful completion."
                     },
                     "params": [
                         {

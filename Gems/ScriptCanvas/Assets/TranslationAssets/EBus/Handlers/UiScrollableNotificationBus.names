@@ -12,7 +12,8 @@
                 {
                     "key": "OnScrollableValueChanging",
                     "details": {
-                        "name": "OnScrollableValueChanging"
+                        "name": "On Scrollable Value Changing",
+                        "tooltip": "Executes when the scroll value is changing"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnScrollableValueChanged",
                     "details": {
-                        "name": "OnScrollableValueChanged"
+                        "name": "On Scrollable Value Changed",
+                        "tooltip": "Executes when the scroll value has changed"
                     },
                     "params": [
                         {

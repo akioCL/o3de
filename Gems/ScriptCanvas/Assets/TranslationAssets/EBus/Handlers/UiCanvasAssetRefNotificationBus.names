@@ -12,7 +12,8 @@
                 {
                     "key": "OnCanvasLoadedIntoEntity",
                     "details": {
-                        "name": "OnCanvasLoadedIntoEntity"
+                        "name": "On Canvas Loaded Into Entity",
+                        "tooltip": "Executes when the canvas asset reference loads a canvas"
                     },
                     "params": [
                         {

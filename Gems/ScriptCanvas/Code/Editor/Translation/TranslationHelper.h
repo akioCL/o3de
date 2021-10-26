@@ -23,7 +23,7 @@ namespace Translation
     {
         static constexpr const char* EBusSenderIDKey = "Globals.EBusSenderBusId";
         static constexpr const char* EBusHandlerIDKey = "Globals.EBusHandlerBusId";
-        static constexpr const char* MissingFunctionKey = "Globals.missing_function";
+        static constexpr const char* MissingFunctionKey = "Globals.MissingFunction";
         static constexpr const char* EBusHandlerOutSlot = "Globals.EBusHandler.OutSlot";
     }
 

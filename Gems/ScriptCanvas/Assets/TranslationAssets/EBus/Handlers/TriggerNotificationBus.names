@@ -12,7 +12,8 @@
                 {
                     "key": "OnTriggerEnter",
                     "details": {
-                        "name": "OnTriggerEnter"
+                        "name": "On Trigger Enter",
+                        "tooltip": "Triggered when another collider enters this trigger"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnTriggerExit",
                     "details": {
-                        "name": "OnTriggerExit"
+                        "name": "On Trigger Exit",
+                        "tooltip": "Triggered when another collider exits this trigger"
                     },
                     "params": [
                         {

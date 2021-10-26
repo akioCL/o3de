@@ -12,7 +12,8 @@
                 {
                     "key": "OnStateChanged",
                     "details": {
-                        "name": "OnStateChanged"
+                        "name": "On State Changed",
+                        "tooltip": "Notifies that the state has changed from state oldName to state newName"
                     },
                     "params": [
                         {

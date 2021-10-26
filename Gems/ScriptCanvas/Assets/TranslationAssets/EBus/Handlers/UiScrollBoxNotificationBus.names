@@ -12,7 +12,8 @@
                 {
                     "key": "OnScrollOffsetChanging",
                     "details": {
-                        "name": "OnScrollOffsetChanging"
+                        "name": "On Scroll Offset Changing",
+                        "tooltip": "Executes when the scroll offset is changing"
                     },
                     "params": [
                         {
@@ -27,7 +28,8 @@
                 {
                     "key": "OnScrollOffsetChanged",
                     "details": {
-                        "name": "OnScrollOffsetChanged"
+                        "name": "On Scroll Offset Changed",
+                        "tooltip": "Executes when the scroll offset has changed"
                     },
                     "params": [
                         {
