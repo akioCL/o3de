@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+
 #pragma once
 
 #include <AzCore/Component/ComponentApplicationBus.h>
@@ -174,6 +175,8 @@ namespace AZ
             bool m_loadDynamicModules = true;
             //! Used by test fixtures to ensure reflection occurs to edit context.
             bool m_createEditContext = false;
+            //! Indicates whether the AssetCatalog.xml should be loaded by default in Application::StartCommon
+            bool m_loadAssetCatalog = true;
         };
 
         ComponentApplication();
@@ -196,14 +199,14 @@ namespace AZ
 
         //////////////////////////////////////////////////////////////////////////
         // ComponentApplicationRequests
-        void RegisterComponentDescriptor(const ComponentDescriptor* descriptor) override final;
-        void UnregisterComponentDescriptor(const ComponentDescriptor* descriptor) override final;
-        void RegisterEntityAddedEventHandler(EntityAddedEvent::Handler& handler) override final;
-        void RegisterEntityRemovedEventHandler(EntityRemovedEvent::Handler& handler) override final;
-        void RegisterEntityActivatedEventHandler(EntityActivatedEvent::Handler& handler) override final;
-        void RegisterEntityDeactivatedEventHandler(EntityDeactivatedEvent::Handler& handler) override final;
-        void SignalEntityActivated(Entity* entity) override final;
-        void SignalEntityDeactivated(Entity* entity) override final;
+        void RegisterComponentDescriptor(const ComponentDescriptor* descriptor) final;
+        void UnregisterComponentDescriptor(const ComponentDescriptor* descriptor) final;
+        void RegisterEntityAddedEventHandler(EntityAddedEvent::Handler& handler) final;
+        void RegisterEntityRemovedEventHandler(EntityRemovedEvent::Handler& handler) final;
+        void RegisterEntityActivatedEventHandler(EntityActivatedEvent::Handler& handler) final;
+        void RegisterEntityDeactivatedEventHandler(EntityDeactivatedEvent::Handler& handler) final;
+        void SignalEntityActivated(Entity* entity) final;
+        void SignalEntityDeactivated(Entity* entity) final;
         bool AddEntity(Entity* entity) override;
         bool RemoveEntity(Entity* entity) override;
         bool DeleteEntity(const EntityId& id) override;
@@ -355,7 +358,7 @@ namespace AZ
         /// Calculates the root directory of the engine.
         void CalculateEngineRoot();
 
-        /// Calculates the directory where the bootstrap.cfg file resides.
+        /// Deprecated: The term "AppRoot" has no meaning
         void CalculateAppRoot();
 
         template<typename Iterator>
@@ -389,7 +392,9 @@ namespace AZ
         AZ::IO::FixedMaxPath                        m_engineRoot;
         AZ::IO::FixedMaxPath                        m_appRoot;
 
-        AZ::SettingsRegistryInterface::NotifyEventHandler m_projectChangedHandler;
+        AZ::SettingsRegistryInterface::NotifyEventHandler m_projectPathChangedHandler;
+        AZ::SettingsRegistryInterface::NotifyEventHandler m_projectNameChangedHandler;
+        AZ::SettingsRegistryInterface::NotifyEventHandler m_commandLineUpdatedHandler;
 
         // ConsoleFunctorHandle is responsible for unregistering the Settings Registry Console
         // from the m_console member when it goes out of scope
