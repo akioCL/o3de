@@ -23,12 +23,13 @@ namespace AWSCore
     static constexpr const char ResourceMappingVersionKeyName[] = "Version";
 
     // TODO: move this into an independent file under AWSCore gem, if resource mapping tool can reuse it
+    // removed: "AccountId"
     static constexpr const char ResourceMappingJsonSchema[] =
         R"({
     "$schema": "http://json-schema.org/draft-04/schema",
     "type": "object",
     "title": "The AWS Resource Mapping Root schema",
-    "required": ["AWSResourceMappings", "AccountId", "Region", "Version"],
+    "required": ["AWSResourceMappings", "Region", "Version"],
     "properties": {
         "AWSResourceMappings": {
             "type": "object",
@@ -68,7 +69,7 @@ namespace AWSCore
     },
     "AccountIdString": {
         "type": "string",
-        "pattern": "^[0-9]{12}$|EMPTY"
+        "pattern": "^[0-9]{12}$|EMPTY|^$"
     },
     "NonEmptyString": {
         "type": "string",
