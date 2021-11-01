@@ -8,6 +8,7 @@
 
 #include <AWSClientAuthBus.h>
 #include <AWSCoreBus.h>
+#include <Authorization/AWSClientAuthCognitoCachingAuthenticatedCredentialsProvider.h> // new
 #include <Authorization/AWSCognitoAuthorizationController.h>
 #include <ResourceMapping/AWSResourceMappingBus.h>
 #include <AWSClientAuthResourceMappingConstants.h>
@@ -37,11 +38,19 @@ namespace AWSClientAuth
 
         auto identityClient = AZ::Interface<IAWSClientAuthRequests>::Get()->GetCognitoIdentityClient();
 
+        /*m_cognitoCachingCredentialsProvider =
+            std::make_shared<Aws::Auth::CognitoCachingAuthenticatedCredentialsProvider>(m_persistentCognitoIdentityProvider, identityClient);*/
+
         m_cognitoCachingCredentialsProvider =
-            std::make_shared<Aws::Auth::CognitoCachingAuthenticatedCredentialsProvider>(m_persistentCognitoIdentityProvider, identityClient);
+            std::make_shared<AWSClientAuthCognitoCachingAuthenticatedCredentialsProvider>(
+            m_persistentCognitoIdentityProvider, identityClient);
+
+        /*m_cognitoCachingAnonymousCredentialsProvider = std::make_shared<AWSClientAuthCognitoCachingAuthenticatedCredentialsProvider>(
+            m_persistentAnonymousCognitoIdentityProvider, identityClient);*/
 
         m_cognitoCachingAnonymousCredentialsProvider =
-            std::make_shared<Aws::Auth::CognitoCachingAnonymousCredentialsProvider>(m_persistentAnonymousCognitoIdentityProvider, identityClient);
+            std::make_shared<AWSClientAuthCachingAnonymousCredsProvider>(
+            m_persistentAnonymousCognitoIdentityProvider, identityClient);
     }
 
     AWSCognitoAuthorizationController::~AWSCognitoAuthorizationController()
@@ -65,9 +74,14 @@ namespace AWSClientAuth
         AWSCore::AWSResourceMappingRequestBus::BroadcastResult(
             m_cognitoIdentityPoolId, &AWSCore::AWSResourceMappingRequests::GetResourceNameId, CognitoIdentityPoolIdResourceMappingKey);
 
-        if (m_awsAccountId.empty() || m_cognitoIdentityPoolId.empty())
+        if (m_awsAccountId.empty())
         {
-            AZ_Warning("AWSCognitoAuthorizationController", !m_awsAccountId.empty(), "Missing AWS account id not configured.");
+            AZ_Warning("AWSCognitoAuthorizationController", !m_awsAccountId.empty(), "Missing AWS account id not configured... but that's ok.");
+        }
+
+        if (m_cognitoIdentityPoolId.empty())
+        {
+            //AZ_Warning("AWSCognitoAuthorizationController", !m_awsAccountId.empty(), "Missing AWS account id not configured.");
             AZ_Warning("AWSCognitoAuthorizationController", !m_cognitoIdentityPoolId.empty(), "Missing Cognito Identity pool id in resource mappings.");
             return false;
         }
