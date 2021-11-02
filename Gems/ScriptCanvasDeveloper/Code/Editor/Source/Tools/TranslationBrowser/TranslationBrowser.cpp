@@ -35,6 +35,7 @@
 
 #include <AzFramework/Asset/AssetSystemBus.h>
 #include <AzFramework/IO/FileOperations.h>
+#include <AzFramework/IO/LocalFileIO.h>
 
 #include <AzToolsFramework/API/EditorAssetSystemAPI.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
@@ -46,17 +47,13 @@
 #include <ScriptCanvas/Components/EditorGraph.h>
 
 #include <Source/Translation/TranslationAsset.h>
+#include <Source/Translation/TranslationHelper.h>
 #include <Source/Translation/TranslationSerializer.h>
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
 #include <Tools/TranslationBrowser/ui_TranslationBrowser.h>
-
-#include "../Translation/TranslationHelper.h"
-#include "AzFramework/IO/LocalFileIO.h"
-
-#pragma optimize("", off)
 
 namespace ScriptCanvasDeveloper
 {
@@ -1116,4 +1113,3 @@ namespace ScriptCanvasDeveloper
     }
 
 }
-#pragma optimize("", on)

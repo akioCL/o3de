@@ -53,9 +53,6 @@
 
 #include <GraphCanvas/Components/Slots/SlotBus.h>
 
-#pragma optimize("", off)
-
-
 namespace ScriptCanvasDeveloperEditor
 {
     namespace TranslationGenerator

@@ -368,7 +368,7 @@ namespace GraphCanvas
     {
         return Styling::VirtualChildElement::Create(real, virtualChildElement);
     }
-#pragma optimize("", off)
+
     void GraphCanvasSystemComponent::OnCatalogLoaded(const char* /*catalogFile*/)
     {
         auto postEnumerateCb = [this]()

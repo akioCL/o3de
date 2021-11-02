@@ -8,8 +8,6 @@
 
 #include "GraphCanvas.h"
 
-#pragma optimize("", off)
-
 namespace GraphCanvas
 {
 
@@ -180,5 +178,3 @@ namespace GraphCanvas
     }
 
 }
-
-#pragma optimize("", on)

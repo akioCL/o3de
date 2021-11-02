@@ -32,8 +32,6 @@
 
 #include <ScriptCanvas/Data/Traits.h>
 
-#pragma optimize("", off)
-
 namespace
 {
     // Various Helper Methods
@@ -633,13 +631,13 @@ namespace
                 categoryPath = "Other/";
             }
 
-            if (displayName.empty())
+            if (!details.Name.empty())
             {
-                categoryPath.append(behaviorEbus.m_name.c_str());
+                categoryPath.append(details.Name.c_str());
             }
             else
             {
-                categoryPath.append(displayName.c_str());
+                categoryPath.append(behaviorEbus.m_name.c_str());
             }
 
             ScriptCanvasEditor::CategoryInformation ebusCategoryInformation;
@@ -986,6 +984,11 @@ namespace ScriptCanvasEditor
             methodModelInformation->m_methodName = methodName;
             methodModelInformation->m_propertyStatus = propertyStatus;
             methodModelInformation->m_titlePaletteOverride = "MethodNodeTitlePalette";
+
+            GraphCanvas::TranslationKey catkey;
+            catkey << "BehaviorClass" << methodClass.c_str() << "details";
+            GraphCanvas::TranslationRequests::Details catdetails;
+            GraphCanvas::TranslationRequestBus::BroadcastResult(catdetails, &GraphCanvas::TranslationRequests::GetDetails, catkey, catdetails);
 
             GraphCanvas::TranslationKey key;
             key << "BehaviorClass" << methodClass.c_str() << "methods" << methodName.c_str() << "details";
@@ -1423,6 +1426,3 @@ namespace ScriptCanvasEditor
         m_categoryInformation.clear();
     }
 }
-
-
-#pragma optimize("", on)
