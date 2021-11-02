@@ -857,34 +857,6 @@ namespace ScriptCanvasDeveloper
 
                         m_ui->fromFileTranslationData->clear();
                         m_ui->fromFileTranslationData->setPlainText(buffer.get());
-
-                        /*rapidjson::Document document;
-
-                        bool failure = false;
-                        if (document.Parse(buffer.get()).HasParseError())
-                        {
-                            failure = true;
-                        }
-                        else
-                        {
-                            const rapidjson::Value& rootValue = document.GetObject();
-                            if (!document.IsObject())
-                            {
-                                failure = true;
-                            }
-
-                            using namespace AZ::JsonSerializationResult;
-
-                            ScriptCanvasDeveloperEditor::TranslationGenerator::TranslationFormat translationFormat;
-                            ResultCode serializerResult = m_serializer->Load(&translationFormat, azrtti_typeid<ScriptCanvasDeveloperEditor::TranslationGenerator::TranslationFormat>(), rootValue, *m_jsonDeserializationContext);
-                            if (serializerResult.GetOutcome() == Outcomes::Success)
-                            {
-                                AZStd::string output = MakeJSON(translationFormat);
-
-                                m_ui->fromFileTranslationData->clear();
-                                m_ui->fromFileTranslationData->setPlainText(output.c_str());
-                            }
-                        }*/
                     }
                 }
             }
