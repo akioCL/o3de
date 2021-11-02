@@ -58,3 +58,9 @@ add_subdirectory(smoke)
 
 ## AWS ##
 add_subdirectory(AWS)
+
+## Multiplayer ##
+add_subdirectory(Multiplayer)
+
+## Integration tests for editor testing framework ##
+add_subdirectory(editor_test_testing)
