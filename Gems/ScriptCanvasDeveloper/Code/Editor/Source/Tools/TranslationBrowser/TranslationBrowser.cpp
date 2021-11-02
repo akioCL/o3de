@@ -46,8 +46,9 @@
 #include <ScriptCanvas/Bus/EditorScriptCanvasBus.h>
 #include <ScriptCanvas/Components/EditorGraph.h>
 
+#include <Editor/Translation/TranslationHelper.h>
+
 #include <Source/Translation/TranslationAsset.h>
-#include <Source/Translation/TranslationHelper.h>
 #include <Source/Translation/TranslationSerializer.h>
 
 #include <rapidjson/stringbuffer.h>
@@ -952,7 +953,6 @@ namespace ScriptCanvasDeveloper
                     {
                         rapidjson::Value methodArguments(rapidjson::kArrayType);
 
-                        //size_t index = 0;
                         for (const auto& argSource : methodSource.m_arguments)
                         {
                             rapidjson::Value argument(rapidjson::kObjectType);
