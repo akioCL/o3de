@@ -258,20 +258,16 @@ namespace ScriptCanvasEditor::Nodes
         graphCanvasEntity->CreateComponent<SlotMappingComponent>(methodNode->GetEntityId());
         graphCanvasEntity->CreateComponent<SceneMemberMappingComponent>(methodNode->GetEntityId());
 
-        TranslationContextGroup contextGroup = TranslationContextGroup::Invalid;
-
         switch (methodNode->GetMethodType())
         {
         case ScriptCanvas::MethodType::Event:
             graphCanvasEntity->CreateComponent<EBusSenderNodeDescriptorComponent>();
-            contextGroup = TranslationContextGroup::EbusSender;
             break;
         case ScriptCanvas::MethodType::Member:
         case ScriptCanvas::MethodType::Getter:
         case ScriptCanvas::MethodType::Setter:
         case ScriptCanvas::MethodType::Free:
             graphCanvasEntity->CreateComponent<ClassMethodNodeDescriptorComponent>();
-            contextGroup = TranslationContextGroup::ClassMethod;
             break;
         default:
             AZ_Error("ScriptCanvas", false, "Invalid method node type, node creation failed. This node needs to be deleted.");
@@ -290,30 +286,22 @@ namespace ScriptCanvasEditor::Nodes
             *graphCanvasUserData = methodNode->GetEntityId();
         }
 
+        const bool isEBusSender = (methodNode->GetMethodType() == ScriptCanvas::MethodType::Event);
         const AZStd::string& className = methodNode->GetMethodClassName();
         const AZStd::string& methodName = methodNode->GetName();
 
         GraphCanvas::TranslationKey key;
-        key << "BehaviorClass" << className;
-
-        GraphCanvas::TranslationRequests::Details fallbackDetails;
-        fallbackDetails.Name = methodName;
-        fallbackDetails.Subtitle = className;
-
-        GraphCanvas::TranslationRequests::Details details = fallbackDetails;
-        
-        GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key + ".details", fallbackDetails);
-        AZStd::string subtitle = details.Subtitle;
-
-        GraphCanvas::NodeRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeRequests::SetTooltip, details.Tooltip);
-
-        // Update the key for the node's methods
+        key = isEBusSender ? "EBusSender" : "BehaviorClass";
+        key << className;
         key << "methods" << methodName;
 
-        GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key + ".details", fallbackDetails);
-        GraphCanvas::NodeTitleRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeTitleRequests::SetDetails, details.Name, subtitle);
+        GraphCanvas::TranslationRequests::Details details;
+        details.Name = methodName;
 
-        AZStd::string translationContext = TranslationHelper::GetContextName(contextGroup, className);
+        GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key + ".details", details);
+
+        GraphCanvas::NodeTitleRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeTitleRequests::SetDetails, details.Name, details.Subtitle);
+        GraphCanvas::NodeRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeRequests::SetTooltip, details.Tooltip);
 
         int paramIndex = 0;
         int outputIndex = 0;
@@ -327,32 +315,35 @@ namespace ScriptCanvasEditor::Nodes
             {
                 AZ::EntityId graphCanvasSlotId = DisplayScriptCanvasSlot(graphCanvasNodeId, slot);
 
-                fallbackDetails.Name = slot.GetName();
-                fallbackDetails.Tooltip = slot.GetToolTip();
+                details.Name = slot.GetName();
+                details.Tooltip = slot.GetToolTip();
 
                 if (methodNode->HasBusID() && busId == slot.GetId() && slot.GetDescriptor() == ScriptCanvas::SlotDescriptors::DataIn())
                 {
                     key = "Global.EBusSender.BusId.details";
-                    GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, fallbackDetails);
+                    GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);
                 }
                 else
                 {
                     TranslationItemType itemType = TranslationHelper::GetItemType(slot.GetDescriptor());
                     int& index = (itemType == TranslationItemType::ParamDataSlot) ? paramIndex : outputIndex;
 
-                    key = "BehaviorClass";
-                    key << className << "methods" << methodName;
-                    if (itemType == TranslationItemType::ParamDataSlot)
+                    if (slot.IsData())
                     {
-                        key << "params";
-                    }
-                    else
-                    {
-                        key << "results";
-                    }
-                    key << index;
+                        key = isEBusSender ? "EBusSender" : "BehaviorClass";
+                        key << className << "methods" << methodName;
+                        if (itemType == TranslationItemType::ParamDataSlot)
+                        {
+                            key << "params";
+                        }
+                        else
+                        {
+                            key << "results";
+                        }
+                        key << index;
 
-                    GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key + ".details", fallbackDetails);
+                        GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key + ".details", details);
+                    }
 
                     if ((itemType == TranslationItemType::ParamDataSlot) || (itemType == TranslationItemType::ReturnDataSlot))
                     {
@@ -533,76 +524,27 @@ namespace ScriptCanvasEditor::Nodes
             if (slot.IsVisible())
             {
                 AZ::EntityId gcSlotId = DisplayScriptCanvasSlot(graphCanvasNodeId, slot, group);
-                if (slot.GetId() == azEventEntry.m_azEventInputSlotId)
-                {
-                    GraphCanvas::TranslationKeyedString slotTranslationEntry(azEventEntry.m_eventName);
-                    slotTranslationEntry.m_context = TranslationHelper::GetAzEventHandlerContextKey();
-                    // The translation key in this case acts like a json pointer referencing a particular
-                    // json string within a hypothetical json document
-                    AZ::StackedString azEventHandlerNodeKey = TranslationHelper::GetAzEventHandlerRootPointer(azEventEntry.m_eventName);
 
-                    azEventHandlerNodeKey.Push("Name");
-                    slotTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
-                    GraphCanvas::SlotRequestBus::Event(gcSlotId, &GraphCanvas::SlotRequests::SetTranslationKeyedName, slotTranslationEntry);
-                    azEventHandlerNodeKey.Pop();
-                    azEventHandlerNodeKey.Push("Tooltip");
-                    slotTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
-                    GraphCanvas::SlotRequestBus::Event(gcSlotId, &GraphCanvas::SlotRequests::SetTranslationKeyedTooltip, slotTranslationEntry);
-                }
-                else
-                {
-                    GraphCanvas::TranslationKeyedString slotTranslationEntry(slot.GetName());
-                    slotTranslationEntry.m_context = TranslationHelper::GetAzEventHandlerContextKey();
-                    // The translation key in this case acts like a json pointer referencing a particular
-                    // json string within a hypothetical json document
-                    // translation key is rooted at /AzEventHandler/${EventName}/Slots/${SlotName}/{In,Out,Param,Return}
-                    AZ::StackedString azEventHandlerNodeKey = TranslationHelper::GetAzEventHandlerRootPointer(azEventEntry.m_eventName);
-                    azEventHandlerNodeKey.Push("Slots");
-                    azEventHandlerNodeKey.Push(slot.GetName());
-                    switch(TranslationHelper::GetItemType(slot.GetDescriptor()))
-                    {
-                    case TranslationItemType::ExecutionInSlot:
-                        azEventHandlerNodeKey.Push("In");
-                        break;
-                    case TranslationItemType::ExecutionOutSlot:
-                        azEventHandlerNodeKey.Push("Out");
-                        break;
-                    case TranslationItemType::ParamDataSlot:
-                        azEventHandlerNodeKey.Push("Param");
-                        break;
-                    case TranslationItemType::ReturnDataSlot:
-                        azEventHandlerNodeKey.Push("Return");
-                        break;
-                    default:
-                        // Slot is not an execution or data slot, do nothing
-                        break;
-                    }
+                GraphCanvas::TranslationKey key;
+                key << "AZEventHandler" << azEventNode->GetNodeName() << "slots" << slot.GetName() << "details";
 
-                    azEventHandlerNodeKey.Push("Name");
-                    slotTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
-                    GraphCanvas::SlotRequestBus::Event(gcSlotId, &GraphCanvas::SlotRequests::SetTranslationKeyedName, slotTranslationEntry);
-                    azEventHandlerNodeKey.Pop();
-                    azEventHandlerNodeKey.Push("Tooltip");
-                    slotTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
-                    GraphCanvas::SlotRequestBus::Event(gcSlotId, &GraphCanvas::SlotRequests::SetTranslationKeyedTooltip, slotTranslationEntry);
-                }
+                GraphCanvas::TranslationRequests::Details details;
+                GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);
+
+                GraphCanvas::SlotRequestBus::Event(gcSlotId, &GraphCanvas::SlotRequests::SetName, details.Name);
+                GraphCanvas::SlotRequestBus::Event(gcSlotId, &GraphCanvas::SlotRequests::SetTooltip, details.Tooltip);;
             }
         }
 
-        GraphCanvas::TranslationKeyedString nodeTranslationEntry(azEventEntry.m_eventName);
-        nodeTranslationEntry.m_context = TranslationHelper::GetAzEventHandlerContextKey();
-        // The translation key in this case acts like a json pointer referencing a particular
-        // json string within a hypothetical json document
-        AZ::StackedString azEventHandlerNodeKey = TranslationHelper::GetAzEventHandlerRootPointer(azEventEntry.m_eventName);
-        azEventHandlerNodeKey.Push("Name");
-        nodeTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
-        GraphCanvas::NodeTitleRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeTitleRequests::SetTranslationKeyedTitle, nodeTranslationEntry);
-        azEventHandlerNodeKey.Pop();
-        azEventHandlerNodeKey.Push("Tooltip");
-        nodeTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
-        GraphCanvas::NodeRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeRequests::SetTranslationKeyedTooltip, nodeTranslationEntry);
+        GraphCanvas::TranslationKey key;
+        key << "AZEventHandler" << azEventEntry.m_eventName << "details";
 
-        // Set the name
+        GraphCanvas::TranslationRequests::Details details;
+        GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);
+
+        GraphCanvas::NodeTitleRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeTitleRequests::SetTitle, details.Name);
+        GraphCanvas::NodeRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeRequests::SetTooltip, details.Tooltip);
+
         graphCanvasEntity->SetName(AZStd::string::format("GC-EventNode: %s", azEventEntry.m_eventName.c_str()));
 
         GraphCanvas::NodeTitleRequestBus::Event(graphCanvasNodeId, &GraphCanvas::NodeTitleRequests::SetPaletteOverride, "HandlerNodeTitlePalette");

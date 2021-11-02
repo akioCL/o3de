@@ -342,14 +342,14 @@
                         "tooltip": "Signaled after GetNotifyEvent is invoked"
                     },
                     "details": {
-                        "name": "SettingsRegistryInterface::GetNotifyEvent",
-                        "category": "Other"
+                        "name": "Get Notify Event",
+                        "subtitle": "Settings Registry"
                     },
                     "params": [
                         {
                             "typeid": "{795C80A0-D243-473B-972A-C32CA487BAA5}",
                             "details": {
-                                "name": "SettingsRegistryScriptProxy*"
+                                "name": "Settings Registry Proxy"
                             }
                         }
                     ],
@@ -357,7 +357,7 @@
                         {
                             "typeid": "{84290CFC-1335-5341-AD8B-0A3FE9FE46D0}",
                             "details": {
-                                "name": "Event<AZStd::basic_string_view<char, AZStd::char_traits<char>> "
+                                "name": "Event"
                             }
                         }
                     ]

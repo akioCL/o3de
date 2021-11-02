@@ -113,25 +113,14 @@ namespace ScriptCanvasEditor
             actionItem.m_name = QString(eventConfigurations[i].m_eventName.c_str());
             actionItem.m_eventId = eventConfigurations[i].m_eventId;
 
-
             GraphCanvas::TranslationKey key;
             key << "EBusHandler" << m_busName.c_str() << "methods" << eventConfigurations[i].m_eventName << "details";
 
             GraphCanvas::TranslationRequests::Details details;
+            details.Name = actionItem.m_name.toUtf8().data();
             GraphCanvas::TranslationRequestBus::BroadcastResult(details, &GraphCanvas::TranslationRequests::GetDetails, key, details);
 
-
-            // HERE
-            AZStd::string translatedName = TranslationHelper::GetKeyTranslation(TranslationContextGroup::EbusHandler, m_busName, eventConfigurations[i].m_eventName, TranslationItemType::Node, TranslationKeyId::Name);
-
-            if (details.Name.empty())
-            {
-                actionItem.m_displayName = actionItem.m_name;
-            }
-            else
-            {
-                actionItem.m_displayName = QString(details.Name.c_str());
-            }
+            actionItem.m_displayName = QString(details.Name.c_str());
             
             actionItem.m_index = i;
             

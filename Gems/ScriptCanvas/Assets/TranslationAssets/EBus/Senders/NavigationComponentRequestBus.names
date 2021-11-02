@@ -143,7 +143,9 @@
                     },
                     "details": {
                         "name": "Find Path To Entity",
-                        "tooltip": "Creates a pathfinding request to navigate toward the specified entity"
+                        "tooltip": "Creates a pathfinding request to navigate toward the specified entity",
+                        "category": "AI/Navigation",
+                        "subtitle": "Navigation"
                     },
                     "params": [
                         {

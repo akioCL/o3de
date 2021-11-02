@@ -49,6 +49,9 @@
 #include <ScriptCanvas/Libraries/Libraries.h>
 #include <ScriptCanvas/Libraries/Core/GetVariable.h>
 #include <ScriptCanvas/Libraries/Core/SetVariable.h>
+#include <ScriptCanvas/Libraries/Core/AzEventHandler.h>
+
+#include <GraphCanvas/Components/Slots/SlotBus.h>
 
 #pragma optimize("", off)
 
@@ -165,22 +168,6 @@ namespace ScriptCanvasDeveloperEditor
             serializeContext.EnumerateDerived(EnumerateLibraryDefintionNodes, libraryDefTypeId, libraryDefTypeId);
 
             return category;
-        }
-
-        AZStd::string GetCategoryName(const AZ::SerializeContext::ClassData& classData)
-        {
-            if (auto editorDataElement = classData.m_editData->FindElementData(AZ::Edit::ClassElements::EditorData))
-            {
-                if (auto attribute = editorDataElement->FindAttribute(AZ::Edit::Attributes::Category))
-                {
-                    if (auto data = azrtti_cast<AZ::Edit::AttributeData<const char*>*>(attribute))
-                    {
-                        return data->Get(nullptr);
-                    }
-                }
-            }
-
-            return {};
         }
 
         AZStd::string GetCategory(const AZ::SerializeContext::ClassData* classData)
@@ -766,10 +753,163 @@ namespace ScriptCanvasDeveloperEditor
             scratchBuffer.Clear();
         }
 
+        AZ::Entity* TranslateAZEvent(const AZ::BehaviorMethod& method)
+        {
+            // Make sure the method returns an AZ::Event by reference or pointer
+            if (AZ::MethodReturnsAzEventByReferenceOrPointer(method))
+            {
+                // Read in AZ Event Description data to retrieve the event name and parameter names
+                AZ::Attribute* azEventDescAttribute = AZ::FindAttribute(AZ::Script::Attributes::AzEventDescription, method.m_attributes);
+                AZ::BehaviorAzEventDescription behaviorAzEventDesc;
+                AZ::AttributeReader azEventDescAttributeReader(nullptr, azEventDescAttribute);
+                azEventDescAttributeReader.Read<decltype(behaviorAzEventDesc)>(behaviorAzEventDesc);
+                if (behaviorAzEventDesc.m_eventName.empty())
+                {
+                    AZ_Error("NodeUtils", false, "Cannot create an AzEvent node with empty event name")
+                }
+
+                auto scriptCanvasEntity = aznew AZ::Entity{ AZStd::string::format("SC-EventNode(%s)", behaviorAzEventDesc.m_eventName.c_str()) };
+                scriptCanvasEntity->Init();
+                auto azEventHandler = scriptCanvasEntity->CreateComponent<ScriptCanvas::Nodes::Core::AzEventHandler>();
+                
+                azEventHandler->InitEventFromMethod(method);
+
+                return scriptCanvasEntity;
+            }
+
+            return nullptr;
+        }
+
+        void TranslateAZEvents([[maybe_unused]] AZ::SerializeContext* serializeContext, AZ::BehaviorContext* behaviorContext)
+        {
+            (void)behaviorContext;
+            GraphCanvas::TranslationKey translationKey;
+            AZStd::vector<AZ::Entity*> nodes;
+
+            // Methods
+            for (const auto& behaviorMethod : behaviorContext->m_methods)
+            {
+                const auto& method = *behaviorMethod.second;
+                AZ::Entity* node = TranslateAZEvent(method);
+                if (node)
+                {
+                    nodes.push_back(node);
+                }
+            }
+
+            // Methods in classes
+            for (auto behaviorClass : behaviorContext->m_classes)
+            {
+                for (auto behaviorMethod : behaviorClass.second->m_methods)
+                {
+                    const auto& method = *behaviorMethod.second;
+                    AZ::Entity* node = TranslateAZEvent(method);
+                    if (node)
+                    {
+                        nodes.push_back(node);
+                    }
+                }
+            }
+
+            TranslationFormat translationRoot;
+
+            for (auto& node : nodes)
+            {
+                ScriptCanvas::Nodes::Core::AzEventHandler* nodeComponent = node->FindComponent<ScriptCanvas::Nodes::Core::AzEventHandler>();
+                nodeComponent->Init();
+                nodeComponent->Configure();
+
+                const ScriptCanvas::Nodes::Core::AzEventEntry& azEventEntry{ nodeComponent->GetEventEntry() };
+
+                Entry entry;
+                entry.m_key = azEventEntry.m_eventName;
+                entry.m_context = "AZEventHandler";
+                entry.m_details.m_name = azEventEntry.m_eventName;
+
+                for (const ScriptCanvas::Slot& slot : nodeComponent->GetSlots())
+                {
+                    Slot slotEntry;
+
+                    GraphCanvas::SlotGroup group = GraphCanvas::SlotGroups::Invalid;
+
+                    if (slot.IsVisible())
+                    {
+                        slotEntry.m_key = slot.GetName();
+
+                        if (slot.GetId() == azEventEntry.m_azEventInputSlotId)
+                        {
+                            GraphCanvas::TranslationKeyedString slotTranslationEntry(azEventEntry.m_eventName);
+                            slotTranslationEntry.m_context = ScriptCanvasEditor::TranslationHelper::GetAzEventHandlerContextKey();
+                            // The translation key in this case acts like a json pointer referencing a particular
+                            // json string within a hypothetical json document
+                            AZ::StackedString azEventHandlerNodeKey = ScriptCanvasEditor::TranslationHelper::GetAzEventHandlerRootPointer(azEventEntry.m_eventName);
+
+                            azEventHandlerNodeKey.Push("Name");
+                            slotTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
+                            
+                            azEventHandlerNodeKey.Pop();
+                            azEventHandlerNodeKey.Push("Tooltip");
+                            slotTranslationEntry.m_key = AZStd::string_view{ azEventHandlerNodeKey };
+
+                            slotEntry.m_details.m_name = slotTranslationEntry.GetDisplayString();
+                        }
+                        else
+                        {
+                            GraphCanvas::TranslationKeyedString slotTranslationEntry(slot.GetName());
+                            slotTranslationEntry.m_context = ScriptCanvasEditor::TranslationHelper::GetAzEventHandlerContextKey();
+                            // The translation key in this case acts like a json pointer referencing a particular
+                            // json string within a hypothetical json document
+                            // translation key is rooted at /AzEventHandler/${EventName}/Slots/${SlotName}/{In,Out,Param,Return}
+                            AZ::StackedString azEventHandlerNodeKey = ScriptCanvasEditor::TranslationHelper::GetAzEventHandlerRootPointer(azEventEntry.m_eventName);
+                            azEventHandlerNodeKey.Push("Slots");
+                            azEventHandlerNodeKey.Push(slot.GetName());
+                            switch (ScriptCanvasEditor::TranslationHelper::GetItemType(slot.GetDescriptor()))
+                            {
+                            case ScriptCanvasEditor::TranslationItemType::ExecutionInSlot:
+                                azEventHandlerNodeKey.Push("In");
+                                break;
+                            case ScriptCanvasEditor::TranslationItemType::ExecutionOutSlot:
+                                azEventHandlerNodeKey.Push("Out");
+                                break;
+                            case ScriptCanvasEditor::TranslationItemType::ParamDataSlot:
+                                azEventHandlerNodeKey.Push("Param");
+                                break;
+                            case ScriptCanvasEditor::TranslationItemType::ReturnDataSlot:
+                                azEventHandlerNodeKey.Push("Return");
+                                break;
+                            default:
+                                // Slot is not an execution or data slot, do nothing
+                                break;
+                            }
+
+                            slotEntry.m_details.m_name = slotTranslationEntry.GetDisplayString();
+
+                        }
+
+                        entry.m_slots.push_back(slotEntry);
+                    }
+                }
+
+                translationRoot.m_entries.push_back(entry);
+
+                // delete the node, don't need to keep it beyond this point
+                delete node;
+
+
+                AZStd::string filename = GraphCanvas::TranslationKey::Sanitize(entry.m_key);
+
+                AZStd::string targetFile = AZStd::string::format("AZEvents/%s", filename.c_str());
+
+                SaveJSONData(targetFile, translationRoot);
+
+                translationRoot.m_entries.clear();
+            }
+
+
+        }
 
         void TranslateNodes(AZ::SerializeContext* serializeContext, TranslationFormat& translationRoot)
         {
-            VerificationSet verificationSet;
             GraphCanvas::TranslationKey translationKey;
             AZStd::vector<AZ::TypeId> nodes;
 
@@ -841,7 +981,7 @@ namespace ScriptCanvasDeveloperEditor
                     GraphCanvas::TranslationKeyedString subtitleKeyedString(nodeContext, translationContext);
                     subtitleKeyedString.m_key = ScriptCanvasEditor::TranslationHelper::GetUserDefinedNodeKey(nodeContext, subtitleFallback, ScriptCanvasEditor::TranslationKeyId::Category);
 
-                    GraphCanvas::TranslationKeyedString categoryKeyedString(GetCategoryName(*classData), nodeContext);
+                    GraphCanvas::TranslationKeyedString categoryKeyedString(GetCategory(classData), nodeContext);
                     categoryKeyedString.m_key = ScriptCanvasEditor::TranslationHelper::GetKey(ScriptCanvasEditor::TranslationContextGroup::ClassMethod, nodeContext, classData->m_editData->m_name, ScriptCanvasEditor::TranslationItemType::Node, ScriptCanvasEditor::TranslationKeyId::Category);
                     details.m_category = categoryKeyedString.GetDisplayString();
 
@@ -1389,6 +1529,151 @@ namespace ScriptCanvasDeveloperEditor
             }
         }
 
+        void TranslateMethod(Entry& entry, const char* context, const char* methodName, const AZ::BehaviorMethod& behaviorMethod)
+        {
+            const char* className = "Global";
+            EntryDetails details;
+            Method methodEntry;
+
+            AZStd::string cleanName = GraphCanvas::TranslationKey::Sanitize(methodName);
+
+            methodEntry.m_key = cleanName;
+            methodEntry.m_context = context;
+
+            methodEntry.m_details.m_category = "";
+            methodEntry.m_details.m_tooltip = "";
+            methodEntry.m_details.m_name = methodName;
+
+            methodEntry.m_entry.m_name = "In";
+            methodEntry.m_entry.m_tooltip = AZStd::string::format("When signaled, this will invoke %s", cleanName.c_str());
+            methodEntry.m_exit.m_name = "Out";
+            methodEntry.m_exit.m_tooltip = AZStd::string::format("Signaled after %s is invoked", cleanName.c_str());
+
+            GraphCanvas::TranslationKeyedString methodCategoryString;
+            methodCategoryString.m_context = ScriptCanvasEditor::TranslationHelper::GetContextName(ScriptCanvasEditor::TranslationContextGroup::GlobalMethod, methodName);
+            methodCategoryString.m_key = ScriptCanvasEditor::TranslationHelper::GetKey(ScriptCanvasEditor::TranslationContextGroup::GlobalMethod, context, methodName, ScriptCanvasEditor::TranslationItemType::Node, ScriptCanvasEditor::TranslationKeyId::Category);
+
+            if (!methodCategoryString.GetDisplayString().empty())
+            {
+                methodEntry.m_details.m_category = methodCategoryString.GetDisplayString();
+            }
+            else
+            {
+                if (!MethodHasAttribute(&behaviorMethod, AZ::ScriptCanvasAttributes::FloatingFunction))
+                {
+                    methodEntry.m_details.m_category = details.m_category;
+                }
+                else if (MethodHasAttribute(&behaviorMethod, AZ::Script::Attributes::Category))
+                {
+                    methodEntry.m_details.m_category = GraphCanvasAttributeHelper::ReadStringAttribute(behaviorMethod.m_attributes, AZ::Script::Attributes::Category);;
+                }
+
+                if (methodEntry.m_details.m_category.empty())
+                {
+                    methodEntry.m_details.m_category = "Other";
+                }
+            }
+
+            AZStd::string translationContext = ScriptCanvasEditor::TranslationHelper::GetContextName(ScriptCanvasEditor::TranslationContextGroup::GlobalMethod, methodName);
+
+            // Arguments (Input Slots)
+            if (behaviorMethod.GetNumArguments() > 0)
+            {
+                for (size_t argIndex = 0; argIndex < behaviorMethod.GetNumArguments(); ++argIndex)
+                {
+                    // Generate the OLD style translation key
+                    AZStd::string oldClassName = className;
+                    AZStd::to_upper(oldClassName.begin(), oldClassName.end());
+                    AZStd::string oldMethodName = cleanName;
+                    AZStd::to_upper(oldMethodName.begin(), oldMethodName.end());
+                    AZStd::string oldKey = AZStd::string::format("%s_%s_PARAM%zu_NAME", oldClassName.c_str(), oldMethodName.c_str(), argIndex);
+                    AZStd::string oldTooltipKey = AZStd::string::format("%s_%s_PARAM%zu_TOOLTIP", oldClassName.c_str(), oldMethodName.c_str(), argIndex);
+
+                    const AZ::BehaviorParameter* parameter = behaviorMethod.GetArgument(argIndex);
+
+                    Argument argument;
+
+                    AZStd::string argumentKey = parameter->m_typeId.ToString<AZStd::string>();
+                    AZStd::string argumentName = parameter->m_name;
+                    AZStd::string argumentDescription = "";
+
+                    GetTypeNameAndDescription(parameter->m_typeId, argumentName, argumentDescription);
+
+                    const AZStd::string parameterName = parameter->m_name;
+                    GraphCanvas::TranslationKeyedString oldArgName(parameterName, translationContext, oldKey);
+
+                    GraphCanvas::TranslationKeyedString oldArgTooltip(argumentDescription, translationContext, oldTooltipKey);
+
+                    argument.m_typeId = argumentKey;
+                    argument.m_details.m_name = oldArgName.GetDisplayString();
+                    argument.m_details.m_category = "";
+                    argument.m_details.m_tooltip = oldArgTooltip.GetDisplayString();
+
+                    methodEntry.m_arguments.push_back(argument);
+                }
+            }
+
+            const AZ::BehaviorParameter* resultParameter = behaviorMethod.HasResult() ? behaviorMethod.GetResult() : nullptr;
+            if (resultParameter)
+            {
+                // Generate the OLD style translation key
+                AZStd::string oldClassName = className;
+                AZStd::to_upper(oldClassName.begin(), oldClassName.end());
+                AZStd::string oldMethodName = cleanName;
+                AZStd::to_upper(oldMethodName.begin(), oldMethodName.end());
+                AZStd::string oldKey = AZStd::string::format("%s_%s_OUTPUT%d_NAME", oldClassName.c_str(), oldMethodName.c_str(), 0);
+                AZStd::string oldTooltipKey = AZStd::string::format("%s_%s_OUTPUT%d_TOOLTIP", oldClassName.c_str(), oldMethodName.c_str(), 0);
+
+                Argument result;
+
+                AZStd::string resultKey = resultParameter->m_typeId.ToString<AZStd::string>();
+                AZStd::string resultName = resultParameter->m_name;
+                AZStd::string resultDescription = "";
+
+                GetTypeNameAndDescription(resultParameter->m_typeId, resultName, resultDescription);
+
+                const AZStd::string parameterName = resultParameter->m_name;
+                GraphCanvas::TranslationKeyedString oldArgName(parameterName, translationContext, oldKey);
+                GraphCanvas::TranslationKeyedString oldArgTooltip(resultDescription, translationContext, oldTooltipKey);
+
+                result.m_typeId = resultKey;
+                result.m_details.m_name = oldArgName.GetDisplayString();
+                result.m_details.m_tooltip = oldArgTooltip.GetDisplayString();
+
+                methodEntry.m_results.push_back(result);
+            }
+
+            entry.m_methods.push_back(methodEntry);
+        }
+
+        void TranslateGlobalMethods(AZ::BehaviorContext* behaviorContext)
+        {
+            for (const auto behaviorMethod : behaviorContext->m_methods)
+            {
+                TranslationFormat translationRoot;
+
+                Entry entry;
+                entry.m_context = "Method";
+
+
+                entry.m_details.m_category = GraphCanvasAttributeHelper::GetStringAttribute(behaviorMethod.second, AZ::Script::Attributes::Category);
+                if (entry.m_details.m_category.empty())
+                {
+                    entry.m_details.m_category = "Globals"; // TODO: Get the category from bC
+                }
+
+                entry.m_key = behaviorMethod.first.c_str();
+                TranslateMethod(entry, "Global", behaviorMethod.first.c_str(), *behaviorMethod.second);
+                translationRoot.m_entries.push_back(entry);
+
+                AZStd::string fileName = AZStd::string::format("GlobalMethods/%s", behaviorMethod.first.c_str());
+                SaveJSONData(fileName, translationRoot);
+
+                translationRoot.m_entries.clear();
+            }
+
+        }
+
         void TranslateBehaviorClasses(AZ::SerializeContext* /*serializeContext*/, AZ::BehaviorContext* behaviorContext)
         {
             for (const auto& classIter : behaviorContext->m_classes)
@@ -1572,6 +1857,11 @@ namespace ScriptCanvasDeveloperEditor
 
             AZ_Assert(serializeContext && behaviorContext, "Must have valid Serialization and Behavior Contexts");
 
+            // Global Methods
+            {
+                TranslateGlobalMethods(behaviorContext);
+            }
+
             // BehaviorClass
             {
                 TranslateBehaviorClasses(serializeContext, behaviorContext);
@@ -1598,6 +1888,11 @@ namespace ScriptCanvasDeveloperEditor
             // Globals
             {
                 TranslateBehaviorGlobals(serializeContext, behaviorContext);
+            }
+
+            // AZ::Events
+            {
+                TranslateAZEvents(serializeContext, behaviorContext);
             }
 
 
