@@ -13,6 +13,7 @@
 #include <AzCore/Utils/Utils.h>
 #include <AzCore/Settings/SettingsRegistryMergeUtils.h>
 #include <AzFramework/Logging/LoggingComponent.h>
+#include <AzQtComponents/AzQtComponentsAPI.h>
 #include <AzQtComponents/Utilities/HandleDpiAwareness.h>
 #include <AzQtComponents/Components/StyleManager.h>
 #include <AzQtComponents/Components/WindowDecorationWrapper.h>
@@ -27,10 +28,12 @@ namespace O3DE::ProjectManager
     Application::~Application()
     {
         TearDown();
+        AzQtComponents::UninitializeDynamicModule();
     }
 
     bool Application::Init(bool interactive)
     {
+        AzQtComponents::InitializeDynamicModule(AZ::Environment::GetInstance());
         constexpr const char* applicationName { "O3DE" };
 
         QApplication::setOrganizationName(applicationName);

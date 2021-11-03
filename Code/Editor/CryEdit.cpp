@@ -4207,10 +4207,12 @@ extern "C" int AZ_DLL_EXPORT CryEditMain(int argc, char* argv[])
 extern "C" AZ_DLL_EXPORT void InitializeDynamicModule(void* env)
 {
     AZ::Environment::Attach(static_cast<AZ::EnvironmentInstance>(env));
+    AzQtComponents::InitializeDynamicModule(env);
 }
 
 extern "C" AZ_DLL_EXPORT void UninitializeDynamicModule()
 {
+    AzQtComponents::UninitializeDynamicModule();
     AZ::Environment::Detach();
 }
 

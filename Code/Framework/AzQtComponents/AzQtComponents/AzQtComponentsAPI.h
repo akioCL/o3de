@@ -51,5 +51,8 @@ namespace AzQtComponents
     constexpr const char* NoMargins = "NoMargins";
     constexpr const char* ValidDropTarget = "ValidDropTarget";
     constexpr const char* InvalidDropTarget = "InvalidDropTarget";
+
+    AZ_QT_COMPONENTS_API void InitializeDynamicModule(void* env);
+    AZ_QT_COMPONENTS_API void UninitializeDynamicModule();
 }
 

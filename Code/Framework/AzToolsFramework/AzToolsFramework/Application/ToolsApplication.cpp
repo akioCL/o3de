@@ -71,6 +71,8 @@
 #include <AzToolsFramework/Prefab/PrefabPublicInterface.h>
 #include <Entity/EntityUtilityComponent.h>
 
+#include <AzQtComponents/AzQtComponentsAPI.h>
+
 #include <QtWidgets/QMessageBox>
 AZ_PUSH_DISABLE_WARNING(4251, "-Wunknown-warning-option") // 4251: 'QFileInfo::d_ptr': class 'QSharedDataPointer<QFileInfoPrivate>' needs to have dll-interface to be used by clients of class 'QFileInfo'
 #include <QDir>
@@ -232,6 +234,8 @@ namespace AzToolsFramework
         , m_isDuringUndoRedo(false)
         , m_isInIsolationMode(false)
     {
+        AzQtComponents::InitializeDynamicModule(AZ::Environment::GetInstance());
+
         ToolsApplicationRequests::Bus::Handler::BusConnect();
 
         m_undoCache.RegisterToUndoCacheInterface();
@@ -240,7 +244,10 @@ namespace AzToolsFramework
     ToolsApplication::~ToolsApplication()
     {
         ToolsApplicationRequests::Bus::Handler::BusDisconnect();
+
         Stop();
+
+        AzQtComponents::UninitializeDynamicModule();
     }
 
     void ToolsApplication::CreateStaticModules(AZStd::vector<AZ::Module*>& outModules)
