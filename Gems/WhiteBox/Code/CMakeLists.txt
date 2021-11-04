@@ -85,7 +85,7 @@ ly_add_target(
 
 # use the above WhiteBox module in runtimes:
 ly_create_alias(NAME WhiteBox.Clients  NAMESPACE Gem TARGETS Gem::WhiteBox)
-ly_create_alias(NAME WhiteBox.Servers  NAMESPACE Gem TARGETS Gem::WhiteBox)
+ly_create_alias(NAME WhiteBox.Servers  NAMESPACE Gem)
 
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(

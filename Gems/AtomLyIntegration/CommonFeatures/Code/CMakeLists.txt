@@ -69,11 +69,7 @@ ly_create_alias(NAME AtomLyIntegration_CommonFeatures.Clients NAMESPACE Gem
         Gem::AtomLyIntegration_CommonFeatures
         Gem::GradientSignal.Clients
 )
-ly_create_alias(NAME AtomLyIntegration_CommonFeatures.Servers NAMESPACE Gem
-    TARGETS
-        Gem::AtomLyIntegration_CommonFeatures
-        Gem::GradientSignal.Servers
-)
+ly_create_alias(NAME AtomLyIntegration_CommonFeatures.Servers NAMESPACE Gem)
 
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(

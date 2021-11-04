@@ -65,7 +65,7 @@ ly_add_target(
 
 # Any 'runtime-like' applications should use Gem::Atom_AtomBridge:
 ly_create_alias(NAME Atom_AtomBridge.Clients NAMESPACE Gem TARGETS Gem::Atom_AtomBridge)
-ly_create_alias(NAME Atom_AtomBridge.Servers NAMESPACE Gem TARGETS Gem::Atom_AtomBridge)
+ly_create_alias(NAME Atom_AtomBridge.Servers NAMESPACE Gem)
 
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(
@@ -122,9 +122,9 @@ endif()
 # The "AtomLyIntegration" Gem will also alias the real Atom_AtomBridge target variants
 # The Atom Gem does the same at the moment.
 ly_create_alias(NAME Atom.Clients NAMESPACE Gem TARGETS Gem::Atom_AtomBridge.Clients)
-ly_create_alias(NAME Atom.Servers NAMESPACE Gem TARGETS Gem::Atom_AtomBridge.Servers)
+ly_create_alias(NAME Atom.Servers NAMESPACE Gem)
 ly_create_alias(NAME AtomLyIntegration.Clients NAMESPACE Gem TARGETS Gem::Atom_AtomBridge.Clients)
-ly_create_alias(NAME AtomLyIntegration.Servers NAMESPACE Gem TARGETS Gem::Atom_AtomBridge.Servers)
+ly_create_alias(NAME AtomLyIntegration.Servers NAMESPACE Gem)
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_create_alias(NAME Atom.Builders NAMESPACE Gem TARGETS Gem::Atom_AtomBridge.Builders)
     ly_create_alias(NAME Atom.Tools    NAMESPACE Gem TARGETS Gem::Atom_AtomBridge.Tools)

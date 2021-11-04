@@ -51,7 +51,7 @@ ly_add_target(
 ly_create_alias(NAME ScriptCanvasDebugger.Builders NAMESPACE Gem TARGETS Gem::ScriptCanvasDebugger)
 ly_create_alias(NAME ScriptCanvasDebugger.Tools    NAMESPACE Gem TARGETS Gem::ScriptCanvasDebugger)
 ly_create_alias(NAME ScriptCanvasDebugger.Clients  NAMESPACE Gem TARGETS Gem::ScriptCanvasDebugger)
-ly_create_alias(NAME ScriptCanvasDebugger.Servers  NAMESPACE Gem TARGETS Gem::ScriptCanvasDebugger)
+ly_create_alias(NAME ScriptCanvasDebugger.Servers  NAMESPACE Gem)
 
 ly_add_target(
     NAME ScriptCanvas.Static STATIC
@@ -117,7 +117,7 @@ ly_add_target(
 
 # the "ScriptCanvas" target is active in Clients and Servers
 ly_create_alias(NAME ScriptCanvas.Clients  NAMESPACE Gem TARGETS Gem::ScriptCanvas)
-ly_create_alias(NAME ScriptCanvas.Servers  NAMESPACE Gem TARGETS Gem::ScriptCanvas)
+ly_create_alias(NAME ScriptCanvas.Servers  NAMESPACE Gem)
 
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(

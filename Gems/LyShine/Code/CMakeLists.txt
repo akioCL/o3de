@@ -54,7 +54,7 @@ ly_add_target(
 
 # by default, load the above "Gem::LyShine" module in Client and Server applications:
 ly_create_alias(NAME LyShine.Clients NAMESPACE Gem TARGETS Gem::LyShine)
-ly_create_alias(NAME LyShine.Servers NAMESPACE Gem TARGETS Gem::LyShine)
+ly_create_alias(NAME LyShine.Servers NAMESPACE Gem)
 
 if (PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(

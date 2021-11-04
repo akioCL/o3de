@@ -41,7 +41,7 @@ ly_add_target(
 
 # if enabled, "Maestro" module is used for Clients and Servers:
 ly_create_alias(NAME Maestro.Clients  NAMESPACE Gem TARGETS Gem::Maestro)
-ly_create_alias(NAME Maestro.Servers  NAMESPACE Gem TARGETS Gem::Maestro)
+ly_create_alias(NAME Maestro.Servers  NAMESPACE Gem)
 
 if (PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(

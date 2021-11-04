@@ -47,7 +47,7 @@ ly_add_target(
 
 # by default, load the above "Gem::LmbrCentral" module in Client and Server
 ly_create_alias(NAME LmbrCentral.Clients NAMESPACE Gem TARGETS Gem::LmbrCentral)
-ly_create_alias(NAME LmbrCentral.Servers NAMESPACE Gem TARGETS Gem::LmbrCentral)
+ly_create_alias(NAME LmbrCentral.Servers NAMESPACE Gem)
 
 
 if (PAL_TRAIT_BUILD_HOST_TOOLS)
