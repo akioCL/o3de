@@ -56,7 +56,7 @@ bool ControlRequestHandler::StartListening(unsigned short port)
 
 void ControlRequestHandler::GotConnection()
 {
-    if (m_tcpServer->hasPendingConnections())
+    while (m_tcpServer->hasPendingConnections())
     {
         QTcpSocket* newSocket = m_tcpServer->nextPendingConnection();
         connect(newSocket, &QTcpSocket::stateChanged, this, &ControlRequestHandler::SocketStateUpdate);
@@ -128,6 +128,10 @@ void ControlRequestHandler::ReadData(QTcpSocket* incoming)
     {
         AZ_TracePrintf(AssetProcessor::ConsoleChannel, "Control request adding signal idle waiter\n");
         m_idleWaitSockets.push_back(incoming);
+    }
+    else
+    {
+        AZ_Warning(AssetProcessor::ConsoleChannel, false, "Unhandled Control request %s", sentMessage.c_str());
     }
 }
 
