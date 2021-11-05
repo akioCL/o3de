@@ -91,7 +91,7 @@ namespace AZ
         private:
             static constexpr int IndentSpaces = 4;
 
-            static void MakeReady();
+            static bool MakeReady();
             static void AddIndent();
             static void RemoveIndent();
             static int GetIndent();

@@ -37,23 +37,34 @@ namespace AZ
             ShaderReloadDebugTrackerInternal::s_indent.Reset();
         }
         
-        void ShaderReloadDebugTracker::MakeReady()
+        bool ShaderReloadDebugTracker::MakeReady()
         {
-            if (!ShaderReloadDebugTrackerInternal::s_enabled.IsValid())
+            bool isReady = ShaderReloadDebugTrackerInternal::s_enabled.IsValid() && ShaderReloadDebugTrackerInternal::s_indent.IsValid();
+
+            if (!isReady)
             {
                 ShaderReloadDebugTrackerInternal::s_enabled = AZ::Environment::FindVariable<bool>(ShaderReloadDebugTrackerInternal::EnabledVariableName);
                 ShaderReloadDebugTrackerInternal::s_indent = AZ::Environment::FindVariable<int>(ShaderReloadDebugTrackerInternal::IndentVariableName);
+
+                isReady = ShaderReloadDebugTrackerInternal::s_enabled.IsValid() && ShaderReloadDebugTrackerInternal::s_indent.IsValid();
             }
+
+            return isReady;
         }
 
         bool ShaderReloadDebugTracker::IsEnabled()
         {
 #ifdef AZ_ENABLE_SHADER_RELOAD_DEBUG_TRACKER
-            MakeReady();
-
-            // Set this to true in the debugger to turn on hot reload tracing.
-            // If needed, we could hook this up to a CVar.
-            return ShaderReloadDebugTrackerInternal::s_enabled.Get();
+            if (MakeReady())
+            {
+                // Set this to true in the debugger to turn on hot reload tracing.
+                // If needed, we could hook this up to a CVar.
+                return ShaderReloadDebugTrackerInternal::s_enabled.Get();
+            }
+            else
+            {
+                return false;
+            }
 #else
             return false;
 #endif
@@ -61,20 +72,30 @@ namespace AZ
         
         void ShaderReloadDebugTracker::AddIndent()
         {
-            MakeReady();
-            ShaderReloadDebugTrackerInternal::s_indent.Get() += IndentSpaces;
+            if (MakeReady())
+            {
+                ShaderReloadDebugTrackerInternal::s_indent.Get() += IndentSpaces;
+            }
         }
 
         void ShaderReloadDebugTracker::RemoveIndent()
         {
-            MakeReady();
-            ShaderReloadDebugTrackerInternal::s_indent.Get() -= IndentSpaces;
+            if (MakeReady())
+            {
+                ShaderReloadDebugTrackerInternal::s_indent.Get() -= IndentSpaces;
+            }
         }
         
         int ShaderReloadDebugTracker::GetIndent()
         {
-            MakeReady();
-            return ShaderReloadDebugTrackerInternal::s_indent.Get();
+            if (MakeReady())
+            {
+                return ShaderReloadDebugTrackerInternal::s_indent.Get();
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         ShaderReloadDebugTracker::ScopedSection::~ScopedSection()
