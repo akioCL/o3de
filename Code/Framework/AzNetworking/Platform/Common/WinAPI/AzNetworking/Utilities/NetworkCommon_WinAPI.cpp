@@ -74,10 +74,7 @@ namespace AzNetworking
             static const int32_t WindowsForciblyClosedError = 10054; // 'Existing connection was forcibly closed by the remote host...'
             if (errorCode == WindowsForciblyClosedError) // Filter WindowsForciblyClosedError messages on windows
             {
-                if (auto console = AZ::Interface<AZ::IConsole>::Get(); console)
-                {
-                    console->GetCvarValue("net_UdpIgnoreWin10054", ignoreError);
-                }
+                AZ::GetCvarValue("net_UdpIgnoreWin10054", ignoreError);
                 return true;
             }
             return false;

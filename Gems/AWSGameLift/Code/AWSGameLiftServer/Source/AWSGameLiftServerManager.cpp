@@ -91,12 +91,9 @@ namespace AWSGameLift
             AZ_Error(AWSGameLiftServerManagerName, false, "Failed to get File IO.");
         }
 
-        if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
-        {
-            [[maybe_unused]] AZ::GetValueResult getCvarResult = console->GetCvarValue("sv_port", serverProcessDesc.m_port);
-            AZ_Error(AWSGameLiftServerManagerName, getCvarResult == AZ::GetValueResult::Success,
-                "Lookup of 'sv_port' console variable failed with error %s", AZ::GetEnumString(getCvarResult));
-        }
+
+        GetCvarValue("sv_port", serverProcessDesc.m_port);
+
         return serverProcessDesc;
     }
 

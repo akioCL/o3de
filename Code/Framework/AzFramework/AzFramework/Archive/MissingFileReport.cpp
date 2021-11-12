@@ -31,10 +31,7 @@ namespace AZ::IO::Internal
     void ReportFileMissingFromArchive(const char* szPath)
     {
         int reportLevel{};
-        if (auto console = AZ::Interface<AZ::IConsole>::Get(); console)
-        {
-            console->GetCvarValue("sys_report_files_not_found_in_paks", reportLevel);
-        }
+        GetCvarValue("sys_report_files_not_found_in_paks", reportLevel);
         if (!reportLevel)
         {
             return;

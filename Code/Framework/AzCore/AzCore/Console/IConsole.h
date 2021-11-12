@@ -12,6 +12,7 @@
 #include <AzCore/Console/ConsoleDataWrapper.h>
 #include <AzCore/Console/IConsoleTypes.h>
 #include <AzCore/EBus/Event.h>
+#include <AzCore/Interface/Interface.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/functional.h>
@@ -193,6 +194,22 @@ namespace AZ
             return GetValueResult::ConsoleVarNotFound;
         }
         return cvarFunctor->GetValue(outValue);
+    }
+
+    //! A helper function that will get the console interface, and if it exists, get a cvar value
+    //! Reports an error if the console variable is not found
+    //! @param command the name of the cvar to retrieve
+    //! @param outValue the value of the cvar
+    template<typename RETURN_TYPE>
+    inline void GetCvarValue(AZStd::string_view command, RETURN_TYPE& outValue)
+    {
+        if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
+        {
+            [[maybe_unused]] AZ::GetValueResult getCvarResult = console->GetCvarValue(command, outValue);
+            AZ_Error(
+                "GetCvarValue", getCvarResult == AZ::GetValueResult::Success,
+                "Lookup of '%s' console variable failed with error %s", command, AZ::GetEnumString(getCvarResult));
+        } 
     }
 }
 

@@ -1954,11 +1954,7 @@ namespace AZ::IO
     ArchiveLocationPriority Archive::GetPakPriority() const
     {
         int pakPriority = aznumeric_cast<int>(ArchiveVars{}.nPriority);
-        if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
-        {
-            [[maybe_unused]] AZ::GetValueResult getCvarResult = console->GetCvarValue("sys_PakPriority", pakPriority);
-            AZ_Error("Archive", getCvarResult == AZ::GetValueResult::Success, "Lookup of 'sys_PakPriority console variable failed with error %s", AZ::GetEnumString(getCvarResult));
-        }
+        GetCvarValue("sys_PakPriority", pakPriority);
         return static_cast<ArchiveLocationPriority>(pakPriority);
     }
 
