@@ -11,9 +11,7 @@ set(FILES
     IAudioSystem.h
     ICmdLine.h
     IConsole.h
-    IEntityRenderState.h
     IFont.h
-    IFunctorBase.h
     IGem.h
     IIndexedMesh.h
     ILevelSystem.h
@@ -30,11 +28,8 @@ set(FILES
     ISerialize.h
     IShader.h
     ISplines.h
-    IStatObj.h
-    StatObjBus.h
     ISystem.h
     ITexture.h
-    ITimer.h
     IValidator.h
     IWindowMessageHandler.h
     IXml.h
@@ -68,7 +63,6 @@ set(FILES
     SimpleSerialize.h
     smartptr.h
     StlUtils.h
-    Timer.h
     TimeValue.h
     VectorMap.h
     VertexFormats.h
