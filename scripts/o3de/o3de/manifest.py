@@ -35,11 +35,6 @@ def get_o3de_folder() -> pathlib.Path:
     o3de_folder.mkdir(parents=True, exist_ok=True)
     return o3de_folder
 
-def get_o3de_user_folder() -> pathlib.Path:
-    o3de_user_folder = get_home_folder() / 'O3DE'
-    o3de_user_folder.mkdir(parents=True, exist_ok=True)
-    return o3de_user_folder
-
 
 def get_o3de_registry_folder() -> pathlib.Path:
     registry_folder = get_o3de_folder() / 'Registry'
@@ -84,13 +79,13 @@ def get_o3de_templates_folder() -> pathlib.Path:
 
 
 def get_o3de_restricted_folder() -> pathlib.Path:
-    restricted_folder = get_o3de_user_folder() / 'Restricted'
+    restricted_folder = get_o3de_folder() / 'Restricted'
     restricted_folder.mkdir(parents=True, exist_ok=True)
     return restricted_folder
 
 
 def get_o3de_logs_folder() -> pathlib.Path:
-    logs_folder = get_o3de_user_folder() / 'Logs'
+    logs_folder = get_o3de_folder() / 'Logs'
     logs_folder.mkdir(parents=True, exist_ok=True)
     return logs_folder
 
