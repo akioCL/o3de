@@ -39,6 +39,7 @@ namespace AZ
             virtual AZStd::string GetName() const;
             virtual AZ::u64 GetUniqueId() const;
             virtual AZStd::string GetTextureFileName(MaterialMapType textureType) const;
+            virtual AZ::u32 GetTextureFlags(MaterialMapType textureType) const;
             virtual AZ::Vector3 GetDiffuseColor() const;
             virtual AZ::Vector3 GetSpecularColor() const;
             virtual AZ::Vector3 GetEmissiveColor() const;

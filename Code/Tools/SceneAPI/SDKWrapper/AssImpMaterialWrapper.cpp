@@ -195,85 +195,121 @@ namespace AZ
             }
             return AZStd::nullopt;
         }
+        
+        bool AssImpMaterialWrapper::GetTwoSided() const
+        {
+            bool twoSided = false;
+            m_assImpMaterial->Get(AI_MATKEY_TWOSIDED, twoSided);
+            return twoSided;
+        }
 
         AZStd::string AssImpMaterialWrapper::GetTextureFileName(MaterialMapType textureType) const
         {
-            /// Engine currently doesn't support multiple textures. Right now we only use first texture.
-            unsigned int textureIndex = 0;
-            aiString absTexturePath;
+            aiString absTexturePath{""};
+
+            auto getTextureFile = [this, &absTexturePath](aiTextureType textureType)
+            {
+                /// Engine currently doesn't support multiple textures. Right now we only use first texture.
+                unsigned int textureIndex = 0;
+                
+                if (m_assImpMaterial->GetTextureCount(textureType) > textureIndex)
+                {
+                    m_assImpMaterial->GetTexture(textureType, textureIndex, &absTexturePath);
+                }
+            };
+
             switch (textureType)
             {
             case MaterialMapType::Diffuse:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_DIFFUSE) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_DIFFUSE, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_DIFFUSE);
                 break;
             case MaterialMapType::Specular:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_SPECULAR) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_SPECULAR, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_SPECULAR);
                 break;
             case MaterialMapType::Bump:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_HEIGHT) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_HEIGHT, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_HEIGHT);
                 break;
             case MaterialMapType::Normal:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_NORMALS) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_NORMALS, textureIndex, &absTexturePath);
-                }
-                else if (m_assImpMaterial->GetTextureCount(aiTextureType_NORMAL_CAMERA) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_NORMAL_CAMERA, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_NORMAL_CAMERA);
+                getTextureFile(aiTextureType_NORMALS); // will override aiTextureType_NORMAL_CAMERA if present
                 break;
             case MaterialMapType::Metallic:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_METALNESS) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_METALNESS, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_METALNESS);
                 break;
             case MaterialMapType::Roughness:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_DIFFUSE_ROUGHNESS);
                 break;
             case MaterialMapType::AmbientOcclusion:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_AMBIENT_OCCLUSION, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_AMBIENT_OCCLUSION);
                 break;
             case MaterialMapType::Emissive:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_EMISSION_COLOR) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_EMISSION_COLOR, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_EMISSION_COLOR);
                 break;
             case MaterialMapType::BaseColor:
-                if (m_assImpMaterial->GetTextureCount(aiTextureType_BASE_COLOR) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_BASE_COLOR, textureIndex, &absTexturePath);
-                }
-                // If the base color texture isn't available, fall back to using the diffuse texture.
-                // Before PBR support was added, the renderer just defaulted to using the diffuse texture
-                // in the base color texture property of the material.
-                else if (m_assImpMaterial->GetTextureCount(aiTextureType_DIFFUSE) > textureIndex)
-                {
-                    m_assImpMaterial->GetTexture(aiTextureType_DIFFUSE, textureIndex, &absTexturePath);
-                }
+                getTextureFile(aiTextureType_DIFFUSE);    // this is the fallback, older property
+                getTextureFile(aiTextureType_BASE_COLOR); // will override aiTextureType_DIFFUSE if present
                 break;
             default:
                 AZ_TraceContext("Unknown value", aznumeric_cast<int>(textureType));
                 AZ_TracePrintf(SceneAPI::Utilities::WarningWindow, "Unrecognized MaterialMapType retrieved");
-                return AZStd::string();
             }
+            
             return AZStd::string(absTexturePath.C_Str());
         }
+        
+        AZ::u32 AssImpMaterialWrapper::GetTextureFlags(MaterialMapType textureType) const
+        {
+            AZ::u32 textureFlags = 0u;
+
+            auto getTextureFlag = [this, &textureFlags](aiTextureType textureType)
+            {
+                /// Engine currently doesn't support multiple textures. Right now we only use first texture.
+                unsigned int textureIndex = 0;
+
+                if (m_assImpMaterial->GetTextureCount(textureType) > textureIndex)
+                {
+                    m_assImpMaterial->Get(AI_MATKEY_TEXFLAGS(textureType, textureIndex), textureFlags);
+                }
+            };
+
+            switch (textureType)
+            {
+            case MaterialMapType::Diffuse:
+                getTextureFlag(aiTextureType_DIFFUSE);
+                break;
+            case MaterialMapType::Specular:
+                getTextureFlag(aiTextureType_SPECULAR);
+                break;
+            case MaterialMapType::Bump:
+                getTextureFlag(aiTextureType_HEIGHT);
+                break;
+            case MaterialMapType::Normal:
+                getTextureFlag(aiTextureType_NORMAL_CAMERA);
+                getTextureFlag(aiTextureType_NORMALS); // will override aiTextureType_NORMAL_CAMERA if present
+                break;
+            case MaterialMapType::Metallic:
+                getTextureFlag(aiTextureType_METALNESS);
+                break;
+            case MaterialMapType::Roughness:
+                getTextureFlag(aiTextureType_DIFFUSE_ROUGHNESS);
+                break;
+            case MaterialMapType::AmbientOcclusion:
+                getTextureFlag(aiTextureType_AMBIENT_OCCLUSION);
+                break;
+            case MaterialMapType::Emissive:
+                getTextureFlag(aiTextureType_EMISSION_COLOR);
+                break;
+            case MaterialMapType::BaseColor:
+                getTextureFlag(aiTextureType_DIFFUSE);    // this is the fallback, older property
+                getTextureFlag(aiTextureType_BASE_COLOR); // will override aiTextureType_DIFFUSE if present
+                break;
+            default:
+                AZ_TraceContext("Unknown value", aznumeric_cast<int>(textureType));
+                AZ_TracePrintf(SceneAPI::Utilities::WarningWindow, "Unrecognized MaterialMapType retrieved");
+            }
+
+            return textureFlags;
+        }
+
     } // namespace AssImpSDKWrapper
 } // namespace AZ

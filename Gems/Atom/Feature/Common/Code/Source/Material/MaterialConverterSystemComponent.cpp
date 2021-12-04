@@ -121,18 +121,28 @@ namespace AZ
             handleTexture("specularF0", SceneAPI::DataTypes::IMaterialData::TextureMapType::Specular);
             handleTexture("normal", SceneAPI::DataTypes::IMaterialData::TextureMapType::Normal);
             AZStd::optional<bool> useColorMap = materialData.GetUseColorMap();
+            SceneAPI::DataTypes::IMaterialData::TextureMapType baseColorTextureType;
             // If the useColorMap property exists, this is a PBR material and the color should be set to baseColor.
             if (useColorMap.has_value())
             {
+                baseColorTextureType = SceneAPI::DataTypes::IMaterialData::TextureMapType::BaseColor;
                 anyPBRInUse = true;
-                handleTexture("baseColor", SceneAPI::DataTypes::IMaterialData::TextureMapType::BaseColor);
                 sourceData.m_properties["baseColor"]["textureBlendMode"].m_value = AZStd::string("Lerp");
             }
             else
             {
                 // If it doesn't have the useColorMap property, then it's a non-PBR material and the baseColor
                 // texture needs to be set to the diffuse texture.
-                handleTexture("baseColor", SceneAPI::DataTypes::IMaterialData::TextureMapType::Diffuse);
+                baseColorTextureType = SceneAPI::DataTypes::IMaterialData::TextureMapType::Diffuse;
+            }
+            
+            handleTexture("baseColor", baseColorTextureType);
+
+            SceneAPI::DataTypes::IMaterialData::TextureFlags baseColorTextureFlags = materialData.GetTextureFlags(baseColorTextureType);
+
+            if ((uint32_t)SceneAPI::DataTypes::IMaterialData::TextureFlags::UseAlpha & (uint32_t)baseColorTextureFlags)
+            {
+                sourceData.m_properties["opacity"]["mode"].m_value = AZStd::string{"Cutout"};
             }
 
             auto toColor = [](const AZ::Vector3& v) { return AZ::Color::CreateFromVector3AndFloat(v, 1.0f); };
@@ -145,6 +155,11 @@ namespace AZ
             }
 
             sourceData.m_properties["opacity"]["factor"].m_value = materialData.GetOpacity();
+
+            if (materialData.GetTwoSided())
+            {
+                sourceData.m_properties["general"]["doubleSided"].m_value = true;
+            }
 
             auto applyOptionalPropertiesFunc = [&sourceData, &anyPBRInUse](const auto& propertyGroup, const auto& propertyName, const auto& propertyOptional)
             {

@@ -41,6 +41,14 @@ namespace AZ
                     BaseColor
                 };
 
+                enum class TextureFlags
+                {
+                    None        = 0x0,
+                    Invert      = 0x1,
+                    UseAlpha    = 0x2,
+                    IgnoreAlpha = 0x4
+                };
+
                 ~IMaterialData() override = default;
 
                 void CloneAttributesFrom([[maybe_unused]] const IGraphObject* sourceObject) override {}
@@ -77,6 +85,7 @@ namespace AZ
 
                 virtual const AZStd::string& GetMaterialName() const = 0;
                 virtual const AZStd::string& GetTexture(TextureMapType mapType) const = 0;
+                virtual TextureFlags GetTextureFlags(TextureMapType mapType) const = 0;
                 virtual bool IsNoDraw() const = 0;
 
                 virtual const AZ::Vector3& GetDiffuseColor() const = 0;
@@ -94,6 +103,8 @@ namespace AZ
                 virtual AZStd::optional<bool> GetUseEmissiveMap() const = 0;
                 virtual AZStd::optional<float> GetEmissiveIntensity() const = 0;
                 virtual AZStd::optional<bool> GetUseAOMap() const = 0;
+
+                virtual bool GetTwoSided() const = 0;
                                 
                 virtual uint64_t GetUniqueId() const = 0;
             };

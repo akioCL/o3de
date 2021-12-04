@@ -29,6 +29,7 @@ namespace AZ
             float GetOpacity() const override;
             float GetShininess() const override;
             AZStd::string GetTextureFileName(MaterialMapType textureType) const override;
+            AZ::u32 GetTextureFlags(MaterialMapType textureType) const override;
 
             AZStd::optional<bool> GetUseColorMap() const;
             AZStd::optional<AZ::Vector3> GetBaseColor() const;
@@ -39,6 +40,8 @@ namespace AZ
             AZStd::optional<bool> GetUseEmissiveMap() const;
             AZStd::optional<float> GetEmissiveIntensity() const;
             AZStd::optional<bool> GetUseAOMap() const;
+
+            bool GetTwoSided() const;
 
         protected:
             aiMaterial* m_assImpMaterial = nullptr;

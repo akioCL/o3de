@@ -46,9 +46,14 @@ namespace AZ
             return {};
         }
 
-        AZStd::string MaterialWrapper::GetTextureFileName([[maybe_unused]]MaterialMapType textureType) const
+        AZStd::string MaterialWrapper::GetTextureFileName([[maybe_unused]] MaterialMapType textureType) const
         {
             return AZStd::string();
+        }
+        
+        AZ::u32 MaterialWrapper::GetTextureFlags([[maybe_unused]] MaterialMapType textureType) const
+        {
+            return 0u;
         }
 
     }// namespace SDKMaterial

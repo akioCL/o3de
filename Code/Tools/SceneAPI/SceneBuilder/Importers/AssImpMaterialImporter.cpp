@@ -44,6 +44,11 @@ namespace AZ
                     serializeContext->Class<AssImpMaterialImporter, SceneCore::LoadingComponent>()->Version(1);
                 }
             }
+            
+            SceneData::GraphData::MaterialData::TextureFlags ToSceneApiTextureFlags(AZ::u32 assTextureFlags)
+            {
+                return static_cast<SceneData::GraphData::MaterialData::TextureFlags>(assTextureFlags);
+            }
 
             Events::ProcessingResult AssImpMaterialImporter::ImportMaterials(AssImpSceneNodeAppendedContext& context)
             {
@@ -80,19 +85,19 @@ namespace AZ
 
                         material = AZStd::make_shared<SceneData::GraphData::MaterialData>();
 
+                        auto setTexturePathAndFlags = [&](DataTypes::IMaterialData::TextureMapType sceneApiMapType, SDKMaterial::MaterialWrapper::MaterialMapType assMapType)
+                        {
+                            material->SetTexture(sceneApiMapType,
+                                ResolveTexturePath(context.m_sourceScene.GetSceneFileName(), assImpMaterial->GetTextureFileName(assMapType)).c_str());
+                            material->SetTextureFlags(sceneApiMapType,
+                                ToSceneApiTextureFlags(assImpMaterial->GetTextureFlags(assMapType)));
+                        };
+
                         material->SetMaterialName(assImpMaterial->GetName());
-                        material->SetTexture(DataTypes::IMaterialData::TextureMapType::Diffuse,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Diffuse)).c_str());
-                        material->SetTexture(DataTypes::IMaterialData::TextureMapType::Specular,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Specular)).c_str());
-                        material->SetTexture(DataTypes::IMaterialData::TextureMapType::Bump,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Bump)).c_str());
-                        material->SetTexture(DataTypes::IMaterialData::TextureMapType::Normal,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Normal)).c_str());
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Diffuse, SDKMaterial::MaterialWrapper::MaterialMapType::Diffuse);
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Specular, SDKMaterial::MaterialWrapper::MaterialMapType::Specular);
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Bump, SDKMaterial::MaterialWrapper::MaterialMapType::Bump);
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Normal, SDKMaterial::MaterialWrapper::MaterialMapType::Normal);
                         material->SetUniqueId(assImpMaterial->GetUniqueId());
                         material->SetDiffuseColor(assImpMaterial->GetDiffuseColor());
                         material->SetSpecularColor(assImpMaterial->GetSpecularColor());
@@ -104,36 +109,23 @@ namespace AZ
 
                         material->SetUseMetallicMap(assImpMaterial->GetUseMetallicMap());
                         material->SetMetallicFactor(assImpMaterial->GetMetallicFactor());
-                        material->SetTexture(
-                            DataTypes::IMaterialData::TextureMapType::Metallic,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Metallic).c_str()));
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Metallic, SDKMaterial::MaterialWrapper::MaterialMapType::Metallic);
 
                         material->SetUseRoughnessMap(assImpMaterial->GetUseRoughnessMap());
                         material->SetRoughnessFactor(assImpMaterial->GetRoughnessFactor());
-                        material->SetTexture(
-                            DataTypes::IMaterialData::TextureMapType::Roughness,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Roughness).c_str()));
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Roughness, SDKMaterial::MaterialWrapper::MaterialMapType::Roughness);
 
                         material->SetUseEmissiveMap(assImpMaterial->GetUseEmissiveMap());
                         material->SetEmissiveIntensity(assImpMaterial->GetEmissiveIntensity());
 
                         material->SetUseAOMap(assImpMaterial->GetUseAOMap());
-                        material->SetTexture(
-                            DataTypes::IMaterialData::TextureMapType::AmbientOcclusion,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::AmbientOcclusion).c_str()));
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::AmbientOcclusion, SDKMaterial::MaterialWrapper::MaterialMapType::AmbientOcclusion);
+                        
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::Emissive, SDKMaterial::MaterialWrapper::MaterialMapType::Emissive);
+                        
+                        setTexturePathAndFlags(DataTypes::IMaterialData::TextureMapType::BaseColor, SDKMaterial::MaterialWrapper::MaterialMapType::BaseColor);
 
-                        material->SetTexture(
-                            DataTypes::IMaterialData::TextureMapType::Emissive,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::Emissive).c_str()));
-
-                        material->SetTexture(
-                            DataTypes::IMaterialData::TextureMapType::BaseColor,
-                            ResolveTexturePath(context.m_sourceScene.GetSceneFileName(),
-                                assImpMaterial->GetTextureFileName(SDKMaterial::MaterialWrapper::MaterialMapType::BaseColor).c_str()));
+                        material->SetTwoSided(assImpMaterial->GetTwoSided());
 
                         AZ_Assert(material, "Failed to allocate scene material data.");
                         if (!material)

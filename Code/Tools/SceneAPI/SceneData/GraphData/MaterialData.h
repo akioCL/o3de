@@ -36,6 +36,7 @@ namespace AZ
                 SCENE_DATA_API virtual void SetTexture(TextureMapType mapType, const char* textureFileName);
                 SCENE_DATA_API virtual void SetTexture(TextureMapType mapType, const AZStd::string& textureFileName);
                 SCENE_DATA_API virtual void SetTexture(TextureMapType mapType, AZStd::string&& textureFileName);
+                SCENE_DATA_API virtual void SetTextureFlags(TextureMapType mapType, TextureFlags flags);
                 SCENE_DATA_API virtual void SetNoDraw(bool isNoDraw);
 
                 SCENE_DATA_API virtual void SetDiffuseColor(const AZ::Vector3& color);
@@ -53,9 +54,12 @@ namespace AZ
                 SCENE_DATA_API virtual void SetUseEmissiveMap(AZStd::optional<bool> useEmissiveMap);
                 SCENE_DATA_API virtual void SetEmissiveIntensity(AZStd::optional<float> emissiveIntensity);
                 SCENE_DATA_API virtual void SetUseAOMap(AZStd::optional<bool> useAOMap);
+
+                SCENE_DATA_API virtual void SetTwoSided(bool twoSided);
                 
 
                 SCENE_DATA_API const AZStd::string& GetTexture(TextureMapType mapType) const override;
+                SCENE_DATA_API TextureFlags GetTextureFlags(TextureMapType mapType) const override;
                 SCENE_DATA_API bool IsNoDraw() const override;
 
                 SCENE_DATA_API const AZ::Vector3& GetDiffuseColor() const override;
@@ -74,10 +78,13 @@ namespace AZ
                 SCENE_DATA_API AZStd::optional<float> GetEmissiveIntensity() const override;
                 SCENE_DATA_API AZStd::optional<bool> GetUseAOMap() const override;
 
+                SCENE_DATA_API bool GetTwoSided() const override;
+
                 static void Reflect(ReflectContext* context);
 
             protected:
                 AZStd::unordered_map<TextureMapType, AZStd::string> m_textureMap;
+                AZStd::unordered_map<TextureMapType, TextureFlags> m_textureFlags;
                 
                 AZ::Vector3 m_diffuseColor;
                 AZ::Vector3 m_specularColor;
@@ -96,6 +103,7 @@ namespace AZ
                 AZStd::optional<bool> m_useAOMap = AZStd::nullopt;
 
                 bool m_isNoDraw;
+                bool m_isTwoSided;
 
                 const AZStd::string m_emptyString;
 

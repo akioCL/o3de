@@ -21,6 +21,7 @@ namespace AZ
 
             MaterialData::MaterialData()
                 : m_isNoDraw(false)
+                , m_isTwoSided(false)
                 , m_diffuseColor(AZ::Vector3::CreateOne())
                 , m_specularColor(AZ::Vector3::CreateZero())
                 , m_emissiveColor(AZ::Vector3::CreateZero())
@@ -59,6 +60,11 @@ namespace AZ
                     m_textureMap[mapType] = AZStd::move(textureFileName);
                 }
             }
+            
+            void MaterialData::SetTextureFlags(TextureMapType mapType, TextureFlags flags)
+            {
+                m_textureFlags[mapType] = flags;
+            }
 
             const AZStd::string& MaterialData::GetTexture(TextureMapType mapType) const
             {
@@ -69,6 +75,17 @@ namespace AZ
                 }
 
                 return m_emptyString;
+            }
+            
+            MaterialData::TextureFlags MaterialData::GetTextureFlags(TextureMapType mapType) const
+            {
+                auto result = m_textureFlags.find(mapType);
+                if (result != m_textureFlags.end())
+                {
+                    return result->second;
+                }
+
+                return TextureFlags::None;
             }
 
             void MaterialData::SetNoDraw(bool isNoDraw)
@@ -229,6 +246,16 @@ namespace AZ
             uint64_t MaterialData::GetUniqueId() const
             {
                 return m_uniqueId;
+            }
+            
+            void MaterialData::SetTwoSided(bool twoSided)
+            {
+                m_isTwoSided = twoSided;
+            }
+
+            bool MaterialData::GetTwoSided() const
+            {
+                return m_isTwoSided;
             }
 
             namespace Helper
