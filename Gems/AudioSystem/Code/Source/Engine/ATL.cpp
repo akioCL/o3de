@@ -1899,7 +1899,7 @@ namespace Audio
         if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
         {
             AZ::CVarFixedString languageAudio;
-            if (auto result = console->GetCvarValue("g_languageAudio", languageAudio); result == AZ::GetValueResult::Success)
+            if (AZ::GetCvarValue("g_languageAudio", languageAudio) == AZ::GetValueResult::Success)
             {
                 AudioSystemImplementationRequestBus::Broadcast(
                     &AudioSystemImplementationRequestBus::Events::SetLanguage, languageAudio.data());

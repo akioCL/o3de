@@ -99,10 +99,7 @@ namespace AZ
             m_needsInit = false;
 
             AZ::u64 sizeInMb{};
-            if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
-            {
-                console->GetCvarValue("r_skinnedMeshInstanceMemoryPoolSize", sizeInMb);
-            }
+            GetCvarValue("r_skinnedMeshInstanceMemoryPoolSize", sizeInMb);
 
             m_sizeInBytes = sizeInMb * (1024u * 1024u);
 

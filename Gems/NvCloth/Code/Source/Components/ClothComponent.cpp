@@ -54,8 +54,7 @@ namespace NvCloth
         if (auto* console = AZ::Interface<AZ::IConsole>::Get())
         {
             bool isDedicated = false;
-            if (const auto result = console->GetCvarValue("sv_isDedicated", isDedicated);
-                result == AZ::GetValueResult::Success && isDedicated)
+            if (AZ::GetCvarValue("sv_isDedicated", isDedicated) == AZ::GetValueResult::Success && isDedicated)
             {
                 return;
             }

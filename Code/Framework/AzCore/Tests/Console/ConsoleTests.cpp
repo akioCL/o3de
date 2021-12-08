@@ -83,12 +83,19 @@ namespace AZ
             AZ_TEST_ASSERT(console->GetCvarValue(cVarName, getCVarTest) == GetValueResult::Success); // Console finds and retrieves cvar value
             AZ_TEST_ASSERT(getCVarTest == initialValue); // Retrieved cvar value
 
+            _TYPE getCVarHelperTest{};
+            AZ_TEST_ASSERT(GetCvarValue(cVarName, getCVarHelperTest) == GetValueResult::Success); // Console helper finds and retrieves cvar value
+            AZ_TEST_ASSERT(getCVarTest == getCVarHelperTest); // Helper function retrieved same value as using the console directly
+
             console->PerformCommand(setCommand);
 
             AZ_TEST_ASSERT(_TYPE(cvarInstance) == setValue); // Set works for type
 
             AZ_TEST_ASSERT(console->GetCvarValue(cVarName, getCVarTest) == GetValueResult::Success); // Console finds and retrieves cvar value
             AZ_TEST_ASSERT(getCVarTest == setValue); // Retrieved cvar value
+
+            AZ_TEST_ASSERT(GetCvarValue(cVarName, getCVarHelperTest) == GetValueResult::Success); // Console helper finds and retrieves cvar value
+            AZ_TEST_ASSERT(getCVarTest == getCVarHelperTest); // Helper function retrieved same value as using the console directly
 
             if (failCommand != nullptr)
             {

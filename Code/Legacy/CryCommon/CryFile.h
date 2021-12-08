@@ -102,14 +102,11 @@ inline bool CCryFile::Open(const char* filename, const char* mode)
 {
     m_filename = filename;
 #if !defined (_RELEASE)
-    if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
+    if (bool lowercasePaths{}; AZ::GetCvarValue("ed_lowercasepaths", lowercasePaths) == AZ::GetValueResult::Success)
     {
-        if (bool lowercasePaths{}; console->GetCvarValue("ed_lowercasepaths", lowercasePaths) == AZ::GetValueResult::Success)
+        if (lowercasePaths)
         {
-            if (lowercasePaths)
-            {
-                AZStd::to_lower(m_filename.Native().begin(), m_filename.Native().end());
-            }
+            AZStd::to_lower(m_filename.Native().begin(), m_filename.Native().end());
         }
     }
 #endif
