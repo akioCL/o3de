@@ -502,14 +502,12 @@ def HandleDriveSnapshots(String repositoryName, String projectName, String pipel
     unstash name: 'ebs_snapshot_script'
 
     catchError(message: "Error snapshotting volume (this won't fail the build)", buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        def pythonCmd = ''
-        if(env.IS_UNIX) pythonCmd = 'sudo -E python3 -u '
-        else pythonCmd = 'python3 -u '
+        def pythonCmd = 'python3 -u '
         
         mountName = "Name:${repositoryName}_${projectName}_${pipeline}_${branchName}_${platform}_${buildType}"
         mountName = mountName.replace('/', '_').replace('\\', '_')
         palSh("${pythonCmd} ${EBS_SNAPSHOT_SCRIPT_PATH} --action create --tags ${mountName} --execute", "Starting volume snapshots", true)
-        palSh("${pythonCmd} ${EBS_SNAPSHOT_SCRIPT_PATH} --action delete --tags ${mountName} --execute", "Cleaning up old snapshots", true)
+        palSh("${pythonCmd} ${EBS_SNAPSHOT_SCRIPT_PATH} --action delete --tags ${mountName} --retention ${env.SNAP_RETENTION} --execute", "Cleaning up old snapshots", true)
     }
 }
 
@@ -658,7 +656,7 @@ def CreateSingleNode(Map pipelineConfig, def platform, def build_job, Map envVar
                             CreateExportTestScreenshotsStage(pipelineConfig, branchName, platform.key, build_job_name, envVars, params).call()
                         }
                         CreateTeardownStage(envVars, params).call()
-                        if (${CREATE_SNAPSHOT}) {
+                        if (${env.CREATE_SNAPSHOT}) {
                             CreateSnapshotStage(repositoryName, projectName, pipelineName, branchName, platform.key, build_job.key, build_job_name).call()
                         }
                     }
