@@ -425,7 +425,9 @@
     "PARAMETERS": {}
   },
   "snapshot_pipe": {
-    "TAGS": [],
+    "TAGS": [
+      "snapshot-test"
+    ],
     "PIPELINE_ENV": {
       "CREATE_SNAPSHOT": "True"
     },
