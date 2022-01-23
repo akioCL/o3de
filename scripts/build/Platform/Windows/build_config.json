@@ -426,7 +426,7 @@
   },
   "snapshot_pipe": {
     "TAGS": [
-      "snapshot-test"
+      "ebs-snapshot-test"
     ],
     "PIPELINE_ENV": {
       "CREATE_SNAPSHOT": "True"
