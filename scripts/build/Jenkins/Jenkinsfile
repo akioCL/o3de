@@ -497,7 +497,7 @@ def PostBuildCommonSteps(String workspace, Map params, boolean mount = true) {
     }
 }
 
-def HandleDriveSnapshots(String repositoryName, String projectName, String pipeline, String branchName, String platform, String buildType) {  
+def HandleDriveSnapshots(String repositoryName, String projectName, String pipeline, String branchName, String platform, String buildType, int retention) {  
     unstash name: 'ebs_snapshot_script'
 
     catchError(message: "Error snapshotting volume (this won't fail the build)", buildResult: 'UNSTABLE', stageResult: 'FAILURE') {        
@@ -506,7 +506,7 @@ def HandleDriveSnapshots(String repositoryName, String projectName, String pipel
         mountName = "Name:${repositoryName}_${projectName}_${pipeline}_${branchName}_${platform}_${buildType}"
         mountName = mountName.replace('/', '_').replace('\\', '_')
         palSh("${pythonCmd} ${EBS_SNAPSHOT_SCRIPT_PATH} --action create --tags ${mountName} --execute", "Starting volume snapshots", true)
-        palSh("${pythonCmd} ${EBS_SNAPSHOT_SCRIPT_PATH} --action delete --tags ${mountName} --retention ${env.SNAP_RETENTION} --execute", "Cleaning up old snapshots", true)
+        palSh("${pythonCmd} ${EBS_SNAPSHOT_SCRIPT_PATH} --action delete --tags ${mountName} --retention ${retention}} --execute", "Cleaning up old snapshots", true)
     }
 }
 
@@ -579,10 +579,10 @@ def CreateTeardownStage(Map environmentVars, Map params) {
     }
 }
 
-def CreateSnapshotStage(String repositoryName, String projectName, String pipelineName, String branchName, String platformName, String buildType, String jobName) {
+def CreateSnapshotStage(String repositoryName, String projectName, String pipelineName, String branchName, String platformName, String buildType, String jobName, String envVars) {
     return{
         stage("${jobName}_snapshot_ebs_volume") {
-            HandleDriveSnapshots(repositoryName, projectName, pipelineName, branchName, platformName, buildType)
+            HandleDriveSnapshots(repositoryName, projectName, pipelineName, branchName, platformName, buildType, envVars['SNAP_RETENTION'])
         }
     }
 }
@@ -656,7 +656,7 @@ def CreateSingleNode(Map pipelineConfig, def platform, def build_job, Map envVar
                         }
                         CreateTeardownStage(envVars, params).call()
                         if ("${env.CREATE_SNAPSHOT}") {
-                            CreateSnapshotStage(repositoryName, projectName, pipelineName, branchName, platform.key, build_job.key, build_job_name).call()
+                            CreateSnapshotStage(repositoryName, projectName, pipelineName, branchName, platform.key, build_job.key, build_job_name, envVars).call()
                         }
                     }
                 }
