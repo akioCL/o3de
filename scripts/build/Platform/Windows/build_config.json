@@ -423,16 +423,5 @@
     },
     "COMMAND": "destroy_cdk_applications.cmd",
     "PARAMETERS": {}
-  },
-  "snapshot_pipe": {
-    "TAGS": [
-      "ebs-snapshot-test"
-    ],
-    "PIPELINE_ENV": {
-      "CREATE_SNAPSHOT": "True"
-    },
-    "steps": [
-      "profile_pipe"
-    ]
   }
 }
