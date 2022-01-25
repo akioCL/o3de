@@ -13,7 +13,7 @@
         "nightly-clean": {
             "CLEAN_WORKSPACE": true
         },
-        "checking": {
+        "snapshot-test": {
             "CLEAN_WORKSPACE": true,
             "CREATE_SNAPSHOT": true
         }
