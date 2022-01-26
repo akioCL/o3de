@@ -14,8 +14,8 @@
             "CLEAN_WORKSPACE": true
         },
         "snapshot-test": {
-            "CLEAN_WORKSPACE": true,
-            "CREATE_SNAPSHOT": true
+            "CLEAN_WORKSPACE": "True",
+            "CREATE_SNAPSHOT": "True"
         }
     },
     "PIPELINE_JENKINS_PARAMETERS": {
