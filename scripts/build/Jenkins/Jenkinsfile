@@ -655,7 +655,7 @@ def CreateSingleNode(Map pipelineConfig, def platform, def build_job, Map envVar
                             CreateExportTestScreenshotsStage(pipelineConfig, branchName, platform.key, build_job_name, envVars, params).call()
                         }
                         CreateTeardownStage(envVars, params).call()
-                        if (envVars['CREATE_SNAPSHOT'] == true) {
+                        if (envVars['CREATE_SNAPSHOT']?.toBoolean()) {
                             CreateSnapshotStage(repositoryName, projectName, pipelineName, branchName, platform.key, build_job.key, build_job_name).call()
                         }
                     }
