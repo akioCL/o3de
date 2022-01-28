@@ -17,7 +17,9 @@ namespace AZ
         namespace PostFx
         {
             using LayerCategoriesMap = AZStd::map<AZStd::string, int>;
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
             static const char* DefaultLayerCategory = "Default";
+            AZ_POP_DISABLE_WARNING_GCC
             static const int DefaultLayerCategoryValue = std::numeric_limits<int>::max();
         }
     }

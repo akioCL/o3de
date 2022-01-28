@@ -18,6 +18,7 @@
 namespace LandscapeCanvas
 {
     static const GraphCanvas::EditorId LANDSCAPE_CANVAS_EDITOR_ID = AZ_CRC("LandscapeCanvasEditor", 0x57f5535f);
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     static const char* SYSTEM_NAME = "Landscape Canvas";
     static const char* MODULE_FILE_EXTENSION = ".landscapecanvas";
     static const char* MIME_EVENT_TYPE = "landscapecanvas/node-palette-mime-event";
@@ -62,4 +63,5 @@ namespace LandscapeCanvas
     static const QString INBOUND_SHAPE_INPUT_SLOT_DESCRIPTION = QObject::tr("Inbound Shape input slot");
     static const QString PIN_TO_SHAPE_INPUT_SLOT_DESCRIPTION = QObject::tr("Pin To Shape input slot");
     static const QString ENTITY_NAME_SLOT_DESCRIPTION = QObject::tr("Vegetation entity name");
+    AZ_POP_DISABLE_WARNING_GCC
 }

@@ -21,6 +21,7 @@ namespace AzToolsFramework
         class Instance;
         namespace PrefabDomUtils
         {
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
             inline static const char* InstancesName = "Instances";
             inline static const char* PatchesName = "Patches";
             inline static const char* SourceName = "Source";
@@ -31,6 +32,7 @@ namespace AzToolsFramework
             inline static const char* ComponentsName = "Components";
             inline static const char* EntityOrderName = "Child Entity Order";
             inline static const char* TypeName = "$type";
+            AZ_POP_DISABLE_WARNING_GCC
 
             /**
             * Find Prefab value from given parent value and target value's name.

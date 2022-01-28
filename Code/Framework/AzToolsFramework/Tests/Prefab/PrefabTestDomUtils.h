@@ -22,11 +22,15 @@ namespace UnitTest
     {
         using namespace AzToolsFramework::Prefab;
 
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
+
         inline static const char* ComponentsValueName = "Components";
         inline static const char* ComponentIdName = "Id";
         inline static const char* EntitiesValueName = "Entities";
         inline static const char* EntityNameValueName = "Name";
         inline static const char* BoolPropertyName = "BoolProperty";
+        
+        AZ_POP_DISABLE_WARNING_GCC
 
         inline PrefabDomPath GetPrefabDomEntitiesPath()
         {

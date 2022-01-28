@@ -12,6 +12,7 @@
 
 namespace Vegetation
 {
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     // Vegetation Areas
     static const char* EditorAreaBlenderComponentTypeId = "{374A5C69-A252-4C4B-AE10-A673EF7AFE82}";
     static const char* EditorBlockerComponentTypeId = "{9E765835-9CEB-4AEC-A913-787D3D21451D}";
@@ -35,4 +36,5 @@ namespace Vegetation
 
     // Vegetation Area Selectors
     static const char* EditorDescriptorWeightSelectorComponentTypeId = "{0FB90550-149B-4E05-B22C-2753F6526E97}";
+    AZ_POP_DISABLE_WARNING_GCC
 }

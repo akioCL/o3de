@@ -73,8 +73,10 @@ namespace EMotionFX
                 AZStd::string m_descriptionText;
             };
 
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
             static const char* MORPH_TARGET_RULE_ADD_METRIC_EVENT_NAME = "MorphRuleAdded";
             static const char* MORPH_TARGET_RULE_REMOVE_METRIC_EVENT_NAME = "MorphRuleRemoved";
+            AZ_POP_DISABLE_WARNING_GCC
 
         } // Rule
     } // Pipeline

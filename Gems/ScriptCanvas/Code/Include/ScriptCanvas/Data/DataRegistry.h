@@ -50,5 +50,7 @@ namespace ScriptCanvas
     void InitDataRegistry();
     void ResetDataRegistry();
     extern AZ::EnvironmentVariable<DataRegistry> GetDataRegistry();
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     static const char* s_dataRegistryName = "ScriptCanvasDataRegistry";
+    AZ_POP_DISABLE_WARNING_GCC
 }

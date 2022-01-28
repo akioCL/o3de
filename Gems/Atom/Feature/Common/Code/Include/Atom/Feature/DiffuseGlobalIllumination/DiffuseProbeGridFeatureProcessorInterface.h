@@ -79,9 +79,11 @@ namespace AZ
         };
         static const uint32_t DiffuseProbeGridNumRaysPerProbeArraySize = RHI::ArraySize(DiffuseProbeGridNumRaysPerProbeArray);
 
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
         static const char* DiffuseProbeGridIrradianceFileName = "Irradiance_lutrgba16f.dds";
         static const char* DiffuseProbeGridDistanceFileName = "Distance_lutrg32f.dds";
         static const char* DiffuseProbeGridProbeDataFileName = "ProbeData_lutrgba16f.dds";
+        AZ_POP_DISABLE_WARNING_GCC
 
         using DiffuseProbeGridBakeTexturesCallback = AZStd::function<void(
             DiffuseProbeGridTexture irradianceTexture,

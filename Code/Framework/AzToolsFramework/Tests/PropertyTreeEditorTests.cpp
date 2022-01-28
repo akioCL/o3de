@@ -607,10 +607,13 @@ namespace UnitTest
 
         // BuildPathsListWithTypes
         {
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-but-set-variable")
             static auto stringContains = [](const AZStd::string& data, const char* subString) -> bool
             {
                 return data.find(subString) != AZStd::string::npos;
             };
+            AZ_POP_DISABLE_WARNING_GCC
+
             auto&& pathList = propertyTree.BuildPathsListWithTypes();
             EXPECT_TRUE(!pathList.empty());
             EXPECT_TRUE(AZStd::any_of(pathList.begin(), pathList.end(), [](auto&& path) { return stringContains(path,"NotVisible"); }));

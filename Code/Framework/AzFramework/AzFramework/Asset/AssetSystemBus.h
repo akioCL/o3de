@@ -306,8 +306,10 @@ namespace AzFramework
 
         namespace ConnectionIdentifiers
         {
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
             static const char* Editor = "EDITOR";
             static const char* Game = "GAME";
+            AZ_POP_DISABLE_WARNING_GCC
         }
 
         //! AssetSystemStatusBusTraits

@@ -46,15 +46,15 @@ ly_append_configurations_options(
         -Wno-switch
         -Wno-tautological-compare
         -Wno-unknown-pragmas
-        -Wno-unused-function
+#        -Wno-unused-function
         -Wno-unused-value
-        -Wno-unused-variable
+#        -Wno-unused-variable
         -Wno-format-truncation
         -Wno-uninitialized
         -Wno-array-bounds
         -Wno-nonnull-compare
         -Wno-strict-aliasing
-        -Wno-unused-result
+#        -Wno-unused-result
         -Wno-sign-compare
         -Wno-return-local-addr
         -Wno-stringop-overflow
@@ -62,7 +62,7 @@ ly_append_configurations_options(
         -Wno-logical-not-parentheses
         -Wno-stringop-truncation
         -Wno-memset-elt-size
-        -Wno-unused-but-set-variable
+ #       -Wno-unused-but-set-variable
         -Wno-enum-compare
         -Wno-int-in-bool-context
         -Wno-sequence-point

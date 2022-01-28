@@ -103,5 +103,7 @@ private:
     QIcon m_icon;
 };
 
+AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
 static const char* EditorPreferencesGeneralRestoreViewportCameraSettingName = "Restore Viewport Camera on Game Mode Exit";
+AZ_POP_DISABLE_WARNING_GCC
 

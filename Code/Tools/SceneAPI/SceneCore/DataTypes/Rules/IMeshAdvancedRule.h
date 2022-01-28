@@ -19,7 +19,9 @@ namespace AZ
     {
         namespace DataTypes
         {
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
             static const char* s_advancedDisabledString = "Disabled";
+            AZ_POP_DISABLE_WARNING_GCC
 
             class IMeshAdvancedRule
                 : public IRule

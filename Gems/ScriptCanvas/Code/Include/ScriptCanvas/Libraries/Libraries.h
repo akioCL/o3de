@@ -50,7 +50,12 @@ namespace ScriptCanvas
     // Call to reset Node Registry
     void ResetNodeRegistry();
     AZ::EnvironmentVariable<NodeRegistry> GetNodeRegistry();
+
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     static const char* s_nodeRegistryName = "ScriptCanvasNodeRegistry";
+    AZ_POP_DISABLE_WARNING_GCC
+
+
 
     namespace Library
     {

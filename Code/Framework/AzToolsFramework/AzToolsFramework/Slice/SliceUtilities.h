@@ -600,12 +600,14 @@ namespace AzToolsFramework
             const AZ::Data::Asset<AZ::SliceAsset>& targetSlice,
             WillPushEntityCallback willPushEntityCallback);
 
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
         static const char* splitterColor = "black";
         static const char* detachMenuItemHoverColor = "#4285F4";
         static const char* detachMenuItemDefaultColor = "#ffffff";
         static const char* detailWidgetBackgroundColor = "#303030";
         static const char* unsavableChangesTextColor = "#ff3f3f";
         static const char* conflictedChangesTextColor = "red";
+        AZ_POP_DISABLE_WARNING_GCC
 
     } // namespace SliceUtilities
 

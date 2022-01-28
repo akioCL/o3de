@@ -128,12 +128,11 @@ namespace UnitTest
     {
         SparseVector<TestData> container;
         constexpr size_t Count = 10;
-        size_t indices[Count];
 
         // Create some elements
         for (size_t i = 0; i < Count; ++i)
         {
-            indices[i] = container.Reserve();
+            container.Reserve();
         }
 
         // Get the raw data pointer
@@ -247,12 +246,11 @@ namespace UnitTest
     {
         MultiSparseVector<TestData, int, float> container;
         constexpr size_t Count = 10;
-        size_t indices[Count];
 
         // Create some elements and give them values to check later.
         for (size_t i = 0; i < Count; ++i)
         {
-            indices[i] = container.Reserve();
+            container.Reserve();
 
             container.GetElement<1>(i) = static_cast<int>(i * 10);
             container.GetElement<2>(i) = i * 20.0f;

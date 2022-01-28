@@ -14,7 +14,9 @@
 
 namespace AWSMetrics
 {
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     static const char* DefaultMetricsSource = "AWSMetricGem";
+    AZ_POP_DISABLE_WARNING_GCC
 
     //! Metrics event is used to represent one event which contains a collection of metrics attributes.
     class MetricsEvent

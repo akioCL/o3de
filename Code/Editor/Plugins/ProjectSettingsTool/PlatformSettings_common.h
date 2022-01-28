@@ -40,6 +40,7 @@ namespace ProjectSettingsTool
 
     namespace Identfiers
     {
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
         static const char* ProjectName = "Base - Project Name";
         static const char* ProductName = "Base - Product Name";
         static const char* ExecutableName = "Base - Executable Name";
@@ -55,5 +56,6 @@ namespace ProjectSettingsTool
         static const char* IosExecutableName = "iOS - Executable Name";
         static const char* IosBundleIdentifer = "iOS - Bundle Identifer";
         static const char* IosVersionName = "iOS - Version Name";
+        AZ_POP_DISABLE_WARNING_GCC
     } // namespace Identfiers
 } // namespace ProjectSettingsTool

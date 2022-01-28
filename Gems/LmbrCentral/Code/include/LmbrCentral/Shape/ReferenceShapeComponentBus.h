@@ -14,7 +14,10 @@
 namespace LmbrCentral
 {
     // Type ID for Reference EditorReferenceShapeComponent
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     static const char* EditorReferenceShapeComponentTypeId = "{21BC79CA-C2F4-428F-AF2E-B76E233D4254}";
+    AZ_POP_DISABLE_WARNING_GCC
+
 
     class ReferenceShapeRequests
         : public AZ::ComponentBus

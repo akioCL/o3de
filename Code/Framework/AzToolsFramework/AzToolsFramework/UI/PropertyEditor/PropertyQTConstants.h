@@ -28,7 +28,9 @@ namespace AzToolsFramework
     static const int PropertyQTConstant_BottomMargin = 2;
 
     //! String for displaying inifinity
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
     static const char* PropertyQTConstant_InfinityString = "INF";
+    AZ_POP_DISABLE_WARNING_GCC
 };
 
 #endif

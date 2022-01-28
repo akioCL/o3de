@@ -14,9 +14,11 @@ namespace ScriptCanvasDeveloper
     typedef AZStd::string AutomationStateModelId;
     namespace StateModelIds
     {
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-variable")
         static const char* GraphCanvasId = "::GraphCanvasId";
         static const char* ScriptCanvasId = "::ScriptCanvasId";
         static const char* ViewId = "::ViewId";
         static const char* MinorStep = "::MinorStep";
+        AZ_POP_DISABLE_WARNING_GCC
     }
 }
