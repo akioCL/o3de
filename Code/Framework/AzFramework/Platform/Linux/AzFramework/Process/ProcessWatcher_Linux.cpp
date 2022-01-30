@@ -120,7 +120,9 @@ namespace AzFramework
                 int res = chdir(processLaunchInfo.m_workingDirectory.c_str());
                 if (res != 0)
                 {
+                    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
                     write(errorPipe[1], &errno, sizeof(int));
+                    AZ_POP_DISABLE_WARNING_GCC
                     // We *have* to _exit as we are the child process and simply
                     // returning at this point would mean we would start running
                     // the code from our parent process and that will just wreck
@@ -132,12 +134,16 @@ namespace AzFramework
             switch (processLaunchInfo.m_processPriority)
             {
                 case PROCESSPRIORITY_BELOWNORMAL:
+                    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
                     nice(1);
+                    AZ_POP_DISABLE_WARNING_GCC
                     // also reduce disk impact:
                     // setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_UTILITY);
                     break;
                 case PROCESSPRIORITY_IDLE:
+                    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
                     nice(20);
+                    AZ_POP_DISABLE_WARNING_GCC
                     // also reduce disk impact:
                     // setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_THROTTLE);
                     break;
@@ -153,7 +159,9 @@ namespace AzFramework
             // to stop it from continuing to run as a clone of the parent.
             // Communicate the error code back to the parent via a pipe for the
             // parent to read.
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
             write(errorPipe[1], &errval, sizeof(errval));
+            AZ_POP_DISABLE_WARNING_GCC
 
             _exit(0);
         }
@@ -320,7 +328,9 @@ namespace AzFramework
 
         // Set up a pipe to communicate the error code from the subprocess's execvpe call
         AZStd::array<int, 2> childErrorPipeFds{};
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
         pipe(childErrorPipeFds.data());
+        AZ_POP_DISABLE_WARNING_GCC
 
         // This configures the write end of the pipe to close on calls to `exec`
         fcntl(childErrorPipeFds[1], F_SETFD, fcntl(childErrorPipeFds[1], F_GETFD) | FD_CLOEXEC);

@@ -383,8 +383,10 @@ namespace AZ::IO::ZipDir
             if (!AZ::IO::FileIOBase::GetDirectInstance()->Write(m_fileHandle, ptr, sizeToWrite))
             {
                 char error[1024];
+                AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
                 azstrerror_s(error, AZ_ARRAY_SIZE(error), errno);
                 AZ_Warning("Archive", false, "Cannot write to zip file!! error = (%d): %s", errno, error);
+                AZ_POP_DISABLE_WARNING_GCC
                 return ZD_ERROR_IO_FAILED;
             }
             ptr += sizeToWrite;
@@ -531,7 +533,9 @@ namespace AZ::IO::ZipDir
         if (!WriteCompressedData((uint8_t*)pUncompressed, nSegmentSize, encrypt))
         {
             char error[1024];
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
             azstrerror_s(error, AZ_ARRAY_SIZE(error), errno);
+            AZ_POP_DISABLE_WARNING_GCC
             AZ_Warning("Archive", false, "Cannot write to zip file!! error = (%d): %s", errno, error);
             return ZD_ERROR_IO_FAILED;
         }

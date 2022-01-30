@@ -37,6 +37,8 @@
 #include <AzCore/Math/Aabb.h>
 #include <AzFramework/StringFunc/StringFunc.h>
 
+AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")  // Suppress -Wunused-result errors for GCC when compiling EI_Read
+
 namespace AMD
 {
     static void GetTangentVectors(const Vector3& n, Vector3& t0, Vector3& t1)
@@ -988,3 +990,4 @@ namespace AMD
     }
 } // namespace AMD
 
+AZ_POP_DISABLE_WARNING_GCC

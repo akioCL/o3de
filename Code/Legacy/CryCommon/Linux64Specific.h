@@ -103,7 +103,7 @@ typedef uint8               byte;
 
 #define PLATFORM_64BIT
 
-#ifdef _RELEASE
+#if defined(_RELEASE) || defined (AZ_COMPILER_GCC)
     #define __debugbreak()
 #else
     #define __debugbreak() "_asm int 3"

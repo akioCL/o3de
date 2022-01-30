@@ -143,7 +143,9 @@ bool CImageUtil::LoadPGM(const QString& fileName, CImageEx& image)
     fseek(file, 0, SEEK_SET);
 
     char* str = new char[fileSize];
+    AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
     fread(str, fileSize, 1, file);
+    AZ_POP_DISABLE_WARNING_GCC
 
     [[maybe_unused]] char* nextToken = nullptr;
     token = azstrtok(str, 0, seps, &nextToken);

@@ -71,7 +71,9 @@ namespace AzNetworking
         const char* GetNetworkErrorDesc(int32_t errorCode)
         {
             static AZ_THREAD_LOCAL char buffer[1024];
+            AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
             strerror_r(errorCode, buffer, sizeof(buffer));
+            AZ_POP_DISABLE_WARNING_GCC
             return buffer;
         }
     }

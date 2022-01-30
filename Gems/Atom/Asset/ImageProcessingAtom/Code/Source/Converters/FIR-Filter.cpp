@@ -16,6 +16,9 @@
 #include <Converters/FIR-Windows.h>
 #include <Converters/FIR-Weights.h>
 
+
+AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-value")  // Suppress -Wunused-result errors for GCC when compiling filter* macros
+
 /* ####################################################################################################################
  */
 #define mallocAligned(sze)  _aligned_malloc(sze, 16)
@@ -1277,3 +1280,5 @@ namespace ImageProcessingAtom
         FilterImage(filterIndex, filterOp, blurH, blurV, srcImg, srcMip, dstImg, dstMip, srcRect, dstRect);
     }
 }
+
+AZ_POP_DISABLE_WARNING_GCC

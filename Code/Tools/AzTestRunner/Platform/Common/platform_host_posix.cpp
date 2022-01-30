@@ -13,7 +13,9 @@ namespace AzTestRunner
 {
     void set_quiet_mode()
     {
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
         freopen("/dev/null", "a", stdout);
+        AZ_POP_DISABLE_WARNING_GCC
     }
 
     const char* get_current_working_directory()
@@ -24,7 +26,9 @@ namespace AzTestRunner
 
     void pause_on_completion()
     {
+        AZ_PUSH_DISABLE_WARNING_GCC("-Wunused-result")
         system("pause");
+        AZ_POP_DISABLE_WARNING_GCC
     }
 
 }
