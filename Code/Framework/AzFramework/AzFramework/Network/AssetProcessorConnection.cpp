@@ -66,6 +66,8 @@ namespace AzFramework
             , m_connectionState(EConnectionState::Disconnected)
             , m_port(0)
             , m_sendEventNotEmpty()
+            , m_lastErrorResult{ 0 }
+            , m_lastErrorMessage{}
         {
             m_requestSerial = 1;
             m_unitTesting = false;
@@ -228,7 +230,9 @@ namespace AzFramework
             AZ::s32 result = AZ::AzSock::Connect(m_socket, socketAddress);
             if (AZ::AzSock::SocketErrorOccured(result))
             {
-                AZ_Warning(ConnectThreadWindow, false, "Network connection attempt failure, Connect returned error %s", AZ::AzSock::GetStringForError(result));
+                m_lastErrorResult = result;
+                m_lastErrorMessage = AZStd::string::format("Network connection attempt failure, Connect returned error %s", AZ::AzSock::GetStringForError(result));
+                DebugMessage("%s", m_lastErrorMessage.c_str());
 
                 if (m_connectThread.m_join)
                 {
@@ -242,7 +246,9 @@ namespace AzFramework
             result = AZ::AzSock::EnableTCPNoDelay(m_socket, true);
             if (result)
             {
-                AZ_Warning(ConnectThreadWindow, false, "Network connection attempt failure, EnableTCPNoDelay returned an error %s", AZ::AzSock::GetStringForError(result));
+                m_lastErrorResult = result;
+                m_lastErrorMessage = AZStd::string::format("Network connection attempt failure, EnableTCPNoDelay returned an error %s", AZ::AzSock::GetStringForError(result));
+                DebugMessage("%s", m_lastErrorMessage.c_str());
                 if (m_connectThread.m_join)
                 {
                     return;
@@ -252,6 +258,9 @@ namespace AzFramework
             }
 
             DebugMessage("AssetProcessorConnection::ConnectThread - socket connected to %s:%u, Negotiate...", m_connectAddr.c_str(), m_port);
+    
+            m_lastErrorResult = 0;
+            m_lastErrorMessage.clear();
 
             //we connected, start the send recv threads so we can negotiate
             StartSendRecvThreads();
@@ -1093,6 +1102,16 @@ namespace AzFramework
                 }
             }
             DebugMessage("AzSockConnection::RemoveMessageHandler - Tried to remove a type callback that didn't exist");
+        }
+
+        AZ::s32 AssetProcessorConnection::GetLastResult() const
+        {
+            return m_lastErrorResult;
+        }
+
+        AZStd::string AssetProcessorConnection::GetLastErrorMessage() const
+        {
+            return m_lastErrorMessage;
         }
 
         void AssetProcessorConnection::InvokeMessageHandler(AZ::u32 typeId, AZ::u32 serial, const void* dataBuffer, AZ::u32 dataLength)
