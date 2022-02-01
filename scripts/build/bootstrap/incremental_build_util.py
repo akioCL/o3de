@@ -131,6 +131,7 @@ def parse_args():
                         help=f"Disk size in Gigabytes (defaults to {DEFAULT_DISK_SIZE})", default=DEFAULT_DISK_SIZE)
     parser.add_argument('-dt', '--disk_type', dest="disk_type", help=f"Disk type (defaults to {DEFAULT_DISK_TYPE})",
                         default=DEFAULT_DISK_TYPE)
+    parser.add_argument('-st', '--snapshot_tag', dest="snapshot_tag", help=f"The build pipeline job snapshot tag to use")
     args = parser.parse_args()
 
     # Input validation
@@ -235,8 +236,10 @@ def delete_volume(ec2_client, volume_id):
     response = ec2_client.delete_volume(VolumeId=volume_id)
     print(f'Volume {volume_id} deleted')
 
-def find_snapshot_id(ec2_client, snapshot_hint, repository_name, project, pipeline, platform, build_type, disk_size):
-    mount_name = get_mount_name(repository_name, project, pipeline, snapshot_hint, platform, build_type)
+def find_snapshot_id(ec2_client, snapshot_hint, repository_name, project, pipeline, platform, build_type, disk_size, snapshot_tag):
+    if snapshot_tag:
+        tag = '_' + snapshot_tag
+    mount_name = get_mount_name(repository_name, project, pipeline + tag, snapshot_hint, platform, build_type)
     response = ec2_client.describe_snapshots(Filters= [{
         'Name': 'tag:Name', 'Values': [mount_name]
     }])
@@ -264,7 +267,7 @@ def offline_drive(disk_number=1):
     os.unlink(f.name)
 
 
-def create_volume(ec2_client, availability_zone, snapshot_hint, repository_name, project, pipeline, branch, platform, build_type, disk_size, disk_type):
+def create_volume(ec2_client, availability_zone, snapshot_hint, repository_name, project, pipeline, branch, platform, build_type, disk_size, disk_type, snapshot_tag):
     # The actual EBS default calculation for IOps is a floating point number, the closest approxmiation is 4x of the disk size for simplicity
     mount_name = get_mount_name(repository_name, project, pipeline, branch, platform, build_type)
     pipeline_and_branch = get_pipeline_and_branch(pipeline, branch)
@@ -293,7 +296,7 @@ def create_volume(ec2_client, availability_zone, snapshot_hint, repository_name,
     if 'io1' in disk_type.lower():
         parameters['Iops'] = (4 * disk_size)
 
-    snapshot_id = find_snapshot_id(ec2_client, snapshot_hint, repository_name, project, pipeline, platform, build_type, disk_size)
+    snapshot_id = find_snapshot_id(ec2_client, snapshot_hint, repository_name, project, pipeline, platform, build_type, disk_size, snapshot_tag)
     if snapshot_id:
         parameters['SnapshotId'] = snapshot_id
         created = False
@@ -421,7 +424,7 @@ def detach_volume_from_ec2_instance(volume, ec2_instance_id, force, timeout_dura
             print(f"Volume {attachment['VolumeId']} {attachment['State']} to instance {attachment['InstanceId']}")
 
 
-def mount_ebs(snapshot_hint, repository_name, project, pipeline, branch, platform, build_type, disk_size, disk_type):
+def mount_ebs(snapshot_hint, repository_name, project, pipeline, branch, platform, build_type, disk_size, disk_type, snapshot_tag):
     region = get_region_name()
     ec2_client = get_ec2_client(region)
     ec2_instance_id = get_ec2_instance_id()
@@ -448,7 +451,7 @@ def mount_ebs(snapshot_hint, repository_name, project, pipeline, branch, platfor
     if 'Volumes' in response and not len(response['Volumes']):
         print(f'Volume for {mount_name} doesn\'t exist creating it...')
         # volume doesn't exist, create it
-        volume_id, created = create_volume(ec2_client, ec2_availability_zone, snapshot_hint, repository_name, project, pipeline, branch, platform, build_type, disk_size, disk_type)
+        volume_id, created = create_volume(ec2_client, ec2_availability_zone, snapshot_hint, repository_name, project, pipeline, branch, platform, build_type, disk_size, disk_type, snapshot_tag)
     else:
         volume = response['Volumes'][0]
         volume_id = volume['VolumeId']
