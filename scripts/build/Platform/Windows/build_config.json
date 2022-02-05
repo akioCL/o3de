@@ -159,7 +159,7 @@
       "nightly-clean"
     ],
     "PIPELINE_ENV":{
-      "NODE_LABEL":"windows-gpu"
+      "NODE_LABEL":"windows-gpu-test"
     },
     "COMMAND": "build_test_windows.cmd",
     "PARAMETERS": {
