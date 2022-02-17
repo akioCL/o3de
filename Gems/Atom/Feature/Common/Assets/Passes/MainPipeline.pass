@@ -342,6 +342,13 @@
                             }
                         },
                         {
+                            "LocalSlot": "DepthLinear",
+                            "AttachmentRef": {
+                                "Pass": "DepthPrePass",
+                                "Attachment": "DepthLinear"
+                            }
+                        },
+                        {
                             "LocalSlot": "MotionVectors",
                             "AttachmentRef": {
                                 "Pass": "MotionVectorPass",

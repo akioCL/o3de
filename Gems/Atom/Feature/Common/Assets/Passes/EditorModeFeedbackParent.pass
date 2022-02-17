@@ -12,6 +12,10 @@
                     "Name": "InputDepth",
                     "SlotType": "Input"
                 },
+                {
+                    "Name": "InputDepthLinear",
+                    "SlotType": "Input"
+                },
                 // Existing swapchain data
                 {
                     "Name": "InputColor",
@@ -49,6 +53,13 @@
                             "AttachmentRef": {
                                 "Pass": "Parent",
                                 "Attachment": "InputDepth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "InputDepthLinear",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "InputDepthLinear"
                             }
                         }
                     ]

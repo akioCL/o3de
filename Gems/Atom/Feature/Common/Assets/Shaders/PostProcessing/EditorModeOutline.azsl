@@ -11,10 +11,7 @@
 
 partial ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
 {    
-    //! Outline line thickness.
     float m_lineThickness;
-
-    //! Outline line color.
     float4 m_lineColor;
 }
 
@@ -57,6 +54,8 @@ PSOutput MainPS(VSOutput IN)
 
     // Apply the visual effect to non-mask entities, leaving mask entities untouched
     OUT.m_color = PassSrg::CalculateFinalBlendAmountAndOutputColor(inColor, PassSrg::m_lineColor.rgb, outline);
+
+    OUT.m_color.rgb = float3(mask, mask, mask);
 
     return OUT;
 }

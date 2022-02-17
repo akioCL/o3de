@@ -24,6 +24,32 @@ ShaderResourceGroup ObjectSrg : SRG_PerObject
     }
 }
 
+ShaderResourceGroup PassSrg : SRG_PerPass
+{
+    //! The non-linear depth buffer data for fragments in the color buffer.
+    Texture2D<float> m_depth;
+    
+    Sampler LinearSampler
+    {
+        MinFilter = Linear;
+        MagFilter = Linear;
+        MipFilter = Linear;
+        AddressU = Clamp;
+        AddressV = Clamp;
+        AddressW = Clamp;
+    };
+
+    Sampler PointSampler
+    {
+        MinFilter = Point;
+        MagFilter = Point;
+        MipFilter = Point;
+        AddressU = Clamp;
+        AddressV = Clamp;
+        AddressW = Clamp;
+    };
+}
+
 struct VSInput
 {
     // Base fields (required by the template azsli file)...
@@ -35,6 +61,8 @@ struct VSOutput
     // Base fields (required by the template azsli file)...
     // "centroid" is needed for SV_Depth to compile
     precise linear centroid float4 m_position : SV_Position;
+    float m_depth : UV0;
+    float2 m_uv : UV1;
 };
 
 VSOutput MainVS(VSInput IN)
@@ -47,18 +75,14 @@ VSOutput MainVS(VSInput IN)
     // A proper programatic solution will be investigated in LYN-10304
     OUT.m_position.z += 0.001;
 
-/*
-    For use in LYN-9929
-
     // NDCs
     float3 ndc = float3(OUT.m_position.x / OUT.m_position.w, OUT.m_position. y/ OUT.m_position.w, OUT.m_position.z / OUT.m_position.w);
 
     // Normalized screenspace UVs
-    float2 uv = float2((ndc.x + 1.0) * 0.5, (ndc.y + 1.0) * 0.5);
+    OUT.m_uv = float2((ndc.x + 1.0) * 0.5, (ndc.y + 1.0) * 0.5);
 
     // Fragment depth
-    float depth = ndc.z;
-*/
+    OUT.m_depth = ndc.z;
 
     return OUT;
 }
@@ -74,6 +98,9 @@ PixelOutput MainPS(VSOutput IN)
 
     // Ignore m_maskId for now until LYN-9878 is resolved
     OUT.m_color = float4(1., 1., 1., 1.);
+
+    OUT.m_color.r = PassSrg::m_depth.Sample(PassSrg::PointSampler, IN.m_uv).r;
+    //OUT.m_color.rgb = float3(IN.m_uv.x, IN.m_uv.y, 0.);
 
     return OUT;
 } 

@@ -17,6 +17,10 @@
                     "SlotType": "Input"
                 },
                 {
+                    "Name": "DepthLinear",
+                    "SlotType": "Input"
+                },
+                {
                     "Name": "MotionVectors",
                     "SlotType": "Input"
                 },
@@ -213,6 +217,13 @@
                             "AttachmentRef": {
                                 "Pass": "Parent",
                                 "Attachment": "Depth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "InputDepthLinear",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "DepthLinear"
                             }
                         },
                         {
