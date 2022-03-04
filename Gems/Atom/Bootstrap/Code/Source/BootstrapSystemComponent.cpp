@@ -184,8 +184,6 @@ namespace AZ
                     return;
                 }
 
-                m_isInitialized = true;
-
                 if (!RPI::RPISystemInterface::Get()->IsInitialized())
                 {
                     RPI::RPISystemInterface::Get()->InitializeSystemAssets();
@@ -202,6 +200,8 @@ namespace AZ
                                         
                     return;
                 }
+
+                m_isInitialized = true;
 
                 // In the case of the game we want to call create and register the scene as a soon as we can
                 // because a level could be loaded in autoexec.cfg and that will assert if there is no scene registered

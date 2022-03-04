@@ -36,6 +36,9 @@ AZ_POP_DISABLE_WARNING
 #include <QMessageBox>
 #include <QDialogButtonBox>
 
+// Atom renderer
+#include <Atom/RPI.Public/RPISystemInterface.h>
+
 // AzCore
 #include <AzCore/Casting/numeric_cast.h>
 #include <AzCore/Component/ComponentApplicationLifecycle.h>
@@ -1643,7 +1646,7 @@ bool CCryEditApp::InitInstance()
 
     // Connect to the AssetProcessor at this point
     // It will be launched if not running
-    ConnectToAssetProcessor();
+    bool apConnected = ConnectToAssetProcessor();
 
     auto initGameSystemOutcome = InitGameSystem(mainWindowWrapperHwnd);
     if (!initGameSystemOutcome.IsSuccess())
@@ -1660,6 +1663,25 @@ bool CCryEditApp::InitInstance()
     // Such as asset catalog loaded notification.
     // There are some systems need to load configurations from assets for post initialization but before loading level
     AZ::TickBus::ExecuteQueuedEvents();
+
+    // Exit app if the RPI system can't be initialized in ConnectToAssetProcessor() step
+    // Note: the state is checked here instead of right after ConnectToAssetProcessor() because the log message would only be output to log file after InitGameSystem()
+    if (!AZ::RPI::RPISystemInterface::Get()->IsInitialized())
+    {
+        if (gEnv && gEnv->pLog)
+        {
+            if (apConnected)
+            {
+                gEnv->pLog->LogError("Asset Processor wasn't connect");
+            }
+            gEnv->pLog->LogError("RPISystem wasn't initialized");
+        }
+        if (!cmdInfo.m_bExport)
+        {
+            QMessageBox::critical(AzToolsFramework::GetActiveWindow(), QString(), QObject::tr("Game can not be initialized due to failed to initialize RPI system"));
+        }
+        return false;
+    }
 
     qobject_cast<Editor::EditorQtApplication*>(qApp)->LoadSettings();
 
