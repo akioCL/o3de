@@ -22,12 +22,36 @@ ShaderResourceGroup ObjectSrg : SRG_PerObject
     {
         return SceneSrg::GetObjectToWorldMatrix(m_objectId);
     }
+
+    //! The non-linear depth buffer data for fragments in the color buffer.
+    Texture2D<float> m_depth;
+
+    Sampler LinearSampler
+    {
+        MinFilter = Linear;
+        MagFilter = Linear;
+        MipFilter = Linear;
+        AddressU = Clamp;
+        AddressV = Clamp;
+        AddressW = Clamp;
+    };
+
+    Sampler PointSampler
+    {
+        MinFilter = Point;
+        MagFilter = Point;
+        MipFilter = Point;
+        AddressU = Clamp;
+        AddressV = Clamp;
+        AddressW = Clamp;
+    };
 }
 
 struct VSInput
 {
     // Base fields (required by the template azsli file)...
     float3 m_position : POSITION;
+    float3 m_normal : NORMAL;
 };
 
 struct VSOutput
@@ -35,30 +59,35 @@ struct VSOutput
     // Base fields (required by the template azsli file)...
     // "centroid" is needed for SV_Depth to compile
     precise linear centroid float4 m_position : SV_Position;
+
+    float2 m_uv : UV0;
+    float m_depth : UV1;
 };
 
 VSOutput MainVS(VSInput IN)
 {
     VSOutput OUT;    
     float3 worldPosition = mul(ObjectSrg::GetWorldMatrix(), float4(IN.m_position, 1.0)).xyz;
+    float3 directionToCamera = normalize(ViewSrg::m_worldPosition.xyz - worldPosition.xyz);
+    float offsetScale = dot(IN.m_normal, directionToCamera);
+    offsetScale = 1.0f / max(offsetScale, 0.01);
+    offsetScale *= 0.001f;   // Adjust this value to be as small as possible without producing too many artifacts
+    worldPosition += directionToCamera * offsetScale;
+    
     OUT.m_position = mul(ViewSrg::m_viewProjectionMatrix, float4(worldPosition, 1.0));
 
     // Offset the depth of redrawn entities to avoid z fighting with the underlying entity rendered data
     // A proper programatic solution will be investigated in LYN-10304
-    OUT.m_position.z += 0.001;
-
-/*
-    For use in LYN-9929
+    //OUT.m_position.z += 0.001;
 
     // NDCs
     float3 ndc = float3(OUT.m_position.x / OUT.m_position.w, OUT.m_position. y/ OUT.m_position.w, OUT.m_position.z / OUT.m_position.w);
 
     // Normalized screenspace UVs
-    float2 uv = float2((ndc.x + 1.0) * 0.5, (ndc.y + 1.0) * 0.5);
+    OUT.m_uv = float2((ndc.x + 1.0) * 0.5, (ndc.y + 1.0) * 0.5);
 
     // Fragment depth
-    float depth = ndc.z;
-*/
+    OUT.m_depth = ndc.z;
 
     return OUT;
 }
@@ -71,9 +100,14 @@ struct PixelOutput
 PixelOutput MainPS(VSOutput IN)
 {
     PixelOutput OUT;
-
+//
     // Ignore m_maskId for now until LYN-9878 is resolved
     OUT.m_color = float4(1., 1., 1., 1.);
+    //const float newDepth = IN.m_depth;
+    //const float existingDepth = ObjectSrg::m_depth.Sample(ObjectSrg::LinearSampler, IN.m_uv).r;
+    //
+    //const float o = existingDepth;
+    //OUT.m_color.rgb = float4(o,o,o,1.);
 
     return OUT;
 } 
