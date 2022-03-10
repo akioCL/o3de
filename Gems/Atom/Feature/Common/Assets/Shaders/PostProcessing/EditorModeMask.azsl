@@ -68,11 +68,11 @@ VSOutput MainVS(VSInput IN)
 {
     VSOutput OUT;    
     float3 worldPosition = mul(ObjectSrg::GetWorldMatrix(), float4(IN.m_position, 1.0)).xyz;
-    float3 directionToCamera = normalize(ViewSrg::m_worldPosition.xyz - worldPosition.xyz);
-    float offsetScale = dot(IN.m_normal, directionToCamera);
-    offsetScale = 1.0f / max(offsetScale, 0.01);
-    offsetScale *= 0.001f;   // Adjust this value to be as small as possible without producing too many artifacts
-    worldPosition += directionToCamera * offsetScale;
+    //float3 directionToCamera = normalize(ViewSrg::m_worldPosition.xyz - worldPosition.xyz);
+    //float offsetScale = dot(IN.m_normal, directionToCamera);
+    //offsetScale = 1.0f / max(offsetScale, 0.01);
+    //offsetScale *= 0.001f;   // Adjust this value to be as small as possible without producing too many artifacts
+    //worldPosition += directionToCamera * offsetScale;
     
     OUT.m_position = mul(ViewSrg::m_viewProjectionMatrix, float4(worldPosition, 1.0));
 

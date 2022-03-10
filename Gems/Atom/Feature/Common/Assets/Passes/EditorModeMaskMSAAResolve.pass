@@ -5,13 +5,14 @@
     "ClassName": "PassAsset",
     "ClassData": {
         "PassTemplate": {
-            "Name": "EditorModeMaskTemplate",
-            "PassClass": "RasterPass",
+            "Name": "EditorModeMaskMSAAResolveTemplate",
+            "PassClass": "FullScreenTriangle",
             "Slots": [
                 {
-                    "Name": "InputDepth",
+                    "Name": "InputEntityMaskMSAA",
                     "SlotType": "Input",
-                    "ScopeAttachmentUsage": "DepthStencil"
+                    "ShaderInputName": "m_entityMaskMSAA",
+                    "ScopeAttachmentUsage": "Shader"
                 },
                 {
                     "Name": "OutputEntityMask",
@@ -36,8 +37,8 @@
                     "Name": "OutputEntityMaskAttachment",
                     "SizeSource": {
                         "Source": {
-                            "Pass": "This",
-                            "Attachment": "InputDepth"
+                            "Pass": "PipelineGlobal",
+                            "Attachment": "SwapChainOutput"
                         }
                     },
                     "ImageDescriptor": {
@@ -57,8 +58,10 @@
                 }
             ],
             "PassData": {
-                "$type": "RasterPassData",
-                "DrawListTag": "editormodemask",
+                "$type": "FullscreenTrianglePassData",
+                "ShaderAsset": {
+                    "FilePath": "Shaders/PostProcessing/EditorModeMaskResolve.shader"
+                },
                 "PipelineViewTag": "MainCamera"
             }
         }

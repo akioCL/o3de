@@ -1,0 +1,60 @@
+{
+    "Type": "JsonSerialization",
+    "Version": 1,
+    "ClassName": "PassAsset",
+    "ClassData": {
+        "PassTemplate": {
+            "Name": "EditorModeMaskParentTemplate",
+            "PassClass": "ParentPass",
+            "Slots": [
+                {
+                    "Name": "InputDepthMSAA",
+                    "SlotType": "Input"
+                },
+                {
+                    "Name": "OutputEntityMask",
+                    "SlotType": "Output"
+                }
+            ],
+            "Connections": [
+                {
+                    "LocalSlot": "OutputEntityMask",
+                    "AttachmentRef": {
+                        "Pass": "EntityMaskMSAAResolvePass",
+                        "Attachment": "OutputEntityMask"
+                    }
+                }
+            ],
+            "PassRequests": [
+                // Generates the mask for entities of interest
+                {
+                    "Name": "EntityMaskMSAAPass",
+                    "TemplateName": "EditorModeMaskMSAATemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepthMSAA",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "InputDepthMSAA"
+                            }
+                        }
+                    ]
+                },
+                // Generates the mask for entities of interest
+                {
+                    "Name": "EntityMaskMSAAResolvePass",
+                    "TemplateName": "EditorModeMaskMSAAResolveTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputEntityMaskMSAA",
+                            "AttachmentRef": {
+                                "Pass": "EntityMaskMSAAPass",
+                                "Attachment": "OutputEntityMaskMSAA"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

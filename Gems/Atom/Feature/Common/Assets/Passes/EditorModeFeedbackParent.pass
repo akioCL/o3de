@@ -41,14 +41,14 @@
             "PassRequests": [
                 // Generates the mask for entities of interest
                 {
-                    "Name": "EntityMaskPass",
-                    "TemplateName": "EditorModeMaskTemplate",
+                    "Name": "EntityMaskPassParent",
+                    "TemplateName": "EditorModeMaskParentTemplate",
                     "Connections": [
                         {
-                            "LocalSlot": "InputDepth",
+                            "LocalSlot": "InputDepthMSAA",
                             "AttachmentRef": {
-                                "Pass": "Parent",
-                                "Attachment": "InputDepth"
+                                "Pass": "PipelineGlobal",
+                                "Attachment": "DepthMSAA"
                             }
                         }
                     ]
@@ -68,7 +68,7 @@
                         {
                             "LocalSlot": "InputEntityMask",
                             "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
+                                "Pass": "EntityMaskPassParent",
                                 "Attachment": "OutputEntityMask"
                             }
                         },
@@ -96,7 +96,7 @@
                         {
                             "LocalSlot": "InputEntityMask",
                             "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
+                                "Pass": "EntityMaskPassParent",
                                 "Attachment": "OutputEntityMask"
                             }
                         },
@@ -124,7 +124,7 @@
                         {
                             "LocalSlot": "InputEntityMask",
                             "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
+                                "Pass": "EntityMaskPassParent",
                                 "Attachment": "OutputEntityMask"
                             }
                         },
@@ -152,7 +152,7 @@
                         {
                             "LocalSlot": "InputEntityMask",
                             "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
+                                "Pass": "EntityMaskPassParent",
                                 "Attachment": "OutputEntityMask"
                             }
                         },

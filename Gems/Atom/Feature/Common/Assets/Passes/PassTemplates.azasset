@@ -573,8 +573,16 @@
                 "Path": "Passes/EditorModeFeedbackParent.pass"
             },
             {
-                "Name": "EditorModeMaskTemplate",
-                "Path": "Passes/EditorModeMask.pass"
+                "Name": "EditorModeMaskParentTemplate",
+                "Path": "Passes/EditorModeMaskParent.pass"
+            },
+            {
+                "Name": "EditorModeMaskMSAATemplate",
+                "Path": "Passes/EditorModeMaskMSAA.pass"
+            },
+            {
+                "Name": "EditorModeMaskMSAAResolveTemplate",
+                "Path": "Passes/EditorModeMaskMSAAResolve.pass"
             },
             {
                 "Name": "EditorModeDesaturationTemplate",
