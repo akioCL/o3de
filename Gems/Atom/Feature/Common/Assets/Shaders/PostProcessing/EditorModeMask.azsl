@@ -49,7 +49,6 @@ struct VSInput
 {
     // Base fields (required by the template azsli file)...
     float3 m_position : POSITION;
-    float3 m_normal : NORMAL;
 };
 
 struct VSOutput
