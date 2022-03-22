@@ -132,14 +132,14 @@ namespace AZ
 
                     if (asset)
                     {
-                        AZ::Vector3 cameraPosition = AZ::Vector3::CreateZero();
+                        AZ::Transform cameraTransform = AZ::Transform::CreateIdentity();
                         bool activeCameraFound = false;
                         Camera::EditorCameraRequestBus::BroadcastResult(
-                            activeCameraFound, &Camera::EditorCameraRequestBus::Events::GetActiveCameraPosition, cameraPosition);
+                            activeCameraFound, &Camera::EditorCameraRequestBus::Events::GetActiveCameraTransform, cameraTransform);
 
                         if (activeCameraFound)
                         {
-                            AZ::Transform worldTransform = AZ::Transform::CreateTranslation(cameraPosition);
+                            AZ::Transform worldTransform = cameraTransform;
 
                             AzToolsFramework::SliceEditorEntityOwnershipServiceNotificationBus::Handler::BusConnect();
 

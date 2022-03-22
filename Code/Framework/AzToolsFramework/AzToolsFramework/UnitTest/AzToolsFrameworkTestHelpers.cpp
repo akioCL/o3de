@@ -140,7 +140,7 @@ namespace UnitTest
         return m_helpersVisible;
     }
 
-    AZ::Vector3 ViewportSettingsTestImpl::DefaultEditorCameraPosition() const
+    AZ::Transform ViewportSettingsTestImpl::DefaultEditorCameraTransform() const
     {
         return {};
     }

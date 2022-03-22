@@ -22,7 +22,7 @@ namespace Camera
                 ->Event("SetViewFromEntityPerspective", &EditorCameraRequestBus::Events::SetViewFromEntityPerspective)
                 ->Event("SetViewAndMovementLockFromEntityPerspective", &EditorCameraRequestBus::Events::SetViewAndMovementLockFromEntityPerspective)
                 ->Event("GetCurrentViewEntityId", &EditorCameraRequestBus::Events::GetCurrentViewEntityId)
-                ->Event("GetActiveCameraPosition", &EditorCameraRequestBus::Events::GetActiveCameraPosition)
+                ->Event("GetActiveCameraTransform", &EditorCameraRequestBus::Events::GetActiveCameraTransform)
                 ;
         }
     }

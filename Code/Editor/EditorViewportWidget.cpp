@@ -111,6 +111,8 @@ void StartFixedCursorMode(QObject *viewport);
 
 #define RENDER_MESH_TEST_DISTANCE (0.2f)
 #define CURSOR_FONT_HEIGHT  8.0f
+
+#pragma optimize("", off)
 namespace AZ::ViewportHelpers
 {
     static const char TextCantCreateCameraNoLevel[] = "Cannot create camera when no level is loaded.";
@@ -599,10 +601,7 @@ void EditorViewportWidget::OnEditorNotifyEvent(EEditorNotifyEvent event)
         {
             PopDisableRendering();
 
-            Matrix34 viewTM;
-            viewTM.SetIdentity();
-
-            viewTM.SetTranslation(Vec3(m_editorViewportSettings.DefaultEditorCameraPosition()));
+            Matrix34 viewTM = AZTransformToLYTransform(m_editorViewportSettings.DefaultEditorCameraTransform());
             SetViewTM(viewTM);
 
             UpdateScene();
@@ -617,10 +616,7 @@ void EditorViewportWidget::OnEditorNotifyEvent(EEditorNotifyEvent event)
         {
             PopDisableRendering();
 
-            Matrix34 viewTM;
-            viewTM.SetIdentity();
-
-            viewTM.SetTranslation(Vec3(m_editorViewportSettings.DefaultEditorCameraPosition()));
+            Matrix34 viewTM = AZTransformToLYTransform(m_editorViewportSettings.DefaultEditorCameraTransform());
             SetViewTM(viewTM);
         }
         break;
@@ -1926,7 +1922,7 @@ void EditorViewportWidget::SetDefaultCamera()
     }
 
     // Set the default Editor Camera position.
-    m_defaultViewTM.SetTranslation(Vec3(m_editorViewportSettings.DefaultEditorCameraPosition()));
+    m_defaultViewTM = AZTransformToLYTransform(m_editorViewportSettings.DefaultEditorCameraTransform());
     SetViewTM(m_defaultViewTM);
 
     PostCameraSet();
@@ -2080,18 +2076,18 @@ void EditorViewportWidget::SetViewAndMovementLockFromEntityPerspective(const AZ:
     }
 }
 
-bool EditorViewportWidget::GetActiveCameraPosition(AZ::Vector3& cameraPos)
+bool EditorViewportWidget::GetActiveCameraTransform(AZ::Transform& cameraTransform)
 {
     if (m_pPrimaryViewport == this)
     {
         if (GetIEditor()->IsInGameMode())
         {
-            cameraPos = m_renderViewport->GetViewportContext()->GetCameraTransform().GetTranslation();
+            cameraTransform = m_renderViewport->GetViewportContext()->GetCameraTransform();
         }
         else
         {
             // Use viewTM, which is synced with the camera and guaranteed to be up-to-date
-            cameraPos = LYVec3ToAZVec3(GetViewTM().GetTranslation());
+            cameraTransform = LYTransformToAZTransform(GetViewTM());
         }
 
         return true;
@@ -2432,9 +2428,9 @@ bool EditorViewportSettings::StickySelectEnabled() const
     return SandboxEditor::StickySelectEnabled();
 }
 
-AZ::Vector3 EditorViewportSettings::DefaultEditorCameraPosition() const
+AZ::Transform EditorViewportSettings::DefaultEditorCameraTransform() const
 {
-    return SandboxEditor::CameraDefaultEditorPosition();
+    return SandboxEditor::CameraDefaultEditorTransform();
 }
 
 bool EditorViewportSettings::IconsVisible() const
@@ -2572,5 +2568,6 @@ AZStd::optional<AzFramework::ViewportBorderPadding> EditorViewportWidget::GetVie
 
     return AZStd::nullopt;
 }
+#pragma optimize("", on)
 
 #include <moc_EditorViewportWidget.cpp>

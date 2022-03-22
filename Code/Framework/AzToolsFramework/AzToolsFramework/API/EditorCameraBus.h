@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <AzCore/Math/Vector3.h>
+#include <AzCore/Math/Transform.h>
 #include <AzCore/Component/Component.h>
 
 namespace AzFramework
@@ -56,7 +56,7 @@ namespace Camera
          * @param cameraPos On return, the current camera position in the one active Editor viewport.
          * @return True if the camera position was successfully retrieved, false if not.
          */
-        virtual bool GetActiveCameraPosition(AZ::Vector3& /*cameraPos*/) { return false; }
+        virtual bool GetActiveCameraTransform(AZ::Transform& /*cameraTransform*/) { return false; }
 
         /**
          * Gets the position of the currently active Editor camera.

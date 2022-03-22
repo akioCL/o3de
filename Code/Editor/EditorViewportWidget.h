@@ -78,7 +78,7 @@ struct EditorViewportSettings : public AzToolsFramework::ViewportInteraction::Vi
     float ManipulatorLineBoundWidth() const override;
     float ManipulatorCircleBoundWidth() const override;
     bool StickySelectEnabled() const override;
-    AZ::Vector3 DefaultEditorCameraPosition() const override;
+    AZ::Transform DefaultEditorCameraTransform() const override;
     bool IconsVisible() const override;
     bool HelpersVisible() const override;
 };
@@ -217,7 +217,7 @@ private:
     void SetViewFromEntityPerspective(const AZ::EntityId& entityId) override;
     void SetViewAndMovementLockFromEntityPerspective(const AZ::EntityId& entityId, bool lockCameraMovement) override;
     AZ::EntityId GetCurrentViewEntityId() override;
-    bool GetActiveCameraPosition(AZ::Vector3& cameraPos) override;
+    bool GetActiveCameraTransform(AZ::Transform& cameraTransform) override;
     bool GetActiveCameraState(AzFramework::CameraState& cameraState) override;
 
     ////////////////////////////////////////////////////////////////////////

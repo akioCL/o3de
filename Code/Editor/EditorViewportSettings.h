@@ -105,8 +105,8 @@ namespace SandboxEditor
     SANDBOX_API bool CameraCaptureCursorForLook();
     SANDBOX_API void SetCameraCaptureCursorForLook(bool capture);
 
-    SANDBOX_API AZ::Vector3 CameraDefaultEditorPosition();
-    SANDBOX_API void SetCameraDefaultEditorPosition(const AZ::Vector3& position);
+    SANDBOX_API AZ::Transform CameraDefaultEditorTransform();
+    SANDBOX_API void SetCameraDefaultEditorTransform(const AZ::Transform& position);
 
     SANDBOX_API float CameraDefaultOrbitDistance();
     SANDBOX_API void SetCameraDefaultOrbitDistance(float distance);

@@ -58,6 +58,9 @@ namespace SandboxEditor
     constexpr AZStd::string_view CameraDefaultStartingPositionX = "/Amazon/Preferences/Editor/Camera/DefaultStartingPosition/x";
     constexpr AZStd::string_view CameraDefaultStartingPositionY = "/Amazon/Preferences/Editor/Camera/DefaultStartingPosition/y";
     constexpr AZStd::string_view CameraDefaultStartingPositionZ = "/Amazon/Preferences/Editor/Camera/DefaultStartingPosition/z";
+    constexpr AZStd::string_view CameraDefaultStartingRotationX = "/Amazon/Preferences/Editor/Camera/DefaultStartingRotation/x";
+    constexpr AZStd::string_view CameraDefaultStartingRotationY = "/Amazon/Preferences/Editor/Camera/DefaultStartingRotation/y";
+    constexpr AZStd::string_view CameraDefaultStartingRotationZ = "/Amazon/Preferences/Editor/Camera/DefaultStartingRotation/z";
 
     struct EditorViewportSettingsCallbacksImpl : public EditorViewportSettingsCallbacks
     {
@@ -92,19 +95,30 @@ namespace SandboxEditor
         return AZStd::make_unique<EditorViewportSettingsCallbacksImpl>();
     }
 
-    AZ::Vector3 CameraDefaultEditorPosition()
-    {
-        return AZ::Vector3(
+    AZ::Transform CameraDefaultEditorTransform()
+    {    
+        AZ::Vector3 position = AZ::Vector3(
             aznumeric_cast<float>(AzToolsFramework::GetRegistry(CameraDefaultStartingPositionX, 0.0)),
             aznumeric_cast<float>(AzToolsFramework::GetRegistry(CameraDefaultStartingPositionY, -10.0)),
             aznumeric_cast<float>(AzToolsFramework::GetRegistry(CameraDefaultStartingPositionZ, 4.0)));
+            
+        AZ::Quaternion rotation = AZ::Quaternion::CreateFromEulerAnglesDegrees(AZ::Vector3(
+            aznumeric_cast<float>(AzToolsFramework::GetRegistry(CameraDefaultStartingRotationX, 0.0)),
+            aznumeric_cast<float>(AzToolsFramework::GetRegistry(CameraDefaultStartingRotationY, 0.0)),
+            aznumeric_cast<float>(AzToolsFramework::GetRegistry(CameraDefaultStartingRotationZ, 0.0))));
+            
+        return AZ::Transform::CreateFromQuaternionAndTranslation(rotation, position);
     }
 
-    void SetCameraDefaultEditorPosition(const AZ::Vector3& defaultCameraPosition)
+    void SetCameraDefaultEditorTransform(const AZ::Transform& defaultCameraTransform)
     {
-        AzToolsFramework::SetRegistry(CameraDefaultStartingPositionX, defaultCameraPosition.GetX());
-        AzToolsFramework::SetRegistry(CameraDefaultStartingPositionY, defaultCameraPosition.GetY());
-        AzToolsFramework::SetRegistry(CameraDefaultStartingPositionZ, defaultCameraPosition.GetZ());
+        AzToolsFramework::SetRegistry(CameraDefaultStartingPositionX, defaultCameraTransform.GetTranslation().GetX());
+        AzToolsFramework::SetRegistry(CameraDefaultStartingPositionY, defaultCameraTransform.GetTranslation().GetY());
+        AzToolsFramework::SetRegistry(CameraDefaultStartingPositionZ, defaultCameraTransform.GetTranslation().GetZ());
+        
+        AzToolsFramework::SetRegistry(CameraDefaultStartingRotationX, defaultCameraTransform.GetEulerDegrees().GetX());
+        AzToolsFramework::SetRegistry(CameraDefaultStartingRotationY, defaultCameraTransform.GetEulerDegrees().GetY());
+        AzToolsFramework::SetRegistry(CameraDefaultStartingRotationZ, defaultCameraTransform.GetEulerDegrees().GetZ());
     }
 
     AZ::u64 MaxItemsShownInAssetBrowserSearch()

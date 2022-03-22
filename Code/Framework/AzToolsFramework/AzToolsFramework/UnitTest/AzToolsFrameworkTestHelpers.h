@@ -115,7 +115,7 @@ namespace UnitTest
         float ManipulatorLineBoundWidth() const override;
         float ManipulatorCircleBoundWidth() const override;
         bool StickySelectEnabled() const override;
-        AZ::Vector3 DefaultEditorCameraPosition() const override;
+        AZ::Transform DefaultEditorCameraTransform() const override;
         bool IconsVisible() const override;
         bool HelpersVisible() const override;
 

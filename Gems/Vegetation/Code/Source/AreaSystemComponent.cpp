@@ -832,10 +832,11 @@ namespace Vegetation
 
         //Get the active camera.
         bool cameraPositionIsValid = false;
-        AZ::Vector3 cameraPosition(0.0f);
+        AZ::Transform cameraTransform = AZ::Transform::CreateIdentity();
 
 #ifdef VEGETATION_EDITOR
-        Camera::EditorCameraRequestBus::BroadcastResult(cameraPositionIsValid, &Camera::EditorCameraRequestBus::Events::GetActiveCameraPosition, cameraPosition);
+        Camera::EditorCameraRequestBus::BroadcastResult(
+            cameraPositionIsValid, &Camera::EditorCameraRequestBus::Events::GetActiveCameraTransform, cameraTransform);
         if (!cameraPositionIsValid)
 #endif // VEGETATION_EDITOR
         {
@@ -843,13 +844,16 @@ namespace Vegetation
             Camera::CameraSystemRequestBus::BroadcastResult(activeCameraId, &Camera::CameraSystemRequests::GetActiveCamera);
             if (activeCameraId.IsValid())
             {
+                AZ::Vector3 cameraPosition = AZ::Vector3::CreateZero();
                 AZ::TransformBus::EventResult(cameraPosition, activeCameraId, &AZ::TransformInterface::GetWorldTranslation);
+                cameraTransform = AZ::Transform::CreateTranslation(cameraPosition);
                 cameraPositionIsValid = true;
             }
         }
 
         if (cameraPositionIsValid)
         {
+            AZ::Vector3 cameraPosition = cameraTransform.GetTranslation();
             float posX = cameraPosition.GetX();
             float posY = cameraPosition.GetY();
 
