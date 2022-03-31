@@ -194,6 +194,12 @@ set(FILES
     Source/Math/MathFilter.h
     Source/Math/MathFilter.cpp
     Source/Math/MathFilterDescriptor.h
+    Source/MeshComparison/MeshComparisonDispatchItem.cpp
+    Source/MeshComparison/MeshComparisonDispatchItem.h
+    Source/MeshComparison/MeshComparisonFeatureProcessor.cpp
+    Source/MeshComparison/MeshComparisonFeatureProcessor.h
+    Source/MeshComparison/MeshComparisonInstance.cpp
+    Source/MeshComparison/MeshComparisonInstance.h
     Source/Mesh/MeshFeatureProcessor.cpp
     Source/Mesh/ModelReloader.cpp
     Source/Mesh/ModelReloader.h
