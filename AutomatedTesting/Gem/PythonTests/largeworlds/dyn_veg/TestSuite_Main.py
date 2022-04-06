@@ -9,7 +9,21 @@ import os
 import pytest
 
 import ly_test_tools.environment.file_system as file_system
+from ly_remote_console.remote_console_commands import RemoteConsole
+import EditorPythonTestTools.editor_python_test_tools.hydra_test_utils as hydra
 from ly_test_tools.o3de.editor_test import EditorSingleTest, EditorSharedTest, EditorParallelTest, EditorTestSuite
+
+
+@pytest.fixture
+def remote_console_instance(request):
+    console = RemoteConsole()
+
+    def teardown():
+        if console.connected:
+            console.stop()
+
+    request.addfinalizer(teardown)
+    return console
 
 
 @pytest.mark.SUITE_main
@@ -58,8 +72,8 @@ class TestAutomation(EditorTestSuite):
         def setup(self, request, workspace, editor, editor_test_results, launcher_platform):
             TestAutomation.cleanup_test_level(self, workspace)
 
-        def teardown(self, request, workspace, editor, editor_test_results, launcher_platform):
-            TestAutomation.cleanup_test_level(self, workspace)
+        #def teardown(self, request, workspace, editor, editor_test_results, launcher_platform):
+        #    TestAutomation.cleanup_test_level(self, workspace)
 
     class test_LayerBlocker_InstancesBlockedInConfiguredArea(EditorSharedTest):
         from .EditorScripts import LayerBlocker_InstancesBlockedInConfiguredArea as test_module
@@ -172,3 +186,30 @@ class TestAutomation(EditorTestSuite):
 
     class test_VegetationInstances_DespawnWhenOutOfRange(EditorSharedTest):
         from .EditorScripts import VegetationInstances_DespawnWhenOutOfRange as test_module
+
+
+@pytest.mark.SUITE_main
+@pytest.mark.parametrize("launcher_platform", ["windows"])
+@pytest.mark.parametrize("project", ["AutomatedTesting"])
+class TestAutomation(EditorTestSuite):
+
+    @pytest.mark.parametrize("level", ["levels/DynVeg/PrefabInstanceSpawner_External_E2E/PrefabInstanceSpawner_External_E2E.spawnable"])
+    @pytest.mark.parametrize("reps", range(10))
+    def test_PrefabInstanceSpawner_External_E2E_Launcher(self, workspace, launcher, level,
+                                                               remote_console_instance, project, launcher_platform,reps):
+
+        expected_lines = [
+            "Instances found in area = 400"
+        ]
+
+        hydra.launch_and_validate_results_launcher(launcher, level, remote_console_instance, expected_lines, launch_ap=False)
+
+    @pytest.mark.parametrize("level", ["levels/DynVeg/PrefabInstanceSpawner_Embedded_E2E/PrefabInstanceSpawner_Embedded_E2E.spawnable"])
+    def test_PrefabInstanceSpawner_Embedded_E2E_Launcher(self, workspace, launcher, level,
+                                                               remote_console_instance, project, launcher_platform):
+
+        expected_lines = [
+            "Instances found in area = 400"
+        ]
+
+        hydra.launch_and_validate_results_launcher(launcher, level, remote_console_instance, expected_lines, launch_ap=False)
