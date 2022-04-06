@@ -1,0 +1,311 @@
+{
+    "ContainerEntity": {
+        "Id": "ContainerEntity",
+        "Name": "PrefabInstanceSpawner_External",
+        "Components": {
+            "Component_[10233422952576907977]": {
+                "$type": "EditorInspectorComponent",
+                "Id": 10233422952576907977
+            },
+            "Component_[1037397994919388185]": {
+                "$type": "EditorPendingCompositionComponent",
+                "Id": 1037397994919388185
+            },
+            "Component_[1043742191275164357]": {
+                "$type": "SelectionComponent",
+                "Id": 1043742191275164357
+            },
+            "Component_[10897321506192153672]": {
+                "$type": "EditorVisibilityComponent",
+                "Id": 10897321506192153672
+            },
+            "Component_[11206727099701835818]": {
+                "$type": "EditorEntitySortComponent",
+                "Id": 11206727099701835818,
+                "Child Entity Order": [
+                    "Entity_[36044889558591]"
+                ]
+            },
+            "Component_[11290500095453289344]": {
+                "$type": "EditorDisabledCompositionComponent",
+                "Id": 11290500095453289344
+            },
+            "Component_[15430393080582139327]": {
+                "$type": "EditorPrefabComponent",
+                "Id": 15430393080582139327
+            },
+            "Component_[1679183206577891902]": {
+                "$type": "EditorOnlyEntityComponent",
+                "Id": 1679183206577891902
+            },
+            "Component_[330053023001913475]": {
+                "$type": "EditorLockComponent",
+                "Id": 330053023001913475
+            },
+            "Component_[6938834697443067337]": {
+                "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                "Id": 6938834697443067337,
+                "Parent Entity": ""
+            },
+            "Component_[8613210532079037713]": {
+                "$type": "EditorEntityIconComponent",
+                "Id": 8613210532079037713
+            }
+        }
+    },
+    "Entities": {
+        "Entity_[36044889558591]": {
+            "Id": "Entity_[36044889558591]",
+            "Name": "PrefabInstanceSpawner_External",
+            "Components": {
+                "Component_[13369071931006159200]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 13369071931006159200,
+                    "Child Entity Order": [
+                        "Entity_[36049184525887]",
+                        "Entity_[36053479493183]"
+                    ]
+                },
+                "Component_[14277662221587140030]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 14277662221587140030
+                },
+                "Component_[15666663034697982850]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 15666663034697982850
+                },
+                "Component_[17208426574817840341]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 17208426574817840341
+                },
+                "Component_[18373110046038782419]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 18373110046038782419
+                },
+                "Component_[4380649787971161205]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 4380649787971161205
+                },
+                "Component_[4720136596941711693]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 4720136596941711693,
+                    "ComponentOrderEntryArray": [
+                        {
+                            "ComponentId": 9406935049282386495
+                        }
+                    ]
+                },
+                "Component_[7465279331817332297]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 7465279331817332297
+                },
+                "Component_[9011804072355472848]": {
+                    "$type": "SelectionComponent",
+                    "Id": 9011804072355472848
+                },
+                "Component_[9406935049282386495]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 9406935049282386495,
+                    "Parent Entity": "ContainerEntity"
+                }
+            }
+        },
+        "Entity_[36049184525887]": {
+            "Id": "Entity_[36049184525887]",
+            "Name": "InstanceSpawner",
+            "Components": {
+                "Component_[10593561173272995499]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 10593561173272995499
+                },
+                "Component_[13422743095628126452]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 13422743095628126452
+                },
+                "Component_[13782060687385351607]": {
+                    "$type": "EditorBoxShapeComponent",
+                    "Id": 13782060687385351607,
+                    "BoxShape": {
+                        "Configuration": {
+                            "Dimensions": [
+                                16.0,
+                                16.0,
+                                16.0
+                            ]
+                        }
+                    }
+                },
+                "Component_[14280283190361024763]": {
+                    "$type": "EditorScriptCanvasComponent",
+                    "Id": 14280283190361024763,
+                    "m_name": "instance_counter.scriptcanvas",
+                    "runtimeDataOverrides": {
+                        "source": {
+                            "id": "{866F454C-4CCE-5988-AD66-90372FDFD71E}",
+                            "path": "GitHub/o3de/AutomatedTesting/ScriptCanvas/instance_counter.scriptcanvas"
+                        },
+                        "variables": [
+                            {
+                                "Datum": {
+                                    "scriptCanvasType": {
+                                        "m_type": 3
+                                    },
+                                    "isNullPointer": false,
+                                    "$type": "double",
+                                    "value": 0.0
+                                },
+                                "VariableId": {
+                                    "m_id": "{0FA3714A-43E8-45CE-8C40-AF730618328D}"
+                                },
+                                "VariableName": "WaitForInstancesDelay",
+                                "InitialValueSource": 1
+                            }
+                        ],
+                        "overrides": [
+                            {
+                                "Datum": {
+                                    "scriptCanvasType": {
+                                        "m_type": 3
+                                    },
+                                    "isNullPointer": false,
+                                    "$type": "double",
+                                    "value": 1.0
+                                },
+                                "InputControlVisibility": {
+                                    "Value": 850104567
+                                },
+                                "VariableId": {
+                                    "m_id": "{0FA3714A-43E8-45CE-8C40-AF730618328D}"
+                                },
+                                "VariableName": "WaitForInstancesDelay",
+                                "InitialValueSource": 1
+                            }
+                        ]
+                    },
+                    "sourceHandle": {
+                        "id": "{866F454C-4CCE-5988-AD66-90372FDFD71E}",
+                        "path": "GitHub/o3de/AutomatedTesting/ScriptCanvas/instance_counter.scriptcanvas"
+                    }
+                },
+                "Component_[16298826837031314879]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 16298826837031314879
+                },
+                "Component_[17250269317094696266]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 17250269317094696266,
+                    "Parent Entity": "Entity_[36044889558591]"
+                },
+                "Component_[2009730438209658304]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 2009730438209658304
+                },
+                "Component_[2924805017849968625]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 2924805017849968625
+                },
+                "Component_[4060858070611655208]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 4060858070611655208
+                },
+                "Component_[4592777829555785738]": {
+                    "$type": "SelectionComponent",
+                    "Id": 4592777829555785738
+                },
+                "Component_[5442746309343186797]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 5442746309343186797
+                },
+                "Component_[6051659630527545705]": {
+                    "$type": "EditorDescriptorListComponent",
+                    "Id": 6051659630527545705,
+                    "Configuration": {
+                        "DescriptorListSourceType": 1,
+                        "DescriptorListAsset": {
+                            "assetId": {
+                                "guid": "{07D5102D-D850-5230-B769-A2E38EAB07C2}"
+                            },
+                            "assetHint": "assets/vegdescriptorlists/flower_pink.vegdescriptorlist"
+                        },
+                        "Descriptors": [
+                            {}
+                        ]
+                    }
+                },
+                "Component_[6501579392795426507]": {
+                    "$type": "{DD96FD51-A86B-48BC-A6AB-89183B538269} EditorSpawnerComponent",
+                    "Id": 6501579392795426507,
+                    "PreviewEntity": "Entity_[36049184525887]"
+                },
+                "Component_[7292914823514457667]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 7292914823514457667
+                }
+            }
+        },
+        "Entity_[36053479493183]": {
+            "Id": "Entity_[36053479493183]",
+            "Name": "Planting Surface",
+            "Components": {
+                "Component_[10513950501661208929]": {
+                    "$type": "SelectionComponent",
+                    "Id": 10513950501661208929
+                },
+                "Component_[10838557207943841970]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 10838557207943841970
+                },
+                "Component_[12291144609104831259]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12291144609104831259
+                },
+                "Component_[14460465805415494493]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 14460465805415494493,
+                    "Parent Entity": "Entity_[36044889558591]"
+                },
+                "Component_[16109275479024288435]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 16109275479024288435
+                },
+                "Component_[16864287218079993509]": {
+                    "$type": "EditorSurfaceDataShapeComponent",
+                    "Id": 16864287218079993509
+                },
+                "Component_[17336559754371303733]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 17336559754371303733
+                },
+                "Component_[193549326654265252]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 193549326654265252
+                },
+                "Component_[2648863144265806677]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 2648863144265806677
+                },
+                "Component_[4219684920475873221]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 4219684920475873221
+                },
+                "Component_[4968164652816822621]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 4968164652816822621
+                },
+                "Component_[7708794929055047501]": {
+                    "$type": "EditorBoxShapeComponent",
+                    "Id": 7708794929055047501,
+                    "BoxShape": {
+                        "Configuration": {
+                            "Dimensions": [
+                                128.0,
+                                128.0,
+                                1.0
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
