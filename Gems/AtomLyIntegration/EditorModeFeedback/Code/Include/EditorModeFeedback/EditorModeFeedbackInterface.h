@@ -31,6 +31,9 @@ namespace AZ
             //! @param meshHandle The handle of this drawable component's mesh.
             virtual void RegisterOrUpdateDrawableComponent(
                 EntityComponentIdPair entityComponentId, const MeshFeatureProcessorInterface::MeshHandle& meshHandle) = 0;
+
+            //! Requests all drawable components for the specified entity update their render data.
+            virtual void RequestDrawableComponentsUpdate(EntityId entityId) = 0;
         };
     } // namespace Render
 } // namespace AZ

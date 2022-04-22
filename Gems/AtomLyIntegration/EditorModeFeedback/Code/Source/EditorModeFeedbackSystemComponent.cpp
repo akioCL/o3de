@@ -208,6 +208,19 @@ namespace AZ
             meshHandleDrawPackets.m_meshDrawPackets.clear();
         }
 
+        void EditorModeFeedbackSystemComponent::RequestDrawableComponentsUpdate(EntityId entityId)
+        {
+            auto entityIterator = m_entityComponentMeshHandleDrawPackets.find(entityId);
+            if (entityIterator != m_entityComponentMeshHandleDrawPackets.end())
+            {
+                // Clear draw packets for all drawable components belonging to this entity
+                for (auto& componentMeshHandleDrawPackets : entityIterator->second)
+                {
+                    componentMeshHandleDrawPackets.second.m_meshDrawPackets.clear();
+                }
+            }
+        }
+
         void EditorModeFeedbackSystemComponent::OnEditorModeActivated(
             [[maybe_unused]] const AzToolsFramework::ViewportEditorModesInterface& editorModeState,
             AzToolsFramework::ViewportEditorMode mode)
@@ -282,14 +295,14 @@ namespace AZ
                     {
                         const auto view = GetViewFromScene(scene);
                         const auto worldTM = GetWorldTransformForEntity(focusedEntityId);
-                        const auto modelAsset = featureProcessor->GetModelAsset(*meshHandleDrawPackets.m_meshHandle);
-                        const auto model = RPI::Model::FindOrCreate(modelAsset);
+                        const auto model = featureProcessor->GetModel(*meshHandleDrawPackets.m_meshHandle);
+                        const auto modelAsset = model->GetModelAsset();
                         const auto modelLodIndex = RPI::ModelLodUtils::SelectLod(view.get(), worldTM, *model);
 
                         // Build the mesh draw packets for this mesh if no draw packets currently exist or if the LoD for the
                         // draw packets no longer matches the loD of the model
-                        if (meshHandleDrawPackets.m_meshHandle->IsValid() &&
-                            (meshHandleDrawPackets.m_meshDrawPackets.empty() || meshHandleDrawPackets.m_modelLodIndex != modelLodIndex))
+                        if (meshHandleDrawPackets.m_meshHandle->IsValid() /* &&
+                            (meshHandleDrawPackets.m_meshDrawPackets.empty() || meshHandleDrawPackets.m_modelLodIndex != modelLodIndex)*/)
                         {
                             // The id value to write to the mask texture for this entity (unused in the current use case)
                             const auto maskMeshObjectSrg = CreateMaskShaderResourceGroup(
@@ -297,10 +310,7 @@ namespace AZ
                             meshHandleDrawPackets.m_modelLodIndex = modelLodIndex;
                             
                             meshHandleDrawPackets.m_meshDrawPackets = BuildMeshDrawPackets(
-                                meshHandleDrawPackets.m_modelLodIndex,
-                                featureProcessor->GetModelAsset(*meshHandleDrawPackets.m_meshHandle),
-                                m_maskMaterial,
-                                maskMeshObjectSrg);
+                                meshHandleDrawPackets.m_modelLodIndex, modelAsset, m_maskMaterial, maskMeshObjectSrg);
                         }
                     }
                     else

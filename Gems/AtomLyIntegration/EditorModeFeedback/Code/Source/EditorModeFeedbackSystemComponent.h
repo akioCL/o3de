@@ -51,6 +51,7 @@ namespace AZ
             bool IsEnabled() const override;
             void RegisterOrUpdateDrawableComponent(
                 EntityComponentIdPair entityComponentId, const MeshFeatureProcessorInterface::MeshHandle& meshHandle) override;
+            void RequestDrawableComponentsUpdate(EntityId entityId) override;
 
         private:
             // ViewportEditorModeNotificationsBus overrides ...
