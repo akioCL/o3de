@@ -8,7 +8,10 @@
 
 #pragma once
 
+#include "WhiteBoxRenderMeshHandle.h"
+
 #include <AzCore/Component/Component.h>
+#include <Atom/Feature/Mesh/MeshFeatureProcessorInterface.h>
 
 namespace AZ
 {
@@ -33,6 +36,9 @@ namespace WhiteBox
         virtual void BuildMesh(
             const WhiteBoxRenderData& renderData, const AZ::Transform& worldFromLocal,
             AZ::EntityId entityId) = 0; // TODO: LYN-786
+
+        //! Gets the abstracted rendering API-specific mesh handle.
+        virtual WhiteBoxRenderMeshHandle GetMeshHandle() const = 0;
 
         //! Update the transform of the render mesh.
         virtual void UpdateTransform(const AZ::Transform& worldFromLocal) = 0;

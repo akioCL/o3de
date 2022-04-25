@@ -24,5 +24,6 @@ namespace WhiteBox
         void UpdateMaterial(const WhiteBoxMaterial& material) override;
         bool IsVisible() const override;
         void SetVisiblity(bool visibility) override;
+        WhiteBoxRenderMeshHandle GetMeshHandle() const;
     };
 } // namespace WhiteBox

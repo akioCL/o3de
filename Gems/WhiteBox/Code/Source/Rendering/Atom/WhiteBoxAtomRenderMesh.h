@@ -41,6 +41,7 @@ namespace WhiteBox
         void UpdateMaterial(const WhiteBoxMaterial& material) override;
         bool IsVisible() const override;
         void SetVisiblity(bool visibility) override;
+        WhiteBoxRenderMeshHandle GetMeshHandle() const override;
 
     private:
         //! Creates an attribute buffer in the slot dictated by AttributeTypeT.

@@ -34,6 +34,7 @@
 #include <AzToolsFramework/Entity/EditorEntityInfoBus.h>
 #include <AzToolsFramework/Maths/TransformUtils.h>
 #include <AzToolsFramework/UI/UICore/WidgetHelpers.h>
+#include <EditorModeFeedback/EditorModeFeedbackInterface.h>
 #include <QMessageBox>
 #include <WhiteBox/EditorWhiteBoxColliderBus.h>
 #include <WhiteBox/WhiteBoxBus.h>
@@ -439,6 +440,14 @@ namespace WhiteBox
                 // generate the mesh
                 // TODO: LYN-786
                 (*m_renderMesh)->BuildMesh(m_renderData, m_worldFromLocal, GetEntityId());
+
+                // Register this component with the editor mode feedback system
+                if (auto* editorModeFeedbackInterface = AZ::Interface<AZ::Render::EditorModeFeedbackInterface>::Get())
+                {
+                    auto meshHandle = (*m_renderMesh)->GetMeshHandle();
+                    editorModeFeedbackInterface->RegisterOrUpdateDrawableComponent(
+                        AZ::EntityComponentIdPair{ GetEntityId(), GetId() }, *meshHandle.GetAs<AZ::Render::MeshFeatureProcessorInterface::MeshHandle>());
+                }
             }
         }
 

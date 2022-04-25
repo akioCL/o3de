@@ -292,4 +292,9 @@ namespace WhiteBox
         // hide: m_meshFeatureProcessor->ReleaseMesh(m_meshHandle);
         // show: m_meshHandle = m_meshFeatureProcessor->AcquireMesh(m_modelAsset);
     }
+
+    WhiteBoxRenderMeshHandle AtomRenderMesh::GetMeshHandle() const
+    {
+        return WhiteBoxRenderMeshHandle(&m_meshHandle);
+    }
 } // namespace WhiteBox

@@ -115,6 +115,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 Legacy::EditorCommon
                 Legacy::Editor.Headers
                 Gem::WhiteBox.Static
+                Gem::EditorModeFeedback.Editor.Static
     )
 
     ly_add_target(

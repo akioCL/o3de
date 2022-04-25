@@ -22,6 +22,8 @@ set(FILES
     Source/Rendering/WhiteBoxRenderData.h
     Source/Rendering/WhiteBoxMaterial.cpp
     Source/Rendering/WhiteBoxMaterial.h
+    Source/Rendering/WhiteBoxRenderMeshHandle.cpp
+    Source/Rendering/WhiteBoxRenderMeshHandle.h
     Source/Rendering/WhiteBoxNullRenderMesh.cpp
     Source/Rendering/WhiteBoxNullRenderMesh.h
     Source/Rendering/Atom/WhiteBoxMeshAtomData.cpp

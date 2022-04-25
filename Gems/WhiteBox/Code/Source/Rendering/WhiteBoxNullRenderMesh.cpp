@@ -37,4 +37,10 @@ namespace WhiteBox
     {
         // noop
     }
+
+    WhiteBoxRenderMeshHandle WhiteBoxNullRenderMesh::GetMeshHandle() const
+    {
+        // noop
+        return WhiteBoxRenderMeshHandle();
+    }
 } // namespace WhiteBox
