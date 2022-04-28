@@ -9,6 +9,7 @@
 #pragma once
 
 #include <AzCore/std/containers/unordered_set.h>
+#include <AzCore/Component/TickBus.h>
 
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
 
@@ -24,6 +25,7 @@ namespace NvCloth
     class EditorClothComponent
         : public AzToolsFramework::Components::EditorComponentBase
         , public AZ::Render::MeshComponentNotificationBus::Handler
+        , public AZ::TickBus::Handler
     {
     public:
         AZ_EDITOR_COMPONENT(EditorClothComponent, "{2C99B4EF-8A5F-4585-89F9-86D50754DF7E}", AzToolsFramework::Components::EditorComponentBase);
@@ -52,6 +54,10 @@ namespace NvCloth
         void OnModelPreDestroy() override;
 
     private:
+        // TickBus overrides ...
+        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+        int GetTickOrder() override;
+
         bool IsSimulatedInEditor() const;
         AZ::u32 OnSimulatedInEditorToggled();
 

@@ -20,6 +20,7 @@
 #include <Atom/RPI.Reflect/Model/ModelLodAssetCreator.h>
 #include <Atom/RPI.Reflect/ResourcePoolAssetCreator.h>
 #include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
+#include <AtomLyIntegration/CommonFeatures/Mesh/AtomMeshBus.h>
 #include <AzCore/Math/PackedVector3.h>
 
 namespace WhiteBox
@@ -178,6 +179,7 @@ namespace WhiteBox
 
         m_meshFeatureProcessor->ReleaseMesh(m_meshHandle);
         m_meshHandle = m_meshFeatureProcessor->AcquireMesh(AZ::Render::MeshHandleDescriptor{ m_modelAsset });
+        AZ::Render::AtomMeshNotificationBus::Event(entityId, &AZ::Render::AtomMeshNotificationBus::Events::OnAcquireMesh, m_meshHandle);
         return true;
     }
 

@@ -17,6 +17,7 @@
 #include <Components/ClothComponent.h>
 #include <Components/ClothComponentMesh/ClothComponentMesh.h>
 #include <Atom/RPI.Reflect/Model/ModelAsset.h>
+#include <AtomLyIntegration/CommonFeatures/Mesh/AtomMeshBus.h>
 
 #include <Utils/AssetHelper.h>
 
@@ -440,10 +441,14 @@ namespace NvCloth
         AzToolsFramework::Components::EditorComponentBase::Activate();
 
         AZ::Render::MeshComponentNotificationBus::Handler::BusConnect(GetEntityId());
+
+        AZ::TickBus::Handler::BusConnect();
     }
 
     void EditorClothComponent::Deactivate()
     {
+        AZ::TickBus::Handler::BusDisconnect();
+
         AZ::Render::MeshComponentNotificationBus::Handler::BusDisconnect();
 
         AzToolsFramework::Components::EditorComponentBase::Deactivate();
@@ -598,5 +603,19 @@ namespace NvCloth
                 const float backstopRadius = backstop.GetY();
                 return backstopRadius > 0.0f;
             });
+    }
+
+    void EditorClothComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    {
+        if (IsSimulatedInEditor())
+        {
+            // Inform the editor mode feedback system to update the mesh data for all drawable components for the entity this component is on
+            AZ::Render::AtomMeshNotificationBus::Event(GetEntityId(), &AZ::Render::AtomMeshNotificationBus::Events::OnMeshDataUpdate);
+        }
+    }
+
+    int EditorClothComponent::GetTickOrder()
+    {
+        return AZ::TICK_PRE_RENDER;
     }
 } // namespace NvCloth

@@ -49,8 +49,6 @@ namespace AZ
 
             // EditorModeFeedbackInterface overrides ...
             bool IsEnabled() const override;
-            void RegisterOrUpdateDrawableComponent(
-                EntityComponentIdPair entityComponentId, const MeshFeatureProcessorInterface::MeshHandle& meshHandle) override;
 
         private:
             // ViewportEditorModeNotificationsBus overrides ...
@@ -63,6 +61,8 @@ namespace AZ
             void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
             int GetTickOrder() override;
 
+            //void RegisterOrUpdateDrawableComponent(EntityId entityId, const MeshFeatureProcessorInterface::MeshHandle& meshHandle);
+
             //! Loads the pass templates mapping file.
             void LoadPassTemplateMappings();
 
@@ -70,17 +70,17 @@ namespace AZ
             bool m_enabled = false;
 
             //! Data to construct draw packets for meshes.
-            struct MeshHandleDrawPackets
-            {
-                ~MeshHandleDrawPackets();
-
-                const MeshFeatureProcessorInterface::MeshHandle* m_meshHandle;
-                RPI::ModelLodIndex m_modelLodIndex = RPI::ModelLodIndex::Null; 
-                AZStd::vector<RPI::MeshDrawPacket> m_meshDrawPackets;
-            };
-            
-            //! Map for entities and their drawable components.
-            AZStd::unordered_map<EntityId, AZStd::unordered_map<ComponentId, MeshHandleDrawPackets>> m_entityComponentMeshHandleDrawPackets;
+            //struct MeshHandleDrawPackets
+            //{
+            //    ~MeshHandleDrawPackets();
+            //
+            //    const MeshFeatureProcessorInterface::MeshHandle* m_meshHandle;
+            //    RPI::ModelLodIndex m_modelLodIndex = RPI::ModelLodIndex::Null; 
+            //    AZStd::vector<RPI::MeshDrawPacket> m_meshDrawPackets;
+            //};
+            //
+            ////! Map for entities and their drawable components.
+            //AZStd::unordered_map<EntityId, MeshHandleDrawPackets> m_entityMeshHandleDrawPackets;
 
             //! Material for sending draw packets to the entity mask pass.
             Data::Instance<RPI::Material> m_maskMaterial = nullptr;

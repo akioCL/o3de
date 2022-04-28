@@ -8,6 +8,7 @@
 
 #include <Mesh/MeshComponentController.h>
 
+#include <AtomLyIntegration/CommonFeatures/Mesh/AtomMeshBus.h>
 #include <AtomLyIntegration/CommonFeatures/Mesh/MeshComponentConstants.h>
 
 #include <Atom/Feature/Mesh/MeshFeatureProcessor.h>
@@ -404,6 +405,7 @@ namespace AZ
                 meshDescriptor.m_requiresCloneCallback = RequiresCloning;
                 meshDescriptor.m_isRayTracingEnabled = m_configuration.m_isRayTracingEnabled;
                 m_meshHandle = m_meshFeatureProcessor->AcquireMesh(meshDescriptor, materials);
+                AtomMeshNotificationBus::Event(entityId, &AtomMeshNotificationBus::Events::OnAcquireMesh, m_meshHandle);
                 m_meshFeatureProcessor->ConnectModelChangeEventHandler(m_meshHandle, m_changeEventHandler);
 
                 const AZ::Transform& transform = m_transformInterface ? m_transformInterface->GetWorldTM() : AZ::Transform::CreateIdentity();

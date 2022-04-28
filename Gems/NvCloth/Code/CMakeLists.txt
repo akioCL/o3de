@@ -77,6 +77,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 Gem::NvCloth.Static
                 AZ::AzToolsFramework
                 AZ::SceneCore
+                Gem::EditorModeFeedback.Editor.Static
     )
 
     ly_add_target(
