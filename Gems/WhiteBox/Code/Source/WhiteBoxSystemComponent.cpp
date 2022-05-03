@@ -53,9 +53,9 @@ namespace WhiteBox
     {
         // default builder
         SetRenderMeshInterfaceBuilder(
-            []() -> AZStd::unique_ptr<RenderMeshInterface>
+            [/* this*/]() -> AZStd::unique_ptr<RenderMeshInterface>
             {
-                return AZStd::make_unique<AtomRenderMesh>();
+                return AZStd::make_unique<AtomRenderMesh>(/* GetEntityId()*/);
             });
 
         WhiteBoxRequestBus::Handler::BusConnect();

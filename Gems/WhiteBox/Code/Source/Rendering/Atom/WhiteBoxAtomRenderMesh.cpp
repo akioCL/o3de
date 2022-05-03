@@ -24,6 +24,17 @@
 
 namespace WhiteBox
 {
+    //AtomRenderMesh::AtomRenderMesh(AZ::EntityId entityId)
+    //    : m_entityId(entityId)
+    //{
+    //    AZ::Render::AtomMeshRequestBus::Handler::BusConnect(m_entityId);
+    //}
+    //
+    //AtomRenderMesh::~AtomRenderMesh()
+    //{
+    //    AZ::Render::AtomMeshRequestBus::Handler::BusDisconnect();
+    //}
+
     bool AtomRenderMesh::AreAttributesValid() const
     {
         bool attributesAreValid = true;
@@ -162,11 +173,10 @@ namespace WhiteBox
         modelCreator.End(m_modelAsset);
     }
 
-    bool AtomRenderMesh::CreateModel(AZ::EntityId entityId)
+    bool AtomRenderMesh::CreateModel()
     {
         m_model = AZ::RPI::Model::FindOrCreate(m_modelAsset);
-        m_meshFeatureProcessor =
-            AZ::RPI::Scene::GetFeatureProcessorForEntity<AZ::Render::MeshFeatureProcessorInterface>(entityId);
+        m_meshFeatureProcessor = AZ::RPI::Scene::GetFeatureProcessorForEntity<AZ::Render::MeshFeatureProcessorInterface>(m_entityId);
 
         if (!m_meshFeatureProcessor)
         {
@@ -178,6 +188,7 @@ namespace WhiteBox
 
         m_meshFeatureProcessor->ReleaseMesh(m_meshHandle);
         m_meshHandle = m_meshFeatureProcessor->AcquireMesh(AZ::Render::MeshHandleDescriptor{ m_modelAsset });
+        AZ::Render::AtomMeshNotificationBus::Event(m_entityId, &AZ::Render::AtomMeshNotificationBus::Events::OnAcquireMesh, &m_meshHandle);
         return true;
     }
 
@@ -186,7 +197,7 @@ namespace WhiteBox
         return meshData.VertexCount() != m_vertexCount;
     }
 
-    bool AtomRenderMesh::CreateMesh(const WhiteBoxMeshAtomData& meshData, AZ::EntityId entityId)
+    bool AtomRenderMesh::CreateMesh(const WhiteBoxMeshAtomData& meshData)
     {
         if (!CreateLodAsset(meshData))
         {
@@ -196,7 +207,7 @@ namespace WhiteBox
 
         CreateModelAsset();
 
-        if (!CreateModel(entityId))
+        if (!CreateModel())
         {
             // TODO: LYN-808
             return false;
@@ -217,15 +228,14 @@ namespace WhiteBox
         return true; // meshData.VertexCount() != m_vertexCount;
     }
 
-    void AtomRenderMesh::BuildMesh(
-        const WhiteBoxRenderData& renderData, const AZ::Transform& worldFromLocal, AZ::EntityId entityId)
+    void AtomRenderMesh::BuildMesh(const WhiteBoxRenderData& renderData, const AZ::Transform& worldFromLocal, [[maybe_unused]] AZ::EntityId entityId)
     {
         const WhiteBoxFaces culledFaceList = BuildCulledWhiteBoxFaces(renderData.m_faces);
         const WhiteBoxMeshAtomData meshData(culledFaceList);
 
         if (DoesMeshRequireFullRebuild(meshData))
         {
-            if (!CreateMesh(meshData, entityId))
+            if (!CreateMesh(meshData))
             {
                 // TODO: LYN-808
                 return;
@@ -292,4 +302,9 @@ namespace WhiteBox
         // hide: m_meshFeatureProcessor->ReleaseMesh(m_meshHandle);
         // show: m_meshHandle = m_meshFeatureProcessor->AcquireMesh(m_modelAsset);
     }
+
+    //const AZ::Render::MeshFeatureProcessorInterface::MeshHandle* AtomRenderMesh::GetMeshHandle() const
+    //{
+    //    return &m_meshHandle;
+    //}
 } // namespace WhiteBox
