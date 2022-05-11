@@ -100,7 +100,7 @@
                             }
                         },
                         {
-                            "LocalSlot": "ColorInputOutput",
+                            "LocalSlot": "InputColor",
                             "AttachmentRef": {
                                 "Pass": "TintPass",
                                 "Attachment": "OutputColor"
