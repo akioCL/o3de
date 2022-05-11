@@ -13,6 +13,10 @@
                 "Path": "Passes/EditorModeMask.pass"
             },
             {
+                "Name": "EditorModeFocusParentTemplate",
+                "Path": "Passes/EditorModeFocusParent.pass"
+            },
+            {
                 "Name": "EditorModeDesaturationTemplate",
                 "Path": "Passes/EditorModeDesaturation.pass"
             },

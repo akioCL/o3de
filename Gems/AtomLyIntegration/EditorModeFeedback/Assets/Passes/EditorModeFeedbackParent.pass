@@ -33,10 +33,10 @@
                         }
                     ]
                 },
-                // Applied the desaturation effect to entities not of interest
+                //
                 {
-                    "Name": "DesaturationPass",
-                    "TemplateName": "EditorModeDesaturationTemplate",
+                    "Name": "EditorModeEffectPass",
+                    "TemplateName": "EditorModeFocusParentTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "InputDepth",
@@ -53,94 +53,10 @@
                             }
                         },
                         {
-                            "LocalSlot": "InputColor",
+                            "LocalSlot": "ColorInputOutput",
                             "AttachmentRef": {
                                 "Pass": "Parent",
                                 "Attachment": "ColorInputOutput"
-                            }
-                        }
-                    ]
-                },
-                // Applied the tint effect to entities not of interest
-                {
-                    "Name": "TintPass",
-                    "TemplateName": "EditorModeTintTemplate",
-                    "Connections": [
-                        {
-                            "LocalSlot": "InputDepth",
-                            "AttachmentRef": {
-                                "Pass": "Parent",
-                                "Attachment": "InputDepth"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputEntityMask",
-                            "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
-                                "Attachment": "OutputEntityMask"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputColor",
-                            "AttachmentRef": {
-                                "Pass": "DesaturationPass",
-                                "Attachment": "OutputColor"
-                            }
-                        }
-                    ]
-                },
-                // Applied the box blur effect to entities not of interest
-                {
-                    "Name": "BlurPass",
-                    "TemplateName": "EditorModeBlurParentTemplate",
-                    "Connections": [
-                        {
-                            "LocalSlot": "InputDepth",
-                            "AttachmentRef": {
-                                "Pass": "Parent",
-                                "Attachment": "InputDepth"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputEntityMask",
-                            "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
-                                "Attachment": "OutputEntityMask"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputColor",
-                            "AttachmentRef": {
-                                "Pass": "TintPass",
-                                "Attachment": "OutputColor"
-                            }
-                        }
-                    ]
-                },
-                // Applied the outlining effect to entities of interest
-                {
-                    "Name": "EntityOutlinePass",
-                    "TemplateName": "EditorModeOutlineTemplate",
-                    "Connections": [
-                        {
-                            "LocalSlot": "InputDepth",
-                            "AttachmentRef": {
-                                "Pass": "Parent",
-                                "Attachment": "InputDepth"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputEntityMask",
-                            "AttachmentRef": {
-                                "Pass": "EntityMaskPass",
-                                "Attachment": "OutputEntityMask"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputColor",
-                            "AttachmentRef": {
-                                "Pass": "BlurPass",
-                                "Attachment": "OutputColor"
                             }
                         }
                     ]
