@@ -39,93 +39,110 @@ namespace AZ
             m_parentPassRequestAsset.Reset();
         }
 
+        EditorModeFeatureProcessor::EditorModeFeatureProcessor()
+            : m_passSystem(Name("PostProcessPass"), Name("Output"))
+        {
+        }
+
+        EditorModeFeatureProcessor::PassSystem::PassSystem(const Name& passName, const Name& passAttachment)
+            : m_lastStatePass(passName)
+            , m_lastStateAttachment(passAttachment)
+        {
+        }
+
+        void EditorModeFeatureProcessor::PassSystem::AddStatePass(const AZStd::string& stateName, const AZStd::string& passParentTemplateName, RPI::RenderPipeline* renderPipeline)
+        {
+            const Name parentTemplateName = Name(stateName + passParentTemplateName);
+            const Name stateTemplateName = Name(passParentTemplateName);
+            const Name passName = Name(stateName + "Parent");
+            auto parentTemplate = RPI::PassSystemInterface::Get()->GetPassTemplate(Name("EditorModeFeedbackParentTemplate"));
+            auto parentInstanceTemplate = parentTemplate->Clone();
+            parentInstanceTemplate->m_name = parentTemplateName;
+            //parentInstanceTemplate->m_passRequests[1].m_passName = Name(stateName); // used to find, coudl just find the parent then "EditorModeEffectPass"
+            parentInstanceTemplate->m_passRequests[1].m_templateName = stateTemplateName;
+            RPI::PassSystemInterface::Get()->AddPassTemplate(parentTemplateName, parentInstanceTemplate);
+
+            AZ::RPI::PassRequest passRequest;
+            passRequest.m_passName = passName;
+            passRequest.m_templateName = parentTemplateName;
+            passRequest.AddInputConnection(
+                RPI::PassConnection{ Name("ColorInputOutput"), RPI::PassAttachmentRef{ m_lastStatePass, m_lastStateAttachment } });
+            passRequest.AddInputConnection(
+                RPI::PassConnection{ Name("InputDepth"), RPI::PassAttachmentRef{ Name("DepthPrePass"), Name("Depth") } });
+
+            RPI::Ptr<RPI::Pass> parentPass = RPI::PassSystemInterface::Get()->CreatePassFromRequest(&passRequest);
+            if (!parentPass)
+            {
+                AZ_Error(
+                    Window, false, "Create editor mode feedback parent pass from pass request failed", renderPipeline->GetId().GetCStr());
+                return;
+            }
+
+            // Inject the parent pass after the PostProcess pass
+            if (!renderPipeline->AddPassAfter(parentPass, m_lastStatePass))
+            {
+                AZ_Error(
+                    Window, false, "Add editor mode feedback parent pass to render pipeline [%s] failed",
+                    renderPipeline->GetId().GetCStr());
+                return;
+            }
+
+            m_lastStatePass = passName;
+            m_lastStateAttachment = Name("ColorInputOutput");
+        }
+
+        void EditorModeFeatureProcessor::OnRenderPipelineAdded(RPI::RenderPipelinePtr pipeline)
+        {
+            InitPasses(pipeline.get());
+        }
+
+        void EditorModeFeatureProcessor::OnRenderPipelinePassesChanged([[maybe_unused]] RPI::RenderPipeline* renderPipeline)
+        {
+            InitPasses(renderPipeline);
+        }
+
+        void EditorModeFeatureProcessor::InitPasses([[maybe_unused]] RPI::RenderPipeline* renderPipeline)
+        {
+            {
+                RPI::PassFilter focusPassFilter = RPI::PassFilter::CreateWithPassName(AZ::Name{ "FocusModeParent" }, renderPipeline);
+                RPI::Ptr<RPI::Pass> focusPass = RPI::PassSystemInterface::Get()->FindFirstPass(focusPassFilter);
+                if (!focusPass.get())
+                    return;
+                auto ppp = azdynamic_cast<RPI::ParentPass*>(focusPass.get());
+                auto qqq = azdynamic_cast<RPI::ParentPass*> (ppp->FindChildPass(Name("EditorModeEffectPass")));
+                RPI::Ptr<RPI::Pass> tintPass = qqq->FindChildPass(Name("TintPass"));
+                m_tintPass1 = azdynamic_cast<EditorModeTintPass*>(tintPass.get());
+            }
+            {
+                RPI::PassFilter focusPassFilter =
+                    RPI::PassFilter::CreateWithPassName(AZ::Name{ "FakeModeParent" }, renderPipeline);
+                RPI::Ptr<RPI::Pass> focusPass = RPI::PassSystemInterface::Get()->FindFirstPass(focusPassFilter);
+                if (!focusPass.get())
+                    return;
+                auto ppp = azdynamic_cast<RPI::ParentPass*>(focusPass.get());
+                auto qqq = azdynamic_cast<RPI::ParentPass*>(ppp->FindChildPass(Name("EditorModeEffectPass")));
+                RPI::Ptr<RPI::Pass> tintPass = qqq->FindChildPass(Name("TintPass"));
+                m_tintPass2 = azdynamic_cast<EditorModeTintPass*>(tintPass.get());
+            }
+        }
+
+        void EditorModeFeatureProcessor::Simulate([[maybe_unused]] const SimulatePacket& packet)
+        {
+            if (m_tintPass1)
+            {
+                m_tintPass1->SetTintColor(AZ::Color(float(1.0), float(0.0), float(0.0), float(1.0)));
+            }
+
+            if (m_tintPass2)
+            {
+                m_tintPass2->SetTintColor(AZ::Color(float(0.0), float(0.0), float(1.0), float(1.0)));
+            }
+        }
+       
         void EditorModeFeatureProcessor::ApplyRenderPipelineChange([[maybe_unused]]RPI::RenderPipeline* renderPipeline)
         {
-            // Attempt to inject the EditorModeFeedback pass system into the pipeline
-            // It is unclear how failures to do so should be handled, ultimately if there is an issue with the pass
-            // files (for whatever reason) there isn't really much that can be done to recover
-
-            // Load the pass request file containing the editor EditorModeFeadback parent pass
-            //const AZ::RPI::PassRequest* passRequest = nullptr;
-            //const char* passRequestAssetFilePath = "Passes/EditorModeFeedback_PassRequest.azasset";
-            //m_parentPassRequestAsset = AZ::RPI::AssetUtils::LoadAssetByProductPath<AZ::RPI::AnyAsset>(
-            //    passRequestAssetFilePath, AZ::RPI::AssetUtils::TraceLevel::Warning);
-            //
-            //if (m_parentPassRequestAsset->IsReady())
-            //{
-            //    passRequest = m_parentPassRequestAsset->GetDataAs<AZ::RPI::PassRequest>();
-            //}
-            //
-            //if (!passRequest)
-            //{
-            //    AZ_Error(Window, false, "Failed to add editor mode feedback parent pass. Can't load PassRequest from %s", passRequestAssetFilePath);
-            //    return;
-            //}
-
-            const AZStd::shared_ptr<const RPI::PassTemplate> emvfParentTemplate =
-                RPI::PassSystemInterface::Get()->GetPassTemplate(Name("EditorModeFeedbackParentTemplate"));
-            
-
-            auto focusParentTemplate = emvfParentTemplate->Clone();
-            const auto focusName = Name("EditorModeFocusStateParentTemplate");
-            focusParentTemplate->m_name = focusName;
-            focusParentTemplate->m_passRequests[1].m_templateName = Name("EditorModeFocusParentTemplate");
-            RPI::PassSystemInterface::Get()->AddPassTemplate(focusName, focusParentTemplate);
-
-            {
-                AZ::RPI::PassRequest passRequest;
-                passRequest.m_passName = Name("EditorModeFeedbackPassParent1");
-                passRequest.m_templateName = focusName;
-                passRequest.AddInputConnection(
-                    RPI::PassConnection{ Name("ColorInputOutput"), RPI::PassAttachmentRef{ Name("PostProcessPass"), Name("Output") } });
-                passRequest.AddInputConnection(
-                    RPI::PassConnection{ Name("InputDepth"), RPI::PassAttachmentRef{ Name("DepthPrePass"), Name("Depth") } });
-
-                RPI::Ptr<RPI::Pass> parentPass = RPI::PassSystemInterface::Get()->CreatePassFromRequest(&passRequest);
-                if (!parentPass)
-                {
-                    AZ_Error(
-                        Window, false, "Create editor mode feedback parent pass from pass request failed",
-                        renderPipeline->GetId().GetCStr());
-                    return;
-                }
-
-                // Inject the parent pass after the PostProcess pass
-                if (!renderPipeline->AddPassAfter(parentPass, Name("PostProcessPass")))
-                {
-                    AZ_Error(
-                        Window, false, "Add editor mode feedback parent pass to render pipeline [%s] failed",
-                        renderPipeline->GetId().GetCStr());
-                    return;
-                }
-            }
-            {
-                AZ::RPI::PassRequest passRequest;
-                passRequest.m_passName = Name("EditorModeFeedbackPassParent2");
-                passRequest.m_templateName = focusName;
-                passRequest.AddInputConnection(RPI::PassConnection{
-                    Name("ColorInputOutput"), RPI::PassAttachmentRef{ Name("EditorModeFeedbackPassParent1"), Name("ColorInputOutput") } });
-                passRequest.AddInputConnection(
-                    RPI::PassConnection{ Name("InputDepth"), RPI::PassAttachmentRef{ Name("DepthPrePass"), Name("Depth") } });
-            
-                RPI::Ptr<RPI::Pass> parentPass = RPI::PassSystemInterface::Get()->CreatePassFromRequest(&passRequest);
-                if (!parentPass)
-                {
-                    AZ_Error(
-                        Window, false, "Create editor mode feedback parent pass from pass request failed",
-                        renderPipeline->GetId().GetCStr());
-                    return;
-                }
-            
-                // Inject the parent pass after the PostProcess pass
-                if (!renderPipeline->AddPassAfter(parentPass, Name("EditorModeFeedbackPassParent1")))
-                {
-                    AZ_Error(
-                        Window, false, "Add editor mode feedback parent pass to render pipeline [%s] failed",
-                        renderPipeline->GetId().GetCStr());
-                    return;
-                }
-            }
+            m_passSystem.AddStatePass("FocusMode", "EditorModeFocusParentTemplate", renderPipeline);
+            m_passSystem.AddStatePass("FakeMode", "EditorModeFocusParentTemplate", renderPipeline);
         }
     } // namespace Render
 } // namespace AZ

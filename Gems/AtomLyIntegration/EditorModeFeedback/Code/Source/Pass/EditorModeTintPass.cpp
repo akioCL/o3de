@@ -63,7 +63,7 @@ AZ_EDITOR_MODE_PASS_CVAR(AZ::Color, cl_editorModeTintPass, TintColor, AZ::Color(
             SetDepthTransitionDuration(cl_editorModeTintPass_DepthTransitionDuration);
             SetFinalBlendAmount(cl_editorModeTintPass_FinalBlendAmount);
             SetTintAmount(cl_editorModeTintPass_TintAmount);
-            SetTintColor(cl_editorModeTintPass_TintColor);
+            //SetTintColor(cl_editorModeTintPass_TintColor);
 
             m_shaderResourceGroup->SetConstant(m_tintAmountIndex, m_tintAmount);
             m_shaderResourceGroup->SetConstant(m_tintColorIndex, m_tintColor);

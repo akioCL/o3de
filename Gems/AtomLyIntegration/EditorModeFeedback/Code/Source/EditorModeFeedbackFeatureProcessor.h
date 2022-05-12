@@ -11,6 +11,8 @@
 #include <Atom/RPI.Public/FeatureProcessor.h>
 #include <Atom/RPI.Reflect/System/AnyAsset.h>
 
+#include <Pass/EditorModeTintPass.h>
+
 namespace AZ
 {
     namespace Render
@@ -24,12 +26,38 @@ namespace AZ
 
             static void Reflect(AZ::ReflectContext* context);
 
+            EditorModeFeatureProcessor();
+
             // FeatureProcessor overrides ...
             void Activate() override;
             void Deactivate() override;
             void ApplyRenderPipelineChange(RPI::RenderPipeline* renderPipeline) override;
+            void Simulate(const SimulatePacket& packet) override;
+
+            // RPI::SceneNotificationBus overrides ...
+            void OnRenderPipelineAdded(RPI::RenderPipelinePtr pipeline) override;
+            void OnRenderPipelinePassesChanged(RPI::RenderPipeline* renderPipeline) override;
 
         private:
+            void InitPasses(RPI::RenderPipeline* renderPipeline);
+            EditorModeTintPass* m_tintPass1 = nullptr;
+            EditorModeTintPass* m_tintPass2 = nullptr;
+
+            class PassSystem
+            {
+            public:
+                PassSystem(const Name& passName, const Name& passAttachment);
+
+                void AddStatePass(
+                    const AZStd::string& stateName, const AZStd::string& passParentTemplateName, RPI::RenderPipeline* renderPipeline);
+
+            private:
+                Name m_lastStatePass;
+                Name m_lastStateAttachment;
+            };
+
+            PassSystem m_passSystem;
+
             //! Cache the pass request data for creating an editor mode feedback parent pass.
             AZ::Data::Asset<AZ::RPI::AnyAsset> m_parentPassRequestAsset;
         };
