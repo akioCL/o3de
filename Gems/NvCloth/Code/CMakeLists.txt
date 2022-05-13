@@ -27,6 +27,7 @@ ly_add_target(
     BUILD_DEPENDENCIES
         PUBLIC
             3rdParty::NvCloth
+            3rdParty::OpenXR
             AZ::AzFramework
             Gem::AtomLyIntegration_CommonFeatures.Public
         PRIVATE

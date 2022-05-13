@@ -20,6 +20,107 @@
 #include <NvCloth/Callbacks.h>
 #include <NvCloth/Solver.h>
 
+//
+// OpenXR Headers
+//
+#include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
+#include <openxr/openxr_reflection.h>
+
+// Macro to generate stringify functions for OpenXR enumerations based data provided in openxr_reflection.h
+// clang-format off
+#define ENUM_CASE_STR(name, val) case name: return #name;
+#define MAKE_TO_STRING_FUNC(enumType)                  \
+    inline const char* to_string(enumType e) {         \
+        switch (e) {                                   \
+            XR_LIST_ENUM_##enumType(ENUM_CASE_STR)     \
+            default: return "Unknown " #enumType;      \
+        }                                              \
+    }
+// clang-format on
+
+MAKE_TO_STRING_FUNC(XrReferenceSpaceType);
+MAKE_TO_STRING_FUNC(XrViewConfigurationType);
+MAKE_TO_STRING_FUNC(XrEnvironmentBlendMode);
+MAKE_TO_STRING_FUNC(XrSessionState);
+MAKE_TO_STRING_FUNC(XrResult);
+MAKE_TO_STRING_FUNC(XrFormFactor);
+
+[[noreturn]] inline void ThrowXrResult(XrResult res, const char* originator)
+{
+    AZ_Error("ThrowXrResult", false, "XrResult failure [%s] %s", to_string(res), originator);
+}
+
+inline XrResult CheckXrResult(XrResult res, const char* originator)
+{
+    if (XR_FAILED(res))
+    {
+        ThrowXrResult(res, originator);
+    }
+
+    return res;
+}
+
+#define CHECK_XRCMD(cmd) CheckXrResult(cmd, #cmd);
+
+inline AZStd::string GetXrVersionString(XrVersion ver)
+{
+    return AZStd::string::format("%d.%d.%d", XR_VERSION_MAJOR(ver), XR_VERSION_MINOR(ver), XR_VERSION_PATCH(ver));
+}
+
+static void LogLayersAndExtensions()
+{
+    // Write out extension properties for a given layer.
+    const auto logExtensions = [](const char* layerName, int indent = 0) {
+        uint32_t instanceExtensionCount;
+        CHECK_XRCMD(xrEnumerateInstanceExtensionProperties(layerName, 0, &instanceExtensionCount, nullptr));
+
+        AZStd::vector<XrExtensionProperties> extensions(instanceExtensionCount);
+        for (XrExtensionProperties& extension : extensions)
+        {
+            extension.type = XR_TYPE_EXTENSION_PROPERTIES;
+        }
+
+        CHECK_XRCMD(xrEnumerateInstanceExtensionProperties(layerName, (uint32_t)extensions.size(), &instanceExtensionCount,
+            extensions.data()));
+
+        const AZStd::string indentStr(indent, ' ');
+        AZ_Warning("LogLayersAndExtensions", false, "%sAvailable Extensions : (% d)", indentStr.c_str(), instanceExtensionCount);
+        for (const XrExtensionProperties& extension : extensions)
+       {
+            AZ_Warning("LogLayersAndExtensions", false, "%s  Name=%s SpecVersion=%d", indentStr.c_str(), extension.extensionName, extension.extensionVersion);
+        }
+    };
+
+    // Log non-layer extensions (layerName==nullptr).
+    logExtensions(nullptr);
+
+    // Log layers and any of their extensions.
+    {
+        uint32_t layerCount;
+        CHECK_XRCMD(xrEnumerateApiLayerProperties(0, &layerCount, nullptr));
+
+        AZStd::vector<XrApiLayerProperties> layers(layerCount);
+        for (XrApiLayerProperties& layer : layers)
+        {
+            layer.type = XR_TYPE_API_LAYER_PROPERTIES;
+        }
+
+        CHECK_XRCMD(xrEnumerateApiLayerProperties((uint32_t)layers.size(), &layerCount, layers.data()));
+
+        AZ_Warning("LogLayersAndExtensions", false, "Available Layers: (%d)", layerCount);
+        for (const XrApiLayerProperties& layer : layers)
+        {
+            AZ_Warning("LogLayersAndExtensions", false,
+                "  Name=%s SpecVersion=%s LayerVersion=%d Description=%s",
+                layer.layerName,
+                GetXrVersionString(layer.specVersion).c_str(),
+                layer.layerVersion, layer.description);
+            logExtensions(layer.layerName, 4);
+        }
+    }
+}
+
 namespace NvCloth
 {
     namespace
@@ -216,6 +317,8 @@ namespace NvCloth
     void SystemComponent::Activate()
     {
         InitializeSystem();
+
+        LogLayersAndExtensions();
     }
 
     void SystemComponent::Deactivate()
