@@ -46,7 +46,9 @@ MAKE_TO_STRING_FUNC(XrSessionState);
 MAKE_TO_STRING_FUNC(XrResult);
 MAKE_TO_STRING_FUNC(XrFormFactor);
 
-[[noreturn]] inline void ThrowXrResult(XrResult res, const char* originator)
+inline void ThrowXrResult(
+    [[maybe_unused]] XrResult res,
+    [[maybe_unused]] const char* originator)
 {
     AZ_Error("ThrowXrResult", false, "XrResult failure [%s] %s", to_string(res), originator);
 }
@@ -84,9 +86,9 @@ static void LogLayersAndExtensions()
         CHECK_XRCMD(xrEnumerateInstanceExtensionProperties(layerName, (uint32_t)extensions.size(), &instanceExtensionCount,
             extensions.data()));
 
-        const AZStd::string indentStr(indent, ' ');
+        [[maybe_unused]] const AZStd::string indentStr(indent, ' ');
         AZ_Warning("LogLayersAndExtensions", false, "%sAvailable Extensions : (% d)", indentStr.c_str(), instanceExtensionCount);
-        for (const XrExtensionProperties& extension : extensions)
+        for ([[maybe_unused]] const XrExtensionProperties& extension : extensions)
        {
             AZ_Warning("LogLayersAndExtensions", false, "%s  Name=%s SpecVersion=%d", indentStr.c_str(), extension.extensionName, extension.extensionVersion);
         }
