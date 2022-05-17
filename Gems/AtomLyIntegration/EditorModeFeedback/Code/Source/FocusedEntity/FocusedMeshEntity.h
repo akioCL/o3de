@@ -24,7 +24,7 @@ namespace AZ
             : private AZ::Render::MeshHandleStateNotificationBus::Handler
         {
         public:
-            FocusedMeshEntity(EntityId entityId, Data::Instance<RPI::Material> maskMaterial);
+            FocusedMeshEntity(EntityId entityId, Data::Instance<RPI::Material> maskMaterial, AZ::u8 maskId);
             ~FocusedMeshEntity();
 
             //! Returns true if this entity can be drawn, otherwise false.
@@ -32,6 +32,11 @@ namespace AZ
 
             //! Draws the entity's Atom mesh.
             void Draw();
+
+            AZ::u32 GetMaskId() const
+            {
+                return m_maskId;
+            }
 
         private:
 
@@ -63,6 +68,7 @@ namespace AZ
             Data::Instance<RPI::Material> m_maskMaterial = nullptr;
             RPI::ModelLodIndex m_modelLodIndex = RPI::ModelLodIndex::Null;
             AZStd::vector<RPI::MeshDrawPacket> m_meshDrawPackets;
+            AZ::u32 m_maskId = 1;
         };
     } // namespace Render
 } // namespace AZ

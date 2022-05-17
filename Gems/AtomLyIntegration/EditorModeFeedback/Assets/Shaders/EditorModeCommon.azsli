@@ -64,6 +64,18 @@ partial ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
         AddressW = Clamp;
     };
 
+    float2 SampleInterestEntities(float2 texCoord)
+    {
+        float2 mask = PassSrg::m_entityMask.Sample(PassSrg::PointSampler, texCoord).rg;
+        return (abs(mask - 0.5) <= 0.1 || abs(mask - 0.75) <= 0.1) ? 1.0 : 0.0;
+    }
+
+    float2 SampleSelectedEntities(float2 texCoord)
+    {
+        float2 mask = PassSrg::m_entityMask.Sample(PassSrg::PointSampler, texCoord).rg;
+        return (abs(mask - 0.25) <= 0.1 || abs(mask - 0.75) <= 0.1) ? 1.0 : 0.0;
+    }
+
     //! Returns the final blend amount after the final blend amount scale is applied.
     float CalculateFinalBlendAmount(const float t)
     {

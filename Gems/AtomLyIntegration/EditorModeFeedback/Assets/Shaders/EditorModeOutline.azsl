@@ -34,7 +34,7 @@ float2 Outliner(const float2 uv, const float lineThickness)
     {
         for(float v = -lineThickness; v <= lineThickness; v+=1.)
         {
-            outlines += PassSrg::m_entityMask.Sample(PassSrg::PointSampler, (unormalizedUv + float2(u,v)) * PassSrg::m_maskDimensions.zw).rg;
+            outlines +=PassSrg::SampleSelectedEntities((unormalizedUv + float2(u,v)) * PassSrg::m_maskDimensions.zw).rg;
         }
     }
     
@@ -46,13 +46,15 @@ PSOutput MainPS(VSOutput IN)
     PSOutput OUT;
 
     const float3 inColor = PassSrg::m_framebuffer.Sample(PassSrg::LinearSampler, IN.m_texCoord).rgb;
-    const float2 mask = PassSrg::m_entityMask.Sample(PassSrg::PointSampler, IN.m_texCoord);
+    //const float2 mask = PassSrg::m_entityMask.Sample(PassSrg::PointSampler, IN.m_texCoord);
+    const float2 mask = PassSrg::SampleSelectedEntities(IN.m_texCoord);
 
     // Only attempt to outline fragments that lie outside of the entity mask
     if((mask.r * mask.g) > 0.0)
     {
         // Fragment lies with the mask, early exit with passthrough color
         OUT.m_color.rgb = inColor;
+        OUT.m_color.a = 1.0;
         return OUT;
     }
 
@@ -79,5 +81,6 @@ PSOutput MainPS(VSOutput IN)
     // Apply the visual effect to non-mask entities, leaving mask entities untouched
     OUT.m_color = PassSrg::CalculateFinalBlendAmountAndOutputColor(inColor, PassSrg::m_lineColor.rgb, outline);
 
+    //OUT.m_color.rgb = mask.ggg;
     return OUT;
 }

@@ -37,7 +37,7 @@ PSOutput MainPS(VSOutput IN)
     PSOutput OUT;
 
     const float3 inColor = PassSrg::m_framebuffer.Sample(PassSrg::LinearSampler, IN.m_texCoord).rgb;
-    const float mask = PassSrg::m_entityMask.Sample(PassSrg::PointSampler, IN.m_texCoord).r;
+    const float mask = PassSrg::SampleInterestEntities(IN.m_texCoord).r;
     
     // Blur effect
     float2 blurDirection = (PassSrg::m_direction == 0) ? float2(1.0, 0.0) : float2(0.0, 1.0);

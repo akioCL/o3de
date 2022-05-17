@@ -69,9 +69,10 @@ namespace AZ
             return m_featureProcessor;
         }
 
-        FocusedMeshEntity::FocusedMeshEntity(EntityId entityId, Data::Instance<RPI::Material> maskMaterial)
+        FocusedMeshEntity::FocusedMeshEntity(EntityId entityId, Data::Instance<RPI::Material> maskMaterial, AZ::u8 maskId)
             : m_entityId(entityId)
             , m_maskMaterial(maskMaterial)
+            , m_maskId(maskId)
         {
             AZ::Render::MeshHandleStateNotificationBus::Handler::BusConnect(m_entityId);
         }
@@ -180,6 +181,11 @@ namespace AZ
             const auto objectId = featureProcessor->GetObjectId(*m_meshHandle).GetIndex();
             RHI::ShaderInputNameIndex objectIdIndex = "m_objectId";
             maskMeshObjectSrg->SetConstant(objectIdIndex, objectId);
+
+            // Set the id to write to the entity mask texture
+            RHI::ShaderInputNameIndex maskIdIndex = "m_maskId";
+            maskMeshObjectSrg->SetConstant(maskIdIndex, m_maskId);
+
             maskMeshObjectSrg->Compile();
 
             return maskMeshObjectSrg;

@@ -157,6 +157,15 @@ namespace AZ
 
         void EditorModeFeedbackSystemComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
         {
+            enum MaskId : AZ::u32
+            {
+                Selected = 1,
+                Interest = 2,
+                SelectedAndInterest = 3
+            };
+
+            AZStd::unordered_map<EntityId, MaskId> entities;
+
             if (!IsEnabled())
             {
                 return;
@@ -173,13 +182,55 @@ namespace AZ
                 m_maskMaterial = CreateMaskMaterial();
             }
 
+            AzToolsFramework::EntityIdList selectedEntityList;
+            AzToolsFramework::ToolsApplicationRequestBus::BroadcastResult(
+                selectedEntityList, &AzToolsFramework::ToolsApplicationRequests::GetSelectedEntities);
+
+            for (const auto& entityId : selectedEntityList)
+            {
+                entities[entityId] = MaskId::Selected;
+            }
+
             const auto focusedEntityIds = focusModeInterface->GetFocusedEntities(AzToolsFramework::GetEntityContextId());
             for (const auto& focusedEntityId : focusedEntityIds)
             {
-                if (auto focusedEntity = m_focusedEntities.find(focusedEntityId);
-                    focusedEntity == m_focusedEntities.end())
+                //if (auto focusedEntity = m_focusedEntities.find(focusedEntityId);
+                //    focusedEntity == m_focusedEntities.end())
+                //{
+                //    AZ::u32 maskId = 1;
+                //   
+                //
+                //    m_focusedEntities.emplace(
+                //        AZStd::piecewise_construct, AZStd::forward_as_tuple(focusedEntityId),
+                //        AZStd::forward_as_tuple(focusedEntityId, m_maskMaterial, maskId));
+                //}
+
+                if (auto it = entities.find(focusedEntityId); it != entities.end())
                 {
-                    m_focusedEntities.emplace(AZStd::piecewise_construct, AZStd::forward_as_tuple(focusedEntityId), AZStd::forward_as_tuple(focusedEntityId, m_maskMaterial));
+                    it->second = MaskId::SelectedAndInterest;
+                }
+                else
+                {
+                    entities[focusedEntityId] = MaskId::Interest;
+                }
+            }
+
+            for (const auto& [entityId, maskId] : entities)
+            {
+                if (auto focusedEntity = m_focusedEntities.find(entityId);
+                   focusedEntity == m_focusedEntities.end())
+                {
+                    m_focusedEntities.emplace(
+                        AZStd::piecewise_construct, AZStd::forward_as_tuple(entityId),
+                        AZStd::forward_as_tuple(entityId, m_maskMaterial, maskId));
+
+                }
+                else if (focusedEntity->second.GetMaskId() != maskId)
+                {
+                    m_focusedEntities.erase(focusedEntity);
+                    m_focusedEntities.emplace(
+                        AZStd::piecewise_construct, AZStd::forward_as_tuple(entityId),
+                        AZStd::forward_as_tuple(entityId, m_maskMaterial, maskId));
                 }
             }
 
