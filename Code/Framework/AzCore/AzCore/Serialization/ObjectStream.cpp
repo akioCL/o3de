@@ -878,6 +878,19 @@ namespace AZ
                     isCastableToClassElement = m_sc->CanDowncast(dataElementClassData->m_typeId, classElement->m_typeId, dataElementClassData->m_azRtti, classElement->m_azRtti);
                     if (!isCastableToClassElement)
                     {
+                        if (const auto* genericInfo = classElement->m_genericClassInfo ? classElement->m_genericClassInfo : m_sc->FindGenericClassInfo(classElement->m_typeId);
+                                genericInfo && genericInfo->GetGenericTypeId() == GetAssetClassId())
+                        {
+                            if (const auto* dataElementGenericInfo = m_sc->FindGenericClassInfo(dataElementClassData->m_typeId);
+                                    dataElementGenericInfo && dataElementGenericInfo->GetGenericTypeId() == GetAssetClassId())
+                            {
+                                isCastableToClassElement = true;
+                            }
+                        }
+                    }
+
+                    if (!isCastableToClassElement)
+                    {
                         const SerializeContext::ClassData* classElementClassData = m_sc->FindClassData(classElement->m_typeId);
                         isConvertibleToClassElement = classElementClassData && classElementClassData->CanConvertFromType(dataElementClassData->m_typeId, *m_sc);
                     }
