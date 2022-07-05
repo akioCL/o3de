@@ -66,10 +66,6 @@ namespace AZ
             return byteSize;
         }
 
-        /// Call to disallow this allocator from being registered with the AllocatorManager.
-        /// Only kernel-level allocators where it would be especially problematic for them to be registered with the AllocatorManager should do this.
-        void DisableRegistration();
-
         /// Records an allocation for profiling.
         void ProfileAllocation(void* ptr, size_t byteSize, size_t alignment, const char* name, const char* fileName, int lineNum, int suppressStackRecord);
 
@@ -101,7 +97,6 @@ namespace AZ
         bool m_isLazilyCreated = false;
         bool m_isProfilingActive = false;
         bool m_isReady = false;
-        bool m_registrationEnabled = true;
     };
 
     namespace Internal  {

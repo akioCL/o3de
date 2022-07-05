@@ -1113,7 +1113,7 @@ namespace UnitTest
                 {
                     // AZ_Assert does not cause the application to exit in profile_test configuration
                     // Therefore an exit with a non-zero error code is invoked to trigger the death condition
-                    abort();
+                    exit(1);
                 }
             }, ".*");
     }
@@ -1534,7 +1534,7 @@ namespace UnitTest
                 {
                     // AZ_Assert does not cause the application to exit in profile_test configuration
                     // Therefore an exit with a non-zero error code is invoked to trigger the death condition
-                    abort();
+                    exit(1);
                 }
             }, ".*");
     }

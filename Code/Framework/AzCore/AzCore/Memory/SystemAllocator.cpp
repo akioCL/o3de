@@ -34,17 +34,6 @@
 
 namespace AZ
 {
-    //////////////////////////////////////////////////////////////////////////
-    // Globals - we use global storage for the first memory schema, since we can't use dynamic memory!
-    static bool g_isSystemSchemaUsed = false;
-#if AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_HPHA
-    static AZStd::aligned_storage<sizeof(HphaSchema), AZStd::alignment_of<HphaSchema>::value>::type g_systemSchema;
-#elif AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_MALLOC
-    static AZStd::aligned_storage<sizeof(MallocSchema), AZStd::alignment_of<MallocSchema>::value>::type g_systemSchema;
-#endif
-
-    //////////////////////////////////////////////////////////////////////////
-
     //=========================================================================
     // SystemAllocator
     // [9/2/2009]
@@ -54,6 +43,8 @@ namespace AZ
         , m_isCustom(false)
         , m_ownsOSAllocator(false)
     {
+        Create({});
+        PostCreate();
     }
 
     //=========================================================================
@@ -63,6 +54,7 @@ namespace AZ
     {
         if (IsReady())
         {
+            PreDestroy();
             Destroy();
         }
     }
@@ -110,41 +102,19 @@ namespace AZ
             heapDesc.m_isPoolAllocations = desc.m_heap.m_isPoolAllocations;
             // Fix SystemAllocator from growing in small chunks
             heapDesc.m_systemChunkSize = desc.m_heap.m_systemChunkSize;
+
+            m_schema = azcreate(HphaSchema, (heapDesc), OSAllocator);
 #elif AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_MALLOC
             MallocSchema::Descriptor heapDesc;
+            m_schema = azcreate(MallocSchema, (heapDesc), OSAllocator);
 #endif
-            if (&AllocatorInstance<SystemAllocator>::Get() == this) // if we are the system allocator
+            if (m_schema == nullptr)
             {
-                AZ_Assert(!g_isSystemSchemaUsed, "AZ::SystemAllocator MUST be created first! It's the source of all allocations!");
-
-#if AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_HPHA
-                m_schema = new (&g_systemSchema) HphaSchema(heapDesc);
-#elif AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_MALLOC
-                m_schema = new (&g_systemSchema) MallocSchema(heapDesc);
-#endif
-                g_isSystemSchemaUsed = true;
-                isReady = true;
+                isReady = false;
             }
             else
             {
-                // this class should be inheriting from SystemAllocator
-                AZ_Assert(
-                    AllocatorInstance<SystemAllocator>::IsReady(),
-                    "System allocator must be created before any other allocator! They allocate from it.");
-
-#if AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_HPHA
-                m_schema = azcreate(HphaSchema, (heapDesc), SystemAllocator);
-#elif AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_MALLOC
-                m_schema = azcreate(MallocSchema, (heapDesc), SystemAllocator);
-#endif
-                if (m_schema == nullptr)
-                {
-                    isReady = false;
-                }
-                else
-                {
-                    isReady = true;
-                }
+                isReady = true;
             }
         }
 
@@ -157,27 +127,9 @@ namespace AZ
     //=========================================================================
     void SystemAllocator::Destroy()
     {
-        if (g_isSystemSchemaUsed)
-        {
-            int dummy;
-            (void)dummy;
-        }
-
         if (!m_isCustom)
         {
-            if ((void*)m_schema == (void*)&g_systemSchema)
-            {
-#if AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_HPHA
-                static_cast<HphaSchema*>(m_schema)->~HphaSchema();
-#elif AZCORE_SYSTEM_ALLOCATOR == AZCORE_SYSTEM_ALLOCATOR_MALLOC
-                static_cast<MallocSchema*>(m_schema)->~MallocSchema();
-#endif
-                g_isSystemSchemaUsed = false;
-            }
-            else
-            {
-                azdestroy(m_schema);
-            }
+            azdestroy(m_schema, OSAllocator);
         }
 
         if (m_ownsOSAllocator)

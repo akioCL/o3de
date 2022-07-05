@@ -32,10 +32,6 @@ namespace AZ
             using size_type = typename Base::size_type;
             using difference_type = typename Base::difference_type;
 
-            PoolAllocatorHelper(const char* name, const char* desc) : Base(name, desc)
-            {
-            }
-
             struct Descriptor
                 : public Schema::Descriptor
             {
@@ -52,38 +48,43 @@ namespace AZ
                 unsigned char m_stackRecordLevels; ///< If stack recording is enabled, how many stack levels to record. (if m_allocationRecords is true)
             };
 
+        private:
+            static constexpr Descriptor GetDefaultDescriptor(Descriptor descriptor)
+            {
+                if (descriptor.m_minAllocationSize < 8)
+                {
+                    descriptor.m_minAllocationSize = 8;
+                }
+                if (descriptor.m_maxAllocationSize < descriptor.m_minAllocationSize)
+                {
+                    descriptor.m_maxAllocationSize = descriptor.m_minAllocationSize;
+                }
+
+                if (descriptor.m_allocationRecords && descriptor.m_isMemoryGuards)
+                {
+                    descriptor.m_maxAllocationSize = AZ_SIZE_ALIGN_UP(descriptor.m_maxAllocationSize + AZ_SIZE_ALIGN_UP(sizeof(Debug::GuardValue), descriptor.m_minAllocationSize), descriptor.m_minAllocationSize);
+                }
+                return descriptor;
+            }
+
+        public:
+
+            PoolAllocatorHelper(const char* name, const char* desc, Descriptor descriptor = {})
+                : Base(name, desc, GetDefaultDescriptor(descriptor))
+                , m_desc(GetDefaultDescriptor(descriptor))
+            {
+                static_cast<Schema*>(this->m_schema)->Create(m_desc);
+            }
+
+            ~PoolAllocatorHelper() override
+            {
+                this->PreDestroy();
+                Destroy();
+            }
+
             bool Create(const Descriptor& descriptor)
             {
-                AZ_Assert(this->IsReady() == false, "Allocator was already created!");
-                if (this->IsReady())
-                {
-                    return false;
-                }
-
-                m_desc = descriptor;
-
-                if (m_desc.m_minAllocationSize < 8)
-                {
-                    m_desc.m_minAllocationSize = 8;
-                }
-                if (m_desc.m_maxAllocationSize < m_desc.m_minAllocationSize)
-                {
-                    m_desc.m_maxAllocationSize = m_desc.m_minAllocationSize;
-                }
-
-                if (m_desc.m_allocationRecords && m_desc.m_isMemoryGuards)
-                {
-                    m_desc.m_maxAllocationSize = AZ_SIZE_ALIGN_UP(m_desc.m_maxAllocationSize + AZ_SIZE_ALIGN_UP(sizeof(Debug::GuardValue), m_desc.m_minAllocationSize), m_desc.m_minAllocationSize);
-                }
-
-                bool isReady = static_cast<Base*>(this)->Create(m_desc);
-
-                if (isReady)
-                {
-                    isReady = static_cast<Schema*>(this->m_schema)->Create(m_desc);
-                }
-
-                return isReady;
+                return true;
             }
 
             void Destroy() override

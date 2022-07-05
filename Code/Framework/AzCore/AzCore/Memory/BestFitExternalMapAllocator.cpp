@@ -22,6 +22,17 @@ namespace AZ
     BestFitExternalMapAllocator::BestFitExternalMapAllocator()
         : AllocatorBase(nullptr, "BestFitExternalMapAllocator", "Best fit allocator with external tracking storage!")
     {
+        Create({});
+        PostCreate();
+    }
+
+    BestFitExternalMapAllocator::~BestFitExternalMapAllocator()
+    {
+        if (IsReady())
+        {
+            PreDestroy();
+            Destroy();
+        }
     }
 
     //=========================================================================

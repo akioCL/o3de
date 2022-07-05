@@ -528,11 +528,8 @@ namespace AZ
         class StoragePolicyBase
         {
         protected:
-            static void Create(Allocator& allocator, const typename Allocator::Descriptor& desc, bool lazilyCreated)
+            static void Create(Allocator& /*allocator*/, const typename Allocator::Descriptor& /*desc*/, bool /*lazilyCreated*/)
             {
-                allocator.Create(desc);
-                allocator.PostCreate();
-                allocator.SetLazilyCreated(lazilyCreated);
             }
 
             static void SetLazilyCreated(Allocator& allocator, bool lazilyCreated)
@@ -555,67 +552,43 @@ namespace AZ
         class EnvironmentStoragePolicy : public StoragePolicyBase<Allocator>
         {
         public:
-            static IAllocator& GetAllocator()
+            EnvironmentStoragePolicy()
+                : m_allocator(InitializeAllocator())
             {
-                if (!s_allocator)
-                {
-                    // Assert here before attempting to resolve. Otherwise a module-local
-                    // environment will be created which will result in a much more difficult to
-                    // locate problem
-                    s_allocator = Environment::FindVariable<Allocator>(AzTypeInfo<Allocator>::Name());
-                    AZ_Assert(s_allocator, "Allocator '%s' NOT ready for use! Call Create first!", AzTypeInfo<Allocator>::Name());
-                }
-                return *s_allocator;
             }
 
-            static void Create(const typename Allocator::Descriptor& desc)
+            static IAllocator& GetAllocator()
             {
-                if (!s_allocator)
-                {
-                    s_allocator = Environment::CreateVariable<Allocator>(AzTypeInfo<Allocator>::Name());
-                    if (s_allocator->IsReady()) // already created in a different module
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    AZ_Assert(s_allocator->IsReady(), "Allocator '%s' already created!", AzTypeInfo<Allocator>::Name());
-                }
+                static EnvironmentStoragePolicy<Allocator> storagePolicy;
+                return *storagePolicy.m_allocator;
+            }
 
-                StoragePolicyBase<Allocator>::Create(*s_allocator, desc, false);
+            static void Create(const typename Allocator::Descriptor& /*desc*/)
+            {
             }
 
             static void Destroy()
             {
-                if (s_allocator)
-                {
-                    if (s_allocator.IsOwner())
-                    {
-                        StoragePolicyBase<Allocator>::Destroy(*s_allocator);
-                    }
-                    s_allocator = nullptr;
-                }
-                else
-                {
-                    AZ_Assert(false, "Allocator '%s' NOT ready for use! Call Create first!", AzTypeInfo<Allocator>::Name());
-                }
             }
 
             AZ_FORCE_INLINE static bool IsReady()
             {
-                if (!s_allocator)
-                {
-                    s_allocator = Environment::FindVariable<Allocator>(AzTypeInfo<Allocator>::Name());
-                }
-                return s_allocator && s_allocator->IsReady();
+                return true;
             }
 
-            static EnvironmentVariable<Allocator> s_allocator;
-        };
+        private:
+            EnvironmentVariable<Allocator> m_allocator;
 
-        template<class Allocator>
-        EnvironmentVariable<Allocator> EnvironmentStoragePolicy<Allocator>::s_allocator;
+            static EnvironmentVariable<Allocator> InitializeAllocator()
+            {
+                auto allocator = Environment::CreateVariable<Allocator>(AzTypeInfo<Allocator>::Name());
+                if (!allocator->IsReady())
+                {
+                    StoragePolicyBase<Allocator>::Create(*allocator, {}, false);
+                }
+                return allocator;
+            }
+        };
     }
 
     namespace Internal

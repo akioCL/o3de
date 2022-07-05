@@ -23,12 +23,13 @@ namespace AZ
     public:
         AZ_TYPE_INFO(BestFitExternalMapAllocator, "{36266C8B-9A2C-4E3E-9812-3DB260868A2B}")
         BestFitExternalMapAllocator();
+        ~BestFitExternalMapAllocator() override;
 
         struct Descriptor
         {
             Descriptor()
                 : m_memoryBlock(NULL)
-                , m_memoryBlockByteSize(0)
+                , m_memoryBlockByteSize(4 * 1024 * 1024)
                 , m_mapAllocator(NULL)
                 , m_allocationRecords(true)
                 , m_stackRecordLevels(5) {}

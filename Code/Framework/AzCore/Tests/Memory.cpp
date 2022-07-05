@@ -758,6 +758,7 @@ namespace UnitTest
             AZ::AllocatorInstance<MyThreadPoolAllocator>::Create();
 
             void* pooled1024 = AZ::AllocatorInstance<MyThreadPoolAllocator>::Get().Allocate(1024, 1024, 0);
+            ASSERT_TRUE(pooled1024);
             AZ::AllocatorInstance<MyThreadPoolAllocator>::Get().DeAllocate(pooled1024);
 
             AZ_TEST_START_TRACE_SUPPRESSION;

@@ -37,7 +37,15 @@ namespace AZ::Internal
 namespace AZ
 {
 
-static EnvironmentVariable<AllocatorManager> s_allocManager = nullptr;
+    namespace
+    {
+        auto& GetAllocManager()
+        {
+            static EnvironmentVariable<AllocatorManager> allocManager;
+            return allocManager;
+        }
+    }
+
 static AllocatorManager* s_allocManagerDebug = nullptr;  // For easier viewing in crash dumps
 
 IAllocator* AllocatorManager::CreateLazyAllocator(size_t size, size_t alignment, IAllocator*(*creationFn)(void*))
@@ -52,15 +60,15 @@ IAllocator* AllocatorManager::CreateLazyAllocator(size_t size, size_t alignment,
 //////////////////////////////////////////////////////////////////////////
 bool AllocatorManager::IsReady()
 {
-    return s_allocManager.IsConstructed();
+    return GetAllocManager().IsConstructed();
 }
 //////////////////////////////////////////////////////////////////////////
 void AllocatorManager::Destroy()
 {
-    if (s_allocManager)
+    if (GetAllocManager())
     {
-        s_allocManager->InternalDestroy();
-        s_allocManager.Reset();
+        GetAllocManager()->InternalDestroy();
+        GetAllocManager().Reset();
     }
 }
 
@@ -68,14 +76,14 @@ void AllocatorManager::Destroy()
 // The only allocator manager instance.
 AllocatorManager& AllocatorManager::Instance()
 {
-    if (!s_allocManager)
+    if (!GetAllocManager())
     {
-        s_allocManager = Environment::CreateVariable<AllocatorManager>(AZ_CRC_CE("AZ::AllocatorManager::s_allocManager"));
+        GetAllocManager() = Environment::CreateVariable<AllocatorManager>(AZ_CRC_CE("AZ::AllocatorManager::s_allocManager"));
 
-        s_allocManagerDebug = &(*s_allocManager);
+        s_allocManagerDebug = &(*GetAllocManager());
     }
 
-    return *s_allocManager;
+    return *GetAllocManager();
 }
 //////////////////////////////////////////////////////////////////////////
 
@@ -144,19 +152,10 @@ AllocatorManager::RegisterAllocator(class IAllocator* alloc)
 void
 AllocatorManager::InternalDestroy()
 {
-    while (m_numAllocators > 0)
-    {
-        IAllocator* allocator = m_allocators[m_numAllocators - 1];
-        (void)allocator;
-        AZ_Assert(allocator->IsLazilyCreated(), "Manually created allocator '%s (%s)' must be manually destroyed before shutdown", allocator->GetName(), allocator->GetDescription());
-        m_allocators[--m_numAllocators] = nullptr;
-        // Do not actually destroy the lazy allocator as it may have work to do during non-deterministic shutdown
-    }
-
-    if (!m_isAllocatorLeaking)
-    {
-        AZ_Assert(m_numAllocators == 0, "There are still %d registered allocators!", m_numAllocators);
-    }
+    using AZStd::begin;
+    using AZStd::end;
+    AZStd::fill(begin(m_allocators), end(m_allocators), nullptr);
+    m_numAllocators = 0;
 }
 
 //=========================================================================

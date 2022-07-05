@@ -29,16 +29,19 @@ namespace AZ
         using size_type = typename Schema::size_type;
         using difference_type = typename Schema::difference_type;
 
-        SimpleSchemaAllocator(const char* name, const char* desc)
+        SimpleSchemaAllocator(const char* name, const char* desc, const Descriptor& descriptor = {})
             : AllocatorBase(nullptr, name, desc)
         {
+            Create(descriptor);
+            PostCreate();
         }
 
         ~SimpleSchemaAllocator() override
         {
-            if (m_schema)
+            if (IsReady())
             {
-                reinterpret_cast<Schema*>(&m_schemaStorage)->~Schema();
+                PreDestroy();
+                Destroy();
             }
             m_schema = nullptr;
         }

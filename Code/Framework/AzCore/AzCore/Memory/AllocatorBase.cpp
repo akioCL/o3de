@@ -169,11 +169,10 @@ namespace AZ
 
     AllocatorBase::~AllocatorBase()
     {
-        AZ_Assert(
-            !m_isReady,
-            "Allocator %s (%s) is being destructed without first having gone through proper calls to PreDestroy() and Destroy(). Use "
-            "AllocatorInstance<> for global allocators or AllocatorWrapper<> for local allocators.",
-            m_name, m_desc);
+        if (m_isReady)
+        {
+            PreDestroy();
+        }
     }
 
     const char* AllocatorBase::GetName() const
@@ -204,11 +203,6 @@ namespace AZ
 
     void AllocatorBase::PostCreate()
     {
-        if (m_registrationEnabled)
-        {
-            AllocatorManager::Instance().RegisterAllocator(this);
-        }
-
         const auto debugConfig = GetDebugConfig();
         if (!debugConfig.m_excludeFromDebugging)
         {
@@ -227,11 +221,6 @@ namespace AZ
         {
             delete allocatorRecords;
             SetRecords(nullptr);
-        }
-
-        if (m_registrationEnabled && AZ::AllocatorManager::IsReady())
-        {
-            AllocatorManager::Instance().UnRegisterAllocator(this);
         }
 
         m_isReady = false;
@@ -255,11 +244,6 @@ namespace AZ
     bool AllocatorBase::IsProfilingActive() const
     {
         return m_isProfilingActive;
-    }
-
-    void AllocatorBase::DisableRegistration()
-    {
-        m_registrationEnabled = false;
     }
 
     void AllocatorBase::ProfileAllocation(
