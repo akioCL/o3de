@@ -23,7 +23,7 @@
 #include <AzCore/std/parallel/thread.h>
 #include <AzCore/std/functional.h>
 #include <AzCore/std/parallel/condition_variable.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AZTestShared/Utils/Utils.h>
 #include <Streamer/IStreamerMock.h>
 #include <Tests/Asset/BaseAssetManagerTest.h>
@@ -155,7 +155,6 @@ namespace UnitTest
         static inline const AZ::Uuid MyAsset6Id{ "{B2F139C3-5032-4B52-ADCA-D52A8F88E043}" };
 
         DataDrivenHandlerAndCatalog* m_assetHandlerAndCatalog;
-        bool m_leakExpected = false;
 
         // Initialize the Job Manager with 2 threads for the Asset Manager to use.
         size_t GetNumJobManagerThreads() const override { return 2; }
@@ -195,26 +194,14 @@ namespace UnitTest
             WriteAssetToDisk("MyAsset4.txt", MyAsset4Id.ToString<AZStd::string>().c_str());
             WriteAssetToDisk("MyAsset5.txt", MyAsset5Id.ToString<AZStd::string>().c_str());
             WriteAssetToDisk("MyAsset6.txt", MyAsset6Id.ToString<AZStd::string>().c_str());
-
-            m_leakExpected = false;
-        }
+       }
 
         void TearDown() override
         {
             // There is no call to AssetManager::Destroy here because it will be called by the various unit tests using this class.
             // Also, m_assetHandlerAndCatalog will either get deleted in the unit tests or by AssetManager::Destroy.
 
-            if (m_leakExpected)
-            {
-                AZ::AllocatorManager::Instance().SetAllocatorLeaking(true);
-            }
-
             BaseAssetManagerTest::TearDown();
-        }
-
-        void SetLeakExpected()
-        {
-            m_leakExpected = true;
         }
     };
 
@@ -282,6 +269,7 @@ namespace UnitTest
 
     TEST_F(AssetManagerShutdownTest, AssetManagerShutdown_UnregisteringHandler_WhileJobsFlight_Assert)
     {
+        AssetWithCustomData* assetPtr[6];
         {
             Asset<AssetWithCustomData> asset1 = AssetManager::Instance().GetAsset<AssetWithCustomData>(MyAsset1Id, AZ::Data::AssetLoadBehavior::Default);
             Asset<AssetWithCustomData> asset2 = AssetManager::Instance().GetAsset<AssetWithCustomData>(MyAsset2Id, AZ::Data::AssetLoadBehavior::Default);
@@ -301,6 +289,13 @@ namespace UnitTest
             AZ_TEST_STOP_TRACE_SUPPRESSION(6);
             AssetManager::Instance().UnregisterCatalog(m_assetHandlerAndCatalog);
             AZ_TEST_START_TRACE_SUPPRESSION;
+
+            assetPtr[0] = asset1.Get();
+            assetPtr[1] = asset2.Get();
+            assetPtr[2] = asset3.Get();
+            assetPtr[3] = asset4.Get();
+            assetPtr[4] = asset5.Get();
+            assetPtr[5] = asset6.Get();
         }
         AZ_TEST_STOP_TRACE_SUPPRESSION(6); // all the above assets ref count will go to zero here but we have already unregistered the handler
 
@@ -308,10 +303,16 @@ namespace UnitTest
         // we do not expect asserts here as they will have already notified of problems up above.
         delete m_assetHandlerAndCatalog;
 
+        // Manually delete the Asset data so we dont have leaks
+        delete assetPtr[0];
+        delete assetPtr[1];
+        delete assetPtr[2];
+        delete assetPtr[3];
+        delete assetPtr[4];
+        delete assetPtr[5];
+
         // destroy asset manager
         AssetManager::Destroy();
-
-        SetLeakExpected();
     }
 
 

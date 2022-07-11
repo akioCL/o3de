@@ -10,7 +10,7 @@
 
 #include <API/AssetDatabaseBus.h>
 #include <AzCore/Settings/SettingsRegistryImpl.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/std/parallel/binary_semaphore.h>
 #include <Tests/Utils/Utils.h>
 #include <native/AssetManager/assetProcessorManager.h>

@@ -6,6 +6,9 @@
  *
  */
 #include <AzCore/EBus/EBus.h>
+#include <AzCore/Memory/OSAllocator_Platform.h>
+#include <AzCore/Memory/AllocatorInstance.h>
+#include <AzCore/Memory/SystemAllocator.h>
 
 namespace AZ
 {
@@ -63,28 +66,6 @@ namespace AZ
         void EBusEnvironmentTLSAccessors::SetTLSEnvironment(EBusEnvironment* environment)
         {
             s_tlsCurrentEnvironment = environment;
-        }
-
-        EBusEnvironmentAllocator::EBusEnvironmentAllocator()
-            : m_name("EBusEnvironmentAllocator")
-        {
-            m_allocator = Environment::GetInstance()->GetAllocator();
-        }
-
-        EBusEnvironmentAllocator::EBusEnvironmentAllocator(const EBusEnvironmentAllocator& rhs)
-            : m_name(rhs.m_name)
-            , m_allocator(rhs.m_allocator)
-        {
-        }
-
-        EBusEnvironmentAllocator::pointer_type EBusEnvironmentAllocator::allocate(size_t byteSize, size_t alignment, int)
-        {
-            return m_allocator->Allocate(byteSize, alignment);
-        }
-        
-        void EBusEnvironmentAllocator::deallocate(pointer_type ptr, size_type, size_type)
-        {
-            m_allocator->DeAllocate(ptr);
         }
 
     } // namespace Internal

@@ -11,7 +11,7 @@
 #include <AzCore/Script/ScriptAsset.h>
 #include <AzCore/Script/ScriptSystemComponent.h>
 #include <AzCore/Script/ScriptContext.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzToolsFramework/ToolsComponents/ScriptEditorComponent.h>
 
 #include "EntityTestbed.h"
@@ -39,9 +39,6 @@ namespace UnitTest
         void SetUp() override
         {        
             ComponentApplication::Descriptor appDesc;
-            appDesc.m_memoryBlocksByteSize = 100 * 1024 * 1024;
-            //appDesc.m_recordsMode = AllocationRecords::RECORD_FULL;
-            //appDesc.m_stackRecordLevels = 20;
             Entity* systemEntity = m_app.Create(appDesc);
 
             systemEntity->CreateComponent<MemoryComponent>();

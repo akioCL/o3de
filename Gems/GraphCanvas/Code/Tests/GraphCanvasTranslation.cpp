@@ -21,23 +21,12 @@ protected:
 
         void SetUp() override
         {
-            AZ::AllocatorInstance<AZ::PoolAllocator>::Create();
-            AZ::AllocatorInstance<AZ::ThreadPoolAllocator>::Create();
-
-            AZ::ComponentApplication::Descriptor appDesc;
-            appDesc.m_memoryBlocksByteSize = 20 * 1024 * 1024;
-            appDesc.m_recordingMode = AZ::Debug::AllocationRecords::RECORD_NO_RECORDS;
-            appDesc.m_stackRecordLevels = 20;
-
-            m_app.Create(appDesc);
+            m_app.Create({});
         }
 
         void TearDown() override
         {
             m_app.Destroy();
-
-            AZ::AllocatorInstance<AZ::ThreadPoolAllocator>::Destroy();
-            AZ::AllocatorInstance<AZ::PoolAllocator>::Destroy();
         }
 
         AZ::ComponentApplication m_app;

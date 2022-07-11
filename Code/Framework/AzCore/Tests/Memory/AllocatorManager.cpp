@@ -7,8 +7,9 @@
  */
 
 #include <AzCore/Memory/AllocatorManager.h>
-#include <AzCore/Memory/MallocSchema.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzCore/Memory/AllocatorWrappers.h>
+#include <AzCore/Memory/OSAllocator.h>
+#include <AzTest/TestTypes.h>
 
 using namespace AZ;
 
@@ -16,11 +17,7 @@ namespace UnitTest
 {
     namespace
     {
-        class AllocatorManagerTestAllocator : public AZ::SystemAllocator
-        {
-        public:
-            AZ_TYPE_INFO(SystemAllocator, "{7E39571D-2E09-416C-BA37-F443C78110FA}")
-        };
+        AZ_ALLOCATOR_DEFAULT_GLOBAL_WRAPPER(AllocatorManagerTestAllocator, AZ::SystemAllocator, "{7E39571D-2E09-416C-BA37-F443C78110FA}");
     }
 
     class AllocatorManagerTests
@@ -65,21 +62,13 @@ namespace UnitTest
 
         void TearDownAllocatorManagerTest()
         {
-            if (AllocatorInstance<SystemAllocator>::IsReady())
-            {
-                AllocatorInstance<SystemAllocator>::Destroy();
-            }
-
-            if (AllocatorManager::IsReady())
-            {
-                AllocatorManager::Destroy();
-            }
+            AllocatorInstance<SystemAllocator>::Destroy();
 
             m_manager = nullptr;
             m_systemAllocator = nullptr;
         }
 
-        MallocSchema m_mallocSchema;
+        OSAllocator m_osAllocator;
         AllocatorManager* m_manager = nullptr;
         IAllocator* m_systemAllocator = nullptr;
     };

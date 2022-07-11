@@ -8,8 +8,8 @@
 
 #include <AzTest/AzTest.h>
 #include <AzCore/Console/IConsole.h>
-#include <AzCore/UnitTest/TestTypes.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/TestTypes.h>
+#include <AzTest/UnitTest.h>
 
 #include <AzCore/IO/SystemFile.h> // for max path decl
 #include <AzCore/Settings/SettingsRegistryMergeUtils.h>
@@ -30,11 +30,8 @@ namespace UnitTest
         : public ScopedAllocatorSetupFixture
     {
     public:
-        // Use an Immediately invoked function to initlaize the m_stackRecordLevels value of the AZ::SystemAllocator::Descriptor class
         ArchiveTestFixture()
-            : ScopedAllocatorSetupFixture(
-                []() { AZ::SystemAllocator::Descriptor desc; desc.m_stackRecordLevels = 30; return desc; }()
-            )
+            : ScopedAllocatorSetupFixture()
             , m_application{ AZStd::make_unique<AzFramework::Application>() }
         {
         }

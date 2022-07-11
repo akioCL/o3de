@@ -23,7 +23,7 @@
 #include <AzCore/Settings/SettingsRegistryMergeUtils.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/parallel/binary_semaphore.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 #include <AzFramework/Asset/AssetCatalog.h>
 #include <AzFramework/Asset/AssetProcessorMessages.h>
@@ -301,7 +301,6 @@ namespace UnitTest
 
             m_app.reset(aznew AzFramework::Application());
             AZ::ComponentApplication::Descriptor desc;
-            desc.m_useExistingAllocator = true;
             
             AZ::SettingsRegistryInterface* registry = AZ::SettingsRegistry::Get();
             auto projectPathKey =

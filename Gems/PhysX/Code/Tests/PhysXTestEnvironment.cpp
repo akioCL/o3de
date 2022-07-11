@@ -12,7 +12,7 @@
 #include <AzCore/IO/Streamer/StreamerComponent.h>
 #include <AzCore/Jobs/JobManagerComponent.h>
 #include <AzCore/Memory/MemoryComponent.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/UnitTest.h>
 #include <AzCore/Utils/Utils.h>
 
 #include <AzFramework/Components/TransformComponent.h>
@@ -106,7 +106,6 @@ namespace PhysX
         // Create application and descriptor
         m_application = aznew PhysXApplication;
         AZ::ComponentApplication::Descriptor appDesc;
-        appDesc.m_useExistingAllocator = true;
 
         // Set up gems other than PhysX for loading
         AZ::DynamicModuleDescriptor dynamicModuleDescriptor;

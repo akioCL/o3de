@@ -9,7 +9,7 @@
 #include <AzCore/DOM/DomUtils.h>
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/RTTI/ReflectContext.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <DOM/DomFixtures.h>
 
 namespace AZ::AttributeDomInteropTests

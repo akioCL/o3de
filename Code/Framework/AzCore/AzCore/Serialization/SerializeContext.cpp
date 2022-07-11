@@ -481,6 +481,7 @@ namespace AZ
         {
             module->UnregisterSerializeContext(this);
         }
+        GetCurrentSerializeContextModule().Cleanup();
     }
 
     void SerializeContext::CleanupModuleGenericClassInfo()
@@ -1733,7 +1734,7 @@ namespace AZ
         {
             return this; // we have already removed the class data.
         }
-        m_classData->second.m_serializer = IDataSerializerPtr(&Serialize::StaticInstance<EmptySerializer>::s_instance, IDataSerializer::CreateNoDeleteDeleter());
+        m_classData->second.m_serializer = IDataSerializerPtr(&Serialize::StaticInstance<EmptySerializer>::GetInstance(), IDataSerializer::CreateNoDeleteDeleter());
         return this;
     }
 
@@ -2962,6 +2963,13 @@ namespace AZ
     }
 
     //=========================================================================
+    // ClassElement
+    //=========================================================================
+    SerializeContext::ClassElement::ClassElement()
+    {
+    }
+
+    //=========================================================================
     // ~ClassElement
     //=========================================================================
     SerializeContext::ClassElement::~ClassElement()
@@ -3160,52 +3168,39 @@ namespace AZ
         return (reflectedClassData != nullptr);
     }
 
-    // Create the member OSAllocator and construct the unordered_map with that allocator
     SerializeContext::PerModuleGenericClassInfo::PerModuleGenericClassInfo()
-        : m_moduleLocalGenericClassInfos(AZ::AZStdIAllocator(&m_moduleOSAllocator))
-        , m_serializeContextSet(AZ::AZStdIAllocator(&m_moduleOSAllocator))
     {
     }
 
     SerializeContext::PerModuleGenericClassInfo::~PerModuleGenericClassInfo()
     {
         Cleanup();
-
-        // Reconstructs the module generic info map with the OSAllocator so that it the previous allocated memory is cleared
-        // Afterwards destroy the OSAllocator
-        {
-            m_moduleLocalGenericClassInfos = GenericInfoModuleMap(AZ::AZStdIAllocator(&m_moduleOSAllocator));
-            m_serializeContextSet = SerializeContextSet(AZ::AZStdIAllocator(&m_moduleOSAllocator));
-        }
     }
 
     void SerializeContext::PerModuleGenericClassInfo::Cleanup()
     {
-        decltype(m_moduleLocalGenericClassInfos) genericClassInfoContainer = AZStd::move(m_moduleLocalGenericClassInfos);
-        decltype(m_serializeContextSet) serializeContextSet = AZStd::move(m_serializeContextSet);
-        // Un-reflect GenericClassInfo from each serialize context registered with the module
-        // The SerailizeContext uses the SystemAllocator so it is required to be ready in order to remove the data
-        if (AZ::AllocatorInstance<AZ::SystemAllocator>::IsReady())
-        {
-            for (AZ::SerializeContext* serializeContext : serializeContextSet)
-            {
-                for (const AZStd::pair<AZ::Uuid, AZ::GenericClassInfo*>& moduleGenericClassInfoPair : genericClassInfoContainer)
-                {
-                    serializeContext->RemoveGenericClassInfo(moduleGenericClassInfoPair.second);
-                }
+        GenericInfoModuleMap genericClassInfoContainer = AZStd::move(m_moduleLocalGenericClassInfos);
+        SerializeContextSet serializeContextSet = AZStd::move(m_serializeContextSet);
 
-                serializeContext->m_perModuleSet.erase(this);
+        // Un-reflect GenericClassInfo from each serialize context registered with the module
+        // The SerailizeContext uses the SystemAllocator so it is required to be ready in order to remove the data       
+        for (AZ::SerializeContext* serializeContext : serializeContextSet)
+        {
+            for (const GenericInfoModuleMap::value_type& moduleGenericClassInfoPair : genericClassInfoContainer)
+            {
+                serializeContext->RemoveGenericClassInfo(moduleGenericClassInfoPair.second.m_classInfo);
             }
+
+            serializeContext->m_perModuleSet.erase(this);
         }
 
         // Cleanup the memory for the GenericClassInfo objects.
-        // This isn't explicitly needed as the OSAllocator owned by this class will take the memory with it.
-        for (const AZStd::pair<AZ::Uuid, AZ::GenericClassInfo*>& moduleGenericClassInfoPair : genericClassInfoContainer)
+        for (const GenericInfoModuleMap::value_type& moduleGenericClassInfoPair : genericClassInfoContainer)
         {
-            GenericClassInfo* genericClassInfo = moduleGenericClassInfoPair.second;
+            GenericInfoModuleMapItem genericClassInfoItem = moduleGenericClassInfoPair.second;
             // Explicitly invoke the destructor and clear the memory from the module OSAllocator
-            genericClassInfo->~GenericClassInfo();
-            m_moduleOSAllocator.DeAllocate(genericClassInfo);
+            genericClassInfoItem.m_classInfo->~GenericClassInfo();
+            AZ::AllocatorInstance<AZ::SystemAllocator>::Get().DeAllocate(genericClassInfoItem.m_classInfo, genericClassInfoItem.m_allocationSize, genericClassInfoItem.m_allocationAlignment);
         }
     }
 
@@ -3219,13 +3214,13 @@ namespace AZ
     {
         m_serializeContextSet.erase(serializeContext);
         serializeContext->m_perModuleSet.erase(this);
-        for (const AZStd::pair<AZ::Uuid, AZ::GenericClassInfo*>& moduleGenericClassInfoPair : m_moduleLocalGenericClassInfos)
+        for (const GenericInfoModuleMap::value_type& moduleGenericClassInfoPair : m_moduleLocalGenericClassInfos)
         {
-            serializeContext->RemoveGenericClassInfo(moduleGenericClassInfoPair.second);
+            serializeContext->RemoveGenericClassInfo(moduleGenericClassInfoPair.second.m_classInfo);
         }
     }
 
-    void SerializeContext::PerModuleGenericClassInfo::AddGenericClassInfo(AZ::GenericClassInfo* genericClassInfo)
+    void SerializeContext::PerModuleGenericClassInfo::AddGenericClassInfo(AZ::GenericClassInfo* genericClassInfo, AZStd::size_t allocationSize, AZStd::size_t allocationAlignment)
     {
         if (!genericClassInfo)
         {
@@ -3233,7 +3228,9 @@ namespace AZ
             return;
         }
 
-        m_moduleLocalGenericClassInfos.emplace(genericClassInfo->GetSpecializedTypeId(), genericClassInfo);
+        [[maybe_unused]] auto it = m_moduleLocalGenericClassInfos.emplace(
+            genericClassInfo->GetSpecializedTypeId(), GenericInfoModuleMapItem{ genericClassInfo, allocationSize, allocationAlignment });
+        AZ_Assert(it.second, "GenericClassInfo \"%s\" already exists in per-module information", genericClassInfo->GetClassData()->m_name);
     }
 
     void SerializeContext::PerModuleGenericClassInfo::RemoveGenericClassInfo(const AZ::TypeId& genericTypeId)
@@ -3247,6 +3244,10 @@ namespace AZ
         auto genericClassInfoFoundIt = m_moduleLocalGenericClassInfos.find(genericTypeId);
         if (genericClassInfoFoundIt != m_moduleLocalGenericClassInfos.end())
         {
+            AZ::AllocatorInstance<AZ::SystemAllocator>::Get().DeAllocate(
+                genericClassInfoFoundIt->second.m_classInfo,
+                genericClassInfoFoundIt->second.m_allocationSize,
+                genericClassInfoFoundIt->second.m_allocationAlignment);           
             m_moduleLocalGenericClassInfos.erase(genericClassInfoFoundIt);
         }
     }
@@ -3254,12 +3255,7 @@ namespace AZ
     AZ::GenericClassInfo* SerializeContext::PerModuleGenericClassInfo::FindGenericClassInfo(const AZ::TypeId& genericTypeId) const
     {
         auto genericClassInfoFoundIt = m_moduleLocalGenericClassInfos.find(genericTypeId);
-        return genericClassInfoFoundIt != m_moduleLocalGenericClassInfos.end() ? genericClassInfoFoundIt->second : nullptr;
-    }
-
-    AZ::IAllocator& SerializeContext::PerModuleGenericClassInfo::GetAllocator()
-    {
-        return m_moduleOSAllocator;
+        return genericClassInfoFoundIt != m_moduleLocalGenericClassInfos.end() ? genericClassInfoFoundIt->second.m_classInfo : nullptr;
     }
 
     // Take advantage of static variables being unique per dll module to clean up module specific registered classes when the module unloads

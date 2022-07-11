@@ -15,7 +15,6 @@ set(FILES
     Source/Array2D.inl
     Source/Attribute.cpp
     Source/Attribute.h
-    Source/AttributeAllocator.cpp
     Source/AttributeAllocator.h
     Source/AttributeBool.cpp
     Source/AttributeBool.h
@@ -96,7 +95,6 @@ set(FILES
     Source/Random.h
     Source/Ray.cpp
     Source/Ray.h
-    Source/StaticAllocator.cpp
     Source/StaticAllocator.h
     Source/StaticString.h
     Source/StandardHeaders.h

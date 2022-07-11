@@ -17,7 +17,7 @@
 #include <AzToolsFramework/Application/ToolsApplication.h>
 #include <AzToolsFramework/AssetBundle/AssetBundleAPI.h>
 #include <AzToolsFramework/AssetBundle/AssetBundleComponent.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Debug/TraceMessageBus.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 
@@ -51,7 +51,6 @@ protected:
         AZ::SettingsRegistryMergeUtils::MergeSettingsToRegistry_AddRuntimeFilePaths(*registry);
 
         AZ::ComponentApplication::Descriptor desc;
-        desc.m_useExistingAllocator = true;
         app.Start(desc);
 
         // Without this, the user settings component would attempt to save on finalize/shutdown. Since the file is

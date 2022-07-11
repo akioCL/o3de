@@ -9,12 +9,11 @@
 #pragma once
 
 #include <AzTest/AzTest.h>
-#include <AzCore/UnitTest/UnitTest.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/UnitTest.h>
+#include <AzTest/TestTypes.h>
 
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Memory/PoolAllocator.h>
-#include <AzCore/Memory/AllocationRecords.h>
 #include <AzCore/RTTI/ReflectionManager.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Name/NameDictionary.h>
@@ -24,8 +23,6 @@
 
 namespace UnitTest
 {
-    inline constexpr bool EnableLeakTracking = false;
-
     class RHITestFixture
         : public ScopedAllocatorSetupFixture
     {
@@ -34,44 +31,7 @@ namespace UnitTest
     public:
         RHITestFixture()
         {
-            {
-                AZ::PoolAllocator::Descriptor desc;
-
-                if constexpr (EnableLeakTracking)
-                {
-                    desc.m_allocationRecords = true;
-                    desc.m_stackRecordLevels = 5;
-                    desc.m_isMemoryGuards = true;
-                    desc.m_isMarkUnallocatedMemory = true;
-                }
-
-                AZ::AllocatorInstance<AZ::PoolAllocator>::Create(desc);
-            }
-
-            {
-                AZ::ThreadPoolAllocator::Descriptor desc;
-
-                if constexpr (EnableLeakTracking)
-                {
-                    desc.m_allocationRecords = true;
-                    desc.m_stackRecordLevels = 5;
-                    desc.m_isMemoryGuards = true;
-                    desc.m_isMarkUnallocatedMemory = true;
-                }
-
-                AZ::AllocatorInstance<AZ::ThreadPoolAllocator>::Create(desc);
-            }
-
-            if constexpr (EnableLeakTracking)
-            {
-                AZ::Debug::AllocationRecords* records = AZ::AllocatorInstance<AZ::SystemAllocator>::GetAllocator().GetRecords();
-                if (records)
-                {
-                    records->SetMode(AZ::Debug::AllocationRecords::RECORD_FULL);
-                }
-            }
         }
-
 
         AZ::SerializeContext* GetSerializeContext()
         {

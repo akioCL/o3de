@@ -8,7 +8,7 @@
 
 #include "LyShineTest.h"
 #include <Mocks/ISystemMock.h>
-#include <AzCore/UnitTest/Mocks/MockITime.h>
+#include <AzTest/Mocks/MockITime.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 #include <AzFramework/Application/Application.h>
 
@@ -100,10 +100,6 @@ namespace UnitTest
         void SetupApplication() override
         {
             AZ::ComponentApplication::Descriptor appDesc;
-            appDesc.m_memoryBlocksByteSize = 10 * 1024 * 1024;
-            appDesc.m_recordingMode = AZ::Debug::AllocationRecords::RECORD_FULL;
-            appDesc.m_stackRecordLevels = 20;
-
             m_application = aznew LyShineAnimationTestApplication();
             m_systemEntity = m_application->Create(appDesc);
             m_systemEntity->Init();

@@ -52,10 +52,7 @@ namespace UnitTest
         AZ::Entity::ComponentArrayType orderedComponents;
 
         ToolsApplication::Descriptor desc;
-        desc.m_useExistingAllocator = true;
         ToolsApplication::StartupParameters startupParams;
-        startupParams.m_allocator = &AZ::AllocatorInstance<AZ::SystemAllocator>::Get();
-
         Entity* systemEntity = app.Create(desc, startupParams);
 
         // Need to reflect the components so that edit attribute used for sorting, such as FixedComponentListIndex, get set.

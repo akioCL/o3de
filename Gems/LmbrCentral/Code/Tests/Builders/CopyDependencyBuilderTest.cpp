@@ -9,14 +9,14 @@
 #include <AzTest/AzTest.h>
 #include <AzTest/Utils.h>
 #include <AzCore/PlatformId/PlatformId.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/UnitTest.h>
 #include <AzCore/IO/Path/Path.h>
 #include <AzFramework/IO/LocalFileIO.h>
 #include <AzFramework/Asset/XmlSchemaAsset.h>
 #include <AzFramework/StringFunc/StringFunc.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Component/ComponentApplication.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/UnitTest.h>
 #include <AzCore/Utils/Utils.h>
 
 #include <Builders/CopyDependencyBuilder/CfgBuilderWorker/CfgBuilderWorker.h>
@@ -43,7 +43,6 @@ namespace UnitTest
 
             m_app.reset(aznew AZ::ComponentApplication());
             AZ::ComponentApplication::Descriptor desc;
-            desc.m_useExistingAllocator = true;
             m_app->Create(desc);
 
             if constexpr (AZ::g_currentPlatform == AZ::PlatformID::PLATFORM_WINDOWS_64)

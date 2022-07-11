@@ -8,108 +8,67 @@
 
 #include <AzCore/Memory/OSAllocator.h>
 
+// OS Allocations macros AZ_OS_MALLOC/AZ_OS_FREE
+#include <AzCore/Memory/OSAllocator_Platform.h>
+
 namespace AZ
 {
-    //=========================================================================
-    // OSAllocator
-    // [9/2/2009]
-    //=========================================================================
-    OSAllocator::OSAllocator()
-        : AllocatorBase(this, "OSAllocator", "OS allocator, allocating memory directly from the OS (C heap)!")
-        , m_custom(nullptr)
-        , m_numAllocatedBytes(0)
+    OSAllocator::pointer OSAllocator::allocate(size_type byteSize, align_type alignment)
     {
-        Create({});
-        PostCreate();
+        pointer ptr = AZ_OS_MALLOC(byteSize, static_cast<AZStd::size_t>(alignment));
+#if defined(AZ_ENABLE_TRACING)
+        // We assume 1 alignment because alignment is sometimes not passed in deallocate. This does mean that we are under-reporting
+        // for cases where alignment != 1 and the OS could not find a block specifically for that alignment (the OS will give use a
+        // block that is byteSize+(alignment-1) and place the ptr in the first address that satisfies the alignment). 
+        const size_type allocatedSize = get_allocated_size(ptr, 1); 
+        AddAllocated(allocatedSize);
+        AddAllocationRecord(ptr, byteSize, allocatedSize, alignment, 1);
+#endif
+        return ptr;
     }
 
-    //=========================================================================
-    // ~OSAllocator
-    // [9/2/2009]
-    //=========================================================================
-    OSAllocator::~OSAllocator()
+    void OSAllocator::deallocate(pointer ptr, size_type byteSize, [[maybe_unused]] align_type alignment)
     {
-        if (IsReady())
+#if defined(AZ_ENABLE_TRACING)
+        const size_type allocatedSize = get_allocated_size(ptr, 1);
+        RemoveAllocated(allocatedSize);
+        RemoveAllocationRecord(ptr, byteSize, allocatedSize);
+#endif
+        AZ_OS_FREE(ptr);
+    }
+
+    OSAllocator::pointer OSAllocator::reallocate(pointer ptr, size_type newSize, align_type alignment)
+    {
+#if defined(AZ_ENABLE_TRACING)
+        if (ptr)
         {
-            PreDestroy();
-            Destroy();
+            const size_type previouslyAllocatedSize = get_allocated_size(ptr, 1);
+            RemoveAllocated(previouslyAllocatedSize);
+            RemoveAllocationRecord(ptr, 0, previouslyAllocatedSize);
         }
+#endif
+        // Realloc in most platforms doesnt support allocating from a nulltpr
+        pointer newPtr = ptr ? AZ_OS_REALLOC(ptr, newSize, static_cast<AZStd::size_t>(alignment))
+                             : AZ_OS_MALLOC(newSize, static_cast<AZStd::size_t>(alignment));
+#if defined(AZ_ENABLE_TRACING)
+        const size_type allocatedSize = get_allocated_size(newPtr, 1);
+        AddAllocated(allocatedSize);
+        AddAllocationRecord(newPtr, newSize, allocatedSize, alignment, 1);
+#endif
+        return newPtr;
     }
 
-    //=========================================================================
-    // Create
-    // [9/2/2009]
-    //=========================================================================
-    bool OSAllocator::Create(const Descriptor& desc)
+    OSAllocator::size_type OSAllocator::get_allocated_size(pointer ptr, align_type alignment) const
     {
-        m_custom = desc.m_custom;
-        m_numAllocatedBytes = 0;
-        return true;
+        return ptr ? AZ_OS_MSIZE(ptr, alignment) : 0;
     }
 
-    //=========================================================================
-    // Destroy
-    // [9/2/2009]
-    //=========================================================================
-    void OSAllocator::Destroy()
+    void OSAllocator::Merge([[maybe_unused]] IAllocator* aOther)
     {
+        // Nothing to do regarding the allocations, we just need to move over all the tracking data
+#if defined(AZ_ENABLE_TRACING)
+        OSAllocator* other = azrtti_cast<OSAllocator*>(aOther);
+        RecordingsMove(other);
+#endif
     }
-
-    //=========================================================================
-    // GetDebugConfig
-    // [10/14/2018]
-    //=========================================================================
-    AllocatorDebugConfig OSAllocator::GetDebugConfig()
-    {
-        return AllocatorDebugConfig().ExcludeFromDebugging();
-    }
-
-    //=========================================================================
-    // Allocate
-    // [9/2/2009]
-    //=========================================================================
-    OSAllocator::pointer_type
-    OSAllocator::Allocate(size_type byteSize, size_type alignment, int flags, const char* name, const char* fileName, int lineNum, unsigned int suppressStackRecord)
-    {
-        OSAllocator::pointer_type address;
-        if (m_custom)
-        {
-            address = m_custom->Allocate(byteSize, alignment, flags, name, fileName, lineNum, suppressStackRecord);
-        }
-        else
-        {
-            address = AZ_OS_MALLOC(byteSize, alignment);
-        }
-
-        if (address == nullptr && byteSize > 0)
-        {
-            AZ_Printf("Memory", "======================================================\n");
-            AZ_Printf("Memory", "OSAllocator run out of system memory!\nWe can't track the debug allocator, since it's used for tracking and pipes trought the OS... here are the other allocator status:\n");
-            OnOutOfMemory(byteSize, alignment, flags, name, fileName, lineNum);
-        }
-
-        m_numAllocatedBytes += byteSize;
-
-        return address;
-    }
-
-    //=========================================================================
-    // DeAllocate
-    // [9/2/2009]
-    //=========================================================================
-    void OSAllocator::DeAllocate(pointer_type ptr, size_type byteSize, size_type alignment)
-    {
-        (void)alignment;
-        if (m_custom)
-        {
-            m_custom->DeAllocate(ptr);
-        }
-        else
-        {
-            AZ_OS_FREE(ptr);
-        }
-
-        m_numAllocatedBytes -= byteSize;
-    }
-
 }

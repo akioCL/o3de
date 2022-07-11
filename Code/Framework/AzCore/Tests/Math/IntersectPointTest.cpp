@@ -7,7 +7,7 @@
  */
 
 #include <AzCore/Math/IntersectPoint.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AZTestShared/Math/MathTestHelpers.h>
 
 using namespace AZ;

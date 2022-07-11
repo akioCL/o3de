@@ -161,7 +161,6 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                     3rdParty::Qt::Test
                     AZ::AzTestShared
                     AZ::AzTest
-                    AZ::AzCoreTestCommon
                     AZ::AzToolsFrameworkTestCommon
                     Gem::Blast.Editor.Static
         )

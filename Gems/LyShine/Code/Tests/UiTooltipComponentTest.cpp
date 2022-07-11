@@ -24,7 +24,7 @@
 #include <AzCore/IO/Streamer/StreamerComponent.h>
 #include <AzCore/Jobs/JobManagerComponent.h>
 #include <AzCore/Slice/SliceSystemComponent.h>
-#include <AzCore/UnitTest/Mocks/MockITime.h>
+#include <AzTest/Mocks/MockITime.h>
 
 namespace UnitTest
 {
@@ -94,10 +94,9 @@ namespace UnitTest
         void SetUp() override
         {
             // start application
-            AZ::AllocatorInstance<AZ::SystemAllocator>::Create(AZ::SystemAllocator::Descriptor());
+            AZ::AllocatorInstance<AZ::SystemAllocator>::Create();
 
             AZ::ComponentApplication::Descriptor appDescriptor;
-            appDescriptor.m_useExistingAllocator = true;
 
             m_application = aznew UiTooltipTestApplication();
             m_application->Start(appDescriptor, AZ::ComponentApplication::StartupParameters());

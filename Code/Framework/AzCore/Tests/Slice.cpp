@@ -27,7 +27,7 @@
 #include <AzCore/Math/Sfmt.h>
 #include <AzCore/Memory/PoolAllocator.h>
 #include <AzCore/Slice/SliceMetadataInfoComponent.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AZTestShared/Utils/Utils.h>
 
 #if defined(HAVE_BENCHMARK)
@@ -830,10 +830,8 @@ namespace Benchmark
         AZ::ComponentApplication componentApp;
 
         AZ::ComponentApplication::Descriptor desc;
-        desc.m_useExistingAllocator = true;
 
         AZ::ComponentApplication::StartupParameters startupParams;
-        startupParams.m_allocator = &AZ::AllocatorInstance<AZ::SystemAllocator>::Get();
 
         componentApp.Create(desc, startupParams);
 

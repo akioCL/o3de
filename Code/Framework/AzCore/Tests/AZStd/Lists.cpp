@@ -399,8 +399,8 @@ namespace UnitTest
         static_buffer_16KB_type myMemoryManager1;
         static_buffer_16KB_type myMemoryManager2;
         typedef allocator_ref<static_buffer_16KB_type> static_allocator_ref_type;
-        static_allocator_ref_type allocator1(myMemoryManager1, "Mystack allocator 1");
-        static_allocator_ref_type allocator2(myMemoryManager2, "Mystack allocator 2");
+        static_allocator_ref_type allocator1(myMemoryManager1);
+        static_allocator_ref_type allocator2(myMemoryManager2);
 
         typedef list<MyClass, static_allocator_ref_type> stack_myclass_list_type;
         stack_myclass_list_type int_list10(allocator1);
@@ -418,8 +418,8 @@ namespace UnitTest
         int_list20.assign(20, MyClass(22));
         int_list20.set_allocator(allocator1);
         AZ_TEST_VALIDATE_LIST(int_list20, 20);
-        AZ_TEST_ASSERT(myMemoryManager1.get_allocated_size() >= 20 * sizeof(stack_myclass_list_type::node_type));
-        AZ_TEST_ASSERT(myMemoryManager2.get_allocated_size() >= 20 * sizeof(stack_myclass_list_type::node_type));
+        EXPECT_GE(myMemoryManager1.get_allocated_size(), 20 * sizeof(stack_myclass_list_type::node_type));
+        EXPECT_LE(myMemoryManager2.get_allocated_size(), 20 * sizeof(stack_myclass_list_type::node_type));
         int_list20.leak_and_reset();
         int_list20.set_allocator(allocator2);
         myMemoryManager1.reset();
@@ -431,8 +431,8 @@ namespace UnitTest
         int_list10.swap(int_list20);
         AZ_TEST_VALIDATE_EMPTY_LIST(int_list20);
         AZ_TEST_VALIDATE_LIST(int_list10, 10);
-        AZ_TEST_ASSERT(myMemoryManager1.get_allocated_size() >= 10 * sizeof(stack_myclass_list_type::node_type));
-        AZ_TEST_ASSERT(myMemoryManager2.get_allocated_size() >= 10 * sizeof(stack_myclass_list_type::node_type));
+        EXPECT_GE(myMemoryManager1.get_allocated_size(), 10 * sizeof(stack_myclass_list_type::node_type));
+        EXPECT_LE(myMemoryManager2.get_allocated_size(), 10 * sizeof(stack_myclass_list_type::node_type));
 
         int_list10.swap(int_list20);
         AZ_TEST_VALIDATE_EMPTY_LIST(int_list10);
@@ -850,8 +850,8 @@ namespace UnitTest
         static_buffer_16KB_type myMemoryManager1;
         static_buffer_16KB_type myMemoryManager2;
         typedef allocator_ref<static_buffer_16KB_type> static_allocator_ref_type;
-        static_allocator_ref_type allocator1(myMemoryManager1, "Mystack allocator 1");
-        static_allocator_ref_type allocator2(myMemoryManager2, "Mystack allocator 2");
+        static_allocator_ref_type allocator1(myMemoryManager1);
+        static_allocator_ref_type allocator2(myMemoryManager2);
 
         typedef forward_list<MyClass, static_allocator_ref_type> stack_myclass_slist_type;
         stack_myclass_slist_type   int_slist10(allocator1);
@@ -869,8 +869,8 @@ namespace UnitTest
         int_slist20.assign(20, MyClass(22));
         int_slist20.set_allocator(allocator1);
         AZ_TEST_VALIDATE_LIST(int_slist20, 20);
-        AZ_TEST_ASSERT(myMemoryManager1.get_allocated_size() >= 20 * sizeof(stack_myclass_slist_type::node_type));
-        AZ_TEST_ASSERT(myMemoryManager2.get_allocated_size() >= 20 * sizeof(stack_myclass_slist_type::node_type));
+        EXPECT_GE(myMemoryManager1.get_allocated_size(), 20 * sizeof(stack_myclass_slist_type::node_type));
+        EXPECT_LE(myMemoryManager2.get_allocated_size(), 20 * sizeof(stack_myclass_slist_type::node_type));
         int_slist20.leak_and_reset();
         int_slist20.set_allocator(allocator2);
         myMemoryManager1.reset();
@@ -882,8 +882,8 @@ namespace UnitTest
         int_slist10.swap(int_slist20);
         AZ_TEST_VALIDATE_EMPTY_LIST(int_slist20);
         AZ_TEST_VALIDATE_LIST(int_slist10, 10);
-        AZ_TEST_ASSERT(myMemoryManager1.get_allocated_size() >= 10 * sizeof(stack_myclass_slist_type::node_type));
-        AZ_TEST_ASSERT(myMemoryManager2.get_allocated_size() >= 10 * sizeof(stack_myclass_slist_type::node_type));
+        EXPECT_GE(myMemoryManager1.get_allocated_size(), 10 * sizeof(stack_myclass_slist_type::node_type));
+        EXPECT_LE(myMemoryManager2.get_allocated_size(), 10 * sizeof(stack_myclass_slist_type::node_type));
 
         int_slist10.swap(int_slist20);
         AZ_TEST_VALIDATE_EMPTY_LIST(int_slist10);

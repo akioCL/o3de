@@ -12,6 +12,7 @@
 #include <AzCore/std/string/string.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/containers/unordered_map.h>
+#include <AzCore/Module/Environment.h>
 
 #define REFLECT_GENERIC_FUNCTION_NODE(GenericFunction, Guid)\
     struct GenericFunction\

@@ -10,7 +10,7 @@
 
 #include <AzTest/AzTest.h>
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/std/containers/fixed_vector.h>
 
 #include <AzFramework/Application/Application.h>

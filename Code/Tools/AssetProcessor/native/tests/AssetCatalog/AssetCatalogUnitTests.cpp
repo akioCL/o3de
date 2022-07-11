@@ -7,7 +7,7 @@
  */
 #include <AzCore/base.h>
 #include <AzCore/Component/ComponentApplication.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Settings/SettingsRegistryMergeUtils.h>
 #include <AzToolsFramework/API/AssetDatabaseBus.h>
 
@@ -101,7 +101,6 @@ namespace AssetProcessor
         {
             m_app.reset(aznew AZ::ComponentApplication());
             AZ::ComponentApplication::Descriptor desc;
-            desc.m_useExistingAllocator = true;
             m_systemEntity = m_app->Create(desc);
 
             m_data = azcreate(DataMembers, ());

@@ -298,7 +298,7 @@ namespace AZ
                     {
                         // Used to allocate storage to store a copy of a pointer and the allocated memory address in one block.
                         constexpr size_t PointerAllocationStorage = 2 * sizeof(void*);
-                        void* valueAddress = returnBehaviorValue.m_tempData.allocate(PointerAllocationStorage, 16, 0);
+                        void* valueAddress = returnBehaviorValue.m_tempData.allocate(PointerAllocationStorage, 16);
                         void* valueAddressPtr = reinterpret_cast<AZ::u8*>(valueAddress) + sizeof(void*);
                         ::memset(valueAddress, 0, sizeof(void*));
                         *reinterpret_cast<void**>(valueAddressPtr) = valueAddress;

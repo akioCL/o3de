@@ -23,6 +23,7 @@ AZ_POP_DISABLE_WARNING;
 #endif
 
 #include <AzCore/Memory/OSAllocator.h>
+#include <AzCore/Module/Environment.h>
 
 #define AZTEST_DLL_PUBLIC AZ_DLL_EXPORT
 #define AZTEST_EXPORT extern "C" AZTEST_DLL_PUBLIC
@@ -193,14 +194,9 @@ namespace AZ
         {
             static_assert(std::is_base_of<BenchmarkEnvironmentBase, T>::value, "Supplied benchmark environment must be derived from BenchmarkEnvironmentBase");
 
-            static AZ::EnvironmentVariable<AZ::Test::BenchmarkEnvironmentRegistry> s_benchmarkRegistry;
-            if (!s_benchmarkRegistry)
-            {
-                s_benchmarkRegistry = AZ::Environment::CreateVariable<AZ::Test::BenchmarkEnvironmentRegistry>(s_benchmarkEnvironmentName);
-            }
-
+            static AZ::Test::BenchmarkEnvironmentRegistry s_benchmarkRegistry;
             auto benchmarkEnv{ new T };
-            s_benchmarkRegistry->AddBenchmarkEnvironment(std::unique_ptr<BenchmarkEnvironmentBase>{ benchmarkEnv });
+            s_benchmarkRegistry.AddBenchmarkEnvironment(std::unique_ptr<BenchmarkEnvironmentBase>{ benchmarkEnv });
             return *benchmarkEnv;
         }
 

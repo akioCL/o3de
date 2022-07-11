@@ -9,7 +9,7 @@
 #include <AzTest/AzTest.h>
 #include <AzCore/Debug/TraceMessageBus.h>
 #include <AssetBuilderSDK/AssetBuilderSDK.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/UnitTest.h>
 #include "assetBuilderSDKTest.h"
 
 namespace AssetProcessorTests

@@ -82,22 +82,6 @@ endif()
 if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
     
     ly_add_target(
-        NAME AzCoreTestCommon STATIC
-        NAMESPACE AZ
-        FILES_CMAKE
-            AzCore/azcoretestcommon_files.cmake
-        INCLUDE_DIRECTORIES
-            PRIVATE
-                .
-                ${pal_dir}
-                ${common_dir}
-        BUILD_DEPENDENCIES
-            PRIVATE
-                3rdParty::googletest::GMock
-                3rdParty::GoogleBenchmark
-    )
-
-    ly_add_target(
         NAME AzTestShared STATIC
         NAMESPACE AZ
         FILES_CMAKE
@@ -143,7 +127,6 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
         BUILD_DEPENDENCIES
             PRIVATE
                 AZ::AzCore
-                AZ::AzCoreTestCommon
                 AZ::AzTestShared
                 AZ::AzTest
         RUNTIME_DEPENDENCIES

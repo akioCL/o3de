@@ -8,7 +8,7 @@
 
 #include <AzCore/Name/Name.h>
 #include <AzCore/Name/NameDictionary.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 
 namespace AZ::NameBenchmarks
 {

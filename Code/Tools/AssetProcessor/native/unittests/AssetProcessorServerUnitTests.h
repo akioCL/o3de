@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <QObject>
 
 class ApplicationServer;

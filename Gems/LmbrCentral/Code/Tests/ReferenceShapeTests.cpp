@@ -8,7 +8,7 @@
 
 #include <AzTest/AzTest.h>
 #include <AzCore/Component/ComponentApplication.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Math/Random.h>
 #include <AzCore/Memory/MemoryComponent.h>
 #include <AzFramework/Components/TransformComponent.h>
@@ -30,10 +30,6 @@ namespace UnitTest
         void SetUp() override
         {
             AZ::ComponentApplication::Descriptor appDesc;
-            appDesc.m_memoryBlocksByteSize = 20 * 1024 * 1024;
-            appDesc.m_recordingMode = AZ::Debug::AllocationRecords::RECORD_NO_RECORDS;
-            appDesc.m_stackRecordLevels = 20;
-
             m_app.Create(appDesc);
         }
 

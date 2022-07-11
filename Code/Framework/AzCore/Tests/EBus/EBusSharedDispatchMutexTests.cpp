@@ -11,7 +11,7 @@
 #include <AzCore/std/parallel/mutex.h>
 #include <AzCore/std/parallel/semaphore.h>
 #include <AzCore/std/parallel/thread.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <Tests/AZTestShared/Utils/Utils.h>
 
 #include <gtest/gtest.h>

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Component/ComponentApplication.h> // Galib
 #include <AzFramework/IO/LocalFileIO.h>
 #include <AzCore/Serialization/Json/JsonSystemComponent.h>

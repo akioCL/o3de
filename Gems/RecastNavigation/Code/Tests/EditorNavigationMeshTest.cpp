@@ -14,8 +14,8 @@
 #include <AzCore/Console/Console.h>
 #include <AzCore/EBus/EventSchedulerSystemComponent.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
-#include <AzCore/UnitTest/TestTypes.h>
-#include <AzCore/UnitTest/Mocks/MockITime.h>
+#include <AzTest/TestTypes.h>
+#include <AzTest/Mocks/MockITime.h>
 #include <AzFramework/Entity/EntityDebugDisplayBus.h>
 #include <AzFramework/Physics/PhysicsScene.h>
 #include <Components/DetourNavigationComponent.h>

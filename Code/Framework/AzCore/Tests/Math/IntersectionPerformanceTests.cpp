@@ -11,7 +11,7 @@
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/Math/IntersectSegment.h>
 #include <AzCore/Math/Geometry3DUtils.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <random>
 #include <Tests/Math/IntersectionTestHelpers.h>
 

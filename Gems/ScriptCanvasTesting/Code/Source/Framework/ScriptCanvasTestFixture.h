@@ -14,7 +14,7 @@
 #include <AzCore/Memory/MemoryComponent.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzFramework/IO/LocalFileIO.h>
@@ -67,7 +67,6 @@ namespace ScriptCanvasTests
                 {
                     ScriptCanvasEditor::TraceSuppressionBus::Broadcast(&ScriptCanvasEditor::TraceSuppressionRequests::SuppressPrintf, true);
                     AZ::ComponentApplication::Descriptor descriptor;
-                    descriptor.m_useExistingAllocator = true;
 
                     AZ::DynamicModuleDescriptor dynamicModuleDescriptor;
                     dynamicModuleDescriptor.m_dynamicLibraryPath = "GraphCanvas.Editor";

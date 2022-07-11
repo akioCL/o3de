@@ -17,7 +17,7 @@
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/std/containers/variant.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Utils/Utils.h>
 
 namespace SettingsRegistryMergeUtilsTests

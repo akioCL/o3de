@@ -10,7 +10,7 @@
 #include <AzCore/Math/LineSegment.h>
 #include <AzCore/Math/Ray.h>
 #include <AzCore/Math/Vector3.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 
 namespace UnitTest
 {

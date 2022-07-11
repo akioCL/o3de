@@ -8,6 +8,7 @@
 #pragma once
 
 #include <AzCore/std/functional.h>
+#include <AzCore/std/parallel/atomic.h>
 #include <AzCore/std/parallel/thread.h>
 #include <AzCore/std/smart_ptr/intrusive_ptr.h>
 

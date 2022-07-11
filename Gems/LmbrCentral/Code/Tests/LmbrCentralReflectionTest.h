@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzTest/AzTest.h>
-#include <AzCore/Memory/AllocationRecords.h>
 #include <AzCore/Serialization/Utils.h>
 #include <AzCore/Component/ComponentApplication.h>
 #include <AzFramework/Application/Application.h>
@@ -118,15 +117,11 @@ protected:
 template<class ApplicationT, class ModuleT>
 void ModuleReflectionTest<ApplicationT, ModuleT>::SetUpTestCase()
 {
-    AZ::AllocatorInstance<AZ::SystemAllocator>::Create(AZ::SystemAllocator::Descriptor());
+    AZ::AllocatorInstance<AZ::SystemAllocator>::Create();
 
     s_application.reset(new ModuleReflectionTest::InternalApplication);
 
     AZ::ComponentApplication::Descriptor appDescriptor;
-    appDescriptor.m_allocationRecords = true;
-    appDescriptor.m_useExistingAllocator = true;
-    appDescriptor.m_recordingMode = AZ::Debug::AllocationRecords::RECORD_FULL;
-
     AZ::ComponentApplication::StartupParameters appStartup;
 
     // ModuleT is declared within this dll.

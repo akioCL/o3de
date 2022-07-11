@@ -10,8 +10,7 @@
 #include <AzCore/Module/Module.h>
 #include <AzCore/PlatformIncl.h>
 #include <AzCore/Module/ModuleManagerBus.h>
-#include <AzCore/Memory/AllocationRecords.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include "ModuleTestBus.h"
 
 #if !AZ_UNIT_TEST_SKIP_DLL_TEST
@@ -75,6 +74,8 @@ namespace UnitTest
         , public ModuleTestRequestBus::Handler
     {
     public:
+        AZ_CLASS_ALLOCATOR(StaticModule, AZ::SystemAllocator, 0);
+
         static bool s_loaded;
         static bool s_reflected;
 
@@ -124,13 +125,13 @@ namespace UnitTest
     TEST(ModuleManager, Test)
 #endif // AZ_TRAIT_DISABLE_FAILED_MODULE_TESTS
     {
+        AZ::AllocatorInstance<AZ::SystemAllocator>::Get(); // Make sure the SystemAllocator is initialized and not initialized within the
+                                                           // module that we are loading/unloading
         {
             ComponentApplication app;
 
             // Create application descriptor
             ComponentApplication::Descriptor appDesc;
-            appDesc.m_memoryBlocksByteSize = 10 * 1024 * 1024;
-            appDesc.m_recordingMode = Debug::AllocationRecords::RECORD_FULL;
 
             // AZCoreTestDLL will load as a dynamic module
             appDesc.m_modules.push_back();
@@ -231,6 +232,8 @@ namespace UnitTest
     TEST(ModuleManager, SequentialLoadTest)
 #endif
     {
+        AZ::AllocatorInstance<AZ::SystemAllocator>::Get(); // Make sure the SystemAllocator is initialized and not initialized within the
+                                                           // module that we are loading/unloading
         {
             ComponentApplication app;
 
@@ -352,6 +355,9 @@ namespace UnitTest
 
     TEST(ModuleManager, OwnerInitializesAndDeinitializesTest)
     {
+        AZ::AllocatorInstance<AZ::SystemAllocator>::Get(); // Make sure the SystemAllocator is initialized and not initialized within the
+                                                           // module that we are loading/unloading
+
         // in this test, we make sure that a module is always initialized even if the operating
         // system previously loaded it (due to static linkage or other reason)
         // and that when it is initialized in this manner, it is also deinitialized when the owner

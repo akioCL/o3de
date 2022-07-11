@@ -5,179 +5,244 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#ifndef AZCORE_POOL_ALLOCATOR_H
-#define AZCORE_POOL_ALLOCATOR_H
 
+#pragma once
+
+#include <AzCore/Memory/IAllocator.h>
+#include <AzCore/Memory/OSAllocator.h>
 #include <AzCore/Memory/SystemAllocator.h>
-#include <AzCore/Memory/PoolSchema.h>
-#include <AzCore/Memory/AllocationRecords.h>
 
 namespace AZ
 {
-    template<class Allocator>
-    class PoolAllocation;
-    namespace Internal
-    {
-        /*!
-        * Template you can use to create your own thread pool allocators, as you can't inherit from ThreadPoolAllocator.
-        * This is the case because we use tread local storage and we need separate "static" instance for each allocator.
-        */
-        template<class Schema>
-        class PoolAllocatorHelper
-            : public SimpleSchemaAllocator<Schema, typename Schema::Descriptor, /* ProfileAllocations */ true, /* ReportOutOfMemory */ false>
-        {
-        public:
-            using Base = SimpleSchemaAllocator<Schema, typename Schema::Descriptor, true, false>;
-            using pointer_type = typename Base::pointer_type;
-            using size_type = typename Base::size_type;
-            using difference_type = typename Base::difference_type;
-
-            struct Descriptor
-                : public Schema::Descriptor
-            {
-                Descriptor()
-                    : m_allocationRecords(true)
-                    , m_isMarkUnallocatedMemory(false)
-                    , m_isMemoryGuards(false)
-                    , m_stackRecordLevels(5)
-                {}
-
-                bool m_allocationRecords; ///< True if we want to track memory allocations, otherwise false.
-                bool m_isMarkUnallocatedMemory; ///< Sets unallocated memory to default values (if m_allocationRecords is true)
-                bool m_isMemoryGuards; ///< Enables memory guards for stomp detection. Keep in mind that this will change the memory "profile" a lot as we usually double every pool allocation.
-                unsigned char m_stackRecordLevels; ///< If stack recording is enabled, how many stack levels to record. (if m_allocationRecords is true)
-            };
-
-        private:
-            static constexpr Descriptor GetDefaultDescriptor(Descriptor descriptor)
-            {
-                if (descriptor.m_minAllocationSize < 8)
-                {
-                    descriptor.m_minAllocationSize = 8;
-                }
-                if (descriptor.m_maxAllocationSize < descriptor.m_minAllocationSize)
-                {
-                    descriptor.m_maxAllocationSize = descriptor.m_minAllocationSize;
-                }
-
-                if (descriptor.m_allocationRecords && descriptor.m_isMemoryGuards)
-                {
-                    descriptor.m_maxAllocationSize = AZ_SIZE_ALIGN_UP(descriptor.m_maxAllocationSize + AZ_SIZE_ALIGN_UP(sizeof(Debug::GuardValue), descriptor.m_minAllocationSize), descriptor.m_minAllocationSize);
-                }
-                return descriptor;
-            }
-
-        public:
-
-            PoolAllocatorHelper(const char* name, const char* desc, Descriptor descriptor = {})
-                : Base(name, desc, GetDefaultDescriptor(descriptor))
-                , m_desc(GetDefaultDescriptor(descriptor))
-            {
-                static_cast<Schema*>(this->m_schema)->Create(m_desc);
-            }
-
-            ~PoolAllocatorHelper() override
-            {
-                this->PreDestroy();
-                Destroy();
-            }
-
-            bool Create(const Descriptor& descriptor)
-            {
-                return true;
-            }
-
-            void Destroy() override
-            {
-                static_cast<Schema*>(this->m_schema)->Destroy();
-                Base::Destroy();
-            }
-                        
-            AllocatorDebugConfig GetDebugConfig() override
-            {
-                return AllocatorDebugConfig()
-                    .ExcludeFromDebugging(!m_desc.m_allocationRecords)
-                    .StackRecordLevels(m_desc.m_stackRecordLevels)
-                    .MarksUnallocatedMemory(m_desc.m_isMarkUnallocatedMemory)
-                    .UsesMemoryGuards(m_desc.m_isMemoryGuards);
-            }
-
-            //////////////////////////////////////////////////////////////////////////
-            // IAllocatorSchema
-            pointer_type ReAllocate(pointer_type ptr, size_type newSize, size_type newAlignment) override
-            {
-                (void)ptr;
-                (void)newSize;
-                (void)newAlignment;
-                AZ_Assert(false, "Not supported!");
-                return nullptr;
-            }
-
-            size_type Resize(pointer_type ptr, size_type newSize) override
-            {
-                (void)ptr;
-                (void)newSize;
-                // \todo return the node size
-                return 0;
-            }
-
-            //////////////////////////////////////////////////////////////////////////
-
-            PoolAllocatorHelper& operator=(const PoolAllocatorHelper&) = delete;
-
-        private:
-            Descriptor m_desc;
-        };
-    }
+    IAllocatorWithTracking* CreatePoolAllocatorPimpl(IAllocator& subAllocator);
+    void DestroyPoolAllocatorPimpl(IAllocator& subAllocator, IAllocator* allocator);
 
     /*!
      * Pool allocator
      * Specialized allocation for extremely fast small object memory allocations.
-     * It can allocate sized from m_minAllocationSize to m_maxPoolSize.
      * Pool Allocator is NOT thread safe, if you if need a thread safe version
      * use PoolAllocatorThreadSafe or do the sync yourself.
      */
-    class PoolAllocator
-        : public Internal::PoolAllocatorHelper<PoolSchema>
+    template<typename SubAllocatorType = OSAllocator>
+    class PoolAllocatorType
+        : public IAllocator
+        , public IAllocatorTrackingRecorder
     {
     public:
-        AZ_CLASS_ALLOCATOR(PoolAllocator, SystemAllocator, 0);
-        AZ_TYPE_INFO(PoolAllocator, "{D3DC61AF-0949-4BFA-87E0-62FA03A4C025}");
+        AZ_RTTI(PoolAllocatorType, "{D3DC61AF-0949-4BFA-87E0-62FA03A4C025}", IAllocator, IAllocatorTrackingRecorder)
 
-        using Base = Internal::PoolAllocatorHelper<PoolSchema>;
-
-        PoolAllocator(const char* name = "PoolAllocator", const char* desc = "Generic pool allocator for small objects")
-            : Base(name, desc)
+        PoolAllocatorType()
         {
+            m_allocatorPimpl = CreatePoolAllocatorPimpl(AZ::AllocatorInstance<SubAllocatorType>::Get());
         }
+
+        ~PoolAllocatorType() override
+        {
+            DestroyPoolAllocatorPimpl(AZ::AllocatorInstance<SubAllocatorType>::Get(), m_allocatorPimpl);
+            m_allocatorPimpl = nullptr;
+        }
+
+        pointer allocate(size_type byteSize, align_type alignment = 1) override
+        {
+            return m_allocatorPimpl->allocate(byteSize, alignment);
+        }
+
+        void deallocate(pointer ptr, size_type byteSize = 0, align_type alignment = 0) override
+        {
+            m_allocatorPimpl->deallocate(ptr, byteSize, alignment);
+        }
+
+        pointer reallocate(pointer ptr, size_type newSize, align_type alignment = 1) override
+        {
+            return m_allocatorPimpl->reallocate(ptr, newSize, alignment);
+        }
+
+        size_type get_allocated_size(pointer ptr, align_type alignment = 1) const override
+        {
+            return m_allocatorPimpl->get_allocated_size(ptr, alignment);
+        }
+
+        void Merge(IAllocator* aOther) override
+        {
+            m_allocatorPimpl->Merge(aOther);
+        }
+
+        void GarbageCollect() override
+        {
+            m_allocatorPimpl->GarbageCollect();
+        }
+
+        // IAllocatorTrackingRecorder
+
+        AZStd::size_t GetRequested() const override
+        {
+            return m_allocatorPimpl->GetRequested();
+        }
+
+        // Total amount of bytes allocated (i.e. requested to the OS)
+        AZStd::size_t GetAllocated() const override
+        {
+            return m_allocatorPimpl->GetAllocated();
+        }
+
+        AZStd::size_t GetFragmented() const override
+        {
+            return m_allocatorPimpl->GetFragmented();
+        }
+
+        void PrintAllocations() const override
+        {
+            m_allocatorPimpl->PrintAllocations();
+        }
+
+        AZStd::size_t GetAllocationCount() const override
+        {
+            return m_allocatorPimpl->GetAllocationCount();
+        }
+
+#if defined(AZ_ENABLE_TRACING)
+        AllocationRecordVector GetAllocationRecords() const
+        {
+            return m_allocatorPimpl->GetAllocationRecords();
+        }
+#endif
+
+    protected:
+        void RecordingsMove(IAllocatorTrackingRecorder* aOther) override
+        {
+            m_allocatorPimpl->RecordingsMove(aOther);
+        }
+
+    private:
+        AZ_DISABLE_COPY_MOVE(PoolAllocatorType)
+
+        // Due the complexity of this allocator, we create a pimpl implementation
+        IAllocatorWithTracking* m_allocatorPimpl;
     };
 
-    template<class Allocator>
-    using ThreadPoolBase = Internal::PoolAllocatorHelper<ThreadPoolSchemaHelper<Allocator> >;
+    class PoolAllocator : public PoolAllocatorType<SystemAllocator>
+    {
+    public:
+        AZ_RTTI(PoolAllocator, "{A53272C9-0869-41AF-A7A8-A46DEDEC9A54}", PoolAllocatorType<SystemAllocator>)
+
+        PoolAllocator() = default;
+        virtual ~PoolAllocator() = default;
+
+        AZ_DISABLE_COPY_MOVE(PoolAllocator)
+    };
+
+    IAllocatorWithTracking* CreateThreadPoolAllocatorPimpl(IAllocator& subAllocator);
+    void DestroyThreadPoolAllocatorPimpl(IAllocator& subAllocator, IAllocator* allocator);
 
     /*!
      * Thread safe pool allocator. If you want to create your own thread pool heap,
      * inherit from ThreadPoolBase, as we need unique static variable for allocator type.
      */
-    class ThreadPoolAllocator final
-        : public ThreadPoolBase<ThreadPoolAllocator>
+    template<typename SubAllocatorType = OSAllocator>
+    class ThreadPoolAllocatorType
+        : public IAllocator
+        , public IAllocatorTrackingRecorder
     {
     public:
-        AZ_CLASS_ALLOCATOR(ThreadPoolAllocator, SystemAllocator, 0);
-        AZ_TYPE_INFO(ThreadPoolAllocator, "{05B4857F-CD06-4942-99FD-CA6A7BAE855A}");
+        AZ_RTTI(ThreadPoolAllocator, "{05B4857F-CD06-4942-99FD-CA6A7BAE855A}", IAllocator, IAllocatorTrackingRecorder)
 
-        using Base = ThreadPoolBase<ThreadPoolAllocator>;
-
-        ThreadPoolAllocator()
-            : Base("PoolAllocatorThreadSafe", "Generic thread safe pool allocator for small objects")
+        ThreadPoolAllocatorType()
         {
+            m_allocatorPimpl = CreateThreadPoolAllocatorPimpl(AZ::AllocatorInstance<SubAllocatorType>::Get());
         }
 
-        //////////////////////////////////////////////////////////////////////////
+        ~ThreadPoolAllocatorType() override
+        {
+            DestroyThreadPoolAllocatorPimpl(AZ::AllocatorInstance<SubAllocatorType>::Get(), m_allocatorPimpl);
+            m_allocatorPimpl = nullptr;
+        }
+
+        pointer allocate(size_type byteSize, align_type alignment = 1) override
+        {
+            return m_allocatorPimpl->allocate(byteSize, alignment);
+        }
+
+        void deallocate(pointer ptr, size_type byteSize = 0, align_type alignment = 0) override
+        {
+            m_allocatorPimpl->deallocate(ptr, byteSize, alignment);
+        }
+
+        pointer reallocate(pointer ptr, size_type newSize, align_type alignment = 1) override
+        {
+            return m_allocatorPimpl->reallocate(ptr, newSize, alignment);
+        }
+
+        size_type get_allocated_size(pointer ptr, align_type alignment = 1) const override
+        {
+            return m_allocatorPimpl->get_allocated_size(ptr, alignment);
+        }
+
+        void Merge(IAllocator* aOther) override
+        {
+            m_allocatorPimpl->Merge(aOther);
+        }
+
+        void GarbageCollect() override
+        {
+            m_allocatorPimpl->GarbageCollect();
+        }
+
+        // IAllocatorTrackingRecorder
+
+        AZStd::size_t GetRequested() const override
+        {
+            return m_allocatorPimpl->GetRequested();
+        }
+
+        // Total amount of bytes allocated (i.e. requested to the OS)
+        AZStd::size_t GetAllocated() const override
+        {
+            return m_allocatorPimpl->GetAllocated();
+        }
+
+        AZStd::size_t GetFragmented() const override
+        {
+            return m_allocatorPimpl->GetFragmented();
+        }
+
+        void PrintAllocations() const override
+        {
+            m_allocatorPimpl->PrintAllocations();
+        }
+
+        AZStd::size_t GetAllocationCount() const override
+        {
+            return m_allocatorPimpl->GetAllocationCount();
+        }
+
+#if defined(AZ_ENABLE_TRACING)
+        AllocationRecordVector GetAllocationRecords() const
+        {
+            return m_allocatorPimpl->GetAllocationRecords();
+        }
+#endif
+
+    protected:
+        void RecordingsMove(IAllocatorTrackingRecorder* aOther) override
+        {
+            m_allocatorPimpl->RecordingsMove(aOther);
+        }
+
+    private:
+        AZ_DISABLE_COPY_MOVE(ThreadPoolAllocatorType)
+
+        // Due the complexity of this allocator, we create a pimpl implementation
+        IAllocatorWithTracking* m_allocatorPimpl;
+    };
+
+    class ThreadPoolAllocator : public ThreadPoolAllocatorType<SystemAllocator>
+    {
+    public:
+        AZ_RTTI(ThreadPoolAllocator, "{DF859CAE-9FBD-463B-954B-F9C42C443A05}", ThreadPoolAllocatorType<SystemAllocator>)
+
+        ThreadPoolAllocator() = default;
+        virtual ~ThreadPoolAllocator() = default;
+
+        AZ_DISABLE_COPY_MOVE(ThreadPoolAllocator)
     };
 }
-
-#endif // AZCORE_POOL_ALLOCATOR_H
-#pragma once
-
-

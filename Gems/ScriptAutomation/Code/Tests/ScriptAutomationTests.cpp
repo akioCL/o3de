@@ -10,7 +10,7 @@
 #include <ScriptAutomationApplicationFixture.h>
 
 #include <AzCore/RTTI/BehaviorContext.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/UnitTest.h>
 
 namespace UnitTest
 {

@@ -14,5 +14,6 @@ set(FILES
 if(NOT LY_MONOLITHIC_GAME)
     list(APPEND FILES 
         std/hash.cpp
+        std/allocator_stateless.cpp
     )
 endif()

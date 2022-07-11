@@ -62,7 +62,6 @@ namespace UnitTest
         AZ::Test::AddActiveGem("ScriptAutomation", *AZ::SettingsRegistry::Get(), AZ::IO::FileIOBase::GetInstance());
 
         AZ::ComponentApplication::Descriptor appDesc;
-        appDesc.m_useExistingAllocator = true;
 
         AZ::DynamicModuleDescriptor dynamicModuleDescriptor;
         dynamicModuleDescriptor.m_dynamicLibraryPath = "ScriptAutomation";

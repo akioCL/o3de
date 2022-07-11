@@ -379,27 +379,18 @@ set(FILES
     Math/Color.cpp
     Math/ColorSerializer.h
     Math/ColorSerializer.cpp
-    Memory/AllocationRecords.cpp
-    Memory/AllocationRecords.h
-    Memory/AllocatorBase.cpp
-    Memory/AllocatorBase.h
+    Memory/AllocatorDebug.h
+    Memory/AllocatorDebug.cpp
+    Memory/AllocatorTrackingRecorder.h
+    Memory/AllocatorTrackingRecorder.cpp
+    Memory/AllocatorInstance.h
     Memory/AllocatorManager.cpp
     Memory/AllocatorManager.h
-    Memory/AllocatorWrapper.h
-    Memory/AllocatorScope.h
-    Memory/BestFitExternalMapAllocator.cpp
-    Memory/BestFitExternalMapAllocator.h
-    Memory/BestFitExternalMapSchema.cpp
-    Memory/BestFitExternalMapSchema.h
-    Memory/Config.h
+    Memory/AllocatorWrappers.h
     Memory/dlmalloc.inl
-    Memory/HeapSchema.h
-    Memory/HphaSchema.cpp
-    Memory/HphaSchema.h
-    Memory/IAllocator.cpp
+    Memory/HphaAllocator.cpp
+    Memory/HphaAllocator.h
     Memory/IAllocator.h
-    Memory/MallocSchema.cpp
-    Memory/MallocSchema.h
     Memory/Memory.cpp
     Memory/Memory.h
     Memory/MemoryComponent.cpp
@@ -408,13 +399,9 @@ set(FILES
     Memory/NewAndDelete.inl
     Memory/OSAllocator.cpp
     Memory/OSAllocator.h
-    Memory/OverrunDetectionAllocator.cpp
-    Memory/OverrunDetectionAllocator.h
+    Memory/OSStdAllocator.h
+    Memory/PoolAllocator.cpp
     Memory/PoolAllocator.h
-    Memory/PoolSchema.cpp
-    Memory/PoolSchema.h
-    Memory/SimpleSchemaAllocator.h
-    Memory/SystemAllocator.cpp
     Memory/SystemAllocator.h
     Module/DynamicModuleHandle.cpp
     Module/DynamicModuleHandle.h
@@ -636,7 +623,6 @@ set(FILES
     Utils/Utils.cpp
     Utils/Utils.h
     Script/lua/lua.h
-    Memory/HeapSchema.cpp
     PlatformId/PlatformDefaults.h
     PlatformId/PlatformDefaults.cpp
     PlatformId/PlatformId.h
@@ -665,10 +651,4 @@ set(FILES
     Time/ITime.h
     Time/TimeSystem.cpp
     Time/TimeSystem.h
-)
-
-# Prevent the following files from being grouped in UNITY builds
-set(SKIP_UNITY_BUILD_INCLUSION_FILES
-    # In some platforms, dlmalloc.inl gives issues when compiled in unity because there is a getpagesize defined differently
-    Memory/HeapSchema.cpp
 )

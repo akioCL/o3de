@@ -6,7 +6,7 @@
  *
  */
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <FileIOBaseTestTypes.h>
 #include <AzCore/IO/CompressionBus.h>
 #include <AzCore/IO/FileIO.h>
@@ -256,7 +256,6 @@ namespace AZ::IO
 
             m_application = aznew GemTestApplication();
             AZ::ComponentApplication::Descriptor appDesc;
-            appDesc.m_useExistingAllocator = true;
             auto m_systemEntity = m_application->Create(appDesc);
             m_systemEntity->AddComponent(aznew AZ::StreamerComponent());
             m_systemEntity->Init();

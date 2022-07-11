@@ -15,7 +15,7 @@
  */
 
 // Test Environment
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Component/Component.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
@@ -266,7 +266,6 @@ namespace UnitTest
         void SetUp() override
         {
             AZ::ComponentApplication::Descriptor componentApplicationDesc;
-            componentApplicationDesc.m_useExistingAllocator = true;
             m_application = aznew ToolsTestApplication("ComponentPaletteTests");
             m_application->Start(componentApplicationDesc);
             // Without this, the user settings component would attempt to save on finalize/shutdown. Since the file is

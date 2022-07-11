@@ -7,8 +7,8 @@
  */
 
 #include <AzTest/AzTest.h>
-#include <AzCore/UnitTest/UnitTest.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/UnitTest.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Memory/OSAllocator.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <platform.h>
@@ -37,12 +37,10 @@ protected:
     {
         AZ::AllocatorInstance<AZ::OSAllocator>::Create();
         AZ::AllocatorInstance<AZ::SystemAllocator>::Create();
-        AZ::AllocatorInstance<AZ::LegacyAllocator>::Create();
     }
 
     void TeardownEnvironment() override
     {
-        AZ::AllocatorInstance<AZ::LegacyAllocator>::Destroy();
         AZ::AllocatorInstance<AZ::SystemAllocator>::Destroy();
         AZ::AllocatorInstance<AZ::OSAllocator>::Destroy();
     }

@@ -416,7 +416,7 @@ namespace Audio
         Audio::ListenerRequest::SetWorldTransform>;
 
 
-    using AudioRequestsQueue = AZStd::deque<AudioRequestVariant, AZ::AZStdAlloc<AZ::SystemAllocator>>;
+    using AudioRequestsQueue = AZStd::deque<AudioRequestVariant, AZ::SystemAllocator>;
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////

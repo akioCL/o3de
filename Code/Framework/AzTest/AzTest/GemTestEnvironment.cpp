@@ -7,7 +7,7 @@
  */
 
 #include <AzTest/GemTestEnvironment.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/UnitTest.h>
 #include <AzCore/Asset/AssetManagerComponent.h>
 #include <AzCore/Jobs/JobManagerComponent.h>
 #include <AzCore/IO/Streamer/StreamerComponent.h>
@@ -91,7 +91,6 @@ namespace AZ
             // Create the application.
             m_application = CreateApplicationInstance();
             AZ::ComponentApplication::Descriptor appDesc;
-            appDesc.m_useExistingAllocator = true;
 
             // Set up gems for loading.
             for (const AZStd::string& dynamicModulePath : m_parameters->m_dynamicModulePaths)

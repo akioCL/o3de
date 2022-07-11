@@ -16,8 +16,8 @@
 #include <AzCore/std/parallel/spin_mutex.h>
 #include <AzCore/std/parallel/thread.h>
 #include <AzCore/std/string/string.h>
-#include <AzCore/UnitTest/TestTypes.h>
-#include <AzCore/UnitTest/UnitTest.h>
+#include <AzTest/TestTypes.h>
+#include <AzTest/UnitTest.h>
 #include <AzCore/Utils/TypeHash.h>
 
 namespace UnitTest

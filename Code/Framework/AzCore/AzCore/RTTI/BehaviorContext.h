@@ -513,7 +513,7 @@ namespace AZ
             if (convertedAddress && convertedAddress != sourceAddress) // if we converted as we have a different address
             {
                 // allocate temp storage and store it
-                targetAddress = tempAllocator.allocate(sizeof(void*), AZStd::alignment_of<void*>::value, 0);
+                targetAddress = tempAllocator.allocate(sizeof(void*), AZStd::alignment_of<void*>::value);
                 *reinterpret_cast<void**>(targetAddress) = convertedAddress;
             }
             return convertedAddress != nullptr;
@@ -1511,15 +1511,13 @@ namespace AZ
         template<class T>
         struct DefaultAllocator
         {
-            static void* Allocate(void* userData)
+            static void* Allocate([[maybe_unused]] void* userData)
             {
-                (void)userData;
                 return T::AZ_CLASS_ALLOCATOR_Allocate();
             }
 
-            static void DeAllocate(void* address, void* userData)
+            static void DeAllocate(void* address, [[maybe_unused]] void* userData)
             {
-                (void)userData;
                 T::AZ_CLASS_ALLOCATOR_DeAllocate(address);
             }
         };
@@ -2374,7 +2372,7 @@ namespace AZ
     inline void BehaviorArgument::StoreInTempDataEvenIfNonTrivial(T&& value)
     {
         AZ::Internal::SetParameters<T>(this);
-        m_value = m_tempData.allocate(sizeof(T), AZStd::alignment_of<T>::value, 0);
+        m_value = m_tempData.allocate(sizeof(T), AZStd::alignment_of<T>::value);
         AZStd::construct_at(reinterpret_cast<AZStd::decay_t<T>*>(m_value), AZStd::forward<T>(value));
     }
 

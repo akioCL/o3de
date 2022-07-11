@@ -64,7 +64,7 @@
 
 #include <AzCore/RTTI/AttributeReader.h>
 #include <AzCore/std/string/conversions.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AZTestShared/Utils/Utils.h>
 
 namespace SerializeTestClasses {
@@ -8253,9 +8253,7 @@ namespace UnitTest
     {
     public:
         PathSerializationParamFixture()
-            : ScopedAllocatorSetupFixture(
-                []() { AZ::SystemAllocator::Descriptor desc; desc.m_stackRecordLevels = 30; return desc; }()
-            )
+            : ScopedAllocatorSetupFixture()
         {}
 
         // We must expose the class for serialization first.

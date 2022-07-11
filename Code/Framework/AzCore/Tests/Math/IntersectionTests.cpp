@@ -12,7 +12,7 @@
 #include <AzCore/Math/MathUtils.h>
 #include <AzCore/Math/Random.h>
 #include <AzCore/Math/Geometry3DUtils.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <random>
 #include <Tests/Math/IntersectionTestHelpers.h>
 

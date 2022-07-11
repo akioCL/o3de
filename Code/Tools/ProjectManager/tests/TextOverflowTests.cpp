@@ -6,7 +6,7 @@
  *
  */
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <TextOverflowWidget.h>
 
 namespace O3DE::ProjectManager

@@ -6,7 +6,7 @@
  *
  */
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Serialization/Utils.h>
 #include <AzCore/Component/ComponentApplication.h>
 #include <AzCore/Math/Transform.h>
@@ -401,7 +401,6 @@ namespace UnitTest
         {
             AllocatorsFixture::SetUp();
             AZ::ComponentApplication::Descriptor desc;
-            desc.m_useExistingAllocator = true;
             m_app.reset(aznew AZ::ComponentApplication);
             m_app->Create(desc);
         }

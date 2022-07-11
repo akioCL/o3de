@@ -103,10 +103,9 @@ namespace UnitTest
         void SetUp() override
         {
             // Start application
-            AZ::AllocatorInstance<AZ::SystemAllocator>::Create(AZ::SystemAllocator::Descriptor());
+            AZ::AllocatorInstance<AZ::SystemAllocator>::Create();
 
             AZ::ComponentApplication::Descriptor appDescriptor;
-            appDescriptor.m_useExistingAllocator = true;
 
             m_applicationPtr = aznew UiTextInputTestApplication();
             m_applicationPtr->Start(appDescriptor, AZ::ComponentApplication::StartupParameters());

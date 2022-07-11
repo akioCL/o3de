@@ -6,7 +6,7 @@
  *
  */
 #pragma once
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzCore/Memory/PoolAllocator.h>
 #include <AzCore/Serialization/SerializeContext.h>
 
@@ -20,9 +20,6 @@ namespace UnitTest
         {
             AllocatorsFixture::SetUp();
 
-            AZ::AllocatorInstance<AZ::PoolAllocator>::Create();
-            AZ::AllocatorInstance<AZ::ThreadPoolAllocator>::Create();
-
             m_serializeContext = aznew AZ::SerializeContext(true, true);
         }
 
@@ -30,9 +27,6 @@ namespace UnitTest
         {
             delete m_serializeContext;
             m_serializeContext = nullptr;
-
-            AZ::AllocatorInstance<AZ::PoolAllocator>::Destroy();
-            AZ::AllocatorInstance<AZ::ThreadPoolAllocator>::Destroy();
 
             AllocatorsFixture::TearDown();
         }

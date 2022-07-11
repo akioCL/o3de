@@ -71,11 +71,8 @@ namespace UnitTest
         void SetUp() override
         {
             // start application
-            AZ::AllocatorInstance<AZ::SystemAllocator>::Create(AZ::SystemAllocator::Descriptor());
-            AZ::AllocatorInstance<AZ::LegacyAllocator>::Create();
-
+            AZ::AllocatorInstance<AZ::SystemAllocator>::Create();
             AZ::ComponentApplication::Descriptor appDescriptor;
-            appDescriptor.m_useExistingAllocator = true;
 
             m_application = aznew UiDynamicScrollBoxTestApplication();
             m_application->Start(appDescriptor, AZ::ComponentApplication::StartupParameters());
@@ -86,7 +83,6 @@ namespace UnitTest
             m_application->Stop();
             delete m_application;
             m_application = nullptr;
-            AZ::AllocatorInstance<AZ::LegacyAllocator>::Destroy();
             AZ::AllocatorInstance<AZ::SystemAllocator>::Destroy();
         }
 

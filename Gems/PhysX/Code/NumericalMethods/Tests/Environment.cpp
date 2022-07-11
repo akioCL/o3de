@@ -6,7 +6,7 @@
  *
  */
 
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include <AzTest/AzTest.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Memory/MemoryComponent.h>
@@ -52,7 +52,6 @@ namespace NumericalMethods
         // Create application and descriptor
         m_application = aznew AZ::ComponentApplication;
         AZ::ComponentApplication::Descriptor appDesc;
-        appDesc.m_useExistingAllocator = true;
 
         // Create system entity
         AZ::ComponentApplication::StartupParameters startupParams;

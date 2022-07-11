@@ -12,7 +12,7 @@
 #include <AzFramework/Application/Application.h>
 #include <AzCore/UserSettings/UserSettingsComponent.h>
 #include <AzCore/IO/SystemFile.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 
 namespace AZ
 {
@@ -51,9 +51,6 @@ namespace UnitTest
 
         void SetUp() override
         {            
-            m_appDescriptor.m_allocationRecords = true;
-            m_appDescriptor.m_allocationRecordsSaveNames = true;
-            m_appDescriptor.m_recordingMode = AZ::Debug::AllocationRecords::Mode::RECORD_FULL;
             m_application = new (AZStd::addressof(m_applicationBuffer)) NoUserSettingsApplication();
             m_application->Start(m_appDescriptor, m_appStartupParams);
         }
