@@ -774,8 +774,6 @@ namespace AZ
         pointer reallocate(pointer ptr, size_type newSize, align_type alignment = 1) override;
         size_type get_allocated_size(pointer ptr, align_type alignment = 1) const override;
 
-        void Merge(IAllocator* aOther) override;
-
         void GarbageCollect() override;
 
     private:
@@ -1958,17 +1956,6 @@ namespace AZ
     HphaAllocatorPimpl::size_type HphaAllocatorPimpl::get_allocated_size(pointer ptr, [[maybe_unused]] align_type alignment) const
     {
         return size(ptr);
-    }
-
-    void HphaAllocatorPimpl::Merge([[maybe_unused]] IAllocator* aOther)
-    {
-        HphaAllocatorPimpl* other = azrtti_cast<HphaAllocatorPimpl*>(aOther);
-        HPPA_ASSERT(other);
-        // Transfer the buckets
-        // Transfer tree
-
-        // Transfer the tracking records
-        RecordingsMove(other);
     }
 
     void HphaAllocatorPimpl::GarbageCollect()

@@ -62,11 +62,6 @@ namespace AZ
             return m_allocatorPimpl->get_allocated_size(ptr, alignment);
         }
 
-        void Merge(IAllocator* aOther) override
-        {
-            m_allocatorPimpl->Merge(aOther);
-        }
-
         void GarbageCollect() override
         {
             m_allocatorPimpl->GarbageCollect();
@@ -106,12 +101,6 @@ namespace AZ
             return m_allocatorPimpl->GetAllocationRecords();
         }
 #endif
-
-    protected:
-        void RecordingsMove(IAllocatorTrackingRecorder* aOther) override
-        {
-            m_allocatorPimpl->RecordingsMove(aOther);
-        }
 
     private:
         AZ_DISABLE_COPY_MOVE(PoolAllocatorType)
@@ -177,11 +166,6 @@ namespace AZ
             return m_allocatorPimpl->get_allocated_size(ptr, alignment);
         }
 
-        void Merge(IAllocator* aOther) override
-        {
-            m_allocatorPimpl->Merge(aOther);
-        }
-
         void GarbageCollect() override
         {
             m_allocatorPimpl->GarbageCollect();
@@ -221,12 +205,6 @@ namespace AZ
             return m_allocatorPimpl->GetAllocationRecords();
         }
 #endif
-
-    protected:
-        void RecordingsMove(IAllocatorTrackingRecorder* aOther) override
-        {
-            m_allocatorPimpl->RecordingsMove(aOther);
-        }
 
     private:
         AZ_DISABLE_COPY_MOVE(ThreadPoolAllocatorType)

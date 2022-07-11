@@ -58,11 +58,6 @@ namespace AZ
             return m_allocator->get_allocated_size(ptr, alignment);
         }
 
-        void Merge(IAllocator* aOther) override
-        {
-            m_allocator->Merge(aOther);
-        }
-
         AllocatorPointerWrapper& operator=(IAllocator* allocator)
         {
             m_allocator = allocator;
@@ -126,11 +121,6 @@ namespace AZ
         size_type get_allocated_size(pointer ptr, align_type alignment = 1) const override
         {
             return AllocatorInstance<Allocator>::Get().get_allocated_size(ptr, alignment);
-        }
-
-        void Merge(IAllocator* aOther) override
-        {
-            AllocatorInstance<Allocator>::Get().Merge(aOther);
         }
     };
 

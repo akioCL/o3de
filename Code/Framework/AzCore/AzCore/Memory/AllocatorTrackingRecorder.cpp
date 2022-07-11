@@ -114,21 +114,6 @@ namespace AZ
 #endif
     }
 
-    void IAllocatorWithTracking::RecordingsMove([[maybe_unused]] IAllocatorTrackingRecorder* aOther)
-    {
-#if defined(AZ_ENABLE_TRACING)
-        IAllocatorWithTracking* other = azrtti_cast<IAllocatorWithTracking*>(aOther);
-        AZ_Assert(other, "Unexpected conversion, RecordingsMove should be reimplmented if IAllocatorTrackingRecorder is being used");
-        m_data->m_allocated += other->m_data->m_allocated;
-        other->m_data->m_allocated = 0;
-
-        AZStd::scoped_lock lock(m_data->m_allocationRecordsMutex);
-        AZStd::scoped_lock lockOther(other->m_data->m_allocationRecordsMutex);
-        m_data->m_allocationRecords.insert(other->m_data->m_allocationRecords.begin(), other->m_data->m_allocationRecords.end());
-        other->m_data->m_allocationRecords.clear();
-#endif
-    }
-
     AZStd::size_t IAllocatorWithTracking::GetRequested() const
     {
 #if defined(AZ_ENABLE_TRACING)

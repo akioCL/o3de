@@ -49,10 +49,6 @@ namespace AZ
         pointer reallocate(pointer ptr, size_type newSize, align_type alignment = 1);
         size_type get_allocated_size(pointer ptr, align_type alignment = 1) const;
 
-        void Merge([[maybe_unused]] IAllocator* aOther)
-        {
-        }
-
         void GarbageCollect();
 
         Allocator* m_allocator;
@@ -302,10 +298,6 @@ namespace AZ
         void deallocate(pointer ptr, size_type byteSize = 0, align_type alignment = 0) override;
         pointer reallocate(pointer ptr, size_type newSize, align_type alignment = 1) override;
         size_type get_allocated_size(pointer ptr, align_type alignment = 1) const override;
-
-        void Merge([[maybe_unused]] IAllocator* aOther) override
-        {
-        }
 
         /**
          * We allocate memory for pools in pages. Page is a information struct
@@ -573,10 +565,6 @@ namespace AZ
         void deallocate(pointer ptr, size_type byteSize = 0, align_type alignment = 0) override;
         pointer reallocate(pointer ptr, size_type newSize, align_type alignment = 1) override;
         size_type get_allocated_size(pointer ptr, align_type alignment = 1) const override;
-
-        void Merge([[maybe_unused]] IAllocator* aOther) override
-        {
-        }
 
         /// Return unused memory to the OS. Don't call this too often because you will force unnecessary allocations.
         void GarbageCollect() override;

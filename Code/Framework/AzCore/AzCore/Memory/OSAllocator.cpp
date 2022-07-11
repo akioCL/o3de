@@ -62,13 +62,4 @@ namespace AZ
     {
         return ptr ? AZ_OS_MSIZE(ptr, alignment) : 0;
     }
-
-    void OSAllocator::Merge([[maybe_unused]] IAllocator* aOther)
-    {
-        // Nothing to do regarding the allocations, we just need to move over all the tracking data
-#if defined(AZ_ENABLE_TRACING)
-        OSAllocator* other = azrtti_cast<OSAllocator*>(aOther);
-        RecordingsMove(other);
-#endif
-    }
 }

@@ -30,9 +30,6 @@ namespace AZ
     public:
         AZ_RTTI(IAllocatorTrackingRecorder, "{10468A58-A4E3-4FD0-8121-60F6DD13981C}")
 
-    protected:
-        virtual void RecordingsMove(IAllocatorTrackingRecorder* aOther) = 0;
-
     public:
         // query APIs
 
@@ -105,8 +102,6 @@ namespace AZ
 
         IAllocatorWithTracking();
         ~IAllocatorWithTracking();
-
-        void RecordingsMove(IAllocatorTrackingRecorder* aOther) override;
 
         // query APIs
 

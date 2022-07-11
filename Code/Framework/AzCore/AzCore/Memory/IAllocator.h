@@ -60,8 +60,6 @@ namespace AZ
 
         virtual size_type get_allocated_size(pointer ptr, align_type alignment = 1) const = 0;
 
-        virtual void Merge(IAllocator* aOther) = 0;
-
         // Frees (if possible) unused memory from the allocator. Unused memory is memory that was allocated
         // from the OS point of view but was not assigned to be used by a pointer.
         // NOTE: this function should be thread safe, allocations can happen at the same time this function
