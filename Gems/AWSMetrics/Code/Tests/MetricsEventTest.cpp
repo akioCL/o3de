@@ -7,6 +7,7 @@
  */
 
 #include <AWSMetricsConstant.h>
+#include <Framework/JsonWriter.h>
 #include <MetricsEvent.h>
 
 #include <AzTest/TestTypes.h>

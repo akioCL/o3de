@@ -350,7 +350,7 @@ namespace AZ
             m_eventLogger = EventLoggerPtr(static_cast<AZ::Debug::LocalFileEventLogger*>(AZ::Interface<AZ::Debug::IEventLogger>::Get()),
                 EventLoggerDeleter{ true });
         }
-
+        
         // Now that the Allocators are initialized, the Command Line parameters can be parsed
         m_commandLine.Parse(m_argC, m_argV);
         SettingsRegistryMergeUtils::ParseCommandLine(m_commandLine);

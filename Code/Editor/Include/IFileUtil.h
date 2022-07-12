@@ -11,6 +11,8 @@
 #include "../Include/SandboxAPI.h"
 #include <set>
 
+#include <QStringList>
+
 class QWidget;
 
 #ifdef CreateDirectory
