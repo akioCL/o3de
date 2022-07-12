@@ -389,7 +389,6 @@ set(FILES
     Memory/AllocatorScope.h
     Memory/Config.h
     Memory/dlmalloc.inl
-    Memory/HeapSchema.h
     Memory/HphaSchema.cpp
     Memory/HphaSchema.h
     Memory/IAllocator.cpp
@@ -634,7 +633,6 @@ set(FILES
     Utils/Utils.cpp
     Utils/Utils.h
     Script/lua/lua.h
-    Memory/HeapSchema.cpp
     PlatformId/PlatformDefaults.h
     PlatformId/PlatformDefaults.cpp
     PlatformId/PlatformId.h
@@ -663,10 +661,4 @@ set(FILES
     Time/ITime.h
     Time/TimeSystem.cpp
     Time/TimeSystem.h
-)
-
-# Prevent the following files from being grouped in UNITY builds
-set(SKIP_UNITY_BUILD_INCLUSION_FILES
-    # In some platforms, dlmalloc.inl gives issues when compiled in unity because there is a getpagesize defined differently
-    Memory/HeapSchema.cpp
 )
