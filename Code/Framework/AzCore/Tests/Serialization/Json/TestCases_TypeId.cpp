@@ -40,7 +40,7 @@ namespace AZ
 
             const Uuid& GetSpecializedTypeId() const override
             {
-                return m_classData.m_typeId;
+                return azrtti_typeid<T>();
             }
 
             const Uuid& GetGenericTypeId() const override
