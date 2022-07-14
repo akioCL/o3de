@@ -6,6 +6,7 @@
  *
  */
 #include <AzCore/PlatformIncl.h>
+#include <AzCore/Memory/AllocatorManager.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Memory/PoolAllocator.h>
 
@@ -448,6 +449,7 @@ namespace UnitTest
 #endif
 
             m_poolAllocator = new ThreadPoolAllocator();
+            AZ::AllocatorManager::Instance().RegisterAllocator(m_poolAllocator);
 
             for (unsigned int i = 0; i < m_maxNumThreads; ++i)
             {
@@ -457,6 +459,15 @@ namespace UnitTest
 
         void TearDown() override
         {
+            m_poolAllocator->GarbageCollect();
+            EXPECT_EQ(m_poolAllocator->GetAllocated(), 0);
+            EXPECT_EQ(m_poolAllocator->GetRequested(), 0);
+            if (m_poolAllocator->GetAllocated() != 0 || m_poolAllocator->GetRequested() != 0)
+            {
+                m_poolAllocator->PrintAllocations();
+            }
+
+            AZ::AllocatorManager::Instance().UnRegisterAllocator(m_poolAllocator);
             delete m_poolAllocator;
             m_poolAllocator = nullptr;
 

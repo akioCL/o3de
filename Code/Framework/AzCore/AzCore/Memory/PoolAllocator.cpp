@@ -845,12 +845,6 @@ namespace AZ
     void ThreadPoolSchemaPimpl::GarbageCollect()
     {
         AZStd::lock_guard<AZStd::recursive_mutex> lock(m_mutex);
-        while (!m_freePages.empty())
-        {
-            Page* page = &m_freePages.front();
-            m_freePages.pop_front();
-            FreePage(page);
-        }
         auto itThreads = m_threads.begin();
         while (itThreads != m_threads.end())
         {
@@ -887,6 +881,12 @@ namespace AZ
             }
         }
         m_threads.shrink_to_fit();
+        while (!m_freePages.empty())
+        {
+            Page* page = &m_freePages.front();
+            m_freePages.pop_front();
+            FreePage(page);
+        }
     }
 
     inline void ThreadPoolSchemaPimpl::Page::SetupFreeList(size_t elementSize, size_t pageDataBlockSize)
