@@ -7,7 +7,7 @@
  */
 
 #include <AzTest/AzTest.h>
-#include <AzCore/UnitTest/TestTypes.h>
+#include <AzTest/TestTypes.h>
 #include "BuilderManagerTests.h"
 #include <AzCore/std/smart_ptr/make_shared.h>
 #include <native/connection/connectionManager.h>
