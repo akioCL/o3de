@@ -66,14 +66,27 @@ namespace AZ
         static AllocatorType& Get(); // This is the current method AZ::AllocatorInstance uses to get the global allocator instances
 
         AllocatorInstance()
-            : m_allocator(Environment::CreateVariable<AllocatorType>(AzTypeInfo<AllocatorType>::Name()))
+            : m_allocator(Environment::FindVariable<AllocatorType>(AzTypeInfo<AllocatorType>::Name()))
         {
-            AZ::AllocatorManager::Instance().RegisterAllocator(&m_allocator.Get());
+            if (!m_allocator)
+            {
+                m_owner = true;
+                m_allocator = Environment::CreateVariable<AllocatorType>(AZ_CRC_CE(AzTypeInfo<AllocatorType>::Name()));
+                AZ::AllocatorManager::Instance().RegisterAllocator(&m_allocator.Get());
+            }
         }
+
+        AllocatorInstance(const AllocatorInstance&) = delete;
+        AllocatorInstance(AllocatorInstance&&) = default;
+        AllocatorInstance& operator=(const AllocatorInstance&) = delete;
+        AllocatorInstance& operator=(AllocatorInstance&&) = default;
 
         ~AllocatorInstance()
         {
-            AZ::AllocatorManager::Instance().UnRegisterAllocator(&m_allocator.Get());
+            if (m_owner)
+            {
+                AZ::AllocatorManager::Instance().UnRegisterAllocator(&m_allocator.Get());
+            }
         }
 
         // Kept for backwards compatibility
@@ -95,6 +108,7 @@ namespace AZ
         }
     private:
         EnvironmentVariable<AllocatorType> m_allocator;
+        bool m_owner = false;
     };
 }
 
