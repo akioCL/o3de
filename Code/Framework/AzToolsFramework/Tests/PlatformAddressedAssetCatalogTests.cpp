@@ -6,6 +6,7 @@
  *
  */
 
+#include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Settings/SettingsRegistryImpl.h>
 #include <AzCore/Settings/SettingsRegistryMergeUtils.h>
 #include <AzTest/TestTypes.h>
@@ -162,6 +163,8 @@ namespace UnitTest
     class PlatformAddressedAssetCatalogMessageTest : public AzToolsFramework::PlatformAddressedAssetCatalog
     {
     public:
+        AZ_CLASS_ALLOCATOR(PlatformAddressedAssetCatalogManagerTest, AZ::SystemAllocator, 0)
+
         PlatformAddressedAssetCatalogMessageTest(AzFramework::PlatformId platformId) :  AzToolsFramework::PlatformAddressedAssetCatalog(platformId)
         {
 
@@ -209,6 +212,23 @@ namespace UnitTest
         UnitTest::ScopedTemporaryDirectory m_tempDir;
     };
 
+    // When making subclasses of a type that uses the AZ_CLASS_ALLOCATOR macro,
+    // the subclasses also need the same macro, so that the allocator's
+    // tracking information for allocated and deallocated sizes stays
+    // consistent. Because the NiceMock template class creates a subclass, and
+    // we can't control the use of AZ_CLASS_ALLOCATOR in that derived class, we
+    // make an additional subclass here, to add the AZ_CLASS_ALLOCATOR macro.
+    template<class MockClass>
+    class NiceMockWithSystemAllocator
+        : public ::testing::NiceMock<MockClass>
+    {
+        using Base = ::testing::NiceMock<MockClass>;
+    public:
+        AZ_CLASS_ALLOCATOR(NiceMockWithSystemAllocator<MockClass>, AZ::SystemAllocator)
+
+        using Base::Base;
+    };
+
     TEST_F(MessageTest, PlatformAddressedAssetCatalogManagerMessageTest_MessagesForwarded_CountsMatch)
     {
         AzFramework::AssetSystem::AssetNotificationMessage testMessage;
@@ -216,7 +236,7 @@ namespace UnitTest
         EXPECT_NE(notificationInterface, nullptr);
 
         AZ_TEST_START_TRACE_SUPPRESSION;
-        auto* mockCatalog = new ::testing::NiceMock<PlatformAddressedAssetCatalogMessageTest>(AzFramework::PlatformId::ANDROID_ID);
+        auto* mockCatalog = new NiceMockWithSystemAllocator<PlatformAddressedAssetCatalogMessageTest>(AzFramework::PlatformId::ANDROID_ID);
         AZ_TEST_STOP_TRACE_SUPPRESSION(1); // Expected error not finding catalog
         AZStd::unique_ptr< ::testing::NiceMock<PlatformAddressedAssetCatalogMessageTest>> catalogHolder;
         catalogHolder.reset(mockCatalog);

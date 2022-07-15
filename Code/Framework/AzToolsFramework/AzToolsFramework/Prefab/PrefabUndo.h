@@ -24,6 +24,8 @@ namespace AzToolsFramework
             : public UndoSystem::URSequencePoint
         {
         public:
+            AZ_CLASS_ALLOCATOR_DECL
+
             explicit PrefabUndoBase(const AZStd::string& undoOperationName);
 
             bool Changed() const override { return m_changed; }
@@ -44,6 +46,8 @@ namespace AzToolsFramework
             : public PrefabUndoBase
         {
         public:
+            AZ_CLASS_ALLOCATOR_DECL
+
             explicit PrefabUndoInstance(const AZStd::string& undoOperationName);
 
             void Capture(
@@ -62,7 +66,7 @@ namespace AzToolsFramework
         {
         public:
             AZ_RTTI(PrefabUndoEntityUpdate, "{6D60C5A6-9535-45B3-8897-E5F6382FDC93}", PrefabUndoBase);
-            AZ_CLASS_ALLOCATOR(PrefabUndoEntityUpdate, AZ::SystemAllocator, 0);
+            AZ_CLASS_ALLOCATOR_DECL
 
             explicit PrefabUndoEntityUpdate(const AZStd::string& undoOperationName);
 
@@ -85,6 +89,8 @@ namespace AzToolsFramework
             : public PrefabUndoBase
         {
         public:
+            AZ_CLASS_ALLOCATOR_DECL
+
             enum class LinkStatus
             {
                 ADD,
@@ -128,6 +134,8 @@ namespace AzToolsFramework
             : public PrefabUndoBase
         {
         public:
+            AZ_CLASS_ALLOCATOR_DECL
+
             explicit PrefabUndoLinkUpdate(const AZStd::string& undoOperationName);
 
             //capture for add/remove

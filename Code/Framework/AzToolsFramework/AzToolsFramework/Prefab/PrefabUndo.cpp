@@ -15,6 +15,12 @@ namespace AzToolsFramework
 {
     namespace Prefab
     {
+        AZ_CLASS_ALLOCATOR_IMPL(PrefabUndoBase, AZ::SystemAllocator, 0)
+        AZ_CLASS_ALLOCATOR_IMPL(PrefabUndoInstance, AZ::SystemAllocator, 0)
+        AZ_CLASS_ALLOCATOR_IMPL(PrefabUndoEntityUpdate, AZ::SystemAllocator, 0)
+        AZ_CLASS_ALLOCATOR_IMPL(PrefabUndoInstanceLink, AZ::SystemAllocator, 0)
+        AZ_CLASS_ALLOCATOR_IMPL(PrefabUndoLinkUpdate, AZ::SystemAllocator, 0)
+
         PrefabUndoBase::PrefabUndoBase(const AZStd::string& undoOperationName)
             : UndoSystem::URSequencePoint(undoOperationName)
             , m_changed(true)

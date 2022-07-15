@@ -20,6 +20,8 @@ namespace UnitTest
         : public URSequencePoint
     {
     public:
+        AZ_CLASS_ALLOCATOR(SequencePointTest, AZ::SystemAllocator, 0)
+
         SequencePointTest(AZStd::string friendlyName, URCommandID id)
             : URSequencePoint(friendlyName, id)
         {}
@@ -40,6 +42,7 @@ namespace UnitTest
         : public URSequencePoint
     {
     public:
+        AZ_CLASS_ALLOCATOR(DifferentTypeSequencePointTest, AZ::SystemAllocator, 0)
         AZ_RTTI(DifferentTypeSequencePointTest, "{D7A42B6F-DCF8-443F-B4F1-57731B1D3CB8}")
 
         DifferentTypeSequencePointTest(AZStd::string friendlyName, URCommandID id)
@@ -406,6 +409,8 @@ namespace UnitTest
     class UndoDestructorTest : public URSequencePoint
     {
     public:
+        AZ_CLASS_ALLOCATOR(UndoDestructorTest, AZ::SystemAllocator, 0)
+
         UndoDestructorTest(bool* completedFlag)
             : URSequencePoint("UndoDestructorTest", 0)
             , m_completedFlag(completedFlag)
@@ -440,6 +445,8 @@ namespace UnitTest
     class UndoIntSetter : public URSequencePoint
     {
     public:
+        AZ_CLASS_ALLOCATOR(UndoIntSetter, AZ::SystemAllocator, 0)
+
         UndoIntSetter(int* value, int newValue)
             : URSequencePoint("UndoIntSetter", 0)
             , m_value(value)
