@@ -122,7 +122,7 @@ namespace EMotionFX
     }
 
     // Turns Qt messages into Google Test assertions
-    class AssertNoQtLogWarnings
+    class AssertNoQtModelTestWarnings
     {
         static void messageHandlerTest(QtMsgType type, [[maybe_unused]] const QMessageLogContext& context, const QString& msg)
         {
@@ -138,23 +138,19 @@ namespace EMotionFX
             case QtWarningMsg:
             case QtCriticalMsg:
             case QtFatalMsg:
-                if (msg.contains("has active key-value observers (KVO)! These will stop working now that the window is recreated, and will result in exceptions when the observers are removed"))
-                {
-                    break;
-                }
-                FAIL() << msg.toStdString();
+                FAIL() << context.category << ": " << msg.toStdString();
                 break;
             }
         }
 
     public:
-        AssertNoQtLogWarnings()
+        AssertNoQtModelTestWarnings()
             : m_oldHandler(qInstallMessageHandler(messageHandlerTest))
         {
-            QLoggingCategory::setFilterRules(QStringLiteral("qt.modeltest=true"));
+            QLoggingCategory::setFilterRules(QStringLiteral("*=false\nqt.modeltest=true"));
         }
 
-        ~AssertNoQtLogWarnings()
+        ~AssertNoQtModelTestWarnings()
         {
             // Install default message handler
             qInstallMessageHandler(m_oldHandler);
@@ -230,7 +226,7 @@ namespace EMotionFX
     private:
         EMStudio::AnimGraphModel* m_model;
         AZStd::unique_ptr<QAbstractItemModelTester> m_modelTester;
-        AssertNoQtLogWarnings m_warningRedirector;
+        AssertNoQtModelTestWarnings m_warningRedirector;
     };
 
     TEST_F(AnimGraphModelFixture, CanAddASingleNodeToTheAnimGraphModel)
