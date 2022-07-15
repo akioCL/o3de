@@ -10,6 +10,7 @@
 #include <Integration/Assets/AnimGraphAsset.h>
 #include <MCore/Source/AttributeFloat.h>
 #include <AzCore/Asset/AssetManager.h>
+#include <EMotionFX/Source/Allocators.h>
 #include <EMotionFX/Source/AnimGraph.h>
 #include <EMotionFX/Source/AnimGraphBindPoseNode.h>
 #include <EMotionFX/Source/AnimGraphReferenceNode.h>
@@ -32,6 +33,8 @@ namespace EMotionFX
         : public EmptyAnimGraph
     {
     public:
+        AZ_CLASS_ALLOCATOR(JustAReferenceNodeGraph, AnimGraphAllocator)
+
         JustAReferenceNodeGraph()
         {
             /*
@@ -76,6 +79,8 @@ namespace EMotionFX
         : public JustAReferenceNodeGraph
     {
     public:
+        AZ_CLASS_ALLOCATOR(ReferenceNodeWithParameterGraph, AnimGraphAllocator)
+
         ReferenceNodeWithParameterGraph()
         {
             /*
@@ -110,6 +115,8 @@ namespace EMotionFX
         : public EmptyAnimGraph
     {
     public:
+        AZ_CLASS_ALLOCATOR(BlendTreeTransformNodeAnimGraph, AnimGraphAllocator)
+
         BlendTreeTransformNodeAnimGraph()
         {
             /*

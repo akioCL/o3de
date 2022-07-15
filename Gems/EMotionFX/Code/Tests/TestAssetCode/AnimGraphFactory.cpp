@@ -15,6 +15,11 @@
 
 namespace EMotionFX
 {
+    AZ_CLASS_ALLOCATOR_IMPL(EmptyAnimGraph, AnimGraphAllocator, 0)
+    AZ_CLASS_ALLOCATOR_IMPL(TwoMotionNodeAnimGraph, AnimGraphAllocator, 0)
+    AZ_CLASS_ALLOCATOR_IMPL(OneBlendTreeNodeAnimGraph, AnimGraphAllocator, 0)
+    AZ_CLASS_ALLOCATOR_IMPL(OneBlendTreeParameterNodeAnimGraph, AnimGraphAllocator, 0)
+
     EmptyAnimGraph::EmptyAnimGraph()
     {
         // Emptry animgraph with nothing inside.

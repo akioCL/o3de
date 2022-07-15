@@ -17,6 +17,8 @@
 
 namespace EMotionFX
 {
+    AZ_CLASS_ALLOCATOR_IMPL(BlendSpaceFixture::TestEventHandler, EventHandlerAllocator, 0)
+
     void BlendSpaceFixture::ConstructGraph()
     {
         AnimGraphFixture::ConstructGraph();

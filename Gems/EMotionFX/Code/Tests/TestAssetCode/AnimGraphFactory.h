@@ -21,6 +21,7 @@ namespace EMotionFX
     {
     public:
         AZ_RTTI(EmptyAnimGraph, "{B4BFE0F0-3A7D-4D90-A4C5-219F0A8E3997}", AnimGraph)
+        AZ_CLASS_ALLOCATOR_DECL
 
         EmptyAnimGraph();
         static void Reflect(AZ::ReflectContext* context);
@@ -34,6 +35,7 @@ namespace EMotionFX
     {
     public:
         AZ_RTTI(TwoMotionNodeAnimGraph, "{CBF4DE6B-BCDA-42A4-8AAC-1184019459CA}", EmptyAnimGraph)
+        AZ_CLASS_ALLOCATOR_DECL
 
         TwoMotionNodeAnimGraph();
         static void Reflect(AZ::ReflectContext* context);
@@ -51,7 +53,8 @@ namespace EMotionFX
         : public EmptyAnimGraph
     {
     public:
-        AZ_RTTI(OneBlendTreeNodeAnimGraph, "{C939CFD0-B50F-4694-8CDD-5E8C7A10CE58}", AnimGraph)
+        AZ_RTTI(OneBlendTreeNodeAnimGraph, "{C939CFD0-B50F-4694-8CDD-5E8C7A10CE58}", EmptyAnimGraph)
+        AZ_CLASS_ALLOCATOR_DECL
 
         OneBlendTreeNodeAnimGraph();
         static void Reflect(AZ::ReflectContext* context);
@@ -69,6 +72,9 @@ namespace EMotionFX
         : public EmptyAnimGraph
     {
     public:
+        AZ_RTTI(OneBlendTreeParameterNodeAnimGraph, "{315F8884-3053-4640-BFB7-7521567E4424}", EmptyAnimGraph)
+        AZ_CLASS_ALLOCATOR_DECL
+
         OneBlendTreeParameterNodeAnimGraph();
         BlendTreeParameterNode* GetParameterNode() const;
 

@@ -9,6 +9,7 @@
 #include "EMotionFX/CommandSystem/Source/AnimGraphParameterCommands.h"
 #include <AzCore/RTTI/TypeInfo.h>
 #include <EMotionFX/CommandSystem/Source/CommandManager.h>
+#include <EMotionFX/Source/Allocators.h>
 #include <EMotionFX/Source/AnimGraphBindPoseNode.h>
 #include <EMotionFX/Source/AnimGraphParameterCondition.h>
 #include <EMotionFX/Source/AnimGraphStateMachine.h>
@@ -23,6 +24,9 @@ namespace EMotionFX
         : public EmptyAnimGraph
     {
     public:
+        AZ_RTTI(ParamConditionAnimGraph, "{E3A44E94-1F5B-49E0-AA46-0273A6FEB758}", EmptyAnimGraph)
+        AZ_CLASS_ALLOCATOR(ParamConditionAnimGraph, AnimGraphAllocator, 0)
+
         ParamConditionAnimGraph()
         {
             AddParameter(aznew FloatSliderParameter("P0"));
