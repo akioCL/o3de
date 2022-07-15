@@ -102,9 +102,6 @@ namespace AZ
 
         static void Destroy()
         {
-            // To prevent leaks, we are going to garbage collect on destruction
-            // Once we deprecate this function, we should 
-            Get().GarbageCollect();
         }
     private:
         EnvironmentVariable<AllocatorType> m_allocator;
