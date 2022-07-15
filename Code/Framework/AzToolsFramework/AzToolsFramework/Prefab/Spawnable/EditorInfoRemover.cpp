@@ -10,6 +10,7 @@
 #include <AzCore/RTTI/ReflectContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/string/string_view.h>
+#include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzToolsFramework/Prefab/Instance/Instance.h>
 #include <AzToolsFramework/Prefab/PrefabDomUtils.h>
 #include <AzToolsFramework/Prefab/Spawnable/EditorInfoRemover.h>
@@ -152,7 +153,7 @@ namespace AzToolsFramework::Prefab::PrefabConversionUtils
             sourceEntity->Init();
         }
 
-        AZ::Entity* exportEntity = aznew AZ::Entity(sourceEntity->GetId(), sourceEntity->GetName().c_str());
+        auto exportEntity = AZStd::make_unique<AZ::Entity>(sourceEntity->GetId(), sourceEntity->GetName().c_str());
         exportEntity->SetRuntimeActiveByDefault(sourceEntity->IsRuntimeActiveByDefault());
 
         AddEntityIdIfEditorOnly(sourceEntity);
@@ -161,7 +162,7 @@ namespace AzToolsFramework::Prefab::PrefabConversionUtils
         EntityList exportedEntities;
         for (AZ::Component* component : editorComponents)
         {
-            auto result = ExportComponent(component, context, sourceEntity, exportEntity);
+            auto result = ExportComponent(component, context, sourceEntity, exportEntity.get());
             if (!result)
             {
                 return AZ::Failure(AZStd::string::format(
@@ -187,7 +188,7 @@ namespace AzToolsFramework::Prefab::PrefabConversionUtils
                 sortResult.GetError().m_message.c_str()));
         }
 
-        return AZ::Success(exportEntity);
+        return AZ::Success(AZStd::move(exportEntity));
     }
 
     bool EditorInfoRemover::ReadComponentAttribute(
@@ -514,7 +515,7 @@ exportComponent, prefabProcessorContext);
         EntityList sourceEntities;
         GetEntitiesFromInstance(sourceInstance, sourceEntities);
 
-        EntityList exportEntities;
+        AZStd::vector<AZStd::unique_ptr<AZ::Entity>> exportEntitiesOwner;
 
         // prepare for validation of component requirements.
         m_componentRequirementsValidator.SetEntities(sourceEntities);
@@ -525,7 +526,7 @@ exportComponent, prefabProcessorContext);
         // export entities.
         for (AZ::Entity* entity : sourceEntities)
         {
-            const auto result = ExportEntity(entity, prefabProcessorContext);
+            auto result = ExportEntity(entity, prefabProcessorContext);
             if (!result)
             {
                 return AZ::Failure(AZStd::string::format(
@@ -536,8 +537,15 @@ exportComponent, prefabProcessorContext);
                 );
             }
 
-            exportEntities.emplace_back(result.GetValue());
+            exportEntitiesOwner.emplace_back(result.TakeValue());
         }
+
+        EntityList exportEntities;
+        exportEntities.reserve(exportEntitiesOwner.size());
+        AZStd::transform(begin(exportEntitiesOwner), end(exportEntitiesOwner), AZStd::back_inserter(exportEntities), [](const AZStd::unique_ptr<AZ::Entity>& entity)
+        {
+            return entity.get();
+        });
 
         // remove editor-only entities with valid editor-only entity handler.
         const auto removeEditorOnlyEntitiesResult = RemoveEditorOnlyEntities(exportEntities);
