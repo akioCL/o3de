@@ -200,6 +200,18 @@ namespace AzToolsFramework
         }
     }
 
+    void PaintBrush::GetValues(
+        AZStd::span<const AZ::Vector3> points,
+        AZStd::span<float> intensities,
+        AZStd::span<float> opacities,
+        AZStd::span<bool> validFlags)
+    {
+        for (size_t index = 0; index < points.size(); index++)
+        {
+            GetValue(points[index], intensities[index], opacities[index], validFlags[index]);
+        }
+    }
+
     void PaintBrush::Activate(const AZ::EntityComponentIdPair& entityComponentIdPair)
     {
         m_ownerEntityComponentId = entityComponentIdPair;

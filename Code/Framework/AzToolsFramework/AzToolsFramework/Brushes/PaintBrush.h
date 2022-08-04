@@ -35,6 +35,11 @@ namespace AzToolsFramework
         void SetOpacity(float opacity) override;
 
         void GetValue(const AZ::Vector3& point, float& intensity, float& opacity, bool& isValid) override;
+        void GetValues(
+            AZStd::span<const AZ::Vector3> points,
+            AZStd::span<float> intensities,
+            AZStd::span<float> opacities,
+            AZStd::span<bool> validFlags) override;
         bool HandleMouseInteraction(const ViewportInteraction::MouseInteractionEvent& mouseInteraction) override;
 
     private:
