@@ -165,11 +165,14 @@ namespace GradientSignal
         void SetTilingY(float tilingY) override;
 
         void SetValue(const GradientSampleParams& sampleParams, float newValue) override;
+        void SetValueInImageData(const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& image, const AZ::Vector3& uvw, float newValue);
+        void SetPixelValue(AZ::u32 x, AZ::u32 y, float value);
 
         void UpdateCurrentAsset(const AZ::Data::Asset<AZ::Data::AssetData> asset);
 
         uint32_t GetImageHeight() const;
         uint32_t GetImageWidth() const;
+        AZ::Vector2 GetImagePixelsPerMeter() const;
 
     private:
         ImageGradientConfig m_configuration;

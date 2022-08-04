@@ -32,8 +32,6 @@ namespace GradientSignal
     {
         AzToolsFramework::PaintBrushNotificationBus::Handler::BusConnect(entityComponentIdPair);
 
-        // MAB TODO: FIXME - missing hookup for mouse events?
-
         AZ::Transform worldFromLocal = AZ::Transform::CreateIdentity();
         AZ::TransformBus::EventResult(worldFromLocal, GetEntityId(), &AZ::TransformInterface::GetWorldTM);
 
@@ -82,40 +80,47 @@ namespace GradientSignal
 
     void EditorImageGradientComponentMode::OnPaint(const AZ::Aabb& dirtyArea)
     {
-        uint32_t imageHeight = 0;
-        uint32_t imageWidth = 0;
-        ImageGradientRequestBus::EventResult(imageHeight, GetEntityId(), &ImageGradientRequestBus::Events::GetImageHeight);
-        ImageGradientRequestBus::EventResult(imageWidth, GetEntityId(), &ImageGradientRequestBus::Events::GetImageWidth);
+        AZ::Vector2 imagePixelsPerMeter(0.0f);
+        ImageGradientRequestBus::EventResult(imagePixelsPerMeter, GetEntityId(), &ImageGradientRequestBus::Events::GetImagePixelsPerMeter);
 
-        const float xStep = dirtyArea.GetXExtent() / imageWidth;
-        const float yStep = dirtyArea.GetYExtent() / imageHeight;
+        if ((imagePixelsPerMeter.GetX() <= 0.0f) || (imagePixelsPerMeter.GetY() <= 0.0f))
+        {
+            return;
+        }
+
+        const float xStep = 1.0f / imagePixelsPerMeter.GetX();
+        const float yStep = 1.0f / imagePixelsPerMeter.GetY();
 
         const AZ::Vector3 minDistances = dirtyArea.GetMin();
         const AZ::Vector3 maxDistances = dirtyArea.GetMax();
+
+        AZStd::vector<AZ::Vector3> points;
 
         for (float y = minDistances.GetY(); y <= maxDistances.GetY(); y += yStep)
         {
             for (float x = minDistances.GetX(); x <= maxDistances.GetX(); x += xStep)
             {
-                float intensity = 0.0f;
-                float opacity = 0.0f;
-                bool isValid = false;
+                points.emplace_back(x, y, minDistances.GetZ());
+            }
+        }
 
-                AZ::Vector3 point = AZ::Vector3(x, y, minDistances.GetZ());
+        AZStd::vector<float> intensities(points.size());
+        AZStd::vector<float> opacities(points.size());
+        AZStd::vector<bool> validFlags(points.size());
 
-                AzToolsFramework::PaintBrushRequestBus::Event(
-                    GetEntityComponentIdPair(), &AzToolsFramework::PaintBrushRequestBus::Events::GetValue, point, intensity, opacity, isValid);
-                if (isValid)
-                {
-                    GradientSignal::GradientSampleParams params;
-                    params.m_position = point;
+        AzToolsFramework::PaintBrushRequestBus::Event(
+            GetEntityComponentIdPair(), &AzToolsFramework::PaintBrushRequestBus::Events::GetValues,
+            points, intensities, opacities, validFlags);
 
-                    float oldValue = 0.0f;
-                    GradientRequestBus::EventResult(oldValue, GetEntityId(), &GradientRequestBus::Events::GetValue, params);
+        AZStd::vector<float> oldValues(points.size());
+        GradientRequestBus::Event(GetEntityId(), &GradientRequestBus::Events::GetValues, points, oldValues);
 
-                    float newValue = opacity * intensity + (1.0f - opacity) * oldValue;
-                    GradientRequestBus::Event(GetEntityId(), &GradientRequestBus::Events::SetValue, params, newValue);
-                }
+        for (size_t index = 0; index < points.size(); index++)
+        {
+            if (validFlags[index])
+            {
+                float newValue = opacities[index] * intensities[index] + (1.0f - opacities[index]) * oldValues[index];
+                GradientRequestBus::Event(GetEntityId(), &GradientRequestBus::Events::SetValue, points[index], newValue);
             }
         }
 

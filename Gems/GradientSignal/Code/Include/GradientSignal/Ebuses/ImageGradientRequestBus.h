@@ -35,6 +35,7 @@ namespace GradientSignal
 
         virtual uint32_t GetImageHeight() const = 0;
         virtual uint32_t GetImageWidth() const = 0;
+        virtual AZ::Vector2 GetImagePixelsPerMeter() const = 0;
     };
 
     using ImageGradientRequestBus = AZ::EBus<ImageGradientRequests>;

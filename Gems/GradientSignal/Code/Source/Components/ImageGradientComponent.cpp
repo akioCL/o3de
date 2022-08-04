@@ -833,26 +833,86 @@ namespace GradientSignal
         }
     }
 
-    void ImageGradientComponent::SetValue([[maybe_unused]] const GradientSampleParams& sampleParams, [[maybe_unused]] float newValue)
+    void ImageGradientComponent::SetValue(const GradientSampleParams& sampleParams, float newValue)
     {
-        // MAB TODO: FIXME
-        /*
         AZ::Vector3 uvw = sampleParams.m_position;
 
         bool wasPointRejected = true;
-        const bool shouldNormalizeOutput = true;
-        GradientTransformRequestBus::Event(
-            GetEntityId(), &GradientTransformRequestBus::Events::TransformPositionToUVW, sampleParams.m_position, uvw, shouldNormalizeOutput, wasPointRejected);
+        m_gradientTransform.TransformPositionToUVWNormalized(sampleParams.m_position, uvw, wasPointRejected);
 
         if (!wasPointRejected)
         {
-            AZStd::lock_guard<decltype(m_imageMutex)> imageLock(m_imageMutex);
-            AZ::Data::Asset<ImageAsset> sourceAsset =
-                m_configuration.m_useOverride ? m_configuration.m_overrideAsset : m_configuration.m_imageAsset;
+            AZStd::unique_lock lock(m_queryMutex);
 
-            SetValueInImageAsset(sourceAsset, uvw, m_configuration.m_tilingX, m_configuration.m_tilingY, newValue);
+            // MAB TODO: FIXME
+            //AZ::Data::Asset<AZ::RPI::StreamingImageAsset> sourceAsset =
+            //    m_configuration.m_useOverride ? m_configuration.m_overrideAsset : m_configuration.m_imageAsset;
+
+            // MAB TODO: FIXME - should pass in either image or override asset.
+            SetValueInImageData(m_configuration.m_imageAsset, uvw, newValue);
         }
-        */
+    }
+
+    void ImageGradientComponent::SetValueInImageData(
+        const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& image, const AZ::Vector3& uvw, float newValue)
+    {
+        if (image.IsReady())
+        {
+            const auto& width = m_imageDescriptor.m_size.m_width;
+            const auto& height = m_imageDescriptor.m_size.m_height;
+
+            if (width > 0 && height > 0)
+            {
+                // When "rasterizing" from uvs, a range of 0-1 has slightly different meanings depending on the sampler state.
+                // For repeating states (Unbounded/None, Repeat), a uv value of 1 should wrap around back to our 0th pixel.
+                // For clamping states (Clamp to Zero, Clamp to Edge), a uv value of 1 should point to the last pixel.
+
+                // We assume here that the code handling sampler states has handled this for us in the clamping cases
+                // by reducing our uv by a small delta value such that anything that wants the last pixel has a value
+                // just slightly less than 1.
+
+                // Keeping that in mind, we scale our uv from 0-1 to 0-image size inclusive.  So a 4-pixel image will scale
+                // uv values of 0-1 to 0-4, not 0-3 as you might expect.  This is because we want the following range mappings:
+                // [0 - 1/4)   = pixel 0
+                // [1/4 - 1/2) = pixel 1
+                // [1/2 - 3/4) = pixel 2
+                // [3/4 - 1)   = pixel 3
+                // [1 - 1 1/4) = pixel 0
+                // ...
+
+                // Also, based on our tiling settings, we extend the size of our image virtually by a factor of tilingX and tilingY.
+                // A 16x16 pixel image and tilingX = tilingY = 1  maps the uv range of 0-1 to 0-16 pixels.
+                // A 16x16 pixel image and tilingX = tilingY = 1.5 maps the uv range of 0-1 to 0-24 pixels.
+
+                const AZ::Vector3 tiledDimensions((width * GetTilingX()), (height * GetTilingY()), 0.0f);
+
+                // Convert from uv space back to pixel space
+                AZ::Vector3 pixelLookup = (uvw * tiledDimensions);
+
+                // UVs outside the 0-1 range are treated as infinitely tiling, so that we behave the same as the
+                // other gradient generators.  As mentioned above, if clamping is desired, we expect it to be applied
+                // outside of this function.
+                float pixelX = pixelLookup.GetX();
+                float pixelY = pixelLookup.GetY();
+                auto x = aznumeric_cast<AZ::u32>(pixelX) % width;
+                auto y = aznumeric_cast<AZ::u32>(pixelY) % height;
+
+                // Retrieve our pixel value based on our sampling type
+                SetPixelValue(x, y, newValue);
+            }
+        }
+    }
+
+    void ImageGradientComponent::SetPixelValue(AZ::u32 x, AZ::u32 y, float value)
+    {
+        AZ_Assert(m_currentChannel != ChannelToUse::Terrarium, "Terrarium images not supported");
+        // Flip the y because images are stored in reverse of our world axes
+        const auto& height = m_imageDescriptor.m_size.m_height;
+        y = (height - 1) - y;
+
+        // For terrarium, there is a separate algorithm for retrieving the value
+        AZStd::span<uint8_t> nonConstImageData(const_cast<uint8_t*>(m_imageData.data()), m_imageData.size());
+        AZ::RPI::SetImageDataPixelValue<float>(nonConstImageData, m_imageDescriptor, value, x, y, aznumeric_cast<AZ::u8>(m_currentChannel));
     }
 
     AZStd::string ImageGradientComponent::GetImageAssetPath() const
@@ -925,7 +985,7 @@ namespace GradientSignal
         // execute an arbitrary amount of logic, including calls back to this component.
         {
             AZStd::unique_lock lock(m_queryMutex);
-        m_configuration.m_tiling.SetX(tilingX);
+            m_configuration.m_tiling.SetX(tilingX);
         }
         LmbrCentral::DependencyNotificationBus::Event(GetEntityId(), &LmbrCentral::DependencyNotificationBus::Events::OnCompositionChanged);
     }
@@ -941,26 +1001,34 @@ namespace GradientSignal
         // execute an arbitrary amount of logic, including calls back to this component.
         {
             AZStd::unique_lock lock(m_queryMutex);
-        m_configuration.m_tiling.SetY(tilingY);
+            m_configuration.m_tiling.SetY(tilingY);
         }
         LmbrCentral::DependencyNotificationBus::Event(GetEntityId(), &LmbrCentral::DependencyNotificationBus::Events::OnCompositionChanged);
     }
 
     uint32_t ImageGradientComponent::GetImageHeight() const
     {
-        // MAB TODO: FIXME
-        //   if (!GetImageAssetPath().empty())
-     //       return m_configuration.m_imageAsset.Get()->m_imageHeight;
-
-        return 0;
+        return m_imageDescriptor.m_size.m_height;
     }
 
     uint32_t ImageGradientComponent::GetImageWidth() const
     {
-        // MAB TODO: FIXME
-     //   if (!GetImageAssetPath().empty())
-     //       return m_configuration.m_imageAsset.Get()->m_imageWidth;
+        return m_imageDescriptor.m_size.m_width;
+    }
 
-        return 0;
+    AZ::Vector2 ImageGradientComponent::GetImagePixelsPerMeter() const
+    {
+        const auto& width = m_imageDescriptor.m_size.m_width;
+        const auto& height = m_imageDescriptor.m_size.m_height;
+
+        if (width > 0 && height > 0)
+        {
+            const AZ::Aabb bounds = m_gradientTransform.GetBounds();
+            const AZ::Vector2 boundsMeters(bounds.GetExtents());
+            const AZ::Vector2 imagePixelsInBounds(width / GetTilingX(), height / GetTilingY());
+            return imagePixelsInBounds / boundsMeters;
+        }
+
+        return AZ::Vector2(0.0f, 0.0f);
     }
 }
