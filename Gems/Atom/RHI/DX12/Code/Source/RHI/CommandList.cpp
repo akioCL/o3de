@@ -20,7 +20,6 @@
 #include <RHI/CommandQueue.h>
 #include <RHI/QueryPool.h>
 #include <Atom/RHI/IndirectArguments.h>
-#include <AzCore/Debug/EventTrace.h>
 #include <RHI/RayTracingBlas.h>
 #include <RHI/RayTracingTlas.h>
 #include <RHI/RayTracingPipelineState.h>
@@ -40,6 +39,8 @@
 #define DX12_COMMANDLIST_TIMER(id)
 #define DX12_COMMANDLIST_TIMER_DETAIL(id)
 #endif
+
+#define PIX_MARKER_CMDLIST_COL 0xFF0000FF
 
 namespace AZ
 {
@@ -94,16 +95,22 @@ namespace AZ
         {
             SetName(name);
 
-            PIXBeginEvent(0xFF0000FF, name.GetCStr());
-            PIXBeginEvent(GetCommandList(), 0xFF0000FF, name.GetCStr());
+            PIXBeginEvent(PIX_MARKER_CMDLIST_COL, name.GetCStr());
+            if (RHI::Factory::Get().PixGpuEventsEnabled())
+            {
+                PIXBeginEvent(GetCommandList(), PIX_MARKER_CMDLIST_COL, name.GetCStr());
+            }
         }
 
         void CommandList::Close()
         {
             FlushBarriers();
-
-            PIXEndEvent(GetCommandList());
             PIXEndEvent();
+            if (RHI::Factory::Get().PixGpuEventsEnabled())
+            {
+                PIXEndEvent(GetCommandList());
+            }
+            
 
             CommandListBase::Close();
         }
@@ -122,14 +129,14 @@ namespace AZ
             const RHI::Viewport* viewports,
             uint32_t count)
         {
-            m_state.m_viewportState.Set(AZStd::array_view<RHI::Viewport>(viewports, count));            
+            m_state.m_viewportState.Set(AZStd::span<const RHI::Viewport>(viewports, count));
         }
 
         void CommandList::SetScissors(
             const RHI::Scissor* scissors,
             uint32_t count)
         {
-            m_state.m_scissorState.Set(AZStd::array_view<RHI::Scissor>(scissors, count));            
+            m_state.m_scissorState.Set(AZStd::span<const RHI::Scissor>(scissors, count));
         }
 
         void CommandList::SetShaderResourceGroupForDraw(const RHI::ShaderResourceGroup& shaderResourceGroup)
@@ -144,6 +151,8 @@ namespace AZ
 
         void CommandList::Submit(const RHI::CopyItem& copyItem)
         {
+            ValidateSubmitItem(copyItem);
+
             switch (copyItem.m_type)
             {
 
@@ -289,9 +298,11 @@ namespace AZ
 
         void CommandList::Submit(const RHI::DispatchItem& dispatchItem)
         {
+            ValidateSubmitItem(dispatchItem);
+
             if (!CommitShaderResources<RHI::PipelineStateType::Dispatch>(dispatchItem))
             {
-                AZ_Warning("CommandList", false, "Failed to bind shader resources for draw item. Skipping.");
+                AZ_Warning("CommandList", false, "Failed to bind shader resources for dispatch item. Skipping.");
                 return;
             }
 
@@ -316,6 +327,8 @@ namespace AZ
         void CommandList::Submit([[maybe_unused]] const RHI::DispatchRaysItem& dispatchRaysItem)
         {
 #ifdef AZ_DX12_DXR_SUPPORT
+            ValidateSubmitItem(dispatchRaysItem);
+
             ID3D12GraphicsCommandList4* commandList = static_cast<ID3D12GraphicsCommandList4*>(GetCommandList());
 
             // manually clear the Dispatch bindings and pipeline state since it is shared with the ray tracing pipeline
@@ -397,6 +410,8 @@ namespace AZ
 
         void CommandList::Submit(const RHI::DrawItem& drawItem)
         {
+            ValidateSubmitItem(drawItem);
+
             if (!CommitShaderResources<RHI::PipelineStateType::Draw>(drawItem))
             {
                 AZ_Warning("CommandList", false, "Failed to bind shader resources for draw item. Skipping.");
@@ -555,7 +570,7 @@ namespace AZ
                 return;
             }
 
-            AZ_TRACE_METHOD();
+            AZ_PROFILE_FUNCTION(RHI);
             D3D12_VIEWPORT dx12Viewports[D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 
             const auto& viewports = m_state.m_viewportState.m_states;
@@ -580,7 +595,7 @@ namespace AZ
                 return;
             }
 
-            AZ_TRACE_METHOD();
+            AZ_PROFILE_FUNCTION(RHI);
             D3D12_RECT dx12Scissors[D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
 
             const auto& scissors = m_state.m_scissorState.m_states;

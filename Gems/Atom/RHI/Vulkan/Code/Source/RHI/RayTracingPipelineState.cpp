@@ -10,8 +10,6 @@
 #include <Atom/RHI.Reflect/SamplerState.h>
 #include <Atom/RHI.Reflect/Vulkan/ShaderStageFunction.h>
 #include <RHI/Device.h>
-#include <AzCore/Debug/EventTrace.h>
-
 namespace AZ
 {
     namespace Vulkan
@@ -47,7 +45,7 @@ namespace AZ
                 moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
                 moduleCreateInfo.codeSize = rayTracingFunction->GetByteCode(0).size();
                 moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(rayTracingFunction->GetByteCode(0).data());
-                vkCreateShaderModule(device.GetNativeDevice(), &moduleCreateInfo, nullptr, &shaderModule);
+                device.GetContext().CreateShaderModule(device.GetNativeDevice(), &moduleCreateInfo, nullptr, &shaderModule);
 
                 VkPipelineShaderStageCreateInfo stageCreateInfo = {};
                 stageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -163,23 +161,24 @@ namespace AZ
             createInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
             createInfo.pNext = nullptr;
             createInfo.flags = 0;
-            createInfo.stageCount = stages.size();
+            createInfo.stageCount = static_cast<uint32_t>(stages.size());
             createInfo.pStages = stages.data();
-            createInfo.groupCount = groups.size();
+            createInfo.groupCount = static_cast<uint32_t>(groups.size());
             createInfo.pGroups = groups.data();
             createInfo.maxPipelineRayRecursionDepth = descriptor->GetConfiguration().m_maxRecursionDepth;
             createInfo.layout = m_pipelineLayout;
             createInfo.basePipelineHandle = nullptr;
             createInfo.basePipelineIndex = 0;
 
-            VkResult result = vkCreateRayTracingPipelinesKHR(device.GetNativeDevice(), nullptr, nullptr, 1, &createInfo, nullptr, &m_pipeline);
+            [[maybe_unused]] VkResult result = device.GetContext().CreateRayTracingPipelinesKHR(
+                device.GetNativeDevice(), nullptr, nullptr, 1, &createInfo, nullptr, &m_pipeline);
             AZ_Assert(result == VK_SUCCESS, "vkCreateRayTracingPipelinesKHR failed");
 
             // retrieve the shader handles
             uint32_t shaderHandleSize = rayTracingPipelineProperties.shaderGroupHandleSize;
             m_shaderHandleData.resize(groups.size()* shaderHandleSize);
 
-            result = vkGetRayTracingShaderGroupHandlesKHR(
+            result = device.GetContext().GetRayTracingShaderGroupHandlesKHR(
                 device.GetNativeDevice(),
                 m_pipeline,
                 0,
@@ -217,7 +216,7 @@ namespace AZ
             Device& device = static_cast<Device&>(GetDevice());
             for (auto& shaderModule : m_shaderModules)
             {
-                vkDestroyShaderModule(device.GetNativeDevice(), shaderModule, nullptr);
+                device.GetContext().DestroyShaderModule(device.GetNativeDevice(), shaderModule, nullptr);
             }
         }
     }

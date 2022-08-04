@@ -81,7 +81,7 @@ namespace GradientSignal
         if (!m_configuration.m_overrideAsset.Get())
         {
             AZ::Data::AssetId newAssetId = AZ::Data::AssetId(AZ::Uuid::CreateRandom());
-            AZ::Data::Asset<ImageAsset> imageAsset = asset;
+            AZ::Data::Asset<AZ::RPI::StreamingImageAsset> imageAsset = asset;
             m_configuration.m_overrideAsset = AZ::Data::AssetManager::Instance().CreateAsset(
                 newAssetId, asset.GetType(), m_configuration.m_overrideAsset.GetAutoLoadBehavior());
 
@@ -102,7 +102,8 @@ namespace GradientSignal
 
     void EditorImageGradientComponent::OnCompositionChanged()
     {
-        BaseClassType::OnCompositionChanged();
+        // MAB TODO: FIXME - should this be here or not?
+        //BaseClassType::OnCompositionChanged();
 
         if (!AZ::Data::AssetBus::Handler::BusIsConnectedId(m_configuration.m_imageAsset.GetId()))
         {
@@ -115,6 +116,12 @@ namespace GradientSignal
             AZ::Data::AssetBus::Handler::BusDisconnect();
             AZ::Data::AssetBus::Handler::BusConnect(m_configuration.m_imageAsset.GetId());
         }
+
+        m_component.WriteOutConfig(&m_configuration);
+        SetDirty();
+
+        AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
+            &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay, AzToolsFramework::Refresh_AttributesAndValues);
     }
 
     void EditorImageGradientComponent::SavePaintLayer()
@@ -165,13 +172,15 @@ namespace GradientSignal
             sourceInfo, watchFolder);
        
         AZ::Data::AssetId newAssetId = AZ::Data::AssetId(sourceInfo.m_assetId.m_guid, 2);
-        AZ::Data::Asset<ImageAsset> asset(newAssetId, m_configuration.m_imageAsset.GetType());
+        AZ::Data::Asset<AZ::RPI::StreamingImageAsset> asset(newAssetId, m_configuration.m_imageAsset.GetType());
         m_configuration.m_overrideAsset = asset;
         m_configuration.m_overrideAsset.QueueLoad();
     }
 
-    void EditorImageGradientComponent::WriteOutputFile(const AZStd::string& filePath)
+    void EditorImageGradientComponent::WriteOutputFile([[maybe_unused]] const AZStd::string& filePath)
     {
+        // MAB TODO: FIXME
+        /*
         AZ::DdsFile::DdsFileData ddsFileData;
         const auto& image = m_configuration.m_overrideAsset.Get();
 
@@ -185,10 +194,13 @@ namespace GradientSignal
         {
             AZ_Warning("WriteDds", false, outcome.GetError().m_message.c_str());
         }
+        */
     }
 
-    AZ::RHI::Format EditorImageGradientComponent::GetFormat(const AZ::Data::Asset<ImageAsset>& imageAsset)
+    AZ::RHI::Format EditorImageGradientComponent::GetFormat([[maybe_unused]] const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset)
     {
+        // MAB TODO: FIXME
+        /*
         switch (imageAsset.Get()->m_imageFormat)
         {
         case ImageProcessingAtom::ePixelFormat_R8:
@@ -202,5 +214,7 @@ namespace GradientSignal
         default:
             return AZ::RHI::Format::Unknown;
         }
+        */
+        return AZ::RHI::Format::Unknown;
     }
 }

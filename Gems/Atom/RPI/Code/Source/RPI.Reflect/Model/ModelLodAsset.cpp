@@ -8,7 +8,7 @@
 
 #include <Atom/RPI.Reflect/Model/ModelLodAsset.h>
 
-#include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Asset/AssetSerializer.h>
 
 namespace AZ
 {
@@ -26,21 +26,23 @@ namespace AZ
                     ->Version(0)
                     ->Field("Meshes", &ModelLodAsset::m_meshes)
                     ->Field("Aabb", &ModelLodAsset::m_aabb)
+                    ->Field("StreamBuffers", &ModelLodAsset::m_streamBuffers)
+                    ->Field("IndexBufferView", &ModelLodAsset::m_indexBuffer)
                     ;
             }
 
             Mesh::Reflect(context);
         }
-
+        
         void ModelLodAsset::Mesh::Reflect(AZ::ReflectContext* context)
         {
             if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
             {
                 serializeContext->Class<ModelLodAsset::Mesh>()
-                    ->Version(0)
-                    ->Field("Material", &ModelLodAsset::Mesh::m_materialAsset)
+                    ->Version(1)
                     ->Field("Name", &ModelLodAsset::Mesh::m_name)
                     ->Field("AABB", &ModelLodAsset::Mesh::m_aabb)
+                    ->Field("MaterialSlotId", &ModelLodAsset::Mesh::m_materialSlotId)
                     ->Field("IndexBufferAssetView", &ModelLodAsset::Mesh::m_indexBufferAssetView)
                     ->Field("StreamBufferInfo", &ModelLodAsset::Mesh::m_streamBufferInfo)
                     ;
@@ -75,9 +77,9 @@ namespace AZ
             return m_indexBufferAssetView.GetBufferViewDescriptor().m_elementCount;
         }
 
-        const Data::Asset <MaterialAsset>& ModelLodAsset::Mesh::GetMaterialAsset() const
+        ModelMaterialSlot::StableId ModelLodAsset::Mesh::GetMaterialSlotId() const
         {
-            return m_materialAsset;
+            return m_materialSlotId;
         }
 
         const AZ::Name& ModelLodAsset::Mesh::GetName() const
@@ -95,9 +97,9 @@ namespace AZ
             return m_indexBufferAssetView;
         }
 
-        AZStd::array_view<ModelLodAsset::Mesh::StreamBufferInfo> ModelLodAsset::Mesh::GetStreamBufferInfoList() const
+        AZStd::span<const ModelLodAsset::Mesh::StreamBufferInfo> ModelLodAsset::Mesh::GetStreamBufferInfoList() const
         {
-            return AZStd::array_view<ModelLodAsset::Mesh::StreamBufferInfo>(m_streamBufferInfo);
+            return AZStd::span<const ModelLodAsset::Mesh::StreamBufferInfo>(m_streamBufferInfo);
         }
 
         void ModelLodAsset::AddMesh(const Mesh& mesh)
@@ -109,19 +111,19 @@ namespace AZ
             m_aabb.AddAabb(meshAabb);
         }
 
-        AZStd::array_view<ModelLodAsset::Mesh> ModelLodAsset::GetMeshes() const
+        AZStd::span<const ModelLodAsset::Mesh> ModelLodAsset::GetMeshes() const
         {
-            return AZStd::array_view<ModelLodAsset::Mesh>(m_meshes);
+            return AZStd::span<const ModelLodAsset::Mesh>(m_meshes);
         }
 
         const AZ::Aabb& ModelLodAsset::GetAabb() const
         {
             return m_aabb;
         }
-
+        
         const BufferAssetView* ModelLodAsset::Mesh::GetSemanticBufferAssetView(const AZ::Name& semantic) const
         {
-            const AZStd::array_view<ModelLodAsset::Mesh::StreamBufferInfo>& streamBufferList = GetStreamBufferInfoList();
+            const AZStd::span<const ModelLodAsset::Mesh::StreamBufferInfo>& streamBufferList = GetStreamBufferInfoList();
 
             for (const ModelLodAsset::Mesh::StreamBufferInfo& streamBufferInfo : streamBufferList)
             {

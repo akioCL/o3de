@@ -50,7 +50,6 @@ namespace AssetProcessor
         void AddJobIdEntry(AssetProcessor::RCJob* rcJob);
         void RemoveJobIdEntry(AssetProcessor::RCJob* rcJob);
 
-
         // implement QSortFilteRProxyModel:
         bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
         bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;

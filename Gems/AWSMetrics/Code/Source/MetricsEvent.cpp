@@ -8,10 +8,11 @@
 
 #include <MetricsEvent.h>
 #include <AWSMetricsConstant.h>
+#include <Framework/JsonWriter.h>
 
 #include <AzCore/JSON/schema.h>
 #include <AzCore/Serialization/Json/JsonSerialization.h>
-#include <AzFramework/FileFunc/FileFunc.h>
+#include <AzCore/Serialization/Json/JsonUtils.h>
 
 #include <sstream>
 
@@ -58,7 +59,7 @@ namespace AWSMetrics
 
     int MetricsEvent::GetNumAttributes() const
     {
-        return m_attributes.size();
+        return static_cast<int>(m_attributes.size());
     }
 
     size_t MetricsEvent::GetSizeInBytes() const
@@ -150,7 +151,7 @@ namespace AWSMetrics
             return false;
         }
 
-        auto result = AzFramework::FileFunc::ReadJsonFromString(stringStream.str().c_str());
+        auto result = AZ::JsonSerializationUtils::ReadJsonString(stringStream.str().c_str());
         if (!result.IsSuccess())
         {
             return false;

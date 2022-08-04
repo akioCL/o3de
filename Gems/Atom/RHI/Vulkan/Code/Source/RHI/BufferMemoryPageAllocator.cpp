@@ -8,8 +8,6 @@
 #include <RHI/BufferMemoryPageAllocator.h>
 #include <RHI/Device.h>
 #include <RHI/Conversion.h>
-#include <AzCore/Debug/EventTrace.h>
-
 namespace AZ
 {
     namespace Vulkan
@@ -41,7 +39,7 @@ namespace AZ
 
             VkBuffer vkBuffer = GetDevice().CreateBufferResouce(bufferDescriptor);
             VkMemoryRequirements memoryRequirements = {};
-            vkGetBufferMemoryRequirements(GetDevice().GetNativeDevice(), vkBuffer, &memoryRequirements);
+            GetDevice().GetContext().GetBufferMemoryRequirements(GetDevice().GetNativeDevice(), vkBuffer, &memoryRequirements);
 
             RHI::HeapMemoryUsage& heapMemoryUsage = *m_descriptor.m_getHeapMemoryUsageFunction();
             if (!heapMemoryUsage.TryReserveMemory(memoryRequirements.size))
@@ -50,12 +48,12 @@ namespace AZ
                 return nullptr;
             }
 
-            AZ_TRACE_METHOD_NAME("Create BufferMemory Page");
+            AZ_PROFILE_SCOPE(RHI, "Create BufferMemory Page");
 
             RHI::Ptr<BufferMemory> bufferMemory;
 
             const VkMemoryPropertyFlags flags = ConvertHeapMemoryLevel(m_descriptor.m_heapMemoryLevel) | m_descriptor.m_additionalMemoryPropertyFlags;
-            RHI::Ptr<Memory> memory = GetDevice().AllocateMemory(memoryRequirements.size, memoryRequirements.memoryTypeBits, flags);
+            RHI::Ptr<Memory> memory = GetDevice().AllocateMemory(memoryRequirements.size, memoryRequirements.memoryTypeBits, flags, m_descriptor.m_bindFlags);
             if (memory)
             {
                 

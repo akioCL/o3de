@@ -11,17 +11,18 @@ set(FILES
     Source/Editor/EditorBlastFamilyComponent.cpp
     Source/Editor/EditorBlastMeshDataComponent.cpp
     Source/Editor/EditorBlastMeshDataComponent.h
-    Source/Editor/EditorBlastSliceAssetHandler.h
-    Source/Editor/EditorBlastSliceAssetHandler.cpp
+    Source/Editor/EditorBlastChunksAssetHandler.h
+    Source/Editor/EditorBlastChunksAssetHandler.cpp
     Source/Editor/EditorSystemComponent.h
     Source/Editor/EditorSystemComponent.cpp
+    Source/Editor/Material/LegacyBlastMaterialAssetConversion.h
+    Source/Editor/Material/LegacyBlastMaterialAssetConversion.cpp
+    Source/Editor/Material/LegacyBlastMaterialPrefabConversion.cpp
     Editor/ConfigurationWidget.h
     Editor/ConfigurationWidget.cpp
     Editor/EditorWindow.h
     Editor/EditorWindow.cpp
     Editor/EditorWindow.ui
-    Editor/MaterialIdWidget.h
-    Editor/MaterialIdWidget.cpp
     Editor/SettingsWidget.h
     Editor/SettingsWidget.cpp
 )

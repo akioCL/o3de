@@ -48,7 +48,7 @@ namespace AZ
         template<class T>
         void AddShaderInputs(
             RHI::ShaderResourceGroupLayout& srgLayout,
-            AZStd::array_view<T> shaderInputs,
+            AZStd::span<const T> shaderInputs,
             const uint32_t bindingSlot,
             const RHI::ShaderResourceGroupBindingInfo& srgBidingInfo)
         {
@@ -134,7 +134,7 @@ namespace AZ
 
                 uint32_t bindingSlot = srgLayout->GetBindingSlot();
                 m_indexToSlot[bindingInfo.m_spaceId].set(bindingSlot);
-                m_slotToIndex[bindingSlot] = bindingInfo.m_spaceId;
+                m_slotToIndex[bindingSlot] = static_cast<uint8_t>(bindingInfo.m_spaceId);
             }
 
             m_descriptorSetLayouts.reserve(srgCount);
@@ -181,7 +181,7 @@ namespace AZ
             if (m_nativePipelineLayout != VK_NULL_HANDLE)
             {
                 auto& device = static_cast<Device&>(GetDevice());
-                vkDestroyPipelineLayout(device.GetNativeDevice(), m_nativePipelineLayout, nullptr);
+                device.GetContext().DestroyPipelineLayout(device.GetNativeDevice(), m_nativePipelineLayout, nullptr);
                 m_nativePipelineLayout = VK_NULL_HANDLE;
             }
             m_layoutDescriptor = nullptr;
@@ -242,7 +242,8 @@ namespace AZ
             createInfo.pPushConstantRanges = m_pushConstantRanges.empty() ? nullptr : m_pushConstantRanges.data();
 
             auto& device = static_cast<Device&>(GetDevice());
-            const VkResult result = vkCreatePipelineLayout(device.GetNativeDevice(), &createInfo, nullptr, &m_nativePipelineLayout);
+            const VkResult result =
+                device.GetContext().CreatePipelineLayout(device.GetNativeDevice(), &createInfo, nullptr, &m_nativePipelineLayout);
 
             return ConvertResult(result);
         }

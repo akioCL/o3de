@@ -6,22 +6,25 @@
  *
  */
 
-#include <Material/EditorMaterialComponent.h>
-#include <Material/EditorMaterialComponentExporter.h>
-
-#include <AzToolsFramework/API/EditorAssetSystemAPI.h>
-#include <AzToolsFramework/API/ToolsApplicationAPI.h>
-#include <AzCore/RTTI/BehaviorContext.h>
 #include <Atom/RPI.Edit/Common/AssetUtils.h>
 #include <Atom/RPI.Edit/Material/MaterialPropertyId.h>
 #include <Atom/RPI.Public/Image/StreamingImage.h>
 #include <Atom/RPI.Reflect/Material/MaterialAsset.h>
 #include <Atom/RPI.Reflect/Material/MaterialTypeAsset.h>
+#include <AtomLyIntegration/CommonFeatures/Mesh/MeshComponentBus.h>
+#include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/Json/RegistrationContext.h>
+#include <AzToolsFramework/API/EditorAssetSystemAPI.h>
+#include <AzToolsFramework/API/ToolsApplicationAPI.h>
+#include <Material/EditorMaterialComponent.h>
+#include <Material/EditorMaterialComponentExporter.h>
+#include <Material/EditorMaterialComponentSerializer.h>
+#include <Material/EditorMaterialComponentUtil.h>
 
 AZ_PUSH_DISABLE_WARNING(4251 4800, "-Wunknown-warning-option") // disable warnings spawned by QT
-#include <QMenu>
 #include <QAction>
 #include <QCursor>
+#include <QMenu>
 AZ_POP_DISABLE_WARNING
 
 namespace AZ
@@ -30,9 +33,6 @@ namespace AZ
     {
         const char* EditorMaterialComponent::GenerateMaterialsButtonText = "Generate/Manage Source Materials...";
         const char* EditorMaterialComponent::GenerateMaterialsToolTipText = "Generate editable source material files from materials provided by the model.";
-
-        const char* EditorMaterialComponent::ResetMaterialsButtonText = "Reset Materials";
-        const char* EditorMaterialComponent::ResetMaterialsToolTipText = "Clear all settings, materials, and properties then rebuild material slots from the associated model.";
 
         // Update serialized data to the new format and data types
         bool EditorMaterialComponent::ConvertVersion(AZ::SerializeContext& context, AZ::SerializeContext::DataElementNode& classElement)
@@ -44,64 +44,15 @@ namespace AZ
 
             if (classElement.GetVersion() < 3)
             {
-                // The default material was changed from an asset to an EditorMaterialComponentSlot and old data must be converted
-                constexpr AZ::u32 defaultMaterialAssetDataCrc = AZ_CRC("defaultMaterialAsset", 0x736fc071);
-
-                Data::Asset<RPI::MaterialAsset> oldDefaultMaterialData;
-                if (!classElement.GetChildData(defaultMaterialAssetDataCrc, oldDefaultMaterialData))
-                {
-                    AZ_Error("AZ::Render::EditorMaterialComponent::ConvertVersion", false, "Failed to get defaultMaterialAsset element");
-                    return false;
-                }
-
-                if (!classElement.RemoveElementByName(defaultMaterialAssetDataCrc))
-                {
-                    AZ_Error("AZ::Render::EditorMaterialComponent::ConvertVersion", false, "Failed to remove defaultMaterialAsset element");
-                    return false;
-                }
-
-                EditorMaterialComponentSlot newDefaultMaterialData;
-                newDefaultMaterialData.m_id = DefaultMaterialAssignmentId;
-                newDefaultMaterialData.m_materialAsset = oldDefaultMaterialData;
-                classElement.AddElementWithData(context, "defaultMaterialSlot", newDefaultMaterialData);
-
-                // Slots now support and display the default material asset when empty
-                // The old placeholder assignments are irrelevant and must be cleared
-                constexpr AZ::u32 materialSlotsByLodDataCrc = AZ_CRC("materialSlotsByLod", 0xb1498db6);
-
-                EditorMaterialComponentSlotsByLodContainer lodSlotData;
-                if (!classElement.GetChildData(materialSlotsByLodDataCrc, lodSlotData))
-                {
-                    AZ_Error("AZ::Render::EditorMaterialComponent::ConvertVersion", false, "Failed to get materialSlotsByLod element");
-                    return false;
-                }
-
-                if (!classElement.RemoveElementByName(materialSlotsByLodDataCrc))
-                {
-                    AZ_Error("AZ::Render::EditorMaterialComponent::ConvertVersion", false, "Failed to remove materialSlotsByLod element");
-                    return false;
-                }
-
-                // Find and clear all slots that are assigned to the slot's default value
-                for (auto& lodSlots : lodSlotData)
-                {
-                    for (auto& slot : lodSlots)
-                    {
-                        if (slot.m_materialAsset.GetId() == slot.m_id.m_materialAssetId)
-                        {
-                            slot.m_materialAsset = {};
-                        }
-                    }
-                }
-
-                classElement.AddElementWithData(context, "materialSlotsByLod", lodSlotData);
+                AZ_Error("EditorMaterialComponent", false, "Material Component version < 3 is no longer supported");
+                return false;
             }
 
             if (classElement.GetVersion() < 4)
             {
                 classElement.AddElementWithData(context, "materialSlotsByLodEnabled", true);
             }
-
+            
             return true;
         }
 
@@ -110,24 +61,27 @@ namespace AZ
             BaseClass::Reflect(context);
             EditorMaterialComponentSlot::Reflect(context);
 
-            if (AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+            if (auto jsonContext = azrtti_cast<JsonRegistrationContext*>(context))
+            {
+                jsonContext->Serializer<JsonEditorMaterialComponentSerializer>()->HandlesType<EditorMaterialComponent>();
+            }
+
+            if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
             {
                 serializeContext->RegisterGenericType<EditorMaterialComponentSlotContainer>();
                 serializeContext->RegisterGenericType<EditorMaterialComponentSlotsByLodContainer>();
+                serializeContext->RegisterGenericType<AZStd::unordered_map<MaterialAssignmentId, Data::AssetId, AZStd::hash<MaterialAssignmentId>, AZStd::equal_to<MaterialAssignmentId>, AZStd::allocator>>();
+                serializeContext->RegisterGenericType<AZStd::unordered_map<MaterialAssignmentId, MaterialPropertyOverrideMap, AZStd::hash<MaterialAssignmentId>, AZStd::equal_to<MaterialAssignmentId>, AZStd::allocator>>();
 
                 serializeContext->Class<EditorMaterialComponent, BaseClass>()
                     ->Version(5, &EditorMaterialComponent::ConvertVersion)
-                    ->Field("message", &EditorMaterialComponent::m_message)
                     ->Field("defaultMaterialSlot", &EditorMaterialComponent::m_defaultMaterialSlot)
                     ->Field("materialSlots", &EditorMaterialComponent::m_materialSlots)
                     ->Field("materialSlotsByLodEnabled", &EditorMaterialComponent::m_materialSlotsByLodEnabled)
                     ->Field("materialSlotsByLod", &EditorMaterialComponent::m_materialSlotsByLod)
                     ;
 
-                serializeContext->RegisterGenericType<AZStd::unordered_map<MaterialAssignmentId, Data::AssetId, AZStd::hash<MaterialAssignmentId>, AZStd::equal_to<MaterialAssignmentId>, AZStd::allocator>>();
-                serializeContext->RegisterGenericType<AZStd::unordered_map<MaterialAssignmentId, MaterialPropertyOverrideMap, AZStd::hash<MaterialAssignmentId>, AZStd::equal_to<MaterialAssignmentId>, AZStd::allocator>>();
-
-                if (AZ::EditContext* editContext = serializeContext->GetEditContext())
+                if (auto editContext = serializeContext->GetEditContext())
                 {
                     editContext->Class<EditorMaterialComponent>(
                         "Material", "The material component specifies the material to use for this entity")
@@ -137,29 +91,21 @@ namespace AZ
                             ->Attribute(AZ::Edit::Attributes::ViewportIcon, "Icons/Components/Viewport/Component_Placeholder.svg")
                             ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC("Game", 0x232b318c))
                             ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                            ->Attribute(AZ::Edit::Attributes::HelpPageURL, "https://o3de.org/docs/user-guide/components/reference/atom/")
+                            ->Attribute(AZ::Edit::Attributes::HelpPageURL, "https://o3de.org/docs/user-guide/components/reference/atom/material/")
                             ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<RPI::MaterialAsset>::Uuid())
-                        ->DataElement(AZ::Edit::UIHandlers::MultiLineEdit, &EditorMaterialComponent::m_message, "Message", "")
-                            ->Attribute(AZ_CRC("PlaceholderText", 0xa23ec278), "Component cannot be edited with multiple entities selected")
-                            ->Attribute(AZ::Edit::Attributes::NameLabelOverride, "")
-                            ->Attribute(AZ::Edit::Attributes::Visibility, &EditorMaterialComponent::GetMessageVisibility)
-                            ->Attribute(AZ::Edit::Attributes::ReadOnly, true)
                         ->UIElement(AZ::Edit::UIHandlers::Button, GenerateMaterialsButtonText, GenerateMaterialsToolTipText)
                             ->Attribute(AZ::Edit::Attributes::NameLabelOverride, "")
                             ->Attribute(AZ::Edit::Attributes::ButtonText, GenerateMaterialsButtonText)
-                            ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorMaterialComponent::OpenMaterialExporter)
-                            ->Attribute(AZ::Edit::Attributes::Visibility, &EditorMaterialComponent::GetEditorVisibility)
-                        ->DataElement(AZ::Edit::UIHandlers::Default, &EditorMaterialComponent::m_defaultMaterialSlot, "Default Material", "Materials assigned to this slot will be applied to the entire model unless specific model or LOD material overrides are set.")
-                            ->Attribute(AZ::Edit::Attributes::Visibility, &EditorMaterialComponent::GetDefaultMaterialVisibility)
+                            ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorMaterialComponent::OpenMaterialExporterFromRPE)
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &EditorMaterialComponent::m_defaultMaterialSlot, "Default Material", "Materials assigned to this slot will be applied to the entire model unless specific model or LOD materials are set.")
+                            ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                             ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorMaterialComponent::OnConfigurationChanged)
                         ->DataElement(AZ::Edit::UIHandlers::Default, &EditorMaterialComponent::m_materialSlots, "Model Materials", "Materials assigned to these slots will be applied to every part of the model with same material slot name unless an overriding LOD material is specified.")
                             ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorMaterialComponent::OnConfigurationChanged)
-                            ->Attribute(AZ::Edit::Attributes::Visibility, &EditorMaterialComponent::GetEditorVisibility)
                             ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                             ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, false)
                         ->DataElement(AZ::Edit::UIHandlers::Default, &EditorMaterialComponent::m_materialSlotsByLodEnabled, "Enable LOD Materials", "When this flag is enabled, materials can be specified per LOD.")
                             ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorMaterialComponent::OnLodsToggled)
-                            ->Attribute(AZ::Edit::Attributes::Visibility, &EditorMaterialComponent::GetEditorVisibility)
                         ->DataElement(AZ::Edit::UIHandlers::Default, &EditorMaterialComponent::m_materialSlotsByLod, "LOD Materials", "Materials assigned to these slots will take precedence over all other materials settings.")
                             ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorMaterialComponent::OnConfigurationChanged)
                             ->Attribute(AZ::Edit::Attributes::IndexedChildNameLabelOverride, &EditorMaterialComponent::GetLabelForLod)
@@ -180,7 +126,7 @@ namespace AZ
                 }
             }
 
-            if (AZ::BehaviorContext* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
+            if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
             {
                 behaviorContext->ConstantProperty("EditorMaterialComponentTypeId", BehaviorConstant(Uuid(EditorMaterialComponentTypeId)))
                     ->Attribute(AZ::Script::Attributes::Module, "render")
@@ -197,157 +143,158 @@ namespace AZ
         void EditorMaterialComponent::Activate()
         {
             BaseClass::Activate();
-            MaterialReceiverNotificationBus::Handler::BusConnect(GetEntityId());
             MaterialComponentNotificationBus::Handler::BusConnect(GetEntityId());
             UpdateMaterialSlots();
         }
 
         void EditorMaterialComponent::Deactivate()
         {
-            MaterialReceiverNotificationBus::Handler::BusDisconnect();
             MaterialComponentNotificationBus::Handler::BusDisconnect();
             BaseClass::Deactivate();
         }
 
         void EditorMaterialComponent::AddContextMenuActions(QMenu* menu)
         {
-            // Don't add menu options if more than one entity is selected
-            if (!IsEditingAllowed())
-            {
-                return;
-            }
+            const auto& entityIdsToEdit = EditorMaterialComponentUtil::GetSelectedEntitiesFromActiveInspector();
 
             QAction* action = nullptr;
 
             menu->addSeparator();
 
-            action = menu->addAction(GenerateMaterialsButtonText, [this]() { OpenMaterialExporter(); });
+            action = menu->addAction(GenerateMaterialsButtonText, [this, entityIdsToEdit]() { OpenMaterialExporter(entityIdsToEdit); });
             action->setToolTip(GenerateMaterialsToolTipText);
+            action->setEnabled(EditorMaterialComponentUtil::DoEntitiesHaveMatchingMaterialSlots(GetEntityId(), entityIdsToEdit));
 
             menu->addSeparator();
 
-            action = menu->addAction(ResetMaterialsButtonText, [this]() { ResetMaterialSlots(); });
-            action->setToolTip(ResetMaterialsToolTipText);
-
-            menu->addSeparator();
-
-            action = menu->addAction("Clear Model Materials", [this]() {
-                AzToolsFramework::ScopedUndoBatch undoBatch("Clearing model materials.");
-                SetDirty();
-
-                for (auto& materialSlotPair : GetMaterialSlots())
+            action = menu->addAction("Clear Materials", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Clear materials.");
+                m_materialSlotsByLodEnabled = false;
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
                 {
-                    EditorMaterialComponentSlot* materialSlot = materialSlotPair.second;
-                    if (materialSlot->m_id.IsAssetOnly())
-                    {
-                        materialSlot->Clear();
-                    }
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+                    MaterialComponentRequestBus::Event(entityId, &MaterialComponentRequestBus::Events::ClearMaterialMap);
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
                 }
-                });
-            action = menu->addAction("Clear LOD Materials", [this]() {
-                AzToolsFramework::ScopedUndoBatch undoBatch("Clearing LOD materials.");
-                SetDirty();
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Clears all material and property overrides.");
 
-                for (auto& materialSlotPair : GetMaterialSlots())
+            action = menu->addAction("Clear Materials On Model Slots", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Clear materials on model slots.");
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
                 {
-                    EditorMaterialComponentSlot* materialSlot = materialSlotPair.second;
-                    if (materialSlot->m_id.IsLodAndAsset())
-                    {
-                        materialSlot->Clear();
-                    }
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+                    MaterialComponentRequestBus::Event(entityId, &MaterialComponentRequestBus::Events::ClearMaterialsOnModelSlots);
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
                 }
-                });
-            action->setEnabled(m_materialSlotsByLodEnabled);
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Clears material and property overrides assigned to the Model Materials group.");
+
+            action = menu->addAction("Clear Materials On LOD Slots", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Clear materials on LOD slots.");
+                m_materialSlotsByLodEnabled = false;
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
+                {
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+                    MaterialComponentRequestBus::Event(entityId, &MaterialComponentRequestBus::Events::ClearMaterialsOnLodSlots);
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
+                }
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Clears material and property overrides assigned to the LOD Materials group.");
+
+            action = menu->addAction("Clear Materials On Invalid Slots", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Clear materials on invalid slots.");
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
+                {
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+                    MaterialComponentRequestBus::Event(
+                        entityId, &MaterialComponentRequestBus::Events::ClearMaterialsOnInvalidSlots);
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
+                }
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Clears residual or hidden material and property overrides assigned to slots that do not match the current layout.");
+
+            action = menu->addAction("Clear Materials With Missing Assets", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Clear materials with missing assets.");
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
+                {
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+                    MaterialComponentRequestBus::Event(entityId, &MaterialComponentRequestBus::Events::ClearMaterialsWithMissingAssets);
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
+                }
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Clears material overrides referencing missing assets.");
+
+            action = menu->addAction("Repair Materials With Missing Assets", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Repair materials with missing assets.");
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
+                {
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+                    MaterialComponentRequestBus::Event(entityId, &MaterialComponentRequestBus::Events::RepairMaterialsWithMissingAssets);
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
+                }
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Removes references to any missing material assets.");
+            
+            action = menu->addAction("Repair Materials With Renamed Properties", [this, entityIdsToEdit]() {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Repair materials with renamed properties.");
+                for (const AZ::EntityId& entityId : entityIdsToEdit)
+                {
+                    AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                        &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+
+                    uint32_t propertiesUpdated = 0;
+                    MaterialComponentRequestBus::EventResult(
+                        propertiesUpdated, entityId, &MaterialComponentRequestBus::Events::RepairMaterialsWithRenamedProperties);
+                    AZ_Printf("EditorMaterialComponent", "Updated %u property(s).", propertiesUpdated);
+
+                    MaterialComponentNotificationBus::Event(entityId, &MaterialComponentNotifications::OnMaterialsEdited);
+                }
+                UpdateMaterialSlots();
+            });
+            action->setToolTip("Update material property overrides referencing names that have changed since they were set on the component.");
         }
 
         void EditorMaterialComponent::SetPrimaryAsset(const AZ::Data::AssetId& assetId)
         {
-            m_controller.SetDefaultMaterialOverride(assetId);
+            MaterialComponentRequestBus::Event(GetEntityId(), &MaterialComponentRequestBus::Events::SetMaterialAssetIdOnDefaultSlot, assetId);
+
+            MaterialComponentNotificationBus::Event(GetEntityId(), &MaterialComponentNotifications::OnMaterialsEdited);
+
+            AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
+                &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay, AzToolsFramework::Refresh_AttributesAndValues);
+        }
+
+        void EditorMaterialComponent::OnMaterialInstanceCreated(const MaterialAssignment& materialAssignment)
+        {
+            // PSO-impacting property changes are allowed in the editor
+            // because the saved slice data can be analyzed to pre-compile the necessary PSOs.
+            if (materialAssignment.m_materialInstance)
+            {
+                materialAssignment.m_materialInstance->SetPsoHandlingOverride(AZ::RPI::MaterialPropertyPsoHandling::Allowed);
+            }
         }
 
         AZ::u32 EditorMaterialComponent::OnConfigurationChanged()
         {
-            // Whenever the user makes changes to the editor component data the controller configuration must be rebuilt
-            m_configurationChangeInProgress = true;
-            UpdateController();
-            m_configurationChangeInProgress = false;
-
             return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
         }
 
-        void EditorMaterialComponent::OnMaterialAssignmentsChanged()
+        void EditorMaterialComponent::OnMaterialSlotLayoutChanged()
         {
-            // [GFX TODO][ATOM-4604] remove flag after mesh component material handling is fixed to not recreate/reload mesh for material changes
-            if (!m_configurationChangeInProgress)
-            {
-                UpdateMaterialSlots();
-            }
-        }
-
-        void EditorMaterialComponent::OnMaterialsEdited(const MaterialAssignmentMap& materials)
-        {
-            AzToolsFramework::ScopedUndoBatch undoBatch("Materials edited.");
-            SetDirty();
-
-            // The layout of the materials slots is already set.
-            // We just need to read the values from any edited overrides into the editor component
-            // and refresh.
-            for (auto& materialSlotPair : GetMaterialSlots())
-            {
-                EditorMaterialComponentSlot& slot = *materialSlotPair.second;
-                const MaterialAssignment& materialFromController = GetMaterialAssignmentFromMap(materials, slot.m_id);
-                slot.m_materialAsset = materialFromController.m_materialAsset;
-                slot.m_propertyOverrides = materialFromController.m_propertyOverrides;
-                slot.m_matModUvOverrides = materialFromController.m_matModUvOverrides;
-            }
-
-            AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
-                &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay,
-                AzToolsFramework::Refresh_AttributesAndValues);
-        }
-
-        void EditorMaterialComponent::UpdateConfiguration(const MaterialComponentConfig& config)
-        {
-            m_controller.SetMaterialOverrides(config.m_materials);
-        }
-
-        void EditorMaterialComponent::UpdateController()
-        {
-            SetDirty();
-
-            // Build the controller configuration from the editor configuration
-            MaterialComponentConfig config = m_controller.GetConfiguration();
-            config.m_materials.clear();
-
-            for (const auto& materialSlotPair : GetMaterialSlots())
-            {
-                const EditorMaterialComponentSlot* materialSlot = materialSlotPair.second;
-
-                // Do not apply materials for lods if they are disabled
-                if (materialSlot->m_id.m_lodIndex != MaterialAssignmentId::NonLodIndex && !m_materialSlotsByLodEnabled)
-                {
-                    continue;
-                }
-
-                // Only material slots with a valid asset IDs or property overrides will be copied
-                // to minimize the amount of data stored in the controller and game component
-                if (materialSlot->m_materialAsset.GetId().IsValid())
-                {
-                    MaterialAssignment& materialAssignment = config.m_materials[materialSlot->m_id];
-                    materialAssignment.m_materialAsset = materialSlot->m_materialAsset;
-                    materialAssignment.m_propertyOverrides = materialSlot->m_propertyOverrides;
-                    materialAssignment.m_matModUvOverrides = materialSlot->m_matModUvOverrides;
-                }
-                else if (!materialSlot->m_propertyOverrides.empty() || !materialSlot->m_matModUvOverrides.empty())
-                {
-                    MaterialAssignment& materialAssignment = config.m_materials[materialSlot->m_id];
-                    materialAssignment.m_materialAsset.Create(materialSlot->m_id.m_materialAssetId);
-                    materialAssignment.m_propertyOverrides = materialSlot->m_propertyOverrides;
-                    materialAssignment.m_matModUvOverrides = materialSlot->m_matModUvOverrides;
-                }
-            }
-
-            UpdateConfiguration(config);
+            UpdateMaterialSlots();
         }
 
         void EditorMaterialComponent::UpdateMaterialSlots()
@@ -357,42 +304,16 @@ namespace AZ
             m_materialSlots = {};
             m_materialSlotsByLod = {};
 
-            const MaterialComponentConfig& config = m_controller.GetConfiguration();
-
             // Get the known material assignment slots from the associated model or other source
-            MaterialAssignmentMap materialsFromSource;
-            MaterialReceiverRequestBus::EventResult(materialsFromSource, GetEntityId(), &MaterialReceiverRequestBus::Events::GetMaterialAssignments);
-
+            MaterialAssignmentMap originalMaterials;
+            MaterialComponentRequestBus::EventResult(
+                originalMaterials, GetEntityId(), &MaterialComponentRequestBus::Events::GetDefautMaterialMap);
+                        
             // Generate the table of editable materials using the source data to define number of groups, elements, and initial values
-            for (const auto& materialPair : materialsFromSource)
+            for (const auto& materialPair : originalMaterials)
             {
                 // Setup the material slot entry
-                EditorMaterialComponentSlot slot;
-                slot.m_id = materialPair.first;
-                slot.m_materialChangedCallback = [this]() {
-                    // This callback is triggered whenever an individual material slot changes outside of normal inspector interactions
-                    // So we must manually handle undo, update configuration, and refresh the inspector to display the new values
-                    AzToolsFramework::ScopedUndoBatch undoBatch("Material slot changed.");
-                    SetDirty();
-
-                    OnConfigurationChanged();
-
-                    AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
-                        &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay,
-                        AzToolsFramework::Refresh_AttributesAndValues);
-                };
-                slot.m_propertyChangedCallback = [this]() {
-                    OnConfigurationChanged();
-                };
-
-                // if material is present in controller configuration, assign its data
-                const MaterialAssignment& materialFromController = GetMaterialAssignmentFromMap(config.m_materials, slot.m_id);
-                slot.m_materialAsset = materialFromController.m_materialAsset;
-                slot.m_propertyOverrides = materialFromController.m_propertyOverrides;
-                slot.m_matModUvOverrides = materialFromController.m_matModUvOverrides;
-
-                // Attempt to get the UV names from model meshes.
-                MaterialReceiverRequestBus::EventResult(slot.m_modelUvNames, GetEntityId(), &MaterialReceiverRequestBus::Events::GetModelUvNames);
+                EditorMaterialComponentSlot slot(GetEntityId(), materialPair.first);
 
                 if (slot.m_id.IsDefault())
                 {
@@ -400,22 +321,23 @@ namespace AZ
                     continue;
                 }
 
-                if (slot.m_id.IsAssetOnly())
+                if (slot.m_id.IsSlotIdOnly())
                 {
                     m_materialSlots.push_back(slot);
                     continue;
                 }
 
-                if (slot.m_id.IsLodAndAsset())
+                if (slot.m_id.IsLodAndSlotId())
                 {
                     // Resize the containers to fit all elements
-                    m_materialSlotsByLod.resize(AZ::GetMax<size_t>(m_materialSlotsByLod.size(), aznumeric_cast<size_t>(slot.m_id.m_lodIndex + 1)));
+                    m_materialSlotsByLod.resize(
+                        AZ::GetMax<size_t>(m_materialSlotsByLod.size(), aznumeric_cast<size_t>(slot.m_id.m_lodIndex + 1)));
                     m_materialSlotsByLod[slot.m_id.m_lodIndex].push_back(slot);
                     continue;
                 }
             }
 
-            // Sort all of the slots by label to ensure stable index values (materialsFromSource is an unordered map)
+            // Sort all of the slots by label to ensure stable index values (originalMaterials is an unordered map)
             AZStd::sort(m_materialSlots.begin(), m_materialSlots.end(),
                 [](const auto& a, const auto& b) { return a.GetLabel() < b.GetLabel(); });
 
@@ -425,60 +347,52 @@ namespace AZ
                     [](const auto& a, const auto& b) { return a.GetLabel() < b.GetLabel(); });
             }
 
+            MaterialComponentNotificationBus::Event(GetEntityId(), &MaterialComponentNotifications::OnMaterialsEdited);
+
             AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
-                &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay,
-                AzToolsFramework::Refresh_EntireTree);
+                &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay, AzToolsFramework::Refresh_EntireTree);
         }
 
-        AZ::u32 EditorMaterialComponent::ResetMaterialSlots()
+        AZ::u32 EditorMaterialComponent::OpenMaterialExporterFromRPE()
         {
-            AzToolsFramework::ScopedUndoBatch undoBatch("Resetting materials.");
-            SetDirty();
-
-            UpdateConfiguration(MaterialComponentConfig());
-            UpdateMaterialSlots();
-
-            m_materialSlotsByLodEnabled = false;
-
-            // Forcing refresh in case triggered from context menu action
-            AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
-                &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay,
-                AzToolsFramework::Refresh_EntireTree);
-
-            return AZ::Edit::PropertyRefreshLevels::EntireTree;
+            return OpenMaterialExporter(EditorMaterialComponentUtil::GetEntitiesMatchingMaterialSlots(
+                GetEntityId(), EditorMaterialComponentUtil::GetSelectedEntitiesFromActiveInspector()));
         }
 
-        AZ::u32 EditorMaterialComponent::OpenMaterialExporter()
+        AZ::u32 EditorMaterialComponent::OpenMaterialExporter(const AzToolsFramework::EntityIdSet& entityIdsToEdit)
         {
-            AzToolsFramework::ScopedUndoBatch undoBatch("Generating materials.");
-            SetDirty();
+            MaterialAssignmentMap originalMaterials;
+            MaterialComponentRequestBus::EventResult(
+                originalMaterials, GetEntityId(), &MaterialComponentRequestBus::Events::GetDefautMaterialMap);
 
-            // First generating a unique set of all material asset IDs that will be used for source data generation
-            AZStd::unordered_set<AZ::Data::AssetId> assetIds;
-
-            auto materialSlots = GetMaterialSlots();
-            for (auto& materialSlotPair : materialSlots)
+            // Generate a unique set of all material asset IDs that will be used for source data generation
+            AZStd::unordered_map<AZ::Data::AssetId, AZStd::string> assetIdToSlotNameMap;
+            for (const auto& materialPair : originalMaterials)
             {
-                EditorMaterialComponentSlot* materialSlot = materialSlotPair.second;
-                if (materialSlot->m_id.m_materialAssetId.IsValid())
+                const Data::AssetId originalAssetId = materialPair.second.m_materialAsset.GetId();
+                if (originalAssetId.IsValid())
                 {
-                    assetIds.insert(materialSlot->m_id.m_materialAssetId);
+                    MaterialComponentRequestBus::EventResult(
+                        assetIdToSlotNameMap[originalAssetId], GetEntityId(), &MaterialComponentRequestBus::Events::GetMaterialLabel,
+                        materialPair.first);
                 }
             }
 
-            // Convert the unique set of asset IDs into export items that can be configured in the dialog 
+            // Convert the unique set of asset IDs into export items that can be configured in the dialog
             // The order should not matter because the table in the dialog can sort itself for a specific row
             EditorMaterialComponentExporter::ExportItemsContainer exportItems;
-            for (const AZ::Data::AssetId& assetId : assetIds)
+            exportItems.reserve(assetIdToSlotNameMap.size());
+
+            for (const auto& [assetId, slotName] : assetIdToSlotNameMap)
             {
-                EditorMaterialComponentExporter::ExportItem exportItem;
-                exportItem.m_assetId = assetId;
-                exportItems.push_back(exportItem);
+                exportItems.emplace_back(assetId, slotName);
             }
 
             // Display the export dialog so that the user can configure how they want different materials to be exported
             if (EditorMaterialComponentExporter::OpenExportDialog(exportItems))
             {
+                AzToolsFramework::ScopedUndoBatch undoBatch("Generating materials.");
+
                 for (const EditorMaterialComponentExporter::ExportItem& exportItem : exportItems)
                 {
                     if (!EditorMaterialComponentExporter::ExportMaterialSourceData(exportItem))
@@ -486,99 +400,61 @@ namespace AZ
                         continue;
                     }
 
-                    const auto& assetIdOutcome = AZ::RPI::AssetUtils::MakeAssetId(exportItem.m_exportPath, 0);
+                    const auto& assetIdOutcome = AZ::RPI::AssetUtils::MakeAssetId(exportItem.GetExportPath(), 0);
                     if (assetIdOutcome)
                     {
-                        for (auto& materialSlotPair : materialSlots)
+                        for (const auto& materialPair : originalMaterials)
                         {
-                            EditorMaterialComponentSlot* materialSlot = materialSlotPair.second;
-                            if (materialSlot && materialSlot->m_id.m_materialAssetId == exportItem.m_assetId)
+                            // We need to check whether replaced material corresponds to this slot's default material.
+                            const Data::AssetId originalAssetId = materialPair.second.m_materialAsset.GetId();
+                            if (originalAssetId == exportItem.GetOriginalAssetId())
                             {
-                                materialSlot->m_materialAsset.Create(assetIdOutcome.GetValue());
+                                if (m_materialSlotsByLodEnabled || !materialPair.first.IsLodAndSlotId())
+                                {
+                                    for (const AZ::EntityId& entityId : entityIdsToEdit)
+                                    {
+                                        AzToolsFramework::ToolsApplicationRequests::Bus::Broadcast(
+                                            &AzToolsFramework::ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
+
+                                        MaterialComponentRequestBus::Event(
+                                            entityId, &MaterialComponentRequestBus::Events::SetMaterialAssetId, materialPair.first,
+                                            assetIdOutcome.GetValue());
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
 
-            // Forcing refresh in case triggered from context menu action
-            AzToolsFramework::ToolsApplicationEvents::Bus::Broadcast(
-                &AzToolsFramework::ToolsApplicationEvents::InvalidatePropertyDisplay,
-                AzToolsFramework::Refresh_AttributesAndValues);
+            UpdateMaterialSlots();
 
-            return OnConfigurationChanged();
+            return AZ::Edit::PropertyRefreshLevels::EntireTree;
         }
 
         AZ::u32 EditorMaterialComponent::OnLodsToggled()
         {
-            OnConfigurationChanged();
+            AzToolsFramework::ScopedUndoBatch undoBatch("Toggling LOD materials.");
+            SetDirty();
+
+            if (!m_materialSlotsByLodEnabled)
+            {
+                MaterialComponentRequestBus::Event(GetEntityId(), &MaterialComponentRequestBus::Events::ClearMaterialsOnLodSlots);
+            }
+
+            UpdateMaterialSlots();
+
             return AZ::Edit::PropertyRefreshLevels::EntireTree;
         }
 
         AZ::Crc32 EditorMaterialComponent::GetLodVisibility() const
         {
-            return IsEditingAllowed() && m_materialSlotsByLodEnabled ? AZ::Edit::PropertyVisibility::Show : AZ::Edit::PropertyVisibility::Hide;
-        }
-
-        AZ::Crc32 EditorMaterialComponent::GetDefaultMaterialVisibility() const
-        {
-            return IsEditingAllowed() ? AZ::Edit::PropertyVisibility::ShowChildrenOnly : AZ::Edit::PropertyVisibility::Hide;
-        }
-
-        AZ::Crc32 EditorMaterialComponent::GetEditorVisibility() const
-        {
-            return IsEditingAllowed() ? AZ::Edit::PropertyVisibility::Show : AZ::Edit::PropertyVisibility::Hide;
-        }
-
-        AZ::Crc32 EditorMaterialComponent::GetMessageVisibility() const
-        {
-            return IsEditingAllowed() ? AZ::Edit::PropertyVisibility::Hide : AZ::Edit::PropertyVisibility::Show;
-        }
-
-        bool EditorMaterialComponent::IsEditingAllowed() const
-        {
-            AzToolsFramework::EntityIdList selectedEntities;
-            AzToolsFramework::ToolsApplicationRequests::Bus::BroadcastResult(
-                selectedEntities, &AzToolsFramework::ToolsApplicationRequests::Bus::Events::GetSelectedEntities);
-            return selectedEntities.size() == 1;
+            return m_materialSlotsByLodEnabled ? AZ::Edit::PropertyVisibility::Show : AZ::Edit::PropertyVisibility::Hide;
         }
 
         AZStd::string EditorMaterialComponent::GetLabelForLod(int lodIndex) const
         {
             return AZStd::string::format("LOD %d", lodIndex);
-        }
-
-        template<typename ComponentType, typename ContainerType>
-        void EditorMaterialComponent::BuildMaterialSlotMap(ComponentType& component, ContainerType& materialSlots)
-        {
-            materialSlots[DefaultMaterialAssignmentId] = &component.m_defaultMaterialSlot;
-
-            for (auto& slot : component.m_materialSlots)
-            {
-                materialSlots[slot.m_id] = &slot;
-            }
-
-            for (auto& slotsForLod : component.m_materialSlotsByLod)
-            {
-                for (auto& slot : slotsForLod)
-                {
-                    materialSlots[slot.m_id] = &slot;
-                }
-            }
-        }
-
-        AZStd::unordered_map<MaterialAssignmentId, EditorMaterialComponentSlot*> EditorMaterialComponent::GetMaterialSlots()
-        {
-            AZStd::unordered_map<MaterialAssignmentId, EditorMaterialComponentSlot*> materialSlots;
-            BuildMaterialSlotMap(*this, materialSlots);
-            return AZStd::move(materialSlots);
-        }
-
-        AZStd::unordered_map<MaterialAssignmentId, const EditorMaterialComponentSlot*> EditorMaterialComponent::GetMaterialSlots() const
-        {
-            AZStd::unordered_map<MaterialAssignmentId, const EditorMaterialComponentSlot*> materialSlots;
-            BuildMaterialSlotMap(*this, materialSlots);
-            return AZStd::move(materialSlots);
         }
     } // namespace Render
 } // namespace AZ

@@ -10,7 +10,7 @@
 
 #include <Atom/Feature/CoreLights/QuadLightFeatureProcessorInterface.h>
 #include <Atom/Feature/Utils/GpuBufferHandler.h>
-#include <CoreLights/IndexedDataVector.h>
+#include <Atom/Feature/Utils/IndexedDataVector.h>
 
 namespace AZ
 {
@@ -47,6 +47,8 @@ namespace AZ
             void SetUseFastApproximation(LightHandle handle, bool useFastApproximation) override;
             void SetAttenuationRadius(LightHandle handle, float attenuationRadius) override;
             void SetQuadDimensions(LightHandle handle, float width, float height) override;
+            void SetAffectsGI(LightHandle handle, bool affectsGI) override;
+            void SetAffectsGIFactor(LightHandle handle, float affectsGIFactor) override;
             void SetQuadData(LightHandle handle, const QuadLightData& data) override;
 
             const Data::Instance<RPI::Buffer> GetLightBuffer()const;

@@ -26,9 +26,16 @@ namespace GradientSignal
         EditorImageGradientComponentMode(const AZ::EntityComponentIdPair& entityComponentIdPair, AZ::Uuid componentType);
         ~EditorImageGradientComponentMode() override;
 
+        // EditorBaseComponentMode
+        void Refresh() override
+        {
+        }
+        AZStd::vector<AzToolsFramework::ActionOverride> PopulateActionsImpl() override;
         bool HandleMouseInteraction(const AzToolsFramework::ViewportInteraction::MouseInteractionEvent& mouseInteraction) override;
-
-        void Refresh() override { }
+        AZStd::string GetComponentModeName() const override
+        {
+            return "Image Gradient Paint Mode";
+        }
 
     protected:
         // PaintBrushNotificationBus overrides

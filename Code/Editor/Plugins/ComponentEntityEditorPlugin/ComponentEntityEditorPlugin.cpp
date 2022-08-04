@@ -9,13 +9,11 @@
 #include "ComponentEntityEditorPlugin.h"
 
 #include <LyViewPaneNames.h>
-#include "IResourceSelectorHost.h"
 
 #include "UI/QComponentEntityEditorMainWindow.h"
 #include "UI/QComponentEntityEditorOutlinerWindow.h"
 #include "UI/QComponentLevelEntityEditorMainWindow.h"
 #include "UI/ComponentPalette/ComponentPaletteSettings.h"
-#include "UI/ComponentPalette/ComponentPaletteWindow.h"
 
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/EntityUtils.h>
@@ -75,7 +73,7 @@ namespace ComponentEntityEditorPluginInternal
             const AZ::TypeId& componentTypeId = componentDescriptor->GetUuid();
             const AZ::TypeId& typeOfAZComponent = azrtti_typeid<AZ::Component>();
 
-            if (const AZ::SerializeContext::ClassData* serializeData = serializeContext->FindClassData(componentTypeId))
+            if (serializeContext->FindClassData(componentTypeId))
             {
                 if (!AZ::EntityUtils::CheckIfClassIsDeprecated(serializeContext, componentTypeId)
                     && !AZ::EntityUtils::CheckDeclaresSerializeBaseClass(serializeContext, typeOfAZComponent, componentTypeId))
@@ -179,8 +177,6 @@ ComponentEntityEditorPlugin::ComponentEntityEditorPlugin([[maybe_unused]] IEdito
         options.preferedDockingArea = Qt::NoDockWidgetArea;
         RegisterViewPane<SliceRelationshipWidget>(LyViewPane::SliceRelationships, LyViewPane::CategoryTools, options);
     }
-
-    RegisterModuleResourceSelectors(GetIEditor()->GetResourceSelectorHost());
 
     ComponentEntityEditorPluginInternal::RegisterSandboxObjects();
 

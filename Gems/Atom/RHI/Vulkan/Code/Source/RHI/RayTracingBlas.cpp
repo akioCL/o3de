@@ -6,7 +6,6 @@
  *
  */
 
-#include <AzCore/Debug/EventTrace.h>
 #include <RHI/RayTracingBlas.h>
 #include <RHI/Buffer.h>
 #include <RHI/Conversion.h>
@@ -36,7 +35,7 @@ namespace AZ
 
             if (buffers.m_accelerationStructure)
             {
-                vkDestroyAccelerationStructureKHR(device.GetNativeDevice(), buffers.m_accelerationStructure, nullptr);
+                device.GetContext().DestroyAccelerationStructureKHR(device.GetNativeDevice(), buffers.m_accelerationStructure, nullptr);
                 buffers.m_accelerationStructure = nullptr;
             }
 
@@ -63,7 +62,9 @@ namespace AZ
                 addressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
                 addressInfo.pNext = nullptr;
                 addressInfo.buffer = static_cast<const Vulkan::Buffer* > (geometry.m_vertexBuffer.GetBuffer())->GetBufferMemoryView()->GetNativeBuffer();
-                geometryDesc.geometry.triangles.vertexData.deviceAddress = vkGetBufferDeviceAddress(device.GetNativeDevice(), &addressInfo) + geometry.m_vertexBuffer.GetByteOffset();
+                geometryDesc.geometry.triangles.vertexData.deviceAddress =
+                    device.GetContext().GetBufferDeviceAddress(device.GetNativeDevice(), &addressInfo) +
+                    geometry.m_vertexBuffer.GetByteOffset();
                 geometryDesc.geometry.triangles.vertexStride = geometry.m_vertexBuffer.GetByteStride();
                 geometryDesc.geometry.triangles.maxVertex = geometry.m_vertexBuffer.GetByteCount() / aznumeric_cast<uint32_t>(geometryDesc.geometry.triangles.vertexStride);
                 geometryDesc.geometry.triangles.vertexFormat = ConvertFormat(geometry.m_vertexFormat);
@@ -71,7 +72,9 @@ namespace AZ
                 addressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
                 addressInfo.pNext = nullptr;
                 addressInfo.buffer = static_cast<const Vulkan::Buffer*>(geometry.m_indexBuffer.GetBuffer())->GetBufferMemoryView()->GetNativeBuffer();
-                geometryDesc.geometry.triangles.indexData.deviceAddress = vkGetBufferDeviceAddress(device.GetNativeDevice(), &addressInfo) + geometry.m_indexBuffer.GetByteOffset();
+                geometryDesc.geometry.triangles.indexData.deviceAddress =
+                    device.GetContext().GetBufferDeviceAddress(device.GetNativeDevice(), &addressInfo) +
+                    geometry.m_indexBuffer.GetByteOffset();
                 geometryDesc.geometry.triangles.indexType = (geometry.m_indexBuffer.GetIndexFormat() == RHI::IndexFormat::Uint16) ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
 
                 geometryDesc.geometry.triangles.transformData = {}; // [GFX-TODO][ATOM-4989] Add BLAS Transform Buffer
@@ -102,7 +105,7 @@ namespace AZ
             VkAccelerationStructureBuildSizesInfoKHR buildSizesInfo = {};
             buildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
 
-            vkGetAccelerationStructureBuildSizesKHR(
+            device.GetContext().GetAccelerationStructureBuildSizesKHR(
                 device.GetNativeDevice(),
                 VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
                 &buffers.m_buildInfo,
@@ -115,13 +118,13 @@ namespace AZ
             // create scratch buffer
             buffers.m_scratchBuffer = RHI::Factory::Get().CreateBuffer();
             AZ::RHI::BufferDescriptor scratchBufferDescriptor;
-            scratchBufferDescriptor.m_bindFlags = RHI::BufferBindFlags::ShaderReadWrite;
+            scratchBufferDescriptor.m_bindFlags = RHI::BufferBindFlags::ShaderReadWrite | RHI::BufferBindFlags::RayTracingScratchBuffer;
             scratchBufferDescriptor.m_byteCount = buildSizesInfo.buildScratchSize;
             
             AZ::RHI::BufferInitRequest scratchBufferRequest;
             scratchBufferRequest.m_buffer = buffers.m_scratchBuffer.get();
             scratchBufferRequest.m_descriptor = scratchBufferDescriptor;
-            RHI::ResultCode resultCode = bufferPools.GetScratchBufferPool()->InitBuffer(scratchBufferRequest);
+            [[maybe_unused]] RHI::ResultCode resultCode = bufferPools.GetScratchBufferPool()->InitBuffer(scratchBufferRequest);
             AZ_Assert(resultCode == RHI::ResultCode::Success, "failed to create BLAS scratch buffer");
             
             BufferMemoryView* scratchMemoryView = static_cast<Buffer*>(buffers.m_scratchBuffer.get())->GetBufferMemoryView();
@@ -154,15 +157,17 @@ namespace AZ
             addressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
             addressInfo.buffer = static_cast<Buffer*>(buffers.m_blasBuffer.get())->GetBufferMemoryView()->GetNativeBuffer();
             createInfo.buffer = blasMemoryView->GetNativeBuffer();
-            
-            VkResult vkResult = vkCreateAccelerationStructureKHR(device.GetNativeDevice(), &createInfo, nullptr, &buffers.m_accelerationStructure);
+
+            VkResult vkResult = device.GetContext().CreateAccelerationStructureKHR(
+                device.GetNativeDevice(), &createInfo, nullptr, &buffers.m_accelerationStructure);
             AssertSuccess(vkResult);
 
             buffers.m_buildInfo.dstAccelerationStructure = buffers.m_accelerationStructure;
 
             addressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
             addressInfo.buffer = scratchMemoryView->GetNativeBuffer();
-            buffers.m_buildInfo.scratchData.deviceAddress = vkGetBufferDeviceAddress(device.GetNativeDevice(), &addressInfo);
+            buffers.m_buildInfo.scratchData.deviceAddress =
+                device.GetContext().GetBufferDeviceAddress(device.GetNativeDevice(), &addressInfo);
 
             return RHI::ResultCode::Success;
         }

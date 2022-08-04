@@ -12,29 +12,34 @@
 #include <Atom/RHI/Factory.h>
 #include <Atom/RHI.Reflect/InputStreamLayoutBuilder.h>
 
-#include <AzCore/Debug/EventTrace.h>
 #include <AtomCore/Instance/InstanceDatabase.h>
 
 namespace AZ
 {
     namespace RPI
     {
-        Data::Instance<ModelLod> ModelLod::FindOrCreate(const Data::Asset<ModelLodAsset>& lodAsset)
+        Data::Instance<ModelLod> ModelLod::FindOrCreate(const Data::Asset<ModelLodAsset>& lodAsset, const Data::Asset<ModelAsset>& modelAsset)
         {
+            AZStd::any modelAssetAny{&modelAsset};
+
             return Data::InstanceDatabase<ModelLod>::Instance().FindOrCreate(
                 Data::InstanceId::CreateFromAssetId(lodAsset.GetId()),
-                lodAsset);
+                lodAsset,
+                &modelAssetAny);
         }
 
-        AZStd::array_view<ModelLod::Mesh> ModelLod::GetMeshes() const
+        AZStd::span<const ModelLod::Mesh> ModelLod::GetMeshes() const
         {
             return m_meshes;
         }
 
-        Data::Instance<ModelLod> ModelLod::CreateInternal(ModelLodAsset& lodAsset)
+        Data::Instance<ModelLod> ModelLod::CreateInternal(const Data::Asset<ModelLodAsset>& lodAsset, const AZStd::any* modelAssetAny)
         {
+            AZ_Assert(modelAssetAny != nullptr, "Invalid model asset param");
+            auto modelAsset = AZStd::any_cast<Data::Asset<ModelAsset>*>(*modelAssetAny);
+
             Data::Instance<ModelLod> lod = aznew ModelLod();
-            const RHI::ResultCode resultCode = lod->Init(lodAsset);
+            const RHI::ResultCode resultCode = lod->Init(lodAsset, *modelAsset);
 
             if (resultCode == RHI::ResultCode::Success)
             {
@@ -44,11 +49,11 @@ namespace AZ
             return nullptr;
         }
 
-        RHI::ResultCode ModelLod::Init(ModelLodAsset& lodAsset)
+        RHI::ResultCode ModelLod::Init(const Data::Asset<ModelLodAsset>& lodAsset, const Data::Asset<ModelAsset>& modelAsset)
         {
-            AZ_TRACE_METHOD();
+            AZ_PROFILE_FUNCTION(RPI);
 
-            for (const ModelLodAsset::Mesh& mesh : lodAsset.GetMeshes())
+            for (const ModelLodAsset::Mesh& mesh : lodAsset->GetMeshes())
             {
                 Mesh meshInstance;
 
@@ -100,10 +105,13 @@ namespace AZ
                     }
                 }
 
-                auto& materialAsset = mesh.GetMaterialAsset();
-                if (materialAsset.IsReady())
+                const ModelMaterialSlot& materialSlot = modelAsset->FindMaterialSlot(mesh.GetMaterialSlotId());
+
+                meshInstance.m_materialSlotStableId = materialSlot.m_stableId;
+
+                if (materialSlot.m_defaultMaterialAsset.IsReady())
                 {
-                    meshInstance.m_material = Material::FindOrCreate(materialAsset);
+                    meshInstance.m_material = Material::FindOrCreate(materialSlot.m_defaultMaterialAsset);
                 }
 
                 m_meshes.emplace_back(AZStd::move(meshInstance));
@@ -255,8 +263,6 @@ namespace AZ
             const MaterialModelUvOverrideMap& materialModelUvMap,
             const MaterialUvNameMap& materialUvNameMap) const
         {
-            AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
-
             streamBufferViewsOut.clear();
 
             RHI::InputStreamLayoutBuilder layoutBuilder;
@@ -281,35 +287,22 @@ namespace AZ
                 {
                     if (contractStreamChannel.m_isOptional)
                     {
-                        //We are using R8G8B8A8_UINT as on Metal mesh stream formats need to be atleast 4 byte aligned.
-                        RHI::Format dummyStreamFormat = RHI::Format::R8G8B8A8_UINT;
+                        // The configuration of the dummy input stream is a bit touchy, and could result in crashes or validation failures that are platform-specific.
+                        // If you modify this code, be sure to test with "-rhi-device-validation=enable" on every platform.
+                        // Here are some criteria that we've noticed before, even for empty buffers:
+                        // Metal: Mesh stream formats need to be at least 4 byte aligned.
+                        // Vulkan: Mesh stream data type (float vs uint) must match the shader, or validation errors are reported
+                        //        ("does not match vertex shader input type")
+                        // Vulkan: We can't just use a null buffer pointer because vulkan will occasionally crash. So we bind some valid non-null buffer and view it with length 0.
+                        // Dx12: Mesh stream data type (float vs uint) must match the shader, or validation warnings are reported
+                        //       ("the matching entry in the Input Layout declaration ... specifies mismatched format").
+                        //
+                        // The stride value does not seem to matter, just the Format type. Still, we use GetFormatSize to set an accurate stride.
+
+                        RHI::Format dummyStreamFormat = RHI::Format::R32G32B32A32_FLOAT;
                         layoutBuilder.AddBuffer()->Channel(contractStreamChannel.m_semantic, dummyStreamFormat);
-                        // We can't just use a null buffer pointer here because vulkan will occasionally crash. So we bind some valid non-null buffer and view it with length 0.
-                        RHI::StreamBufferView dummyBuffer{*mesh.m_indexBufferView.GetBuffer(), 0, 0, 4};
+                        RHI::StreamBufferView dummyBuffer{*mesh.m_indexBufferView.GetBuffer(), 0, 0, RHI::GetFormatSize(dummyStreamFormat)};
                         streamBufferViewsOut.push_back(dummyBuffer);
-
-                        // Note that all of the below scenarios seem to work find on PC, for both dx12 and vulkan. If the above approach proves to be incompatible
-                        // with another platform, consider trying one of the approaches below.
-
-                        //RHI::Format formatDoesntReallyMatter = RHI::Format::R8_UNORM;
-                        //layoutBuilder.AddBuffer(RHI::StreamStepFunction::PerInstance)->Channel(contractStreamChannel.m_semantic, formatDoesntReallyMatter);
-                        //RHI::StreamBufferView dummyBuffer{*mesh.m_indexBufferView.GetBuffer(), 0, 0, 0};
-                        //streamBufferViewsOut.push_back(dummyBuffer);
-
-                        //RHI::Format formatDoesntReallyMatter = RHI::Format::R8G8B8A8_UINT;
-                        //layoutBuilder.AddBuffer(RHI::StreamStepFunction::PerInstance)->Channel(contractStreamChannel.m_semantic, formatDoesntReallyMatter);
-                        //RHI::StreamBufferView dummyBuffer{*mesh.m_indexBufferView.GetBuffer(), 0, 4, 4};
-                        //streamBufferViewsOut.push_back(dummyBuffer);
-
-                        //RHI::Format formatDoesntMatter = RHI::Format::R32G32B32A32_FLOAT;
-                        //layoutBuilder.AddBuffer()->Channel(contractStreamChannel.m_semantic, formatDoesntMatter);
-                        //RHI::StreamBufferView emptyBuffer{*m_buffers[0]->GetRHIBuffer(), 0, 16, 16};
-                        //streamBufferViewsOut.push_back(emptyBuffer);
-
-                        //RHI::Format formatDoesntMatter = RHI::Format::R32G32B32A32_FLOAT;
-                        //layoutBuilder.AddBuffer()->Channel(contractStreamChannel.m_semantic, formatDoesntMatter);
-                        //RHI::StreamBufferView emptyBuffer{*m_buffers[0]->GetRHIBuffer(), 0, 0, 16};
-                        //streamBufferViewsOut.push_back(emptyBuffer);
                     }
                     else
                     {
@@ -357,8 +350,6 @@ namespace AZ
             const MaterialModelUvOverrideMap& materialModelUvMap,
             const MaterialUvNameMap& materialUvNameMap) const
         {
-            AZ_PROFILE_FUNCTION(Debug::ProfileCategory::AzRender);
-
             const Mesh& mesh = m_meshes[meshIndex];
 
             auto defaultUv = FindDefaultUvStream(meshIndex, materialUvNameMap);
@@ -384,7 +375,7 @@ namespace AZ
             const ModelLodAsset::Mesh::StreamBufferInfo& streamBufferInfo,
             Mesh& meshInstance)
         {
-            AZ_TRACE_METHOD();
+            AZ_PROFILE_FUNCTION(RPI);
 
             const Data::Asset<BufferAsset>& streamBufferAsset = streamBufferInfo.m_bufferAssetView.GetBufferAsset();
             const Data::Instance<Buffer>& streamBuffer = Buffer::FindOrCreate(streamBufferAsset);

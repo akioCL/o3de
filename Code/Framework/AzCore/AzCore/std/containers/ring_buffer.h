@@ -5,14 +5,14 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#ifndef AZSTD_RINGBUFFER_H
-#define AZSTD_RINGBUFFER_H 1
+
+#pragma once
 
 #include <AzCore/std/allocator.h>
+#include <AzCore/std/allocator_traits.h>
 #include <AzCore/std/algorithm.h>
 #include <AzCore/std/createdestroy.h>
 #include <AzCore/std/utils.h>
-//#include <AzCore/std/containers/deque.h>
 
 namespace AZStd
 {
@@ -417,7 +417,7 @@ namespace AZStd
         }
 
         AZ_FORCE_INLINE size_type size() const      { return m_size; }
-        AZ_FORCE_INLINE size_type max_size() const  { return m_allocator.max_size() / sizeof(node_type); }
+        AZ_FORCE_INLINE size_type max_size() const  { return AZStd::allocator_traits<allocator_type>::max_size(m_allocator) / sizeof(node_type); }
         AZ_FORCE_INLINE bool empty() const          { return m_size == 0; }
         AZ_FORCE_INLINE bool full() const           { return size_type(m_end - m_buff) == m_size; }
         AZ_FORCE_INLINE size_type free() const      { return size_type(m_end - m_buff) - m_size; }
@@ -483,83 +483,67 @@ namespace AZStd
 
         inline void push_back(const_reference value)
         {
-            if (full())
-            {
-                if (m_size == 0)
-                {
-                    return;
-                }
-                replace(m_last, value);
-                increment(m_last);
-                m_first = m_last;
-            }
-            else
-            {
-                Internal::construct<pointer>::single(m_last, value);
-                increment(m_last);
-                ++m_size;
-            }
+            emplace_back(value);
         }
 
-        inline void push_back()
+        inline void push_back(value_type&& value)
+        {
+            emplace_back(AZStd::move(value));
+        }
+
+        template<class... Args>
+        inline reference emplace_back(Args&&... args)
         {
             if (full())
             {
-                if (m_size == 0)
-                {
-                    return;
-                }
+                AZSTD_CONTAINER_ASSERT(m_size > 0, "Cannot replaces last element in a ring buffer of zero capacity");
                 Internal::destroy<pointer>::single(m_last);
-                Internal::construct<pointer>::single(m_last);
+                Internal::construct<pointer>::single(m_last, AZStd::forward<Args>(args)...);
+                reference emplaceRef = *m_last;
                 increment(m_last);
                 m_first = m_last;
+                return emplaceRef;
             }
             else
             {
-                Internal::construct<pointer>::single(m_last);
+                Internal::construct<pointer>::single(m_last, AZStd::forward<Args>(args)...);
+                reference emplaceRef = *m_last;
                 increment(m_last);
                 ++m_size;
+                return emplaceRef;
             }
         }
 
         inline void push_front(const_reference value)
         {
-            if (full())
-            {
-                if (m_size == 0)
-                {
-                    return;
-                }
-                decrement(m_first);
-                replace(m_first, value);
-                m_last = m_first;
-            }
-            else
-            {
-                decrement(m_first);
-                Internal::construct<pointer>::single(m_first, value);
-                ++m_size;
-            }
+            emplace_front(value);
         }
 
-        inline void push_front()
+        inline void push_front(value_type&& value)
+        {
+            emplace_front(AZStd::move(value));
+        }
+
+        template<class... Args>
+        inline reference emplace_front(Args&&... args)
         {
             if (full())
             {
-                if (m_size == 0)
-                {
-                    return;
-                }
+                AZSTD_CONTAINER_ASSERT(m_size > 0, "Cannot replaces first element in a ring buffer of zero capacity");
                 decrement(m_first);
                 Internal::destroy<pointer>::single(m_first);
-                Internal::construct<pointer>::single(m_first);
+                Internal::construct<pointer>::single(m_first, AZStd::forward<Args>(args)...);
+                reference emplaceRef = *m_first;
                 m_last = m_first;
+                return emplaceRef;
             }
             else
             {
                 decrement(m_first);
-                Internal::construct<pointer>::single(m_first);
+                Internal::construct<pointer>::single(m_first, AZStd::forward<Args>(args)...);
+                reference emplaceRef = *m_first;
                 ++m_size;
+                return emplaceRef;
             }
         }
         AZ_FORCE_INLINE void pop_back()
@@ -1056,7 +1040,7 @@ namespace AZStd
         inline void insert(const iterator& pos, ForwardIterator first, ForwardIterator last, const AZStd::forward_iterator_tag&)
         {
             size_type size = AZStd::distance(first, last);
-            AZSTD_CONTAINER_ASSERT(size >= 0, "AZStd::ring_buffer::insert - there are no elements to insert!");
+            AZSTD_CONTAINER_ASSERT(first > last, "AZStd::ring_buffer::insert - there are no elements to insert!");
             if (size == 0)
             {
                 return;
@@ -1241,6 +1225,3 @@ namespace AZStd
         lhs.swap(rhs);
     }
 }
-
-#endif // AZSTD_RINGBUFFER_H
-#pragma once

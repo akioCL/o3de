@@ -20,8 +20,6 @@ namespace AZ
 
     namespace RHI
     {
-        AZ_ASSERT_NO_ALIGNMENT_PADDING_BEGIN
-
         /**
          * Image views map to a range of mips / array slices in an image.
          */
@@ -83,7 +81,8 @@ namespace AZ
 
             ImageViewDescriptor() = default;
             explicit ImageViewDescriptor(Format overrideFormat);
-
+            bool operator==(const ImageViewDescriptor& other) const;
+            
             HashValue64 GetHash(HashValue64 seed = HashValue64{ 0 }) const;
 
             // Returns true if other is the same sub resource
@@ -124,7 +123,5 @@ namespace AZ
             /// This is needed because a texture array can have 1 layer only.
             uint32_t m_isArray = 0;            
         };
-
-        AZ_ASSERT_NO_ALIGNMENT_PADDING_END
     }
 }

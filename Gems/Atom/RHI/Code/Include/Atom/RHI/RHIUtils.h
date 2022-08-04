@@ -37,8 +37,14 @@ namespace AZ
         //! If multiple values exist it will return the last one
         AZStd::string GetCommandLineValue(const AZStd::string& commandLineOption);
 
-        //! Returns if the current bakcend is a null renderer
-        bool IsNullRenderer();
+        //! Returns true if the command line option is set
+        bool QueryCommandLineOption(const AZStd::string& commandLineOption);
+
+        //! Returns if the current bakcend is null 
+        bool IsNullRHI();
+
+        //! Returns true if the Atom/GraphicsDevMode settings registry key is set
+        bool IsGraphicsDevModeEnabled();
     }
 }
 

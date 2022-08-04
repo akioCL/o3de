@@ -19,18 +19,23 @@ namespace O3DE::ProjectManager
     public:
         EngineInfo() = default;
         EngineInfo(const QString& path, const QString& name, const QString& version, const QString& thirdPartyPath);
+        bool operator<(const EngineInfo& engineInfo) const;
 
         // from engine.json
         QString m_version;
         QString m_name;
         QString m_thirdPartyPath;
 
-        // from o3de_manifest.json
         QString m_path;
+
+        // from o3de_manifest.json
         QString m_defaultProjectsFolder;
         QString m_defaultGemsFolder;
         QString m_defaultTemplatesFolder;
         QString m_defaultRestrictedFolder;
+
+        bool m_registered = false;
+        bool m_thisEngine = false;
 
         bool IsValid() const;
     };

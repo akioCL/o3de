@@ -32,6 +32,8 @@ namespace GradientSignal
     {
         AzToolsFramework::PaintBrushNotificationBus::Handler::BusConnect(entityComponentIdPair);
 
+        // MAB TODO: FIXME - missing hookup for mouse events?
+
         AZ::Transform worldFromLocal = AZ::Transform::CreateIdentity();
         AZ::TransformBus::EventResult(worldFromLocal, GetEntityId(), &AZ::TransformInterface::GetWorldTM);
 
@@ -50,6 +52,13 @@ namespace GradientSignal
         AzToolsFramework::PaintBrushComponentNotificationBus::Event(GetEntityComponentIdPair(), &AzToolsFramework::PaintBrushComponentNotificationBus::Events::SavePaintLayer);
         undo.MarkEntityDirty(GetEntityId());
     }
+
+    AZStd::vector<AzToolsFramework::ActionOverride> EditorImageGradientComponentMode::PopulateActionsImpl()
+    {
+        // MAB TODO: FIXME - what should this return?
+        return {};
+    }
+
 
     bool EditorImageGradientComponentMode::HandleMouseInteraction(
         const AzToolsFramework::ViewportInteraction::MouseInteractionEvent& mouseInteraction)

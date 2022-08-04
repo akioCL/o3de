@@ -7,8 +7,7 @@
  */
 
 #include <Multiplayer/NetworkEntity/NetworkEntityRpcMessage.h>
-#include <AzNetworking/Serialization/NetworkInputSerializer.h>
-#include <AzNetworking/Serialization/NetworkOutputSerializer.h>
+#include <Multiplayer/IMultiplayer.h>
 #include <AzCore/Console/ILogger.h>
 
 namespace Multiplayer
@@ -97,7 +96,7 @@ namespace Multiplayer
             + sizeof(RpcIndex);
 
         // 2-byte size header + the actual blob payload itself
-        const uint32_t sizeOfBlob = (m_data != nullptr) ? sizeof(uint16_t) + m_data->GetSize() : 0;
+        const uint32_t sizeOfBlob = static_cast<uint32_t>((m_data != nullptr) ? sizeof(uint16_t) + m_data->GetSize() : 0);
 
         // No sliceId, remote replicator already exists so we don't need to know what type of entity this is
         return sizeOfFields + sizeOfBlob;
@@ -135,7 +134,7 @@ namespace Multiplayer
             m_data = AZStd::make_unique<AzNetworking::PacketEncodingBuffer>();
         }
 
-        AzNetworking::NetworkInputSerializer serializer(m_data->GetBuffer(), m_data->GetCapacity());
+        RpcInputSerializer serializer(m_data->GetBuffer(), static_cast<uint32_t>(m_data->GetCapacity()));
         if (params.Serialize(serializer))
         {
             m_data->Resize(serializer.GetSize());
@@ -154,7 +153,7 @@ namespace Multiplayer
             return false;
         }
 
-        AzNetworking::NetworkOutputSerializer serializer(m_data->GetBuffer(), m_data->GetSize());
+        RpcOutputSerializer serializer(m_data->GetBuffer(), static_cast<uint32_t>(m_data->GetSize()));
         return outParams.Serialize(serializer);
     }
 

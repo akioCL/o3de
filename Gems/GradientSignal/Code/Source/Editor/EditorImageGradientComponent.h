@@ -11,10 +11,11 @@
 #include <AzToolsFramework/ComponentMode/ComponentModeDelegate.h>
 #include <AzToolsFramework/Brushes/PaintBrush.h>
 #include <AzToolsFramework/Brushes/PaintBrushComponentNotificationBus.h>
-#include <Components/ImageGradientComponent.h>
+#include <GradientSignal/Components/ImageGradientComponent.h>
 #include <GradientSignal/Editor/EditorGradientComponentBase.h>
 
 #include <Atom/RHI.Reflect/Format.h>
+#include <Atom/RPI.Reflect/Image/StreamingImageAsset.h>
 
 namespace GradientSignal
 {
@@ -32,7 +33,7 @@ namespace GradientSignal
         void Deactivate() override;
         
         void SavePaintLayer() override;
-        AZ::RHI::Format GetFormat(const AZ::Data::Asset<ImageAsset>& imageAsset);
+        AZ::RHI::Format GetFormat(const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset);
         void WriteOutputFile(const AZStd::string& filePath);
 
         void OnCompositionChanged() override;
@@ -56,6 +57,6 @@ namespace GradientSignal
     private:
         AzToolsFramework::PaintBrush m_paintBrush;
 
-        AZStd::string m_path;
+        AZ::IO::FixedMaxPath m_path;
     };
 }

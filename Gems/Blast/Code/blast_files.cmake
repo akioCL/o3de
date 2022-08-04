@@ -8,9 +8,9 @@
 
 set(FILES
     Include/Blast/BlastActor.h
+    Include/Blast/BlastActorConfiguration.h
     Include/Blast/BlastActorData.h
     Include/Blast/BlastFamilyComponentBus.h
-    Include/Blast/BlastMaterial.h
     Include/Blast/BlastSystemBus.h
     Include/Blast/BlastDebug.h
     Source/Actor/BlastActorDesc.h
@@ -26,8 +26,8 @@ set(FILES
     Source/Asset/BlastAsset.cpp
     Source/Asset/BlastAssetHandler.h
     Source/Asset/BlastAssetHandler.cpp
-    Source/Asset/BlastSliceAsset.h
-    Source/Asset/BlastSliceAsset.cpp
+    Source/Asset/BlastChunksAsset.h
+    Source/Asset/BlastChunksAsset.cpp
     Source/Components/BlastFamilyComponent.h
     Source/Components/BlastFamilyComponent.cpp
     Source/Components/BlastFamilyComponentNotificationBusHandler.h
@@ -46,6 +46,11 @@ set(FILES
     Source/Family/DamageManager.h
     Source/Family/DamageManager.cpp
     Source/Common/BlastInterfaces.h
-    Source/Common/BlastMaterial.cpp
     Source/Common/Utils.h
+    Source/Material/BlastMaterial.h
+    Source/Material/BlastMaterial.cpp
+    Source/Material/BlastMaterialAsset.h
+    Source/Material/BlastMaterialAsset.cpp
+    Source/Material/BlastMaterialConfiguration.h
+    Source/Material/BlastMaterialConfiguration.cpp
 )

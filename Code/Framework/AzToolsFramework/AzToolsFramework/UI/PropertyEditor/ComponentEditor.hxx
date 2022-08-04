@@ -32,6 +32,11 @@ namespace AZ
 {
     class Component;
     class SerializeContext;
+
+    namespace DocumentPropertyEditor
+    {
+        class ReflectionAdapter;
+    }
 }
 
 namespace AzToolsFramework
@@ -39,6 +44,7 @@ namespace AzToolsFramework
     class ComponentEditorHeader;
     class IPropertyEditorNotify;
     class ReflectedPropertyEditor;
+    class DocumentPropertyEditor;
     enum PropertyModificationRefreshLevel : int;
 
     /**
@@ -90,7 +96,6 @@ namespace AzToolsFramework
 
         void SetComponentOverridden(const bool overridden);
 
-        // Calls match EditorComponentModeNotificationBus - called from EntityPropertyEditor
         void EnteredComponentMode(const AZStd::vector<AZ::Uuid>& componentModeTypes);
         void LeftComponentMode(const AZStd::vector<AZ::Uuid>& componentModeTypes);
         void ActiveComponentModeChanged(const AZ::Uuid& componentType);
@@ -135,9 +140,11 @@ namespace AzToolsFramework
         QIcon m_warningIcon;
 
         ReflectedPropertyEditor* m_propertyEditor = nullptr;
-        QVBoxLayout* m_mainLayout = nullptr;
 
-        AZ::SerializeContext* m_serializeContext;
+        AZStd::shared_ptr<AZ::DocumentPropertyEditor::ReflectionAdapter> m_adapter;
+        DocumentPropertyEditor* m_dpe = nullptr;
+
+        AZ::SerializeContext* m_serializeContext = nullptr;
 
         /// Type of component being shown
         AZ::Uuid m_componentType = AZ::Uuid::CreateNull();

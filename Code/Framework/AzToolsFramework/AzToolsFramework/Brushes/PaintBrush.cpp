@@ -146,11 +146,13 @@ namespace AzToolsFramework
         AZ::EntityId entityIdUnderCursor;
         const int viewportId = mouseInteraction.m_mouseInteraction.m_interactionId.m_viewportId;
 
-        auto selectionFunction = [this, &closestDistance, &entityIdUnderCursor, &mouseInteraction, &viewportId](AZ::Entity* entity)
+        auto selectionFunction = [&closestDistance, &entityIdUnderCursor, &mouseInteraction, &viewportId](AZ::Entity* entity)
         {
-            if (AzToolsFramework::PickEntity(entity->GetId(), mouseInteraction.m_mouseInteraction, closestDistance, viewportId))
+            float tempClosestDistance = std::numeric_limits<float>::max();
+            if (AzToolsFramework::PickEntity(entity->GetId(), mouseInteraction.m_mouseInteraction, tempClosestDistance, viewportId))
             {
                 entityIdUnderCursor = entity->GetId();
+                closestDistance = tempClosestDistance;
             }
         };
 

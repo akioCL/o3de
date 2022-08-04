@@ -19,8 +19,6 @@ namespace AZ
 
     namespace RHI
     {
-        AZ_ASSERT_NO_ALIGNMENT_PADDING_BEGIN
-
         //! Buffer views describe how to interpret a region of memory in a buffer.
         struct BufferViewDescriptor
         {
@@ -30,7 +28,8 @@ namespace AZ
             static void Reflect(AZ::ReflectContext* context);
 
             BufferViewDescriptor() = default;
-
+            bool operator==(const BufferViewDescriptor& other) const;
+            
             //! Creates a structured buffer view. Structured buffers are defined by an array of non-fundamental
             //! types, or custom data structures. The exact format of the data structure is defined elsewhere
             //! (e.g. in the shader).
@@ -85,7 +84,5 @@ namespace AZ
             // manual alignment padding
             char m_pad0 = 0, m_pad1 = 0, m_pad2 = 0;
         };
-
-        AZ_ASSERT_NO_ALIGNMENT_PADDING_END
     }
 }

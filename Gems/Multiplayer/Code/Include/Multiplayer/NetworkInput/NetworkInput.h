@@ -10,6 +10,7 @@
 
 #include <Multiplayer/NetworkEntity/NetworkEntityHandle.h>
 #include <Multiplayer/NetworkInput/IMultiplayerComponentInput.h>
+#include <Multiplayer/IMultiplayerDebug.h>
 #include <Multiplayer/NetworkTime/INetworkTime.h>
 #include <AzCore/RTTI/TypeSafeIntegral.h>
 
@@ -45,9 +46,21 @@ namespace Multiplayer
         AZ::TimeMs GetHostTimeMs() const;
         AZ::TimeMs& ModifyHostTimeMs();
 
+        void SetHostBlendFactor(float hostBlendFactor);
+        float GetHostBlendFactor() const;
+
         void AttachNetBindComponent(NetBindComponent* netBindComponent);
 
         bool Serialize(AzNetworking::ISerializer& serializer);
+
+        //! Fetches a vector of datums detailing which values per component input were
+        //! not the default
+        //! @return A vector of datums detailing inputs and their non-default values
+        AZStd::vector<MultiplayerAuditingElement> GetComponentInputDeltaLogs() const;
+
+        //! Returns the name of the owner entity of this input
+        //! @return An AZStd::string of the owning entity's name
+        const AZStd::string GetOwnerName() const;
 
         const IMultiplayerComponentInput* FindComponentInput(NetComponentId componentId) const;
         IMultiplayerComponentInput* FindComponentInput(NetComponentId componentId);
@@ -72,7 +85,8 @@ namespace Multiplayer
         MultiplayerComponentInputVector m_componentInputs;
         ClientInputId m_inputId = ClientInputId{ 0 };
         HostFrameId m_hostFrameId = InvalidHostFrameId;
-        AZ::TimeMs m_hostTimeMs = AZ::TimeMs{ 0 };
+        AZ::TimeMs m_hostTimeMs = AZ::Time::ZeroTimeMs;
+        float m_hostBlendFactor = 0.f;
         ConstNetworkEntityHandle m_owner;
         bool m_wasAttached = false;
     };
