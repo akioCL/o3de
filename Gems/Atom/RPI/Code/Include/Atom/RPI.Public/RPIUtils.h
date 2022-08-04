@@ -80,6 +80,17 @@ namespace AZ
         T GetSubImagePixelValue(const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset, uint32_t x, uint32_t y,
             uint32_t componentIndex = 0, uint32_t mip = 0, uint32_t slice = 0);
 
+        //! Set single image pixel value in raw image data
+        //! This assumes the imageData is not empty
+        template<typename T>
+        void SetImageDataPixelValue(AZStd::span<uint8_t> imageData, const AZ::RHI::ImageDescriptor& imageDescriptor,
+            T value, uint32_t x, uint32_t y, uint32_t componentIndex = 0);
+
+        //! Set single image pixel value for specified mip and slice
+        template<typename T>
+        void SetSubImagePixelValue(const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset, T value, uint32_t x, uint32_t y,
+            uint32_t componentIndex = 0, uint32_t mip = 0, uint32_t slice = 0);
+
         //! Process a region of image pixel values (float) for specified mip and slice
         //! The visitor function `callback` is invoked on each pixel specified by the region
         //! NOTE: The topLeft coordinate is inclusive, whereas the bottomRight is exclusive
