@@ -34,6 +34,10 @@ namespace GradientSignal
 
         virtual float GetTilingY() const = 0;
         virtual void SetTilingY(float tilingY) = 0;
+
+        virtual uint32_t GetImageHeight() const = 0;
+        virtual uint32_t GetImageWidth() const = 0;
+        virtual AZ::Vector2 GetImagePixelsPerMeter() const = 0;
     };
 
     using ImageGradientRequestBus = AZ::EBus<ImageGradientRequests>;

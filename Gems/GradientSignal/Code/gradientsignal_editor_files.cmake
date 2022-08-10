@@ -30,6 +30,8 @@ set(FILES
     Source/Editor/EditorGradientSurfaceDataComponent.h
     Source/Editor/EditorGradientTransformComponent.cpp
     Source/Editor/EditorGradientTransformComponent.h
+    Source/Editor/EditorImageGradientComponentMode.cpp
+    Source/Editor/EditorImageGradientComponentMode.h
     Source/Editor/EditorImageGradientComponent.cpp
     Source/Editor/EditorImageGradientComponent.h
     Source/Editor/EditorInvertGradientComponent.cpp

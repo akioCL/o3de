@@ -82,8 +82,10 @@ namespace GradientSignal
         AZ::Crc32 GetManualScaleVisibility() const;
 
         AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_imageAsset = { AZ::Data::AssetLoadBehavior::QueueLoad };
+        AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_overrideAsset = { AZ::Data::AssetLoadBehavior::QueueLoad };
         AZ::Vector2 m_tiling = AZ::Vector2::CreateOne();
 
+        bool m_useOverride = false;
         bool m_advancedMode = false;
         ChannelToUse m_channelToUse = ChannelToUse::Red;
         CustomScaleType m_customScaleType = CustomScaleType::None;
@@ -100,7 +102,7 @@ namespace GradientSignal
     */
     class ImageGradientComponent
         : public AZ::Component
-        , private AZ::Data::AssetBus::Handler
+        , private AZ::Data::AssetBus::MultiHandler
         , private GradientRequestBus::Handler
         , private ImageGradientRequestBus::Handler
         , private GradientTransformNotificationBus::Handler
@@ -132,6 +134,10 @@ namespace GradientSignal
         void OnAssetMoved(AZ::Data::Asset<AZ::Data::AssetData> asset, void* oldDataPointer) override;
         void OnAssetReloaded(AZ::Data::Asset<AZ::Data::AssetData> asset) override;
 
+        void CopyImageAsset(
+            const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& source, AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& destination);
+        void ClearOverrideConfiguration();
+
     protected:
         // GradientTransformNotificationBus overrides...
         void OnGradientTransformChanged(const GradientTransform& newTransform) override;
@@ -159,6 +165,16 @@ namespace GradientSignal
 
         float GetTilingY() const override;
         void SetTilingY(float tilingY) override;
+
+        void SetValue(const GradientSampleParams& sampleParams, float newValue) override;
+        void SetValueInImageData(const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& image, const AZ::Vector3& uvw, float newValue);
+        void SetPixelValue(AZ::u32 x, AZ::u32 y, float value);
+
+        void UpdateCurrentAsset(const AZ::Data::Asset<AZ::Data::AssetData> asset);
+
+        uint32_t GetImageHeight() const;
+        uint32_t GetImageWidth() const;
+        AZ::Vector2 GetImagePixelsPerMeter() const;
 
     private:
         ImageGradientConfig m_configuration;

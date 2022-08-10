@@ -8,27 +8,55 @@
 
 #pragma once
 
-#include <GradientSignal/Editor/EditorGradientComponentBase.h>
+#include <AzToolsFramework/ComponentMode/ComponentModeDelegate.h>
+#include <AzToolsFramework/Brushes/PaintBrush.h>
+#include <AzToolsFramework/Brushes/PaintBrushComponentNotificationBus.h>
 #include <GradientSignal/Components/ImageGradientComponent.h>
+#include <GradientSignal/Editor/EditorGradientComponentBase.h>
+
+#include <Atom/RHI.Reflect/Format.h>
+#include <Atom/RPI.Reflect/Image/StreamingImageAsset.h>
 
 namespace GradientSignal
 {
     class EditorImageGradientComponent
         : public EditorGradientComponentBase<ImageGradientComponent, ImageGradientConfig>
+        , private AZ::Data::AssetBus::Handler
+        , private AzToolsFramework::PaintBrushComponentNotificationBus::Handler
     {
     public:
         using BaseClassType = EditorGradientComponentBase<ImageGradientComponent, ImageGradientConfig>;
         AZ_EDITOR_COMPONENT(EditorImageGradientComponent, EditorImageGradientComponentTypeId, BaseClassType);
         static void Reflect(AZ::ReflectContext* context);
 
+        void Activate() override;
+        void Deactivate() override;
+        
+        void SavePaintLayer() override;
+        AZ::RHI::Format GetFormat(const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset);
+        void WriteOutputFile(const AZStd::string& filePath);
+
+        void OnCompositionChanged() override;
+
         static constexpr const char* const s_categoryName = "Gradients";
         static constexpr const char* const s_componentName = "Image Gradient";
         static constexpr const char* const s_componentDescription = "Generates a gradient by sampling an image asset";
-        static constexpr const char* const s_icon = "Editor/Icons/Components/Gradient.svg";
+        static constexpr const char* const s_icon = "Editor/Icons/Components/Gradient.svg";        
         static constexpr const char* const s_viewportIcon = "Editor/Icons/Components/Viewport/Gradient.svg";
-        static constexpr const char* const s_helpUrl = "";
+        static constexpr const char* const s_helpUrl = "https://o3de.org/docs/user-guide/components/";
 
-        // DependencyNotificationBus overrides ...
-        void OnCompositionChanged() override;
+    protected:
+        using ComponentModeDelegate = AzToolsFramework::ComponentModeFramework::ComponentModeDelegate;
+        ComponentModeDelegate m_componentModeDelegate;
+        
+        void OnAssetReady(AZ::Data::Asset<AZ::Data::AssetData> asset) override;
+
+        bool InComponentMode() const;
+        AZ::Crc32 InOverrideMode() const;
+
+    private:
+        AzToolsFramework::PaintBrush m_paintBrush;
+
+        AZ::IO::FixedMaxPath m_path;
     };
 }

@@ -48,6 +48,7 @@ namespace GradientSignal
 
             behaviorContext->EBus<GradientRequestBus>("GradientRequestBus")
                 ->Event("GetValue", &GradientRequestBus::Events::GetValue)
+                ->Event("SetValue", &GradientRequestBus::Events::SetValue)
                 ;
         }
     }

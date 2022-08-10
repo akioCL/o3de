@@ -51,6 +51,11 @@ namespace GradientSignal
         virtual float GetValue(const GradientSampleParams& sampleParams) const = 0;
 
         /**
+         * Given a certain position and a new value, update the bit's value.
+         */
+        virtual void SetValue([[maybe_unused]] const GradientSampleParams& sampleParams, [[maybe_unused]] float newValue) { AZ_Assert(false, "SetValue() not implemented"); }
+
+        /**
          * Given a list of positions, generate values. Implementations of this need to be thread-safe without using locks,
          * as it can get called from multiple threads simultaneously and has the potential to cause lock inversion deadlocks.
          * \param positions The input list of positions to query.

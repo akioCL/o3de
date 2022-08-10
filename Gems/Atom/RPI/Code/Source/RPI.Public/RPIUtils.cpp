@@ -284,6 +284,171 @@ namespace AZ
             }
 
             // Given an XY position, return a pair of indices that can be used to decode an individual pixel.
+            void SetFloatValue(
+                AZ::u8* mem, AZStd::pair<size_t, size_t> indices, uint32_t componentIndex, AZ::RHI::Format format, float value)
+            {
+                switch (format)
+                {
+                case AZ::RHI::Format::R8_UNORM:
+                case AZ::RHI::Format::A8_UNORM:
+                case AZ::RHI::Format::R8G8_UNORM:
+                case AZ::RHI::Format::R8G8B8A8_UNORM:
+                case AZ::RHI::Format::A8B8G8R8_UNORM:
+                    {
+                        AZ::u8 pixel = static_cast<AZ::u8>(value * static_cast<float>(std::numeric_limits<AZ::u8>::max()));
+                        mem[indices.first + componentIndex] = pixel;
+                        break;
+                    }
+                case AZ::RHI::Format::R8_UNORM_SRGB:
+                case AZ::RHI::Format::R8G8_UNORM_SRGB:
+                case AZ::RHI::Format::R8G8B8A8_UNORM_SRGB:
+                case AZ::RHI::Format::A8B8G8R8_UNORM_SRGB:
+                    {
+                        AZ::u8 pixel = static_cast<AZ::u8>(
+                            AZ::Color::ConvertSrgbLinearToGamma(value) * static_cast<float>(std::numeric_limits<AZ::u8>::max()));
+                        mem[indices.first + componentIndex] = pixel;
+                        break;
+                    }
+                case AZ::RHI::Format::R8_SNORM:
+                case AZ::RHI::Format::R8G8_SNORM:
+                case AZ::RHI::Format::R8G8B8A8_SNORM:
+                case AZ::RHI::Format::A8B8G8R8_SNORM:
+                    {
+                        AZ::s8 pixel = static_cast<AZ::s8>(
+                            ((value - 0.5f) * 2.0f) * static_cast<float>(std::numeric_limits<AZ::s8>::max()));
+                        mem[indices.first + componentIndex] = pixel;
+                        break;
+                    }
+                case AZ::RHI::Format::D16_UNORM:
+                case AZ::RHI::Format::R16_UNORM:
+                case AZ::RHI::Format::R16G16_UNORM:
+                case AZ::RHI::Format::R16G16B16A16_UNORM:
+                    {
+                        auto actualMem = reinterpret_cast<AZ::u16*>(mem);
+                        AZ::u16 pixel = static_cast<AZ::u16>(value * static_cast<float>(std::numeric_limits<AZ::u16>::max()));
+                        actualMem[indices.first + componentIndex] = pixel;
+                        break;
+                    }
+                case AZ::RHI::Format::R16_SNORM:
+                case AZ::RHI::Format::R16G16_SNORM:
+                case AZ::RHI::Format::R16G16B16A16_SNORM:
+                    {
+                        AZ::s16 pixel =
+                            static_cast<AZ::s16>(((value - 0.5f) * 2.0f) * static_cast<float>(std::numeric_limits<AZ::s16>::max()));
+                        auto actualMem = reinterpret_cast<AZ::s16*>(mem);
+                        actualMem[indices.first + componentIndex] = pixel;
+                        break;
+                    }
+                case AZ::RHI::Format::R16_FLOAT:
+                case AZ::RHI::Format::R16G16_FLOAT:
+                case AZ::RHI::Format::R16G16B16A16_FLOAT:
+                    {
+                        auto actualMem = reinterpret_cast<float*>(mem);
+                        actualMem[indices.first + componentIndex] = SHalf(value);
+                        break;
+                    }
+                case AZ::RHI::Format::D32_FLOAT:
+                case AZ::RHI::Format::R32_FLOAT:
+                case AZ::RHI::Format::R32G32_FLOAT:
+                case AZ::RHI::Format::R32G32B32_FLOAT:
+                case AZ::RHI::Format::R32G32B32A32_FLOAT:
+                    {
+                        auto actualMem = reinterpret_cast<float*>(mem);
+                        actualMem[indices.first + componentIndex] = value;
+                    }
+                case AZ::RHI::Format::BC1_UNORM:
+                    {
+                        AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                        break;
+                        //auto actualMem = reinterpret_cast<const BC1Block*>(mem);
+                        //return actualMem[indices.first].GetBlockColor(indices.second, componentIndex);
+                    }
+                case AZ::RHI::Format::BC1_UNORM_SRGB:
+                    {
+                        AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                        break;
+                        //auto actualMem = reinterpret_cast<const BC1Block*>(mem);
+                        //float color = actualMem[indices.first].GetBlockColor(indices.second, componentIndex);
+                        //return s_SrgbGammaToLinearLookupTable[aznumeric_cast<uint8_t>(color * AZStd::numeric_limits<AZ::u8>::max())];
+                    }
+                default:
+                    AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                    break;
+                }
+            }
+
+            void SetUintValue(
+                AZ::u8* mem, AZStd::pair<size_t, size_t> indices, uint32_t componentIndex, AZ::RHI::Format format, AZ::u32 value)
+            {
+                switch (format)
+                {
+                case AZ::RHI::Format::R8_UINT:
+                case AZ::RHI::Format::R8G8_UINT:
+                case AZ::RHI::Format::R8G8B8A8_UINT:
+                    {
+                        mem[indices.first + componentIndex] = value >> 24;
+                        break;
+                    }
+                case AZ::RHI::Format::R16_UINT:
+                case AZ::RHI::Format::R16G16_UINT:
+                case AZ::RHI::Format::R16G16B16A16_UINT:
+                    {
+                        auto actualMem = reinterpret_cast<AZ::u16*>(mem);
+                        actualMem[indices.first + componentIndex] = (value >> 16);
+                        break;
+                    }
+                case AZ::RHI::Format::R32_UINT:
+                case AZ::RHI::Format::R32G32_UINT:
+                case AZ::RHI::Format::R32G32B32_UINT:
+                case AZ::RHI::Format::R32G32B32A32_UINT:
+                    {
+                        auto actualMem = reinterpret_cast<AZ::u32*>(mem);
+                        actualMem[indices.first + componentIndex] = value;
+                        break;
+                    }
+                default:
+                    AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                    break;
+                }
+            }
+
+            void SetIntValue(
+                AZ::u8* mem, AZStd::pair<size_t, size_t> indices, uint32_t componentIndex, AZ::RHI::Format format, AZ::s32 value)
+            {
+                switch (format)
+                {
+                case AZ::RHI::Format::R8_SINT:
+                case AZ::RHI::Format::R8G8_SINT:
+                case AZ::RHI::Format::R8G8B8A8_SINT:
+                    {
+                        AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                        break;
+                        // return mem[indices.first + componentIndex] / static_cast<AZ::s32>(std::numeric_limits<AZ::s8>::max());
+                    }
+                case AZ::RHI::Format::R16_SINT:
+                case AZ::RHI::Format::R16G16_SINT:
+                case AZ::RHI::Format::R16G16B16A16_SINT:
+                    {
+                        AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                        break;
+                        // auto actualMem = reinterpret_cast<const AZ::s16*>(mem);
+                        //return actualMem[indices.first + componentIndex] / static_cast<AZ::s32>(std::numeric_limits<AZ::s16>::max());
+                    }
+                case AZ::RHI::Format::R32_SINT:
+                case AZ::RHI::Format::R32G32_SINT:
+                case AZ::RHI::Format::R32G32B32_SINT:
+                case AZ::RHI::Format::R32G32B32A32_SINT:
+                    {
+                        auto actualMem = reinterpret_cast<AZ::s32*>(mem);
+                        actualMem[indices.first + componentIndex] = value;
+                        break;
+                    }
+                default:
+                    AZ_Assert(false, "Unsupported pixel format: %s", AZ::RHI::ToString(format));
+                    break;
+                }
+            }
+
             // For uncompressed formats:
             //   The first index points to the start of the pixel when indexing by component type
             //   The second index is 0 (unused)
@@ -784,6 +949,110 @@ namespace AZ
 
             return true;
         }
+
+        template<>
+        void SetImageDataPixelValue<float>(
+            AZStd::span<uint8_t> imageData,
+            const AZ::RHI::ImageDescriptor& imageDescriptor,
+            float value,
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex)
+        {
+            auto imageDataIndices = Internal::GetImageDataIndex(imageDescriptor, x, y);
+            Internal::SetFloatValue(imageData.data(), imageDataIndices, componentIndex, imageDescriptor.m_format, value);
+        }
+
+        template<>
+        void SetImageDataPixelValue<AZ::u32>(
+            AZStd::span<uint8_t> imageData,
+            const AZ::RHI::ImageDescriptor& imageDescriptor,
+            AZ::u32 value,
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex)
+        {
+            auto imageDataIndices = Internal::GetImageDataIndex(imageDescriptor, x, y);
+            Internal::SetUintValue(imageData.data(), imageDataIndices, componentIndex, imageDescriptor.m_format, value);
+        }
+
+        template<>
+        void SetImageDataPixelValue<AZ::s32>(
+            AZStd::span<uint8_t> imageData,
+            const AZ::RHI::ImageDescriptor& imageDescriptor,
+            AZ::s32 value, 
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex)
+        {
+            auto imageDataIndices = Internal::GetImageDataIndex(imageDescriptor, x, y);
+            Internal::SetIntValue(imageData.data(), imageDataIndices, componentIndex, imageDescriptor.m_format, value);
+        }
+
+        template<typename T>
+        void SetSubImagePixelValueInternal(
+            const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset,
+            T value,
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex,
+            uint32_t mip,
+            uint32_t slice)
+        {
+            if (!imageAsset.IsReady())
+            {
+                return;
+            }
+
+            auto imageData = imageAsset->GetSubImageData(mip, slice);
+            if (!imageData.empty())
+            {
+                AZStd::span<uint8_t> nonConstImageData(const_cast<uint8_t*>(imageData.data()), imageData.size());
+                auto imageDescriptor = imageAsset->GetImageDescriptorForMipLevel(mip);
+                SetImageDataPixelValue<T>(nonConstImageData, imageDescriptor, value, x, y, componentIndex);
+            }
+        }
+
+        template<>
+        void SetSubImagePixelValue<float>(
+            const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset,
+            float value,
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex,
+            uint32_t mip,
+            uint32_t slice)
+        {
+            SetSubImagePixelValueInternal<float>(imageAsset, value, x, y, componentIndex, mip, slice);
+        }
+
+        template<>
+        void SetSubImagePixelValue<AZ::u32>(
+            const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset,
+            AZ::u32 value,
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex,
+            uint32_t mip,
+            uint32_t slice)
+        {
+            SetSubImagePixelValueInternal<AZ::u32>(imageAsset, value, x, y, componentIndex, mip, slice);
+        }
+
+        template<>
+        void SetSubImagePixelValue<AZ::s32>(
+            const AZ::Data::Asset<AZ::RPI::StreamingImageAsset>& imageAsset,
+            AZ::s32 value, 
+            uint32_t x,
+            uint32_t y,
+            uint32_t componentIndex,
+            uint32_t mip,
+            uint32_t slice)
+        {
+            SetSubImagePixelValueInternal<AZ::s32>(imageAsset, value, x, y, componentIndex, mip, slice);
+        }
+
+
 
         AZStd::optional<RenderPipelineDescriptor> GetRenderPipelineDescriptorFromAsset(const AZStd::string& pipelineAssetPath, AZStd::string_view nameSuffix)
         {
