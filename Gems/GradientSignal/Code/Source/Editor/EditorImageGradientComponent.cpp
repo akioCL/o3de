@@ -107,11 +107,13 @@ namespace GradientSignal
 
         if (!AZ::Data::AssetBus::Handler::BusIsConnectedId(m_configuration.m_imageAsset.GetId()))
         {
+            /*
             m_configuration.m_useOverride = false;
             m_configuration.m_overrideAsset = { AZ::Data::AssetLoadBehavior::QueueLoad };
             m_path.clear();
 
             m_component.ClearOverrideConfiguration();
+            */
 
             AZ::Data::AssetBus::Handler::BusDisconnect();
             AZ::Data::AssetBus::Handler::BusConnect(m_configuration.m_imageAsset.GetId());
