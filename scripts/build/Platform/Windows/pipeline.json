@@ -1,6 +1,6 @@
 {
     "ENV": {
-        "NODE_LABEL": "windows-a4a28adb2",
+        "NODE_LABEL": "windows-a4a28adb2-test",
         "LY_3RDPARTY_PATH": "D:/workspace/3rdParty",
         "TIMEOUT": 30,
         "WORKSPACE": "D:/workspace",
