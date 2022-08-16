@@ -42,7 +42,6 @@
 #include <AzToolsFramework/API/EntityCompositionRequestBus.h>
 #include <AzToolsFramework/API/ComponentEntityObjectBus.h>
 #include <AzToolsFramework/AssetBrowser/AssetBrowserEntry.h>
-#include <AzToolsFramework/AssetBrowser/AssetBrowserSourceDropBus.h>
 #include <AzToolsFramework/ContainerEntity/ContainerEntityInterface.h>
 #include <AzToolsFramework/Entity/EditorEntityContextBus.h>
 #include <AzToolsFramework/Entity/EditorEntityHelpers.h>
@@ -57,11 +56,11 @@
 #include <AzToolsFramework/ToolsComponents/EditorVisibilityBus.h>
 #include <AzToolsFramework/ToolsComponents/EditorOnlyEntityComponentBus.h>
 #include <AzToolsFramework/ToolsComponents/GenericComponentWrapper.h>
-#include <AzToolsFramework/ToolsComponents/SelectionComponent.h>
 #include <AzToolsFramework/ToolsComponents/TransformComponent.h>
 #include <AzToolsFramework/UI/EditorEntityUi/EditorEntityUiInterface.h>
 #include <AzToolsFramework/UI/EditorEntityUi/EditorEntityUiHandlerBase.h>
 #include <AzToolsFramework/UI/Outliner/EntityOutlinerDisplayOptionsMenu.h>
+#include <AzToolsFramework/UI/Outliner/EntityOutlinerDragAndDropContext.h>
 #include <AzToolsFramework/UI/Outliner/EntityOutlinerSortFilterProxyModel.hxx>
 #include <AzToolsFramework/UI/Outliner/EntityOutlinerTreeView.hxx>
 #include <AzToolsFramework/UI/Outliner/EntityOutlinerCacheBus.h>
@@ -80,7 +79,6 @@ namespace AzToolsFramework
     EntityOutlinerListModel::EntityOutlinerListModel(QObject* parent)
         : QAbstractItemModel(parent)
         , m_entitySelectQueue()
-        , m_entityExpandQueue()
         , m_entityChangeQueue()
         , m_entityChangeQueued(false)
         , m_entityLayoutQueued(false)
@@ -93,6 +91,8 @@ namespace AzToolsFramework
 
     EntityOutlinerListModel::~EntityOutlinerListModel()
     {
+        FocusModeNotificationBus::Handler::BusDisconnect();
+        Prefab::PrefabFocusNotificationBus::Handler::BusDisconnect();
         ContainerEntityNotificationBus::Handler::BusDisconnect();
         EditorEntityInfoNotificationBus::Handler::BusDisconnect();
         EditorEntityContextNotificationBus::Handler::BusDisconnect();
@@ -116,6 +116,8 @@ namespace AzToolsFramework
             editorEntityContextId, &AzToolsFramework::EditorEntityContextRequestBus::Events::GetEditorEntityContextId);
 
         ContainerEntityNotificationBus::Handler::BusConnect(editorEntityContextId);
+        Prefab::PrefabFocusNotificationBus::Handler::BusConnect(editorEntityContextId);
+        FocusModeNotificationBus::Handler::BusConnect(editorEntityContextId);
 
         m_editorEntityUiInterface = AZ::Interface<AzToolsFramework::EditorEntityUiInterface>::Get();
         AZ_Assert(m_editorEntityUiInterface != nullptr, "EntityOutlinerListModel requires a EditorEntityUiInterface instance on Initialize.");
@@ -605,7 +607,7 @@ namespace AzToolsFramework
                 return true;
             }
 
-            if (CanDropMimeDataAssets(data, action, row, column, parent))
+            if (CanDropMimeData(data, action, row, column, parent))
             {
                 return true;
             }
@@ -677,16 +679,22 @@ namespace AzToolsFramework
             }
         }
 
-        if (data->hasFormat(AssetBrowser::AssetBrowserEntry::GetMimeType()))
-        {
-            return DropMimeDataAssets(data, action, row, column, parent);
-        }
-
+        // if its entity ids (internal drags of entities onto each other in the outliner), we handle this internally
         if (data->hasFormat(EditorEntityIdContainer::GetMimeType()))
         {
             return dropMimeDataEntities(data, action, row, column, parent);
         }
 
+        // if its not what we handle internally, try handling it externally
+        if (data->hasFormat(AssetBrowser::AssetBrowserEntry::GetMimeType()))
+        {
+            if (DropMimeData(data, action, row, column, parent))
+            {
+                return true;
+            }
+        }
+
+        // nothing handled it, so let Qt have it
         return QAbstractItemModel::dropMimeData(data, action, row, column, parent);
     }
 
@@ -722,265 +730,78 @@ namespace AzToolsFramework
         return false;
     }
     
-    bool EntityOutlinerListModel::DecodeAssetMimeData(const QMimeData* data, AZStd::optional<ComponentAssetPairs*> componentAssetPairs,
-        AZStd::optional<AZStd::vector<AZStd::string>*> sourceFiles) const
-    {
-        bool canHandleData = false;
-        AZStd::vector<AssetBrowser::AssetBrowserEntry*> entries;
-        AssetBrowser::AssetBrowserEntry::FromMimeData(data, entries);
-
-        AZStd::vector<const AssetBrowser::ProductAssetBrowserEntry*> products;
-
-        // Go through all entries and determine if they have products or are source-only.
-        for (AssetBrowser::AssetBrowserEntry* entry : entries)
-        {
-            const AssetBrowser::ProductAssetBrowserEntry* productEntry = azrtti_cast<const AssetBrowser::ProductAssetBrowserEntry*>(entry);
-
-            if (productEntry)
-            {
-                products.push_back(productEntry);
-            }
-            else
-            {
-                // If it's a source entry AND that extension is handled, use it directly
-                const AssetBrowser::SourceAssetBrowserEntry* sourceEntry = azrtti_cast<const AssetBrowser::SourceAssetBrowserEntry*>(entry);
-
-                if (sourceEntry && AssetBrowser::AssetBrowserSourceDropBus::HasHandlers(sourceEntry->GetExtension()))
-                {
-                    if (sourceFiles.has_value())
-                    {
-                        sourceFiles.value()->push_back(sourceEntry->GetFullPath());
-                    }
-                    canHandleData = true;
-                }
-                else
-                {
-                    // If it's not a product entry, but it has product children, just use those instead.
-                    AZStd::vector<const AssetBrowser::ProductAssetBrowserEntry*> children;
-                    entry->GetChildren<AssetBrowser::ProductAssetBrowserEntry>(children);
-
-                    for (auto child : children)
-                    {
-                        products.push_back(child);
-                    }
-                }
-            }
-        }
-
-        // Handle all Product assets.
-        for (const auto* product : products)
-        {
-            // Determine if the product type has an associated component.
-            // If so, store the componentType->assetId pair.
-            bool canCreateComponent = false;
-            AZ::AssetTypeInfoBus::EventResult(canCreateComponent, product->GetAssetType(), &AZ::AssetTypeInfo::CanCreateComponent, product->GetAssetId());
-
-            AZ::TypeId componentType;
-            AZ::AssetTypeInfoBus::EventResult(componentType, product->GetAssetType(), &AZ::AssetTypeInfo::GetComponentTypeId);
-
-            if (canCreateComponent && !componentType.IsNull())
-            {
-                if (componentAssetPairs.has_value())
-                {
-                    componentAssetPairs.value()->push_back(AZStd::make_pair(componentType, product->GetAssetId()));
-                }
-                canHandleData = true;
-            }
-        }
-
-        return canHandleData;
-    }
-
-    bool EntityOutlinerListModel::CanDropMimeDataAssets(
+    bool EntityOutlinerListModel::CanDropMimeData(
         const QMimeData* data,
         [[maybe_unused]] Qt::DropAction action,
         [[maybe_unused]] int row,
         [[maybe_unused]] int column,
         const QModelIndex& parent) const
     {
+        if (action != Qt::DropAction::CopyAction)
+        {
+            // we can only 'move' entityIds, and that will already be handled at this point
+            // so if we get here, and its not a 'copy' operation, we must refuse.  Accepting
+            // a 'move' operation for example will cause the sender to try to delete the object
+            // if it is accepted.  (So for example dragging a file from windows explorer to
+            // a view that accepts a 'move' operation will cause windows explorer to delete the
+            // file, as it will be satisfied that the file has been safely 'moved' to the target.
+            return false;
+        }
+
         AZ::EntityId parentId = GetEntityFromIndex(parent);
 
-        // Disable dropping assets on closed container entities.
-        if (auto containerEntityInterface = AZ::Interface<ContainerEntityInterface>::Get();
-            !containerEntityInterface->IsContainerOpen(parentId))
+        if (parentId.IsValid())
         {
-            return false;
+            // Disable dropping assets on closed container entities.
+            if (auto containerEntityInterface = AZ::Interface<ContainerEntityInterface>::Get();
+                !containerEntityInterface->IsContainerOpen(parentId))
+            {
+                return false;
+            }
+
+            // Disable dropping assets on read-only entities.
+            if (m_readOnlyEntityPublicInterface->IsReadOnly(parentId))
+            {
+                return false;
+            }
         }
 
-        // Disable dropping assets on read-only entities.
-        if (m_readOnlyEntityPublicInterface->IsReadOnly(parentId))
-        {
-            return false;
-        }
+        // if the program gets here, it means that the thing being dropped on
+        // is either the empty space, or its in something we are allowed to modify.
+        // So, delegate responsibility to bus listeners.
+        EntityOutlinerDragAndDropContext context;
+        context.m_dataBeingDropped = data;
+        context.m_parentEntity = parentId;
+        bool accepted = false;
+        AzQtComponents::DragAndDropItemViewEventsBus::Event(
+            AzQtComponents::DragAndDropContexts::EntityOutliner,
+            &AzQtComponents::DragAndDropItemViewEvents::CanDropItemView,
+            accepted,
+            context);
 
-        if (data->hasFormat(AssetBrowser::AssetBrowserEntry::GetMimeType()))
-        {
-            return DecodeAssetMimeData(data);
-        }
-
-        return false;
+        return accepted;
     }
 
-    bool EntityOutlinerListModel::DropMimeDataAssets(const QMimeData* data, [[maybe_unused]] Qt::DropAction action, int row, [[maybe_unused]] int column, const QModelIndex& parent)
+    bool EntityOutlinerListModel::DropMimeData(const QMimeData* data, [[maybe_unused]] Qt::DropAction action, int row, [[maybe_unused]] int column, const QModelIndex& parent)
     {
-        ComponentAssetPairs componentAssetPairs;
-        AZStd::vector<AZStd::string> sourceFiles;
         AZ::EntityId assignParentId = GetEntityFromIndex(parent);
 
-        bool hasValidAssets = DecodeAssetMimeData(data, &componentAssetPairs, &sourceFiles);
-        if (!hasValidAssets)
+        // calling CanDropMimeDataAssets means not having to repeat redundant code here, orr forgetting to
+        // add additional conditions that were added to CanDrop into the Do Drop.
+        if (!CanDropMimeData(data, action, row, column, parent))
         {
             return false;
         }
 
-        // If the parent entity is a closed container, bail.
-        if (auto containerEntityInterface = AZ::Interface<ContainerEntityInterface>::Get();
-            !containerEntityInterface->IsContainerOpen(assignParentId))
-        {
-            return false;
-        }
+        // delegate responsibility to listeners
+        EntityOutlinerDragAndDropContext context;
+        context.m_dataBeingDropped = data;
+        context.m_parentEntity = assignParentId;
+        bool accepted = false;
+        AzQtComponents::DragAndDropItemViewEventsBus::Event(
+            AzQtComponents::DragAndDropContexts::EntityOutliner, &AzQtComponents::DragAndDropItemViewEvents::DoDropItemView, accepted, context);
 
-        // Source Files
-        if (!sourceFiles.empty())
-        {
-            // Get position (center of viewport). If no viewport is available, (0,0,0) will be used.
-            AZ::Vector3 viewportCenterPosition = AZ::Vector3::CreateZero();
-            EditorRequestBus::BroadcastResult(viewportCenterPosition, &EditorRequestBus::Events::GetWorldPositionAtViewportCenter);
-
-            for (AZStd::string& sourceFile : sourceFiles)
-            {
-                AZStd::string extension;
-                AZ::StringFunc::Path::GetExtension(sourceFile.c_str(), extension);
-
-                AssetBrowser::AssetBrowserSourceDropBus::Event(
-                    extension, &AssetBrowser::AssetBrowserSourceDropEvents::HandleSourceFileType, sourceFile, assignParentId, viewportCenterPosition
-                );
-            }
-        }
-
-        // Product Assets
-        if (componentAssetPairs.size() > 0)
-        {
-            ScopedUndoBatch undo("Create/Modify Entities for Asset Drop");
-
-            AZ::Vector3 viewportCenter = AZ::Vector3::CreateZero();
-            EditorRequestBus::BroadcastResult(viewportCenter, &EditorRequestBus::Events::GetWorldPositionAtViewportCenter);
-
-            // Only resolve an existing if the drop was directly on it. Otherwise we'll create a new entity.
-            AZ::EntityId targetEntityId = (row < 0) ? GetEntityFromIndex(parent) : AZ::EntityId();
-            bool createdNewEntity = false;
-
-            // Shift modifier enables creating a child entity from the asset.
-            if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
-            {
-                assignParentId = targetEntityId;
-                targetEntityId.SetInvalid();
-            }
-
-            if (!targetEntityId.IsValid())
-            {
-                // Only set the entity instantiation position if a new entity will be created. Otherwise, the next entity to be created will
-                // be given this position.
-                ToolsApplicationNotificationBus::Broadcast(
-                    &ToolsApplicationNotificationBus::Events::SetEntityInstantiationPosition, assignParentId,
-                    GetEntityFromIndex(index(row, 0, parent)));
-
-                EditorRequests::Bus::BroadcastResult(targetEntityId, &EditorRequests::CreateNewEntity, assignParentId);
-                if (!targetEntityId.IsValid())
-                {
-                    // Clear the entity instantiation position because this entity failed to be created.
-                    // Otherwise, the next entity to be created will be given the wrong parent in the outliner.
-                    ToolsApplicationNotificationBus::Broadcast(&ToolsApplicationNotificationBus::Events::ClearEntityInstantiationPosition);
-                    QMessageBox::warning(
-                        AzToolsFramework::GetActiveWindow(), tr("Asset Drop Failed"), tr("A new entity could not be created for the specified asset."));
-                    return false;
-                }
-
-                createdNewEntity = true;
-            }
-
-            AZ::Entity* targetEntity = nullptr;
-            AZ::ComponentApplicationBus::BroadcastResult(targetEntity, &AZ::ComponentApplicationBus::Events::FindEntity, targetEntityId);
-            if (!targetEntity)
-            {
-                QMessageBox::warning(AzToolsFramework::GetActiveWindow(), tr("Asset Drop Failed"), tr("Failed to locate target entity."));
-                return false;
-            }
-
-            // Batch-add all the components.
-            AZ::ComponentTypeList componentsToAdd;
-            componentsToAdd.reserve(componentAssetPairs.size());
-            for (const ComponentAssetPair& pair : componentAssetPairs)
-            {
-                const AZ::TypeId& componentType = pair.first;
-
-                componentsToAdd.push_back(componentType);
-            }
-
-            AZStd::vector<AZ::EntityId> entityIds = {targetEntityId};
-            EntityCompositionRequests::AddComponentsOutcome addComponentsOutcome = AZ::Failure(AZStd::string());
-            EntityCompositionRequestBus::BroadcastResult(
-                addComponentsOutcome, &EntityCompositionRequests::AddComponentsToEntities, entityIds, componentsToAdd);
-
-            if (!addComponentsOutcome.IsSuccess())
-            {
-                QMessageBox::warning(
-                    AzToolsFramework::GetActiveWindow(), tr("Asset Drop Failed"),
-                    QStringLiteral("Components could not be added to the target entity \"%1\".\n\nDetails:\n%2.")
-                        .arg(targetEntity->GetName().c_str())
-                        .arg(addComponentsOutcome.GetError().c_str()));
-
-                if (createdNewEntity)
-                {
-                    EditorEntityContextRequestBus::Broadcast(&EditorEntityContextRequests::DestroyEditorEntity, targetEntityId);
-                }
-
-                return false;
-            }
-
-            // Assign asset associated with each created component.
-            for (const ComponentAssetPair& pair : componentAssetPairs)
-            {
-                const AZ::TypeId& componentType = pair.first;
-                const AZ::Data::AssetId& assetId = pair.second;
-
-                // Name the entity after the first asset.
-                if (createdNewEntity && &pair == &componentAssetPairs.front())
-                {
-                    AZStd::string assetPath;
-                    EBUS_EVENT_RESULT(assetPath, AZ::Data::AssetCatalogRequestBus, GetAssetPathById, assetId);
-                    if (!assetPath.empty())
-                    {
-                        AZStd::string entityName;
-                        AzFramework::StringFunc::Path::GetFileName(assetPath.c_str(), entityName);
-                        targetEntity->SetName(entityName);
-                    }
-                }
-
-                AZ::Component* componentAdded = targetEntity->FindComponent(componentType);
-                if (componentAdded)
-                {
-                    Components::EditorComponentBase* editorComponent = GetEditorComponent(componentAdded);
-                    if (editorComponent)
-                    {
-                        editorComponent->SetPrimaryAsset(assetId);
-                    }
-                }
-            }
-
-            if (createdNewEntity)
-            {
-                const EntityIdList selection = {targetEntityId};
-                ToolsApplicationRequests::Bus::Broadcast(&ToolsApplicationRequests::SetSelectedEntities, selection);
-            }
-
-            if (IsSelected(targetEntityId))
-            {
-                ToolsApplicationEvents::Bus::Broadcast(&ToolsApplicationEvents::InvalidatePropertyDisplay, Refresh_EntireTree_NewContent);
-            }
-        }
-
-        return true;
+        return accepted;
     }
 
     bool EntityOutlinerListModel::dropMimeDataEntities(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
@@ -1238,10 +1059,10 @@ namespace AzToolsFramework
 
     QStringList EntityOutlinerListModel::mimeTypes() const
     {
+        // the mimeTypes function needs to return the possible types of mimeData
+        // that this model will PRODUCE, not which types it accepts.
         QStringList list = QAbstractItemModel::mimeTypes();
         list.append(EditorEntityIdContainer::GetMimeType());
-        list.append(ComponentTypeMimeData::GetMimeType());
-        list.append(ComponentAssetMimeDataContainer::GetMimeType());
         return list;
     }
 
@@ -1275,7 +1096,6 @@ namespace AzToolsFramework
     void EntityOutlinerListModel::QueueEntityToExpand(AZ::EntityId entityId, bool expand)
     {
         m_entityExpansionState[entityId] = expand;
-        m_entityExpandQueue.insert(entityId);
         QueueEntityUpdate(entityId);
     }
 
@@ -1300,16 +1120,7 @@ namespace AzToolsFramework
         {
             return;
         }
-
-        {
-            AZ_PROFILE_SCOPE(Editor, "EntityOutlinerListModel::ProcessEntityUpdates:ExpandQueue");
-            for (auto entityId : m_entityExpandQueue)
-            {
-                emit ExpandEntity(entityId, IsExpanded(entityId));
-            };
-            m_entityExpandQueue.clear();
-        }
-
+        
         {
             AZ_PROFILE_SCOPE(Editor, "EntityOutlinerListModel::ProcessEntityUpdates:SelectQueue");
             for (auto entityId : m_entitySelectQueue)
@@ -1417,17 +1228,30 @@ namespace AzToolsFramework
 
     void EntityOutlinerListModel::OnContainerEntityStatusChanged(AZ::EntityId entityId, [[maybe_unused]] bool open)
     {
-        QModelIndex changedIndex = GetIndexFromEntity(entityId);
-
         // Trigger a refresh of all direct children so that they can be shown or hidden appropriately.
-        int numChildren = rowCount(changedIndex);
-        if (numChildren > 0)
+        QueueEntityUpdate(entityId);
+
+        EntityIdList children;
+        EditorEntityInfoRequestBus::EventResult(children, entityId, &EditorEntityInfoRequestBus::Events::GetChildren);
+        for (auto childId : children)
         {
-            emit dataChanged(index(0, 0, changedIndex), index(numChildren - 1, ColumnCount - 1, changedIndex));
+            QueueEntityUpdate(childId);
         }
 
         // Always expand containers
         QueueEntityToExpand(entityId, true);
+    }
+
+    void EntityOutlinerListModel::OnInstanceOpened(AZ::EntityId containerEntityId)
+    {
+        QueueEntityToExpand(containerEntityId, true);
+    }
+
+    void EntityOutlinerListModel::OnPrefabFocusChanged(
+        [[maybe_unused]] AZ::EntityId previousContainerEntityId, [[maybe_unused]] AZ::EntityId newContainerEntityId)
+    {
+        QueueEntityToExpand(previousContainerEntityId, false);
+        QueueEntityToExpand(newContainerEntityId, true);
     }
 
     void EntityOutlinerListModel::OnEntityInfoUpdatedRemoveChildBegin([[maybe_unused]] AZ::EntityId parentId, [[maybe_unused]] AZ::EntityId childId)
@@ -2018,6 +1842,12 @@ namespace AzToolsFramework
         m_beginStartPlayInEditor = false;
     }
 
+    void EntityOutlinerListModel::OnEditorFocusChanged([[maybe_unused]] AZ::EntityId previousFocusEntityId, AZ::EntityId newFocusEntityId)
+    {
+        // Ensure all descendants of the current focus root are expanded, so it is visible.
+        ExpandAncestors(newFocusEntityId);
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // OutlinerItemDelegate
     ////////////////////////////////////////////////////////////////////////////
@@ -2102,8 +1932,14 @@ namespace AzToolsFramework
             customOption.state ^= QStyle::State_HasFocus;
         }
 
+        // Don't allow to paint on the spacing column
+        if (index.column() == EntityOutlinerListModel::ColumnSpacing)
+        {
+            return;
+        }
+
         // Retrieve the Entity UI Handler
-        auto firstColumnIndex = index.siblingAtColumn(0);
+        auto firstColumnIndex = index.siblingAtColumn(EntityOutlinerListModel::ColumnName);
         AZ::EntityId entityId(firstColumnIndex.data(EntityOutlinerListModel::EntityIdRole).value<AZ::u64>());
         auto entityUiHandler = m_editorEntityFrameworkInterface->GetHandler(entityId);
 
@@ -2450,7 +2286,6 @@ namespace AzToolsFramework
         opt.rect.setWidth(m_toggleColumnWidth);
         style()->drawControl(QStyle::CE_CheckBox, &opt, painter, this);
     }
-
 }
 
 #include <UI/Outliner/moc_EntityOutlinerListModel.cpp>

@@ -13,9 +13,9 @@
 #include <CommonFeaturesSystemComponent.h>
 #include <CoreLights/AreaLightComponent.h>
 #include <CoreLights/DirectionalLightComponent.h>
+#include <CubeMapCapture/CubeMapCaptureComponent.h>
+#include <Debug/RenderDebugComponent.h>
 #include <Decals/DecalComponent.h>
-#include <DiffuseGlobalIllumination/DiffuseProbeGridComponent.h>
-#include <DiffuseGlobalIllumination/DiffuseGlobalIlluminationComponent.h>
 #include <Grid/GridComponent.h>
 #include <ImageBasedLights/ImageBasedLightComponent.h>
 #include <Material/MaterialComponent.h>
@@ -33,7 +33,9 @@
 #include <PostProcess/RadiusWeightModifier/RadiusWeightModifierComponent.h>
 #include <PostProcess/ShapeWeightModifier/ShapeWeightModifierComponent.h>
 #include <PostProcess/GradientWeightModifier/GradientWeightModifierComponent.h>
+#include <PostProcess/ChromaticAberration/ChromaticAberrationComponent.h>
 #include <ScreenSpace/DeferredFogComponent.h>
+#include <SkyAtmosphere/SkyAtmosphereComponent.h>
 #include <SkyBox/HDRiSkyboxComponent.h>
 #include <SkyBox/PhysicalSkyComponent.h>
 #include <Scripting/EntityReferenceComponent.h>
@@ -45,9 +47,9 @@
 #include <PostProcess/EditorPostFxSystemComponent.h>
 #include <CoreLights/EditorAreaLightComponent.h>
 #include <CoreLights/EditorDirectionalLightComponent.h>
+#include <CubeMapCapture/EditorCubeMapCaptureComponent.h>
+#include <Debug/RenderDebugEditorComponent.h>
 #include <Decals/EditorDecalComponent.h>
-#include <DiffuseGlobalIllumination/EditorDiffuseProbeGridComponent.h>
-#include <DiffuseGlobalIllumination/EditorDiffuseGlobalIlluminationComponent.h>
 #include <Grid/EditorGridComponent.h>
 #include <ImageBasedLights/EditorImageBasedLightComponent.h>
 #include <Material/EditorMaterialComponent.h>
@@ -67,7 +69,9 @@
 #include <PostProcess/RadiusWeightModifier/EditorRadiusWeightModifierComponent.h>
 #include <PostProcess/ShapeWeightModifier/EditorShapeWeightModifierComponent.h>
 #include <PostProcess/GradientWeightModifier/EditorGradientWeightModifierComponent.h>
+#include <PostProcess/ChromaticAberration/EditorChromaticAberrationComponent.h>
 #include <ScreenSpace/EditorDeferredFogComponent.h>
+#include <SkyAtmosphere/EditorSkyAtmosphereComponent.h>
 #include <SkyBox/EditorHDRiSkyboxComponent.h>
 #include <SkyBox/EditorPhysicalSkyComponent.h>
 #include <Scripting/EditorEntityReferenceComponent.h>
@@ -103,22 +107,24 @@ namespace AZ
                         LookModificationComponent::CreateDescriptor(),
                         GridComponent::CreateDescriptor(),
                         HDRiSkyboxComponent::CreateDescriptor(),
+                        SkyAtmosphereComponent::CreateDescriptor(),
                         ImageBasedLightComponent::CreateDescriptor(),
                         MaterialComponent::CreateDescriptor(),
                         MeshComponent::CreateDescriptor(),
                         PhysicalSkyComponent::CreateDescriptor(),
                         PostFxLayerComponent::CreateDescriptor(),
                         ReflectionProbeComponent::CreateDescriptor(),
+                        RenderDebugComponent::CreateDescriptor(),
                         RadiusWeightModifierComponent::CreateDescriptor(),
                         ShapeWeightModifierComponent::CreateDescriptor(),
                         EntityReferenceComponent::CreateDescriptor(),
                         GradientWeightModifierComponent::CreateDescriptor(),
-                        DiffuseProbeGridComponent::CreateDescriptor(),
-                        DiffuseGlobalIlluminationComponent::CreateDescriptor(),
                         DeferredFogComponent::CreateDescriptor(),
                         SurfaceData::SurfaceDataMeshComponent::CreateDescriptor(),
                         AttachmentComponent::CreateDescriptor(),
                         OcclusionCullingPlaneComponent::CreateDescriptor(),
+                        ChromaticAberrationComponent::CreateDescriptor(),
+                        CubeMapCaptureComponent::CreateDescriptor(),
 
 #ifdef ATOMLYINTEGRATION_FEATURE_COMMON_EDITOR
                         EditorAreaLightComponent::CreateDescriptor(),
@@ -135,6 +141,7 @@ namespace AZ
                         EditorLookModificationComponent::CreateDescriptor(),
                         EditorGridComponent::CreateDescriptor(),
                         EditorHDRiSkyboxComponent::CreateDescriptor(),
+                        EditorSkyAtmosphereComponent::CreateDescriptor(),
                         EditorImageBasedLightComponent::CreateDescriptor(),
                         EditorMaterialComponent::CreateDescriptor(),
                         EditorMaterialSystemComponent::CreateDescriptor(),
@@ -143,16 +150,17 @@ namespace AZ
                         EditorPhysicalSkyComponent::CreateDescriptor(),
                         EditorPostFxLayerComponent::CreateDescriptor(),
                         EditorReflectionProbeComponent::CreateDescriptor(),
+                        RenderDebugEditorComponent::CreateDescriptor(),
                         EditorRadiusWeightModifierComponent::CreateDescriptor(),
                         EditorShapeWeightModifierComponent::CreateDescriptor(),
                         EditorEntityReferenceComponent::CreateDescriptor(),
                         EditorGradientWeightModifierComponent::CreateDescriptor(),
-                        EditorDiffuseProbeGridComponent::CreateDescriptor(),
-                        EditorDiffuseGlobalIlluminationComponent::CreateDescriptor(),
                         EditorDeferredFogComponent::CreateDescriptor(),
                         SurfaceData::EditorSurfaceDataMeshComponent::CreateDescriptor(),
                         EditorAttachmentComponent::CreateDescriptor(),
                         EditorOcclusionCullingPlaneComponent::CreateDescriptor(),
+                        EditorChromaticAberrationComponent::CreateDescriptor(),
+                        EditorCubeMapCaptureComponent::CreateDescriptor(),
 #endif
                     });
             }

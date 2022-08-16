@@ -81,9 +81,12 @@ namespace AZ::Render
 
     void BindlessImageArrayHandler::RemoveBindlessImage(uint16_t index)
     {
-        AZStd::unique_lock<AZStd::shared_mutex> lock(m_updateMutex);
-        m_bindlessImageViews.at(index) = AZ::RPI::ImageSystemInterface::Get()->GetSystemImage(AZ::RPI::SystemImage::Magenta)->GetImageView();
-        m_bindlessImageViewFreeList.push_back(index);
+        if (index != InvalidImageIndex)
+        {
+            AZStd::unique_lock<AZStd::shared_mutex> lock(m_updateMutex);
+            m_bindlessImageViews.at(index) = AZ::RPI::ImageSystemInterface::Get()->GetSystemImage(AZ::RPI::SystemImage::Magenta)->GetImageView();
+            m_bindlessImageViewFreeList.push_back(index);
+        }
     }
 
     bool BindlessImageArrayHandler::UpdateSrg(AZ::Data::Instance<AZ::RPI::ShaderResourceGroup>& srg) const
@@ -94,7 +97,7 @@ namespace AZ::Render
             return false;
         }
 
-        AZStd::array_view<const AZ::RHI::ImageView*> imageViews(m_bindlessImageViews.data(), m_bindlessImageViews.size());
+        AZStd::span<const AZ::RHI::ImageView* const> imageViews(m_bindlessImageViews.data(), m_bindlessImageViews.size());
         return srg->SetImageViewUnboundedArray(m_texturesIndex, imageViews);
     }
 

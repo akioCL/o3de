@@ -137,15 +137,11 @@ namespace AZ
                 };
             }
 
-            const uint32_t materialTypeVersion = m_materialTypeAsset->GetVersion();
-            if (m_materialTypeVersion < materialTypeVersion)
-            {
-                // It is possible that the material type has had some properties renamed or otherwise updated. If that's the case,
-                // and this material is still referencing the old property layout, we need to apply any auto updates to rename those
-                // properties before using them to realign the property values.
-                ApplyVersionUpdates();
-            }
-            
+            // It is possible that the material type has had some properties renamed or otherwise updated. If that's the case,
+            // and this material is still referencing the old property layout, we need to apply any auto updates to rename those
+            // properties before using them to realign the property values.
+            ApplyVersionUpdates(reportError);
+
             const MaterialPropertiesLayout* propertyLayout = GetMaterialPropertiesLayout();
 
             AZStd::vector<MaterialPropertyValue> finalizedPropertyValues(m_materialTypeAsset->GetDefaultPropertyValues().begin(), m_materialTypeAsset->GetDefaultPropertyValues().end());
@@ -180,9 +176,16 @@ namespace AZ
                     }
                     else
                     {
-                        if (ValidateMaterialPropertyDataType(value.GetTypeId(), name, propertyDescriptor, reportError))
+                        // The material asset could be finalized sometime after the original JSON is loaded, and the material type might not have been available
+                        // at that time, so the data type would not be known for each property. So each raw property's type was based on what appeared in the JSON
+                        // and here we have the first opportunity to resolve that value with the actual type. For example, a float property could have been specified in
+                        // the JSON as 7 instead of 7.0, which is valid. Similarly, a Color and a Vector3 can both be specified as "[0.0,0.0,0.0]" in the JSON file.
+
+                        MaterialPropertyValue finalValue = value.CastToType(propertyDescriptor->GetStorageDataTypeId());
+
+                        if (ValidateMaterialPropertyDataType(finalValue.GetTypeId(), name, propertyDescriptor, reportError))
                         {
-                            finalizedPropertyValues[propertyIndex.GetIndex()] = value;
+                            finalizedPropertyValues[propertyIndex.GetIndex()] = finalValue;
                         }
                     }
                 }
@@ -261,38 +264,41 @@ namespace AZ
             }
         }
         
-        void MaterialAsset::ApplyVersionUpdates()
+        void MaterialAsset::ApplyVersionUpdates(AZStd::function<void(const char*)> reportError)
         {
             if (m_materialTypeVersion == m_materialTypeAsset->GetVersion())
             {
                 return;
             }
-
             [[maybe_unused]] const uint32_t originalVersion = m_materialTypeVersion;
 
-            bool changesWereApplied = false;
+            [[maybe_unused]] bool changesWereApplied =
+                m_materialTypeAsset->GetMaterialVersionUpdates().ApplyVersionUpdates(*this, reportError);
 
-            for (const MaterialVersionUpdate& versionUpdate : m_materialTypeAsset->GetMaterialVersionUpdateList())
-            {
-                if (m_materialTypeVersion < versionUpdate.GetVersion())
-                {
-                    if (versionUpdate.ApplyVersionUpdates(*this))
-                    {
-                        changesWereApplied = true;
-                        m_materialTypeVersion = versionUpdate.GetVersion();
-                    }
-                }
-            }
-            
+#if AZ_ENABLE_TRACING
             if (changesWereApplied)
             {
+                const AZStd::string versionString = (originalVersion == UnspecifiedMaterialTypeVersion) ?
+                    "<Unspecified>" : AZStd::string::format("'%u'", originalVersion);
+
+                AZStd::string assetString = GetId().ToString<AZStd::string>().c_str();
+
+                AZ::Data::AssetInfo assetInfo;
+                AZ::Data::AssetCatalogRequestBus::BroadcastResult(assetInfo,
+                    &AZ::Data::AssetCatalogRequestBus::Events::GetAssetInfoById, GetId());
+                if (assetInfo.m_assetId.IsValid())
+                {
+                    assetString += " (" + assetInfo.m_relativePath + ")";
+                }
+
                 AZ_Warning(
                     "MaterialAsset", false,
-                    "This material is based on version '%u' of %s, but the material type is now at version '%u'. "
-                    "Automatic updates are available. Consider updating the .material source file for '%s'.",
-                    originalVersion, m_materialTypeAsset.ToString<AZStd::string>().c_str(), m_materialTypeAsset->GetVersion(),
-                    GetId().ToString<AZStd::string>().c_str());
+                    "This material is based on version %s of %s, and the material type is now at version '%u'. "
+                    "Automatic updates have been applied. Consider updating the .material source file for %s.",
+                    versionString.c_str(), m_materialTypeAsset.ToString<AZStd::string>().c_str(),
+                    m_materialTypeAsset->GetVersion(), assetString.c_str());
             }
+#endif
 
             m_materialTypeVersion = m_materialTypeAsset->GetVersion();
         }

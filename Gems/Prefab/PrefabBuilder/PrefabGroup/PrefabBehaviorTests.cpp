@@ -17,13 +17,59 @@
 #include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzToolsFramework/Asset/AssetSystemComponent.h>
 #include <AzToolsFramework/Prefab/Procedural/ProceduralPrefabAsset.h>
+#include <AzToolsFramework/Prefab/PrefabDomUtils.h>
+#include <AzToolsFramework/ToolsComponents/TransformComponent.h>
 #include <SceneAPI/SceneCore/Containers/Scene.h>
+#include <SceneAPI/SceneCore/DataTypes/GraphData/IMeshData.h>
+#include <SceneAPI/SceneCore/DataTypes/GraphData/ITransform.h>
+#include <SceneAPI/SceneCore/DataTypes/Groups/IMeshGroup.h>
+#include <SceneAPI/SceneCore/Events/AssetImportRequest.h>
 #include <SceneAPI/SceneCore/Events/CallProcessorBus.h>
 #include <SceneAPI/SceneCore/Events/ExportEventContext.h>
 #include <SceneAPI/SceneCore/Events/ExportProductList.h>
+#include <SceneAPI/SceneCore/Mocks/DataTypes/MockIGraphObject.h>
 #include <SceneAPI/SceneCore/SceneCoreStandaloneAllocator.h>
+#include <SceneAPI/SceneData/GraphData/MeshData.h>
+#include <SceneAPI/SceneData/SceneDataStandaloneAllocator.h>
 
 #include <PrefabGroup/PrefabBehaviorTests.inl>
+
+// a mock AZ::Render::EditorMeshComponent
+namespace AZ::Render
+{
+    struct EditorMeshComponent
+        : public AZ::Component
+    {
+        AZ_COMPONENT(EditorMeshComponent, "{DCE68F6E-2E16-4CB4-A834-B6C2F900A7E9}");
+        void Activate() override {}
+        void Deactivate() override {}
+
+        static void Reflect(AZ::ReflectContext* context)
+        {
+            if (AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+            {
+                serializeContext->Class<AZ::Render::EditorMeshComponent>();
+            }
+
+            if (BehaviorContext* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
+            {
+                behaviorContext->Class<EditorMeshComponent>("AZ::Render::EditorMeshComponent");
+            }
+
+        }
+    };
+
+    struct EditorMeshComponentHelper
+        : public AZ::ComponentDescriptorHelper<EditorMeshComponent>
+    {
+        AZ_CLASS_ALLOCATOR(EditorMeshComponentHelper, AZ::SystemAllocator, 0);
+
+        void Reflect(AZ::ReflectContext* reflection) const override
+        {
+            AZ::Render::EditorMeshComponent::Reflect(reflection);
+        }
+    };
+}
 
 namespace UnitTest
 {
@@ -38,11 +84,13 @@ namespace UnitTest
             {
                 AZ::AllocatorInstance<AZ::SystemAllocator>().Create();
             }
-            AZ::SceneAPI::SceneCoreStandaloneAllocator::Initialize(AZ::Environment::GetInstance());
+            AZ::SceneAPI::SceneCoreStandaloneAllocator::Initialize();
+            AZ::SceneAPI::SceneDataStandaloneAllocator::Initialize();
         }
 
         static void TearDownTestCase()
         {
+            AZ::SceneAPI::SceneDataStandaloneAllocator::TearDown();
             AZ::SceneAPI::SceneCoreStandaloneAllocator::TearDown();
             AZ::AllocatorInstance<AZ::SystemAllocator>().Destroy();
         }
@@ -62,10 +110,16 @@ namespace UnitTest
                 return PrefabBehaviorTests::OnGetSourceInfoBySourcePath(path, info);
             });
             m_assetSystemRequestMock.BusConnect();
+
+            m_componentDescriptorHelperEditorMeshComponent = AZStd::make_unique<AZ::Render::EditorMeshComponentHelper>();
+            m_componentDescriptorHelperEditorMeshComponent->Reflect(m_app.GetSerializeContext());
+            m_componentDescriptorHelperEditorMeshComponent->Reflect(m_app.GetBehaviorContext());
         }
 
         void TearDown() override
         {
+            m_componentDescriptorHelperEditorMeshComponent.reset();
+
             m_assetSystemRequestMock.BusDisconnect();
 
             m_prefabGroupBehavior->Deactivate();
@@ -74,17 +128,22 @@ namespace UnitTest
             PrefabBuilderTests::TearDown();
         }
 
-        static bool OnGetSourceInfoBySourcePath(AZStd::string_view sourcePath, AZ::Data::AssetInfo& assetInfo)
+        // mock classes and structures
+
+        struct MockTransform : public AZ::SceneAPI::DataTypes::ITransform
         {
-            if (sourcePath == AZStd::string_view("mock"))
+            AZ::Matrix3x4 m_matrix = AZ::Matrix3x4::CreateIdentity();
+
+            AZ::Matrix3x4& GetMatrix() override
             {
-                assetInfo.m_assetId = AZ::Uuid::CreateRandom();
-                assetInfo.m_assetType = azrtti_typeid<AZ::Prefab::ProceduralPrefabAsset>();
-                assetInfo.m_relativePath = "mock/path";
-                assetInfo.m_sizeBytes = 0;
+                return m_matrix;
             }
-            return true;
-        }
+
+            const AZ::Matrix3x4& GetMatrix() const
+            {
+                return m_matrix;
+            }
+        };
 
         struct TestPreExportEventContext
         {
@@ -108,8 +167,148 @@ namespace UnitTest
             AZ::SceneAPI::Containers::Scene m_scene;
         };
 
+        // Helpers
+
+        static bool OnGetSourceInfoBySourcePath(AZStd::string_view sourcePath, AZ::Data::AssetInfo& assetInfo)
+        {
+            if (sourcePath == AZStd::string_view("mock"))
+            {
+                assetInfo.m_assetId = AZ::Uuid::CreateRandom();
+                assetInfo.m_assetType = azrtti_typeid<AZ::Prefab::ProceduralPrefabAsset>();
+                assetInfo.m_relativePath = "mock/path";
+                assetInfo.m_sizeBytes = 0;
+            }
+            return true;
+        }
+
+        AZStd::shared_ptr<AZ::SceneAPI::Containers::Scene> CreateMockScene(
+            const AZStd::string manifestFilename = "ManifestFilename",
+            const AZStd::string sourceFileName = "Source",
+            const AZStd::string watchFolder = "WatchFolder")
+        {
+            using namespace AZ::SceneAPI;
+
+            auto scene = CreateEmptyMockSceneWithRoot(manifestFilename, sourceFileName, watchFolder);
+
+            // Build up the graph
+            BuildMockScene(scene);
+
+            return scene;
+        }
+
+        AZStd::shared_ptr<AZ::SceneAPI::Containers::Scene> CreateEmptyMockSceneWithRoot(
+            const AZStd::string manifestFilename = "ManifestFilename",
+            const AZStd::string sourceFileName = "Source",
+            const AZStd::string watchFolder = "WatchFolder")
+        {
+            using namespace AZ::SceneAPI;
+
+            auto scene = AZStd::make_shared<Containers::Scene>("mock_scene");
+            scene->SetManifestFilename(manifestFilename);
+            scene->SetSource(sourceFileName, AZ::Uuid::CreateRandom());
+            scene->SetWatchFolder(watchFolder);
+
+            auto root = scene->GetGraph().GetRoot();
+            scene->GetGraph().SetContent(root, AZStd::make_shared<DataTypes::MockIGraphObject>(0));
+
+            return scene;
+        }
+
+        void BuildMockScene(AZStd::shared_ptr<AZ::SceneAPI::Containers::Scene> scene)
+        {
+            using namespace AZ::SceneAPI;
+
+            /*---------------------------------------\
+                        Root
+                         |
+                         1
+                         |
+                         2
+                       /   \
+                ------3m    7
+               /  /  /        \
+              6  5  4t         8m-------
+                                \   \   \
+                                 9t 10  11
+            \---------------------------------------*/
+
+            // Build up the graph
+            auto root = scene->GetGraph().GetRoot();
+            auto index1 = scene->GetGraph().AddChild(root, "1", AZStd::make_shared<DataTypes::MockIGraphObject>(1));
+            auto index2 = scene->GetGraph().AddChild(index1, "2", AZStd::make_shared<DataTypes::MockIGraphObject>(2));
+            auto index3 = scene->GetGraph().AddChild(index2, "3", AZStd::make_shared<AZ::SceneData::GraphData::MeshData>());
+            auto index4 = scene->GetGraph().AddChild(index3, "4", AZStd::make_shared<MockTransform>());
+            auto index5 = scene->GetGraph().AddChild(index3, "5", AZStd::make_shared<DataTypes::MockIGraphObject>(5));
+            auto index6 = scene->GetGraph().AddChild(index3, "6", AZStd::make_shared<DataTypes::MockIGraphObject>(6));
+            auto index7 = scene->GetGraph().AddChild(index2, "7", AZStd::make_shared<DataTypes::MockIGraphObject>(7));
+            auto index8 = scene->GetGraph().AddChild(index7, "8", AZStd::make_shared<AZ::SceneData::GraphData::MeshData>());
+            auto index9 = scene->GetGraph().AddChild(index8, "9", AZStd::make_shared<MockTransform>());
+            auto index10 = scene->GetGraph().AddChild(index8, "10", AZStd::make_shared<DataTypes::MockIGraphObject>(10));
+            auto index11 = scene->GetGraph().AddChild(index8, "11", AZStd::make_shared<DataTypes::MockIGraphObject>(11));
+
+            scene->GetGraph().MakeEndPoint(index4);
+            scene->GetGraph().MakeEndPoint(index5);
+            scene->GetGraph().MakeEndPoint(index6);
+            scene->GetGraph().MakeEndPoint(index9);
+            scene->GetGraph().MakeEndPoint(index10);
+            scene->GetGraph().MakeEndPoint(index11);
+        }
+
+        const AZ::Entity* FindEntityByName(
+            const AzToolsFramework::Prefab::Instance& instance,
+            const AZStd::string& entityName)
+        {
+            const AZ::Entity* result = nullptr;
+            instance.GetConstEntities(
+                [&result, entityName](const AZ::Entity& entity)
+                {
+                    if (entity.GetName() != entityName)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        result = &entity;
+                        return false;
+                    }
+                });
+            return result;
+        }
+
+        AZStd::shared_ptr<MockTransform> CreateMockTransform(AZ::Matrix3x4& matrix)
+        {
+            AZStd::shared_ptr<MockTransform> mocTransform = AZStd::make_shared<MockTransform>();
+            AZ::Matrix3x4& mocMatrix = mocTransform->GetMatrix();
+            mocMatrix = matrix;
+
+            return mocTransform;
+        }
+
+        bool IsChildOfParent(
+            const AzToolsFramework::Prefab::Instance& instance,
+            const AzToolsFramework::Prefab::EntityAlias& childName,
+            const AzToolsFramework::Prefab::EntityAlias& parentName)
+        {
+            const AZ::Entity* childEntity = FindEntityByName(instance, childName);
+            const AZ::Entity* parentEntity = FindEntityByName(instance, parentName);
+
+            if (childEntity && parentEntity)
+            {
+                AzToolsFramework::Components::TransformComponent* childTransform =
+                    childEntity->FindComponent<AzToolsFramework::Components::TransformComponent>();
+
+                if (childTransform)
+                {
+                    return (childTransform->GetParentId() == parentEntity->GetId());
+                }
+            }
+
+            return false;
+        }
+
         AZStd::unique_ptr<AZ::SceneAPI::Behaviors::PrefabGroupBehavior> m_prefabGroupBehavior;
         testing::NiceMock<UnitTests::MockAssetSystemRequest> m_assetSystemRequestMock;
+        AZStd::unique_ptr<AZ::Render::EditorMeshComponentHelper> m_componentDescriptorHelperEditorMeshComponent;
     };
 
     TEST_F(PrefabBehaviorTests, PrefabBehavior_EmptyContextIgnored_Works)
@@ -163,5 +362,152 @@ namespace UnitTest
         {
             AZ_Warning("testing", false, "The product asset (%s) is missing", pathStr.c_str());
         }
+    }
+
+    TEST_F(PrefabBehaviorTests, PrefabBehavior_UpdateManifestWithEmptyScene_DoesNotFail)
+    {
+        using namespace AZ::SceneAPI;
+        using namespace AZ::SceneAPI::Events;
+
+        Containers::Scene scene("empty_scene");
+        AssetImportRequest::ManifestAction action = AssetImportRequest::ManifestAction::ConstructDefault;
+        AssetImportRequest::RequestingApplication requester = {};
+
+        Behaviors::PrefabGroupBehavior prefabGroupBehavior;
+        ProcessingResult result = ProcessingResult::Failure;
+        AssetImportRequestBus::BroadcastResult(result, &AssetImportRequestBus::Events::UpdateManifest, scene, action, requester);
+        EXPECT_NE(result,  ProcessingResult::Failure);
+    }
+
+    TEST_F(PrefabBehaviorTests, PrefabBehavior_UpdateManifestWithEmptyScene_Ignored)
+    {
+        using namespace AZ::SceneAPI;
+        using namespace AZ::SceneAPI::Events;
+
+        Containers::Scene scene("empty_scene");
+        AssetImportRequest::ManifestAction action = AssetImportRequest::ManifestAction::Update;
+        AssetImportRequest::RequestingApplication requester = {};
+
+        Behaviors::PrefabGroupBehavior prefabGroupBehavior;
+        ProcessingResult result = ProcessingResult::Failure;
+        AssetImportRequestBus::BroadcastResult(result, &AssetImportRequestBus::Events::UpdateManifest, scene, action, requester);
+        EXPECT_EQ(result, ProcessingResult::Ignored);
+    }
+
+    TEST_F(PrefabBehaviorTests, PrefabBehavior_UpdateManifestMockScene_CreatesPrefab)
+    {
+        using namespace AZ::SceneAPI;
+        using namespace AZ::SceneAPI::Events;
+
+        #if AZ_TRAIT_OS_USE_WINDOWS_FILE_PATHS
+        auto scene = CreateMockScene("Manifest", "C:/o3de/watch.folder/manifest_src_file.xml", "C:/o3de/watch.folder");
+        #else
+        auto scene = CreateMockScene("Manifest", "//o3de/watch.folder/manifest_src_file.xml", "//o3de/watch.folder");
+        #endif
+        AssetImportRequest::ManifestAction action = AssetImportRequest::ManifestAction::ConstructDefault;
+        AssetImportRequest::RequestingApplication requester = {};
+
+        Behaviors::PrefabGroupBehavior prefabGroupBehavior;
+        ProcessingResult result = ProcessingResult::Failure;
+        AssetImportRequestBus::BroadcastResult(result, &AssetImportRequestBus::Events::UpdateManifest, *scene, action, requester);
+
+        EXPECT_EQ(result, ProcessingResult::Success);
+        EXPECT_EQ(scene->GetManifest().GetEntryCount(), 3);
+
+        EXPECT_TRUE(azrtti_istypeof<AZ::SceneAPI::DataTypes::IMeshGroup>(scene->GetManifest().GetValue(0).get()));
+        EXPECT_TRUE(azrtti_istypeof<AZ::SceneAPI::DataTypes::IMeshGroup>(scene->GetManifest().GetValue(1).get()));
+        EXPECT_TRUE(azrtti_istypeof<AZ::SceneAPI::DataTypes::IPrefabGroup>(scene->GetManifest().GetValue(2).get()));
+
+        // The mesh group names are expected to be just the file name relative to the watch folder and not any absolute path
+        for (size_t i = 0; i < scene->GetManifest().GetEntryCount(); i++)
+        {
+            if (azrtti_istypeof<AZ::SceneAPI::DataTypes::IMeshGroup>(scene->GetManifest().GetValue(i).get()))
+            {
+                AZ::SceneAPI::DataTypes::IMeshGroup* meshGroup = reinterpret_cast<AZ::SceneAPI::DataTypes::IMeshGroup*>(scene->GetManifest().GetValue(i).get());
+                AZStd::string groupName = meshGroup->GetName();
+                EXPECT_TRUE(groupName.starts_with("default_mock_"));
+            }
+        }
+    }
+
+    TEST_F(PrefabBehaviorTests, PrefabBehavior_EntityHierarchy_MatchesSceneNodeHierarchy)
+    {
+        using namespace AZ::SceneAPI;
+        using namespace AZ::SceneAPI::Events;
+
+#if AZ_TRAIT_OS_USE_WINDOWS_FILE_PATHS
+        auto scene = CreateEmptyMockSceneWithRoot("Manifest", "C:/o3de/watch.folder/manifest_src_file.xml", "C:/o3de/watch.folder");
+#else
+        auto scene = CreateEmptyMockSceneWithRoot("Manifest", "//o3de/watch.folder/manifest_src_file.xml", "//o3de/watch.folder");
+#endif
+        /*---------------------------------------\
+                    Root
+                     |
+                     1
+                     |
+                     2t
+                   /   \
+                  3m    5t
+                 /
+                4t
+        \---------------------------------------*/
+
+        AZ::Matrix3x4 nonIdentityMatrix = AZ::Matrix3x4::CreateScale(AZ::Vector3(10.0f));
+
+        // Build up the graph
+        auto root = scene->GetGraph().GetRoot();
+        auto index1 = scene->GetGraph().AddChild(root, "1", AZStd::make_shared<DataTypes::MockIGraphObject>(1));
+        auto index2 = scene->GetGraph().AddChild(index1, "2", CreateMockTransform(nonIdentityMatrix));
+        auto index3 = scene->GetGraph().AddChild(index2, "3", AZStd::make_shared<AZ::SceneData::GraphData::MeshData>());
+        auto index4 = scene->GetGraph().AddChild(index3, "4", CreateMockTransform(nonIdentityMatrix));
+        auto index5 = scene->GetGraph().AddChild(index2, "5", CreateMockTransform(nonIdentityMatrix));
+
+        scene->GetGraph().MakeEndPoint(index4);
+        scene->GetGraph().MakeEndPoint(index5);
+
+        AssetImportRequest::ManifestAction action = AssetImportRequest::ManifestAction::ConstructDefault;
+        AssetImportRequest::RequestingApplication requester = {};
+
+        Behaviors::PrefabGroupBehavior prefabGroupBehavior;
+        ProcessingResult result = ProcessingResult::Failure;
+        AssetImportRequestBus::BroadcastResult(result, &AssetImportRequestBus::Events::UpdateManifest, *scene, action, requester);
+
+        constexpr size_t expectedEntryCount = 2;
+
+        EXPECT_EQ(result, ProcessingResult::Success);
+        EXPECT_EQ(scene->GetManifest().GetEntryCount(), expectedEntryCount);
+
+        EXPECT_TRUE(azrtti_istypeof<AZ::SceneAPI::DataTypes::IPrefabGroup>(scene->GetManifest().GetValue(expectedEntryCount - 1).get()));
+
+        AZ::SceneAPI::DataTypes::IPrefabGroup* prefabGroup =
+            reinterpret_cast<AZ::SceneAPI::DataTypes::IPrefabGroup*>(scene->GetManifest().GetValue(expectedEntryCount - 1).get());
+        AzToolsFramework::Prefab::PrefabDomConstReference prefabDomRef = prefabGroup->GetPrefabDomRef();
+        ASSERT_TRUE(prefabDomRef.has_value());
+
+        // Check that the entity hierarchy of the prefab group is correct.
+        // Each mesh and each transform not associated with any mesh should have a unique entity
+        AzToolsFramework::Prefab::Instance instance;
+        ASSERT_TRUE(AzToolsFramework::Prefab::PrefabDomUtils::LoadInstanceFromPrefabDom(instance, *prefabDomRef));
+        EXPECT_TRUE(IsChildOfParent(instance, "3", "2")); // Mesh entity is child of a transform entity
+        EXPECT_TRUE(IsChildOfParent(instance, "5", "2")); // Transform entity is child of another transform entity
+    }
+
+    TEST_F(PrefabBehaviorTests, PrefabBehavior_UpdateManifest_ToggleWorks)
+    {
+        using namespace AZ::SceneAPI;
+        using namespace AZ::SceneAPI::Events;
+
+        ASSERT_TRUE(AZ::SettingsRegistry::Get());
+        AZ::SettingsRegistry::Get()->Set("/O3DE/Preferences/Prefabs/CreateDefaults", false);
+
+        auto scene = CreateMockScene();
+        AssetImportRequest::ManifestAction action = AssetImportRequest::ManifestAction::ConstructDefault;
+        AssetImportRequest::RequestingApplication requester = {};
+
+        Behaviors::PrefabGroupBehavior prefabGroupBehavior;
+        ProcessingResult result = ProcessingResult::Failure;
+        AssetImportRequestBus::BroadcastResult(result, &AssetImportRequestBus::Events::UpdateManifest, *scene, action, requester);
+        EXPECT_EQ(result, ProcessingResult::Ignored);
+        EXPECT_EQ(scene->GetManifest().GetEntryCount(), 0);
     }
 }

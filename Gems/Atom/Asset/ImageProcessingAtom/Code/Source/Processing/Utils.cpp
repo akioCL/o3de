@@ -260,10 +260,7 @@ namespace ImageProcessingAtom
             u32 mipLevels = imageDescriptor.m_mipLevels;
             u32 arraySize = imageDescriptor.m_arraySize;
 
-            if (imageDescriptor.m_isCubemap)
-            {
-                height *= 6;
-            }
+            height *= arraySize;
 
             IImageObjectPtr outputImage = IImageObjectPtr(IImageObject::CreateImage(width, height, mipLevels, format));
 
@@ -286,7 +283,7 @@ namespace ImageProcessingAtom
 
                 for (u32 slice = 0; slice < arraySize; slice++)
                 {
-                    AZStd::array_view<uint8_t> imageData = imageAsset->GetSubImageData(mip, slice);
+                    AZStd::span<const uint8_t> imageData = imageAsset->GetSubImageData(mip, slice);
                     memcpy(imageBuf + slice * imageData.size(), imageData.data(), imageData.size());
                 }
             }

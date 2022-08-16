@@ -103,7 +103,7 @@ namespace AZ
                 // the dynamic data that can be changed between passes.
                 Name bufferName = Name{ "SkinnedHairSharedBuffer" };
                 RPI::PassAttachmentBinding* localBinding = FindAttachmentBinding(bufferName);
-                if (localBinding && !localBinding->m_attachment)
+                if (localBinding && !localBinding->GetAttachment())
                 {
                     AttachBufferToSlot(Name{ "SkinnedHairSharedBuffer" }, HairSharedBufferInterface::Get()->GetBuffer());
                 }
@@ -138,6 +138,13 @@ namespace AZ
                 m_newRenderObjects.clear();
 
                 RPI::ComputePass::FrameBeginInternal(params);
+            }
+
+            void HairSkinningComputePass::SetupFrameGraphDependencies(RHI::FrameGraphInterface frameGraph)
+            {
+                frameGraph.SetEstimatedItemCount(aznumeric_cast<uint32_t>(m_dispatchItems.size()));
+
+                RPI::ComputePass::SetupFrameGraphDependencies(frameGraph);
             }
 
             void HairSkinningComputePass::CompileResources([[maybe_unused]] const RHI::FrameGraphCompileContext& context)
@@ -225,9 +232,13 @@ namespace AZ
                 // This includes the PerView, PerScene and PerPass srgs (what about per draw?)
                 SetSrgsForDispatch(commandList);
 
-                for (const RHI::DispatchItem* dispatchItem : m_dispatchItems)
+                AZStd::unordered_set<const RHI::DispatchItem*>::iterator it = m_dispatchItems.begin();
+                AZStd::advance(it, context.GetSubmitRange().m_startIndex);
+
+                for (uint32_t index = context.GetSubmitRange().m_startIndex; index < context.GetSubmitRange().m_endIndex; ++index, ++it)
                 {
-                    commandList->Submit(*dispatchItem);
+                    const RHI::DispatchItem* dispatchItem = *it;
+                    commandList->Submit(*dispatchItem, index);
                 }
 
                 // Clear the dispatch items. They will need to be re-populated next frame

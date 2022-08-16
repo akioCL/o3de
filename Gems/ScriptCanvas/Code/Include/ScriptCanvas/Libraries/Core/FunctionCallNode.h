@@ -38,6 +38,13 @@ namespace ScriptCanvas
         {
             struct FunctionCallNodeCompareConfig;
 
+            enum class IsFunctionCallNodeOutOfDataResult
+            {
+                No,
+                Yes,
+                EvaluateAfterLocalDefinition
+            };
+
             class FunctionCallNode
                 : public Node
                 , AZ::Data::AssetBus::Handler
@@ -69,11 +76,13 @@ namespace ScriptCanvas
 
                 const AZStd::string& GetName() const;
 
+                Grammar::FunctionSourceId GetSourceId() const;
+
                 void Initialize(AZ::Data::AssetId assetId, const ScriptCanvas::Grammar::FunctionSourceId& sourceId);
 
                 bool IsOutOfDate(const VersionData& graphVersion) const override;
 
-                bool IsOutOfDate(const FunctionCallNodeCompareConfig& config) const;
+                IsFunctionCallNodeOutOfDataResult IsOutOfDate(const FunctionCallNodeCompareConfig& config, const AZ::Uuid& graphId) const;
 
                 UpdateResult OnUpdateNode() override;
 
@@ -90,9 +99,11 @@ namespace ScriptCanvas
 
                 AZ::Outcome<AZStd::string, void> GetFunctionCallName(const Slot* /*slot*/) const override;
 
-                AZStd::string GetInterfaceName() const;
+                AZ::Outcome<AZStd::string, AZStd::string> GetInterfaceNameFromAssetOrLastSave() const;
 
                 const SlotExecution::Map* GetSlotExecutionMap() const override;
+
+                const Grammar::SubgraphInterface& GetSlotExecutionMapSource() const;
 
                 const Grammar::SubgraphInterface* GetSubgraphInterface() const override;
 

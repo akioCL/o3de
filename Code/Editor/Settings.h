@@ -20,6 +20,7 @@
 #include <AzToolsFramework/Editor/EditorSettingsAPIBus.h>
 #include <AzToolsFramework/Prefab/PrefabLoaderInterface.h>
 #include <AzCore/JSON/document.h>
+#include <AzCore/Console/IConsole.h>
 
 #include <AzQtComponents/Components/Widgets/ToolBar.h>
 
@@ -181,12 +182,6 @@ struct SSelectObjectDialogSettings
 //////////////////////////////////////////////////////////////////////////
 struct SGUI_Settings
 {
-    bool bWindowsVista;        // true when running on windows Vista
-    QFont hSystemFont;         // Default system GUI font.
-    QFont hSystemFontBold;     // Default system GUI bold font.
-    QFont hSystemFontItalic;   // Default system GUI italic font.
-    int nDefaultFontHieght;    // Default font height for 8 logical units.
-
     int nToolbarIconSize;      // Override size of the toolbar icons
 };
 
@@ -253,6 +248,7 @@ struct SSmartOpenDialogSettings
 //////////////////////////////////////////////////////////////////////////
 /** Various editor settings.
 */
+AZ_CVAR_EXTERNED(int64_t, ed_backgroundSystemTickCap);
 AZ_PUSH_DISABLE_DLL_EXPORT_BASECLASS_WARNING
 struct SANDBOX_API SEditorSettings
     : AzToolsFramework::EditorSettingsAPIBus::Handler
@@ -378,10 +374,6 @@ AZ_POP_DISABLE_DLL_EXPORT_BASECLASS_WARNING
 
     SGUI_Settings gui;
 
-    bool              bApplyConfigSpecInEditor;
-
-    ESystemConfigSpec editorConfigSpec;
-
     //! Terrain Texture Export/Import filename.
     QString terrainTextureExport;
 
@@ -423,8 +415,6 @@ AZ_POP_DISABLE_DLL_EXPORT_BASECLASS_WARNING
 
     bool bSettingsManagerMode;
 
-    bool bAutoSaveTagPoints;
-
     bool bNavigationContinuousUpdate;
     bool bNavigationShowAreas;
     bool bNavigationDebugDisplay;
@@ -451,7 +441,6 @@ private:
     void LoadValue(const char* sSection, const char* sKey, float& value);
     void LoadValue(const char* sSection, const char* sKey, bool& value);
     void LoadValue(const char* sSection, const char* sKey, QString& value);
-    void LoadValue(const char* sSection, const char* sKey, ESystemConfigSpec& value);
 
     void SaveCloudSettings();
 

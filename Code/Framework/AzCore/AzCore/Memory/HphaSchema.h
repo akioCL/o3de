@@ -13,13 +13,12 @@
 
 namespace AZ
 {
-    class HpAllocator;
-
     /**
     * Heap allocator schema, based on Dimitar Lazarov "High Performance Heap Allocator".
     */
-    class HphaSchema
-        : public IAllocatorAllocate
+    template<bool DebugAllocator = false>
+    class HphaSchemaBase
+        : public IAllocatorSchema
     {
     public:
         /**
@@ -47,14 +46,14 @@ namespace AZ
             unsigned int            m_isPoolAllocations : 1;                ///< True to allow allocations from pools, otherwise false.
             size_t                  m_fixedMemoryBlockByteSize;             ///< Memory block size, if 0 we use the OS memory allocation functions.
             void*                   m_fixedMemoryBlock;                     ///< Can be NULL if so the we will allocate memory from the subAllocator if m_memoryBlocksByteSize is != 0.
-            IAllocatorAllocate*     m_subAllocator;                         ///< Allocator that m_memoryBlocks memory was allocated from or should be allocated (if NULL).
+            IAllocatorSchema*       m_subAllocator;                         ///< Allocator that m_memoryBlocks memory was allocated from or should be allocated (if NULL).
             size_t                  m_systemChunkSize;                      ///< Size of chunk to request from the OS when more memory is needed (defaults to m_pageSize)
             size_t                  m_capacity;                             ///< Max size this allocator can grow to
         };
 
 
-        HphaSchema(const Descriptor& desc);
-        virtual ~HphaSchema();
+        HphaSchemaBase(const Descriptor& desc);
+        virtual ~HphaSchemaBase();
 
         pointer_type    Allocate(size_type byteSize, size_type alignment, int flags = 0, const char* name = 0, const char* fileName = 0, int lineNum = 0, unsigned int suppressStackRecord = 0) override;
         void            DeAllocate(pointer_type ptr, size_type byteSize = 0, size_type alignment = 0) override;
@@ -68,25 +67,50 @@ namespace AZ
         size_type       GetMaxAllocationSize() const override;
         size_type       GetMaxContiguousAllocationSize() const override;
         size_type       GetUnAllocatedMemory(bool isPrint = false) const override;
-        IAllocatorAllocate* GetSubAllocator() override                       { return m_desc.m_subAllocator; }
 
         /// Return unused memory to the OS (if we don't use fixed block). Don't call this unless you really need free memory, it is slow.
         void            GarbageCollect() override;
 
+        static size_t GetMemoryGuardSize();
+        static size_t GetFreeLinkSize();
+
     private:
-        // [LY-84974][sconel@][2018-08-10] SliceStrike integration up to CL 671758
+        // Forward declare HpAllocator class
+        // It is a private class implemented in the cpp
+        class HpAllocator;
+
         // this must be at least the max size of HpAllocator (defined in the cpp) + any platform compiler padding
-        static const int hpAllocatorStructureSize = 16584;
-        // [LY][sconel@] end
-        
+        // A static assert inside of HphaSchema.cpp validates that this is the case
+        // as of commit https://github.com/o3de/o3de/commit/92cd457c256e1ec91eeabe04b56d1d4c61f8b1af
+        // When MULTITHREADED and USE_MUTEX_PER_BUCKET is defined
+        // the largest sizeof for HpAllocator is 16640 on MacOS
+        // On Windows the sizeof HpAllocator is 8384
+        // Up this value to 18 KiB to be safe
+        static constexpr size_t hpAllocatorStructureSize = 18 * 1024;
+
         Descriptor          m_desc;
         int                 m_pad;      // pad the Descriptor to avoid C4355
         size_type           m_capacity;                 ///< Capacity in bytes.
         HpAllocator*        m_allocator;
-        // [LY-84974][sconel@][2018-08-10] SliceStrike integration up to CL 671758
-        AZStd::aligned_storage<hpAllocatorStructureSize, 16>::type m_hpAllocatorBuffer;    ///< Memory buffer for HpAllocator
-        // [LY][sconel@] end
+        AZStd::aligned_storage_t<hpAllocatorStructureSize, 16> m_hpAllocatorBuffer;    ///< Memory buffer for HpAllocator
         bool                m_ownMemoryBlock;
+    };
+
+    // Template is externed here and explicitly instantiated in the cpp file
+    extern template class HphaSchemaBase<false>;
+    extern template class HphaSchemaBase<true>;
+
+    namespace Internal
+    {
+        // HphaSchema class defaults to disabling the allocator debug functionality
+        constexpr bool HphaDebugAllocator = false;
+    }
+
+    class HphaSchema
+        : public HphaSchemaBase<Internal::HphaDebugAllocator>
+    {
+    public:
+        using HphaSchemaBase<Internal::HphaDebugAllocator>::HphaSchemaBase;
     };
 } // namespace AZ
 

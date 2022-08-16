@@ -16,6 +16,7 @@ ly_add_target(
     NAMESPACE AZ
     FILES_CMAKE
         AzFramework/azframework_files.cmake
+        AzFramework/azframework_autogen_files.cmake
         ${pal_dir}/platform_${PAL_PLATFORM_NAME_LOWERCASE}_files.cmake
     PLATFORM_INCLUDE_FILES
         ${pal_dir}/platform_${PAL_PLATFORM_NAME_LOWERCASE}.cmake
@@ -29,7 +30,7 @@ ly_add_target(
         PRIVATE
             AZ::AzCore
         PUBLIC
-            AZ::GridMate
+            AZ::AzNetworking
             3rdParty::zstd
             3rdParty::lz4
 )

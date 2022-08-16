@@ -104,26 +104,25 @@ ly_add_target(
             3rdParty::Qt::Concurrent
             3rdParty::TIFF
             3rdParty::squish-ccr
-            3rdParty::AWSNativeSDK::STS
             Legacy::CryCommon
             Legacy::EditorCommon
             AZ::AzCore
             AZ::AzToolsFramework
             Gem::LmbrCentral.Static
-            AZ::AWSNativeSDKInit
             AZ::AtomCore
             Gem::Atom_RPI.Edit
             Gem::Atom_RPI.Public
             Gem::Atom_Feature_Common.Static
             Gem::AtomToolsFramework.Static
             Gem::AtomViewportDisplayInfo
+            Gem::EditorModeFeedback.Editor
             ${additional_dependencies}
         PUBLIC
-            3rdParty::AWSNativeSDK::Core
             3rdParty::Qt::Network
             Legacy::EditorCore
     RUNTIME_DEPENDENCIES
         Gem::AtomViewportDisplayInfo
+        Gem::EditorModeFeedback.Editor
         Legacy::EditorCommon
 )
 ly_add_source_properties(
@@ -235,6 +234,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
         BUILD_DEPENDENCIES
             PRIVATE
                 AZ::AzTest
+                AZ::AzCoreTestCommon
                 3rdParty::Qt::Core
                 3rdParty::Qt::Gui
                 3rdParty::Qt::Widgets

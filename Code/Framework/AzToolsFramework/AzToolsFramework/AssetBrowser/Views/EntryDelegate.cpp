@@ -101,8 +101,9 @@ namespace AzToolsFramework
                     remainingRect.adjust(thumbX, 0, 0, 0); // bump it to the right by the size of the thumbnail
                     remainingRect.adjust(EntrySpacingLeftPixels, 0, 0, 0); // bump it to the right by the spacing.
                 }
+                // for display use the display name when the name column is aksed for, otherwise use the path.
                 QString displayString = index.column() == aznumeric_cast<int>(AssetBrowserEntry::Column::Name)
-                    ? qvariant_cast<QString>(entry->data(aznumeric_cast<int>(AssetBrowserEntry::Column::Name)))
+                    ? qvariant_cast<QString>(entry->data(aznumeric_cast<int>(AssetBrowserEntry::Column::DisplayName)))
                     : qvariant_cast<QString>(entry->data(aznumeric_cast<int>(AssetBrowserEntry::Column::Path)));
 
                 style->drawItemText(
@@ -110,11 +111,6 @@ namespace AzToolsFramework
                     displayString,
                     isSelected ? QPalette::HighlightedText : QPalette::Text);
             }
-        }
-
-        void EntryDelegate::SetThumbnailContext(const char* thumbnailContext)
-        {
-            m_thumbnailContext = thumbnailContext;
         }
 
         void EntryDelegate::SetShowSourceControlIcons(bool showSourceControl)
@@ -125,8 +121,8 @@ namespace AzToolsFramework
         int EntryDelegate::DrawThumbnail(QPainter* painter, const QPoint& point, const QSize& size, Thumbnailer::SharedThumbnailKey thumbnailKey) const
         {
             SharedThumbnail thumbnail;
-            ThumbnailerRequestsBus::BroadcastResult(thumbnail, &ThumbnailerRequests::GetThumbnail, thumbnailKey, m_thumbnailContext.c_str());
-            AZ_Assert(thumbnail, "The shared numbernail was not available from the ThumbnailerRequestsBus.");
+            ThumbnailerRequestBus::BroadcastResult(thumbnail, &ThumbnailerRequests::GetThumbnail, thumbnailKey);
+            AZ_Assert(thumbnail, "The shared numbernail was not available from the ThumbnailerRequestBus.");
             AZ_Assert(painter, "A null QPainter was passed in to DrawThumbnail.");
             if (!painter || !thumbnail || thumbnail->GetState() == Thumbnail::State::Failed)
             {
@@ -177,7 +173,6 @@ namespace AzToolsFramework
             auto data = index.data(AssetBrowserModel::Roles::EntryRole);
             if (data.canConvert<const AssetBrowserEntry*>())
             {
-                bool isEnabled = (option.state & QStyle::State_Enabled) != 0;
 
                 QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
@@ -223,7 +218,6 @@ namespace AzToolsFramework
                         // sources with no children should be greyed out.
                         if (sourceEntry->GetChildCount() == 0)
                         {
-                            isEnabled = false; // draw in disabled style.
                             actualPalette.setCurrentColorGroup(QPalette::Disabled);
                         }
                     }
@@ -276,16 +270,16 @@ namespace AzToolsFramework
                     remainingRect.adjust(thumbX, 0, 0, 0); // bump it to the right by the size of the thumbnail
                     remainingRect.adjust(EntrySpacingLeftPixels, 0, 0, 0); // bump it to the right by the spacing.
                 }
-
+                // if we are asking for the name, use the display name.  Else we must be asking for the path, so use that.
                 QString displayString = index.column() == aznumeric_cast<int>(AssetBrowserEntry::Column::Name)
-                    ? qvariant_cast<QString>(entry->data(aznumeric_cast<int>(AssetBrowserEntry::Column::Name)))
+                    ? qvariant_cast<QString>(entry->data(aznumeric_cast<int>(AssetBrowserEntry::Column::DisplayName)))
                     : qvariant_cast<QString>(entry->data(aznumeric_cast<int>(AssetBrowserEntry::Column::Path)));
 
                 QStyleOptionViewItem optionV4{ option };
                 initStyleOption(&optionV4, index);
                 optionV4.state &= ~(QStyle::State_HasFocus | QStyle::State_Selected);
 
-                if (m_assetBrowserFilerModel && m_assetBrowserFilerModel->GetStringFilter() 
+                if (m_assetBrowserFilerModel && m_assetBrowserFilerModel->GetStringFilter()
                     && !m_assetBrowserFilerModel->GetStringFilter()->GetFilterString().isEmpty())
                 {
                     displayString = RichTextHighlighter::HighlightText(displayString, m_assetBrowserFilerModel->GetStringFilter()->GetFilterString());
@@ -316,7 +310,7 @@ namespace AzToolsFramework
                     absoluteIconPath = AZ::IO::FixedMaxPath(AZ::Utils::GetEnginePath()) / TreeIconPathOneChild;
                     break;
                 }
-                [[maybe_unused]] bool pixmapLoadedSuccess = pixmap.load(absoluteIconPath.c_str()); 
+                [[maybe_unused]] bool pixmapLoadedSuccess = pixmap.load(absoluteIconPath.c_str());
                 AZ_Assert(pixmapLoadedSuccess, "Error loading Branch Icons in SearchEntryDelegate");
 
                 m_branchIcons[static_cast<EntryBranchType>(branchType)] = pixmap;
