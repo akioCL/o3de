@@ -103,7 +103,7 @@ namespace AZ
             if (auto* serialize = azrtti_cast<SerializeContext*>(context))
             {
                 serialize->Class<ModelAssetBuilderComponent, SceneAPI::SceneCore::ExportingComponent>()
-                    ->Version(33);  // Fix parent-child relationship in scene
+                    ->Version(34);  // Fix merging mismatched vertex layouts
             }
         }
 
@@ -1184,6 +1184,19 @@ namespace AZ
 
             if (layoutMatches)
             {
+                for (size_t i = 0; i < lhs.m_uvSets.size(); ++i)
+                {
+                    layoutMatches &= lhs.m_uvSets[i].empty() == rhs.m_uvSets.empty();
+                }
+                
+                for (size_t i = 0; i < lhs.m_colorSets.size(); ++i)
+                {
+                    layoutMatches &= lhs.m_colorSets[i].empty() == rhs.m_colorSets.empty();
+                }
+            }
+
+            if (layoutMatches)
+            {
                 // For the streams that come with names, make sure the names match
                 bool namesMatch = true;
                 for (size_t i = 0; i < lhs.m_uvCustomNames.size(); ++i)
@@ -1209,7 +1222,7 @@ namespace AZ
                 }
                 for (size_t i = 0; i < lhs.m_colorCustomNames.size(); ++i)
                 {
-                    if (lhs.m_colorCustomNames[i] != rhs.m_uvCustomNames[i])
+                    if (lhs.m_colorCustomNames[i] != rhs.m_colorCustomNames[i])
                     {
                         namesMatch = false;
                         AZ_Warning(
@@ -1228,7 +1241,7 @@ namespace AZ
                             rhs.m_colorCustomNames[i].GetCStr());
                     }
                 }
-                layoutMatches = namesMatch;
+                layoutMatches &= namesMatch;
             }
             else
             {
@@ -1277,11 +1290,18 @@ namespace AZ
             }
             for (size_t i = 0; i < mesh.m_uvSets.size(); ++i)
             {
-                success &= ValidateStreamSize(expectedVertexCount, mesh.m_uvSets[i], UVFormat, mesh.m_uvCustomNames[i].GetCStr());
+                if (!mesh.m_uvSets[i].empty())
+                {
+                    success &= ValidateStreamSize(expectedVertexCount, mesh.m_uvSets[i], UVFormat, mesh.m_uvCustomNames[i].GetCStr());
+                }
             }
             for (size_t i = 0; i < mesh.m_colorSets.size(); ++i)
             {
-                success &= ValidateStreamSize(expectedVertexCount, mesh.m_colorSets[i], ColorFormat, mesh.m_colorCustomNames[i].GetCStr());
+                if (!mesh.m_colorSets[i].empty())
+                {
+                    success &=
+                        ValidateStreamSize(expectedVertexCount, mesh.m_colorSets[i], ColorFormat, mesh.m_colorCustomNames[i].GetCStr());
+                }
             }
             if (!mesh.m_clothData.empty())
             {
