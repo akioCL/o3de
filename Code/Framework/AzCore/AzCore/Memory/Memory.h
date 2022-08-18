@@ -20,11 +20,6 @@
 #include <AzCore/Module/Environment.h>
 
 
-// Declarations of new overloads, definitions are in NewAndDelete.inl, or you can link your own versions
-// AZ::Internal::AllocatorDummy is merely to differentiate our overloads from any other operator new signatures
-void* operator new(std::size_t, const AZ::Internal::AllocatorDummy*);
-void* operator new[](std::size_t, const AZ::Internal::AllocatorDummy*);
-
 /**
  * AZ Memory allocation supports all best know allocation schemes. Even though we highly recommend using the
  * class overriding of new/delete operators for which we provide \ref ClassAllocators. We don't restrict to
@@ -32,8 +27,8 @@ void* operator new[](std::size_t, const AZ::Internal::AllocatorDummy*);
  * In every macro that doesn't require to specify an allocator AZ::SystemAllocator is implied.
  */
 #if !defined(_RELEASE)
-    #define aznew                                                   aznewex((const char*)nullptr)
-    #define aznewex(_Name)                                          new(__FILE__, __LINE__, _Name)
+    #define aznew                                                   new
+    #define aznewex(_Name)                                          new
 
 /// azmalloc(size)
     #define azmalloc_1(_1)                                          AZ::AllocatorInstance< AZ::SystemAllocator >::Get().Allocate(_1, 0, 0, "azmalloc", __FILE__, __LINE__)
@@ -55,8 +50,8 @@ void* operator new[](std::size_t, const AZ::Internal::AllocatorDummy*);
 /// azcreate(class,params,Allocator,allocationName,flags)
     #define azcreate_5(_1, _2, _3, _4, _5)                          new(azmalloc_5(sizeof(_1), AZStd::alignment_of< _1 >::value, _3, _4, _5)) _1 _2
 #else
-    #define aznew           new((const AZ::Internal::AllocatorDummy*)nullptr)
-    #define aznewex(_Name)  aznew
+    #define aznew           new
+    #define aznewex(_Name)  new
 
 /// azmalloc(size)
     #define azmalloc_1(_1)                                          AZ::AllocatorInstance< AZ::SystemAllocator >::Get().Allocate(_1, 0, 0)
@@ -187,301 +182,286 @@ namespace AZ {
  * Of course you can use placement new and do the array allocation anyway if
  * it's really needed.
  */
-#if __cpp_aligned_new
-// C++17 aligned alloc overloads for types with an alignment greater than sizeof(max_align_t)
-#define _AZ_CLASS_ALLOCATOR_ALIGNED_NEW(_Class, _Allocator, _Flags)                                                                                                                          \
-    /* class-specific allocation functions */                                                                                                                                                \
-    [[nodiscard]] void* operator new(std::size_t size, std::align_val_t align) {                                                                                                             \
-        return operator new(size, align, nullptr, 0, #_Class);                                                                                                                               \
-    }                                                                                                                                                                                        \
-    [[nodiscard]] void* operator new(std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                             \
-        return operator new(size, align, nullptr, 0, #_Class);                                                                                                                               \
-    }                                                                                                                                                                                        \
-    [[nodiscard]] void* operator new(std::size_t size, std::align_val_t align, const char* fileName, int lineNum, const char* name) {                                                        \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(%s): %d", size, #_Class, sizeof(_Class));                    \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, static_cast<std::size_t>(align), _Flags, name ? name : #_Class, fileName, lineNum);                                 \
-    }                                                                                                                                                                                        \
-    [[nodiscard]] void* operator new[]([[maybe_unused]] std::size_t size, [[maybe_unused]] std::align_val_t align) {                                                                         \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                             \
-                          "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                                   \
-                          "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                              \
-        return AZ_INVALID_POINTER;                                                                                                                                                           \
-    }                                                                                                                                                                                        \
-    [[nodiscard]] void* operator new[](std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                           \
-        return operator new[](size, align);                                                                                                                                                  \
-    }                                                                                                                                                                                        \
-    [[nodiscard]] void* operator new[](std::size_t size, std::align_val_t align, const char*, int, const char*) {                                                                            \
-        return operator new[](size, align);                                                                                                                                                  \
-    }                                                                                                                                                                                        \
-    void operator delete(void* p, std::align_val_t align) noexcept {                                                                                                                         \
-        return operator delete(p, 0, align);                                                                                                                                    \
-    }                                                                                                                                                                                        \
-    void operator delete(void* p, std::size_t size, std::align_val_t align) noexcept {                                                                                                       \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p, size, static_cast<std::size_t>(align)); }                                                                          \
-    }                                                                                                                                                                                        \
-    void operator delete(void* p, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                                                  \
-        return operator delete(p, 0, align);                                                                                                                                    \
-    }                                                                                                                                                                                        \
-    void operator delete(void* p, std::align_val_t align, [[maybe_unused]] const char* fileName, [[maybe_unused]] int lineNum, [[maybe_unused]] const char* name) noexcept {                 \
-        return operator delete(p, 0, align);                                                                                                                                    \
-    }                                                                                                                                                                                        \
-    void operator delete[]([[maybe_unused]] void* p, [[maybe_unused]] std::align_val_t align) noexcept {                                                                                     \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                             \
-                          "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                                   \
-                          "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                              \
-    }                                                                                                                                                                                        \
-    void operator delete[](void* p, [[maybe_unused]] std::size_t size, std::align_val_t align) noexcept {                                                                                    \
-        return operator delete[](p, align);                                                                                                                                                  \
-    }                                                                                                                                                                                        \
-    void operator delete[](void* p, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                                                \
-        return operator delete[](p, align);                                                                                                                                                  \
-    }                                                                                                                                                                                        \
-    void operator delete[](void* p, std::align_val_t align, [[maybe_unused]] const char* fileName, [[maybe_unused]] int lineNum, [[maybe_unused]] const char* name) noexcept {               \
-        return operator delete[](p, align);                                                                                                                                                  \
-    }
-#else
-#define _AZ_CLASS_ALLOCATOR_ALIGNED_NEW(_Class, _Allocator, _Flags)
-#endif
+static_assert(__cpp_aligned_new);
 
-#define AZ_CLASS_ALLOCATOR(_Class, _Allocator, _Flags)                                                                                                                              \
-    /* ========== placement operators (default) ========== */                                                                                                                       \
-    AZ_FORCE_INLINE void* operator new(std::size_t, void* p)    { return p; }   /* placement new */                                                                                 \
-    AZ_FORCE_INLINE void* operator new[](std::size_t, void* p)  { return p; }   /* placement array new */                                                                           \
-    AZ_FORCE_INLINE void  operator delete(void*, void*)         { }             /* placement delete, called when placement new asserts */                                           \
-    AZ_FORCE_INLINE void  operator delete[](void*, void*)       { }             /* placement array delete */                                                                        \
-    /* ========== standard operator new/delete ========== */                                                                                                                        \
-    AZ_FORCE_INLINE void* operator new(std::size_t size) {                      /* default operator new (called with "new _Class()") */                                             \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(%s): %d", size, #_Class, sizeof(_Class));           \
-        AZ_Warning(0, true/*false*/, "Make sure you use aznew, offers better tracking!" /*Warning temporarily disabled until engine is using AZ allocators.*/);                     \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, AZStd::alignment_of< _Class >::value, _Flags,#_Class);                                                     \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE void  operator delete(void* p, std::size_t size) {    /* default operator delete */                                                                             \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p, size, AZStd::alignment_of< _Class >::value); }                                                            \
-    }                                                                                                                                                                               \
-    /* ========== aznew (called "aznew _Class()") ========== */                                                                                                                     \
-    AZ_FORCE_INLINE void* operator new(std::size_t size, const char* fileName, int lineNum, const char* name) { /* with tracking */                                                 \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(_type): %d", size, sizeof(_Class));                 \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, AZStd::alignment_of< _Class >::value, _Flags, (name == 0) ?#_Class: name, fileName, lineNum);              \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE void* operator new(std::size_t size, const AZ::Internal::AllocatorDummy*) {                 /* without tracking */                                              \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(_type): %d", size, sizeof(_Class));                 \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, AZStd::alignment_of< _Class >::value);                                                                     \
-    }                                                                                                                                                                               \
-    /* ========== Symetrical delete operators (required incase aznew throws) ========== */                                                                                          \
-    AZ_FORCE_INLINE void  operator delete(void* p, const char*, int, const char*) {                                                                                                 \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p); }                                                                                                        \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE void  operator delete(void* p, const AZ::Internal::AllocatorDummy*) {                                                                                           \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p); }                                                                                                        \
-    }                                                                                                                                                                               \
-    /* ========== Unsupported operators ========== */                                                                                                                               \
-    AZ_FORCE_INLINE void* operator new[](std::size_t) {                                         /* default array operator new (called with "new _Class[x]") */                      \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                    \
-                         "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                           \
-                         "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                      \
-        return AZ_INVALID_POINTER;                                                                                                                                                  \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE void  operator delete[](void*) {                                            /* default array operator delete */                                                 \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                    \
-                         "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                           \
-                         "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                      \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE void* operator new[](std::size_t, const char*, int, const char*) {          /* array operator aznew with tracking (called with "aznew _Class[x]") */            \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                    \
-                         "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                           \
-                         "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                      \
-        return AZ_INVALID_POINTER;                                                                                                                                                  \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE void* operator new[](std::size_t, const AZ::Internal::AllocatorDummy*) {    /* array operator aznew without tracking (called with "aznew _Class[x]") */         \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                    \
-                         "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                           \
-                         "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                      \
-        return AZ_INVALID_POINTER;                                                                                                                                                  \
-    }                                                                                                                                                                               \
-    /* ========== AZ_CLASS_ALLOCATOR API ========== */                                                                                                                              \
-    AZ_FORCE_INLINE static void* AZ_CLASS_ALLOCATOR_Allocate() {                                                                                                                    \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(sizeof(_Class), AZStd::alignment_of< _Class >::value, _Flags, #_Class);                                          \
-    }                                                                                                                                                                               \
-    AZ_FORCE_INLINE static void AZ_CLASS_ALLOCATOR_DeAllocate(void* object) {                                                                                                       \
-        AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(object, sizeof(_Class), AZStd::alignment_of< _Class >::value);                                                        \
-    }                                                                                                                                                                               \
-    template<bool Placeholder = true> void AZ_CLASS_ALLOCATOR_DECLARED();                                                                                                           \
-    _AZ_CLASS_ALLOCATOR_ALIGNED_NEW(_Class, _Allocator, _Flags)
+// _Flag kept for backwards compatibility, not necessary anymore
+#define AZ_CLASS_ALLOCATOR(_Class, _Allocator, ...)                                                                                        \
+    /* ---------- NEW OPERATORS ----------*/                                                                                               \
+    /* replaceable allocation functions */                                                                                                 \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new(AZStd::size_t size)                                                                   \
+    {                                                                                                                                      \
+        return operator new(size, static_cast<AZStd::align_val_t>(AZStd::alignment_of<_Class>::value));                                    \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new[](AZStd::size_t size)                                                                 \
+    {                                                                                                                                      \
+        return operator new(size);                                                                                                         \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new(AZStd::size_t size, AZStd::align_val_t al)                                            \
+    {                                                                                                                                      \
+        /* The >= is necessary because this is used to allocate multiple objects as well, a better check would be */                       \
+        /* size % sizeof(_Class) == 0, however, more expensive */                                                                          \
+        AZ_Assert(size >= sizeof(_Class), "Size mismatch trying to allocate. Size: %d sizeof(%s): %d", size, #_Class, sizeof(_Class));     \
+        return AZ::AllocatorInstance<_Allocator>::Get().Allocate(size, static_cast<AZStd::size_t>(al));                                    \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new[](AZStd::size_t size, AZStd::align_val_t al)                                          \
+    {                                                                                                                                      \
+        return operator new(size, al);                                                                                                     \
+    }                                                                                                                                      \
+    /* replaceable non - throwing allocation functions */                                                                                  \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new(AZStd::size_t size, const std::nothrow_t&) noexcept                                   \
+    {                                                                                                                                      \
+        return operator new(size);                                                                                                         \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new[](AZStd::size_t size, const std::nothrow_t&) noexcept                                 \
+    {                                                                                                                                      \
+        return operator new[](size);                                                                                                       \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new(AZStd::size_t size, AZStd::align_val_t al, const std::nothrow_t&) noexcept            \
+    {                                                                                                                                      \
+        return operator new(size, al);                                                                                                     \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new[](AZStd::size_t size, AZStd::align_val_t al, const std::nothrow_t&) noexcept          \
+    {                                                                                                                                      \
+        return operator new[](size, al);                                                                                                   \
+    }                                                                                                                                      \
+    /* non - allocating placement allocation functions */                                                                                  \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new(AZStd::size_t, void* ptr) noexcept                                                    \
+    {                                                                                                                                      \
+        return ptr;                                                                                                                        \
+    }                                                                                                                                      \
+    [[nodiscard]] AZ_FORCE_INLINE void* operator new[](AZStd::size_t, void* ptr) noexcept                                                  \
+    {                                                                                                                                      \
+        return ptr;                                                                                                                        \
+    }                                                                                                                                      \
+    /* ---------- DELETE OPERATORS ----------*/                                                                                            \
+    /* replaceable usual deallocation functions */                                                                                         \
+    AZ_FORCE_INLINE void operator delete(void* ptr) noexcept                                                                               \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), static_cast<AZStd::align_val_t>(AZStd::alignment_of<_Class>::value));                         \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void* ptr) noexcept                                                                             \
+    {                                                                                                                                      \
+        operator delete(ptr, AZStd::size_t(0), AZStd::align_val_t(0));                                                                     \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete(void* ptr, AZStd::align_val_t al) noexcept                                                        \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), al);                                                                                          \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void* ptr, AZStd::align_val_t al) noexcept                                                      \
+    {                                                                                                                                      \
+        operator delete(ptr, AZStd::size_t(0), al);                                                                                        \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete(void* ptr, AZStd::size_t sz) noexcept                                                             \
+    {                                                                                                                                      \
+        operator delete(ptr, sz, AZStd::align_val_t(0));                                                                                   \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void* ptr, AZStd::size_t sz) noexcept                                                           \
+    {                                                                                                                                      \
+        operator delete(ptr, sz, AZStd::align_val_t(0));                                                                                   \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete(void* ptr, AZStd::size_t sz, AZStd::align_val_t al) noexcept                                      \
+    {                                                                                                                                      \
+        AZ::AllocatorInstance<_Allocator>::Get().DeAllocate(ptr, sz, static_cast<AZStd::size_t>(al));                                      \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void* ptr, AZStd::size_t sz, AZStd::align_val_t al) noexcept                                    \
+    {                                                                                                                                      \
+        operator delete(ptr, sz, al);                                                                                                      \
+    }                                                                                                                                      \
+    /* replaceable placement deallocation functions */                                                                                     \
+    AZ_FORCE_INLINE void operator delete(void* ptr, const std::nothrow_t&) noexcept                                                        \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), AZStd::align_val_t(0));                                                                       \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void* ptr, const std::nothrow_t&) noexcept                                                      \
+    {                                                                                                                                      \
+        operator delete[](ptr, AZStd::size_t(0), AZStd::align_val_t(0));                                                                   \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete(void* ptr, AZStd::align_val_t al, const std::nothrow_t&) noexcept                                 \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), al);                                                                                          \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void* ptr, AZStd::align_val_t al, const std::nothrow_t&) noexcept                               \
+    {                                                                                                                                      \
+        operator delete[](ptr, AZStd::size_t(0), al);                                                                                      \
+    }                                                                                                                                      \
+    /* non - allocating placement deallocation functions */                                                                                \
+    AZ_FORCE_INLINE void operator delete(void*, void*) noexcept                                                                            \
+    {                                                                                                                                      \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE void operator delete[](void*, void*) noexcept                                                                          \
+    {                                                                                                                                      \
+    }                                                                                                                                      \
+    /* ========== AZ_CLASS_ALLOCATOR API ========== */                                                                                     \
+    AZ_FORCE_INLINE static void* AZ_CLASS_ALLOCATOR_Allocate()                                                                             \
+    {                                                                                                                                      \
+        return AZ::AllocatorInstance<_Allocator>::Get().Allocate(sizeof(_Class), AZStd::alignment_of<_Class>::value);                      \
+    }                                                                                                                                      \
+    AZ_FORCE_INLINE static void AZ_CLASS_ALLOCATOR_DeAllocate(void* object)                                                                \
+    {                                                                                                                                      \
+        AZ::AllocatorInstance<_Allocator>::Get().DeAllocate(object, sizeof(_Class), AZStd::alignment_of<_Class>::value);                   \
+    }                                                                                                                                      \
+    template<bool Placeholder = true>                                                                                                      \
+    void AZ_CLASS_ALLOCATOR_DECLARED();
 
-// If you want to avoid including the memory manager class in the header file use the _DECL (declaration) and _IMPL (implementations/definition) macros
-#if __cpp_aligned_new
-// Declares the C++17 aligned_new operator new/operator delete overloads
-#define _AZ_CLASS_ALLOCATOR_DECL_ALIGNED_NEW                                                                                                                 \
-    /* class-specific allocation functions */                                                                                                                \
-    [[nodiscard]] void* operator new(std::size_t size, std::align_val_t align);                                                                              \
-    [[nodiscard]] void* operator new(std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept;                                              \
-    [[nodiscard]] void* operator new(std::size_t size, std::align_val_t align, const char* fileName, int lineNum, const char* name);                         \
-    [[nodiscard]] void* operator new[](std::size_t, std::align_val_t);                                                                                       \
-    [[nodiscard]] void* operator new[](std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept;                                            \
-    [[nodiscard]] void* operator new[](std::size_t size, std::align_val_t align, const char*, int, const char*);                                             \
-    void operator delete(void* p, std::align_val_t align) noexcept;                                                                                          \
-    void operator delete(void* p, std::size_t size, std::align_val_t align) noexcept;                                                                        \
-    void operator delete(void* p, std::align_val_t align, const std::nothrow_t&) noexcept;                                                                   \
-    void operator delete(void* p, std::align_val_t align, [[maybe_unused]] const char* fileName, [[maybe_unused]] int lineNum, const char* name) noexcept;   \
-    void operator delete[](void* p, std::align_val_t align) noexcept;                                                                                        \
-    void operator delete[](void* p, std::size_t size, std::align_val_t align) noexcept;                                                                      \
-    void operator delete[](void* p, std::align_val_t align, const std::nothrow_t&) noexcept;                                                                 \
-    void operator delete[](void* p, std::align_val_t align, [[maybe_unused]] const char* fileName, [[maybe_unused]] int lineNum, const char* name) noexcept;
-#else
-#define _AZ_CLASS_ALLOCATOR_DECL_ALIGNED_NEW
-#endif
+#define AZ_CLASS_ALLOCATOR_DECL                                                                                                            \
+    /* ---------- NEW OPERATORS ----------*/                                                                                               \
+    /* replaceable allocation functions */                                                                                                 \
+    [[nodiscard]] void* operator new(AZStd::size_t size);                                                                                  \
+    [[nodiscard]] void* operator new[](AZStd::size_t size);                                                                                \
+    [[nodiscard]] void* operator new(AZStd::size_t size, AZStd::align_val_t al);                                                           \
+    [[nodiscard]] void* operator new[](AZStd::size_t size, AZStd::align_val_t al);                                                         \
+    /* replaceable non - throwing allocation functions */                                                                                  \
+    [[nodiscard]] void* operator new(AZStd::size_t size, const std::nothrow_t& tag) noexcept;                                              \
+    [[nodiscard]] void* operator new[](AZStd::size_t size, const std::nothrow_t& tag) noexcept;                                            \
+    [[nodiscard]] void* operator new(AZStd::size_t size, AZStd::align_val_t al, const std::nothrow_t&) noexcept;                           \
+    [[nodiscard]] void* operator new[](AZStd::size_t size, AZStd::align_val_t al, const std::nothrow_t&) noexcept;                         \
+    /* non - allocating placement allocation functions */                                                                                  \
+    [[nodiscard]] void* operator new(AZStd::size_t, void* ptr) noexcept;                                                                   \
+    [[nodiscard]] void* operator new[](AZStd::size_t size, void* ptr) noexcept;                                                            \
+    /* ---------- DELETE OPERATORS ----------*/                                                                                            \
+    /* replaceable usual deallocation functions */                                                                                         \
+    void operator delete(void* ptr) noexcept;                                                                                              \
+    void operator delete[](void* ptr) noexcept;                                                                                            \
+    void operator delete(void* ptr, AZStd::align_val_t al) noexcept;                                                                       \
+    void operator delete[](void* ptr, AZStd::align_val_t al) noexcept;                                                                     \
+    void operator delete(void* ptr, AZStd::size_t sz) noexcept;                                                                            \
+    void operator delete[](void* ptr, AZStd::size_t sz) noexcept;                                                                          \
+    void operator delete(void* ptr, AZStd::size_t sz, AZStd::align_val_t al) noexcept;                                                     \
+    void operator delete[](void* ptr, AZStd::size_t sz, AZStd::align_val_t al) noexcept;                                                   \
+    /* replaceable placement deallocation functions */                                                                                     \
+    void operator delete(void* ptr, const std::nothrow_t& tag) noexcept;                                                                   \
+    void operator delete[](void* ptr, const std::nothrow_t& tag) noexcept;                                                                 \
+    void operator delete(void* ptr, AZStd::align_val_t al, const std::nothrow_t& tag) noexcept;                                            \
+    void operator delete[](void* ptr, AZStd::align_val_t al, const std::nothrow_t& tag) noexcept;                                          \
+    /* non - allocating placement deallocation functions */                                                                                \
+    void operator delete(void* ptr, void* place) noexcept;                                                                                 \
+    void operator delete[](void* ptr, void* place) noexcept;                                                                               \
+    /* ========== AZ_CLASS_ALLOCATOR API ========== */                                                                                     \
+    static void* AZ_CLASS_ALLOCATOR_Allocate();                                                                                            \
+    static void AZ_CLASS_ALLOCATOR_DeAllocate(void* object);                                                                               \
+    template<bool Placeholder = true>                                                                                                      \
+    void AZ_CLASS_ALLOCATOR_DECLARED();
 
-#define AZ_CLASS_ALLOCATOR_DECL                                                                                                                           \
-    /* ========== placement operators (default) ========== */                                                                                             \
-    AZ_FORCE_INLINE void* operator new(std::size_t, void* p)    { return p; }                                                                             \
-    AZ_FORCE_INLINE void* operator new[](std::size_t, void* p)  { return p; }                                                                             \
-    AZ_FORCE_INLINE void operator delete(void*, void*)          { }                                                                                       \
-    AZ_FORCE_INLINE void operator delete[](void*, void*)        { }                                                                                       \
-    /* ========== standard operator new/delete ========== */                                                                                              \
-    void* operator new(std::size_t size);                                                                                                                 \
-    void  operator delete(void* p, std::size_t size);                                                                                                     \
-    /* ========== aznew (called "aznew _Class()")========== */                                                                                            \
-    void* operator new(std::size_t size, const char* fileName, int lineNum, const char* name);                                                            \
-    void* operator new(std::size_t size, const AZ::Internal::AllocatorDummy*);                                                                            \
-    /* ========== Symetrical delete operators (required incase aznew throws) ========== */                                                                \
-    void  operator delete(void* p, const char*, int, const char*);                                                                                        \
-    void  operator delete(void* p, const AZ::Internal::AllocatorDummy*);                                                                                  \
-    /* ========== Unsupported operators ========== */                                                                                                     \
-    AZ_FORCE_INLINE void* operator new[](std::size_t) {                                                                                                   \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"          \
-                        "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                  \
-                        "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                             \
-        return AZ_INVALID_POINTER;                                                                                                                        \
-    }                                                                                                                                                     \
-    AZ_FORCE_INLINE void  operator delete[](void*) {                                                                                                      \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"          \
-                        "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                  \
-                        "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                             \
-    }                                                                                                                                                     \
-    AZ_FORCE_INLINE void* operator new[](std::size_t, const char*, int, const char*, const AZ::Internal::AllocatorDummy*) {                               \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"          \
-            "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                              \
-            "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                         \
-        return AZ_INVALID_POINTER;                                                                                                                        \
-    }                                                                                                                                                     \
-    AZ_FORCE_INLINE void* operator new[](std::size_t, const AZ::Internal::AllocatorDummy*) {                                                              \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"          \
-            "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                              \
-            "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                         \
-        return AZ_INVALID_POINTER;                                                                                                                        \
-    }                                                                                                                                                     \
-    /* ========== AZ_CLASS_ALLOCATOR API ========== */                                                                                                    \
-    static void* AZ_CLASS_ALLOCATOR_Allocate();                                                                                                           \
-    static void  AZ_CLASS_ALLOCATOR_DeAllocate(void* object);                                                                                             \
-    template<bool Placeholder = true> void AZ_CLASS_ALLOCATOR_DECLARED();                                                                                 \
-    _AZ_CLASS_ALLOCATOR_DECL_ALIGNED_NEW
+// _Flags kept for backwards compatibility, not necessary anymore
+#define AZ_CLASS_ALLOCATOR_IMPL_INTERNAL(_Class, _Allocator, _Template)                                                                    \
+    /* ---------- NEW OPERATORS ----------*/                                                                                               \
+    /* replaceable allocation functions */                                                                                                 \
+    _Template [[nodiscard]] void* _Class::operator new(AZStd::size_t size, AZStd::align_val_t al)                                          \
+    {                                                                                                                                      \
+        return AZ::AllocatorInstance<_Allocator>::Get().Allocate(size, static_cast<AZStd::size_t>(al));                                    \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new(AZStd::size_t size)                                                                 \
+    {                                                                                                                                      \
+        /* The >= is necessary because this is used to allocate multiple objects as well, a better check would be */                       \
+        /* size % sizeof(_Class) == 0, however, more expensive */                                                                          \
+        AZ_Assert(size >= sizeof(_Class), "Size mismatch trying to allocate. Size: %d sizeof(%s): %d", size, #_Class, sizeof(_Class));     \
+        return operator new(size, static_cast<AZStd::align_val_t>(AZStd::alignment_of<_Class>::value));                                    \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new[](AZStd::size_t size)                                                               \
+    {                                                                                                                                      \
+        return operator new(size);                                                                                                         \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new[](AZStd::size_t size, AZStd::align_val_t al)                                        \
+    {                                                                                                                                      \
+        return operator new(size, al);                                                                                                     \
+    }                                                                                                                                      \
+    /* replaceable non - throwing allocation functions */                                                                                  \
+    _Template [[nodiscard]] void* _Class::operator new(AZStd::size_t size, const std::nothrow_t&) noexcept                                 \
+    {                                                                                                                                      \
+        return operator new(size);                                                                                                         \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new[](AZStd::size_t size, const std::nothrow_t&) noexcept                               \
+    {                                                                                                                                      \
+        return operator new[](size);                                                                                                       \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new(AZStd::size_t size, AZStd::align_val_t al, const std::nothrow_t&) noexcept          \
+    {                                                                                                                                      \
+        return operator new(size, al);                                                                                                     \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new[](AZStd::size_t size, AZStd::align_val_t al, const std::nothrow_t&) noexcept        \
+    {                                                                                                                                      \
+        return operator new[](size, al);                                                                                                   \
+    }                                                                                                                                      \
+    /* non - allocating placement allocation functions */                                                                                  \
+    _Template [[nodiscard]] void* _Class::operator new(AZStd::size_t, void* ptr) noexcept                                                  \
+    {                                                                                                                                      \
+        return ptr;                                                                                                                        \
+    }                                                                                                                                      \
+    _Template [[nodiscard]] void* _Class::operator new[](AZStd::size_t, void* ptr) noexcept                                                \
+    {                                                                                                                                      \
+        return ptr;                                                                                                                        \
+    }                                                                                                                                      \
+    /* ---------- DELETE OPERATORS ----------*/                                                                                            \
+    /* replaceable usual deallocation functions */                                                                                         \
+    _Template void _Class::operator delete(void* ptr, AZStd::size_t sz, AZStd::align_val_t al) noexcept                                    \
+    {                                                                                                                                      \
+        AZ::AllocatorInstance<_Allocator>::Get().DeAllocate(ptr, sz, static_cast<AZStd::size_t>(al));                                      \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete(void* ptr) noexcept                                                                             \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), AZStd::align_val_t(0));                                                                       \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void* ptr) noexcept                                                                           \
+    {                                                                                                                                      \
+        operator delete(ptr, AZStd::size_t(0), AZStd::align_val_t(0));                                                                     \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete(void* ptr, AZStd::align_val_t al) noexcept                                                      \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), al);                                                                                          \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void* ptr, AZStd::align_val_t al) noexcept                                                    \
+    {                                                                                                                                      \
+        operator delete(ptr, AZStd::size_t(0), al);                                                                                        \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete(void* ptr, AZStd::size_t sz) noexcept                                                           \
+    {                                                                                                                                      \
+        operator delete(ptr, sz, AZStd::align_val_t(0));                                                                                   \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void* ptr, AZStd::size_t sz) noexcept                                                         \
+    {                                                                                                                                      \
+        operator delete(ptr, sz, AZStd::align_val_t(0));                                                                                   \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void* ptr, AZStd::size_t sz, AZStd::align_val_t al) noexcept                                  \
+    {                                                                                                                                      \
+        operator delete(ptr, sz, al);                                                                                                      \
+    }                                                                                                                                      \
+    /* replaceable placement deallocation functions */                                                                                     \
+    _Template void _Class::operator delete(void* ptr, const std::nothrow_t&) noexcept                                                      \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), AZStd::align_val_t(0));                                                                       \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void* ptr, const std::nothrow_t&) noexcept                                                    \
+    {                                                                                                                                      \
+        operator delete[](ptr, AZStd::size_t(0), AZStd::align_val_t(0));                                                                   \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete(void* ptr, AZStd::align_val_t al, const std::nothrow_t&) noexcept                               \
+    {                                                                                                                                      \
+        operator delete(ptr, sizeof(_Class), al);                                                                                          \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void* ptr, AZStd::align_val_t al, const std::nothrow_t&) noexcept                             \
+    {                                                                                                                                      \
+        operator delete[](ptr, AZStd::size_t(0), al);                                                                                      \
+    }                                                                                                                                      \
+    /* non - allocating placement deallocation functions */                                                                                \
+    _Template void _Class::operator delete(void*, void*) noexcept                                                                          \
+    {                                                                                                                                      \
+    }                                                                                                                                      \
+    _Template void _Class::operator delete[](void*, void*) noexcept                                                                        \
+    {                                                                                                                                      \
+    }                                                                                                                                      \
+    /* ========== AZ_CLASS_ALLOCATOR API ========== */                                                                                     \
+    _Template void* _Class::AZ_CLASS_ALLOCATOR_Allocate()                                                                                  \
+    {                                                                                                                                      \
+        return AZ::AllocatorInstance<_Allocator>::Get().Allocate(sizeof(_Class), AZStd::alignment_of<_Class>::value);                      \
+    }                                                                                                                                      \
+    _Template void _Class::AZ_CLASS_ALLOCATOR_DeAllocate(void* object)                                                                     \
+    {                                                                                                                                      \
+        AZ::AllocatorInstance<_Allocator>::Get().DeAllocate(object, sizeof(_Class), AZStd::alignment_of<_Class>::value);                   \
+    }                                                                                                                                      \
 
-#if __cpp_aligned_new
-// Defines the C++17 aligned_new operator new/operator delete overloads
-#define _AZ_CLASS_ALLOCATOR_IMPL_ALIGNED_NEW(_Class, _Allocator, _Flags, _Template)                                                                                                                     \
-    _Template [[nodiscard]] void* _Class::operator new(std::size_t size, std::align_val_t align, const char* fileName, int lineNum, const char* name) {                                                 \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(%s): %d", size, #_Class, sizeof(_Class));                               \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, static_cast<std::size_t>(align), _Flags, name ? name : #_Class, fileName, lineNum);                                            \
-    }                                                                                                                                                                                                   \
-    _Template [[nodiscard]] void* _Class::operator new(std::size_t size, std::align_val_t align) {                                                                                                      \
-        return operator new(size, align, nullptr, 0, #_Class);                                                                                                                                          \
-    }                                                                                                                                                                                                   \
-    _Template [[nodiscard]] void* _Class::operator new(std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                      \
-        return operator new(size, align, nullptr, 0, #_Class);                                                                                                                                          \
-    }                                                                                                                                                                                                   \
-    _Template [[nodiscard]] void* _Class::operator new[]([[maybe_unused]] std::size_t, [[maybe_unused]] std::align_val_t) {                                                                             \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                                        \
-                          "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                                              \
-                          "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                                         \
-        return AZ_INVALID_POINTER;                                                                                                                                                                      \
-    }                                                                                                                                                                                                   \
-    _Template [[nodiscard]] void* _Class::operator new[](std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                    \
-        return operator new[](size, align);                                                                                                                                                             \
-    }                                                                                                                                                                                                   \
-    _Template [[nodiscard]] void* _Class::operator new[](std::size_t size, std::align_val_t align, const char*, int, const char*) {                                                                     \
-        return operator new[](size, align);                                                                                                                                                             \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete(void* p, std::size_t size, std::align_val_t align) noexcept {                                                                                                \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p, size, static_cast<std::size_t>(align)); }                                                                                     \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete(void* p, std::align_val_t align) noexcept {                                                                                                                  \
-        return operator delete(p, 0, align);                                                                                                                                               \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete(void* p, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                                           \
-        return operator delete(p, 0, align);                                                                                                                                               \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete(void* p, std::align_val_t align, [[maybe_unused]] const char* fileName, [[maybe_unused]] int lineNum, [[maybe_unused]] const char* name) noexcept {          \
-        return operator delete(p, 0, align);                                                                                                                                               \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete[]([[maybe_unused]] void* p, [[maybe_unused]] std::align_val_t align) noexcept {                                                                              \
-        AZ_Assert(false, "We DO NOT support array operators, because it's really hard/impossible to handle alignment without proper tracking!\n"                                                        \
-                          "new[] inserts a header (platform dependent) to keep track of the array size!\n"                                                                                              \
-                          "Use AZStd::vector,AZStd::array,AZStd::fixed_vector or placement new and it's your responsibility!");                                                                         \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete[](void* p, [[maybe_unused]] std::size_t size, std::align_val_t align) noexcept {                                                                             \
-        return _Class::operator delete[](p, align);                                                                                                                                                             \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete[](void* p, std::align_val_t align, const std::nothrow_t&) noexcept {                                                                                         \
-        return _Class::operator delete[](p, align);                                                                                                                                                             \
-    }                                                                                                                                                                                                   \
-    _Template void _Class::operator delete[](void* p, std::align_val_t align, [[maybe_unused]] const char* fileName, [[maybe_unused]] int lineNum, [[maybe_unused]] const char* name) noexcept {        \
-        return _Class::operator delete[](p, align);                                                                                                                                                             \
-    }
-#else
-#define _AZ_CLASS_ALLOCATOR_IMPL_ALIGNED_NEW(_Class, _Allocator, _Flags, _Template)
-#endif
-#define AZ_CLASS_ALLOCATOR_IMPL_INTERNAL(_Class, _Allocator, _Flags, _Template)                                                                                                                                                                     \
-    /* ========== standard operator new/delete ========== */                                                                                                                                                                                        \
-    _Template                                                                                                                                                                                                                                       \
-    [[nodiscard]] void* _Class::operator new(std::size_t size)                                                                                                                                                                                      \
-    {                                                                                                                                                                                                                                               \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(_Class): %d", size, sizeof(_Class));                                                                                \
-        AZ_Warning(0, false, "Make sure you use aznew, offers better tracking!");                                                                                                                                                                   \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, AZStd::alignment_of< _Class >::value, _Flags,#_Class);                                                                                                                     \
-    }                                                                                                                                                                                                                                               \
-    _Template                                                                                                                                                                                                                                       \
-    void _Class::operator delete(void* p, std::size_t size)  {                                                                                                                                                                                      \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p, size, AZStd::alignment_of< _Class >::value); }                                                                                                                            \
-    }                                                                                                                                                                                                                                               \
-    /* ========== aznew (called "aznew _Class()")========== */                                                                                                                                                                                      \
-    _Template                                                                                                                                                                                                                                       \
-    [[nodiscard]] void* _Class::operator new(std::size_t size, const char* fileName, int lineNum, const char* name) {                                                                                                                               \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(_type): %d", size, sizeof(_Class));                                                                                 \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, AZStd::alignment_of< _Class >::value, _Flags, (name == 0) ?#_Class: name, fileName, lineNum);                                                                              \
-    }                                                                                                                                                                                                                                               \
-    _Template                                                                                                                                                                                                                                       \
-    [[nodiscard]] void* _Class::operator new(std::size_t size, const AZ::Internal::AllocatorDummy*) {                                                                                                                                               \
-        AZ_Assert(size >= sizeof(_Class), "Size mismatch! Did you forget to declare the macro in derived class? Size: %d sizeof(_type): %d", size, sizeof(_Class));                                                                                 \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(size, AZStd::alignment_of< _Class >::value);                                                                                                                                     \
-    }                                                                                                                                                                                                                                               \
-    /* ========== Symetrical delete operators (required incase aznew throws) ========== */                                                                                                                                                          \
-    _Template                                                                                                                                                                                                                                       \
-    void  _Class::operator delete(void* p, const char*, int, const char*) {                                                                                                                                                                         \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p); }                                                                                                                                                                        \
-    }                                                                                                                                                                                                                                               \
-    _Template                                                                                                                                                                                                                                       \
-    void  _Class::operator delete(void* p, const AZ::Internal::AllocatorDummy*) {                                                                                                                                                                   \
-        if (p) { AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(p); }                                                                                                                                                                        \
-    }                                                                                                                                                                                                                                               \
-    /* ========== AZ_CLASS_ALLOCATOR API ========== */                                                                                                                                                                                              \
-    _Template                                                                                                                                                                                                                                       \
-    [[nodiscard]] void* _Class::AZ_CLASS_ALLOCATOR_Allocate() {                                                                                                                                                                                     \
-        return AZ::AllocatorInstance< _Allocator >::Get().Allocate(sizeof(_Class), AZStd::alignment_of< _Class >::value, _Flags, #_Class);                                                                                                          \
-    }                                                                                                                                                                                                                                               \
-    _Template                                                                                                                                                                                                                                       \
-    void _Class::AZ_CLASS_ALLOCATOR_DeAllocate(void* object) {                                                                                                                                                                                      \
-        AZ::AllocatorInstance< _Allocator >::Get().DeAllocate(object, sizeof(_Class), AZStd::alignment_of< _Class >::value);                                                                                                                        \
-    }                                                                                                                                                                                                                                               \
-    _AZ_CLASS_ALLOCATOR_IMPL_ALIGNED_NEW(_Class, _Allocator, _Flags, _Template)
 
-#define AZ_CLASS_ALLOCATOR_IMPL(_Class, _Allocator, _Flags)                                                                                                                                                                                         \
-    AZ_CLASS_ALLOCATOR_IMPL_INTERNAL(_Class, _Allocator, _Flags,)
-
-#define AZ_CLASS_ALLOCATOR_IMPL_TEMPLATE(_Class, _Allocator, _Flags)                                                                                                                                                                                \
-    AZ_CLASS_ALLOCATOR_IMPL_INTERNAL(_Class, _Allocator, _Flags, template<>)
-
-//////////////////////////////////////////////////////////////////////////
-// new operator overloads
+#define AZ_CLASS_ALLOCATOR_IMPL(_Class, _Allocator, ...) AZ_CLASS_ALLOCATOR_IMPL_INTERNAL(_Class, _Allocator,)
+#define AZ_CLASS_ALLOCATOR_IMPL_TEMPLATE(_Class, _Allocator, ...) AZ_CLASS_ALLOCATOR_IMPL_INTERNAL(_Class, _Allocator, template<>)
 
 // you can redefine this macro to whatever suits you.
 #ifndef AZCORE_GLOBAL_NEW_ALIGNMENT
@@ -499,8 +479,6 @@ namespace AZ {
  * aznew call signature.
  * So in an exception free environment (AZLibs don't have exception support) you need to implement the following functions:
  *
- * void* operator new(std::size_t size, const char* fileName, int lineNum, const char* name, const AZ::Internal::AllocatorDummy*);
- * void* operator new[](std::size_t size, const char* fileName, int lineNum, const char* name, const AZ::Internal::AllocatorDummy*);
  * void* operator new(std::size_t);
  * void* operator new[](std::size_t);
  * void operator delete(void*);
@@ -510,8 +488,6 @@ namespace AZ {
  * All allocations will happen using the AZ::SystemAllocator. Make sure you create it properly before any new calls.
  * If you use our default new implementation you should map the global functions like that:
  *
- * void* operator new(std::size_t size, const char* fileName, int lineNum, const char* name, const AZ::Internal::AllocatorDummy*)       { return AZ::OperatorNew(size,fileName,lineNum,name); }
- * void* operator new[](std::size_t size, const char* fileName, int lineNum, const char* name, const AZ::Internal::AllocatorDummy*)     { return AZ::OperatorNewArray(size,fileName,lineNum,name); }
  * void* operator new(std::size_t size)         { return AZ::OperatorNew(size); }
  * void* operator new[](std::size_t size)       { return AZ::OperatorNewArray(size); }
  * void operator delete(void* ptr)              { AZ::OperatorDelete(ptr); }
@@ -637,7 +613,7 @@ namespace AZ
                 return StoragePolicy::GetAllocator();
             }
 
-            AZ_FORCE_INLINE static IAllocator& Get() 
+            AZ_FORCE_INLINE static IAllocator& Get()
             {
                 return StoragePolicy::GetAllocator();
             }
@@ -847,24 +823,20 @@ namespace AZ
     AZ_HAS_MEMBER(AZClassAllocator, AZ_CLASS_ALLOCATOR_DECLARED, void, ());
 
     // {@ Global New/Delete Operators
-    [[nodiscard]] void* OperatorNew(std::size_t size, const char* fileName, int lineNum, const char* name = nullptr);
-    [[nodiscard]] void* OperatorNew(std::size_t size);
+    [[nodiscard]] void* OperatorNew(AZStd::size_t size);
+    [[nodiscard]] void* OperatorNew(AZStd::size_t size, AZStd::align_val_t align);
+
     void OperatorDelete(void* ptr);
-    void OperatorDelete(void* ptr, std::size_t size);
+    void OperatorDelete(void* ptr, AZStd::size_t size);
+    void OperatorDelete(void* ptr, AZStd::size_t size, AZStd::align_val_t align);
 
-    [[nodiscard]] void* OperatorNewArray(std::size_t size, const char* fileName, int lineNum, const char* name = nullptr);
-    [[nodiscard]] void* OperatorNewArray(std::size_t size);
+    [[nodiscard]] void* OperatorNewArray(AZStd::size_t size);
+    [[nodiscard]] void* OperatorNewArray(AZStd::size_t size, AZStd::align_val_t align);
+
     void OperatorDeleteArray(void* ptr);
-    void OperatorDeleteArray(void* ptr, std::size_t size);
+    void OperatorDeleteArray(void* ptr, AZStd::size_t size);
+    void OperatorDeleteArray(void* ptr, AZStd::size_t size, AZStd::align_val_t align);
 
-#if __cpp_aligned_new
-    [[nodiscard]] void* OperatorNew(std::size_t size, std::align_val_t align, const char* fileName, int lineNum, const char* name = nullptr);
-    [[nodiscard]] void* OperatorNew(std::size_t size, std::align_val_t align);
-    [[nodiscard]] void* OperatorNewArray(std::size_t size, std::align_val_t align, const char* fileName, int lineNum, const char* name = nullptr);
-    [[nodiscard]] void* OperatorNewArray(std::size_t size, std::align_val_t align);
-    void OperatorDelete(void* ptr, std::size_t size, std::align_val_t align);
-    void OperatorDeleteArray(void* ptr, std::size_t size, std::align_val_t align);
-#endif
     // @}
 }
 
