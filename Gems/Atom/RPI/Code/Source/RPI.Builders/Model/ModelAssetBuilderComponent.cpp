@@ -114,7 +114,7 @@ namespace AZ
             if (auto* serialize = azrtti_cast<SerializeContext*>(context))
             {
                 serialize->Class<ModelAssetBuilderComponent, SceneAPI::SceneCore::ExportingComponent>()
-                    ->Version(34);  // Fix merging mismatched vertex layouts
+                    ->Version(35);  // Fix mismatched vertex format merging
             }
         }
 
@@ -1186,7 +1186,7 @@ namespace AZ
 
         bool ModelAssetBuilderComponent::VertexStreamLayoutMatches(const ProductMeshContent& lhs, const ProductMeshContent& rhs) const
         {
-            bool mismatchedVertexLayoutsAreErrors = MismatchedVertexLayoutsAreErrors();
+            [[maybe_unused]] bool mismatchedVertexLayoutsAreErrors = MismatchedVertexLayoutsAreErrors();
 
             // Check that the stream counts and types match
             bool layoutMatches =
@@ -1199,19 +1199,6 @@ namespace AZ
                 lhs.m_skinWeights.empty() == rhs.m_skinWeights.empty() &&
                 lhs.m_uvSets.size() == rhs.m_uvSets.size() &&
                 lhs.m_colorSets.size() == rhs.m_colorSets.size();
-
-            if (layoutMatches)
-            {
-                for (size_t i = 0; i < lhs.m_uvSets.size(); ++i)
-                {
-                    layoutMatches &= lhs.m_uvSets[i].empty() == rhs.m_uvSets.empty();
-                }
-                
-                for (size_t i = 0; i < lhs.m_colorSets.size(); ++i)
-                {
-                    layoutMatches &= lhs.m_colorSets[i].empty() == rhs.m_colorSets.empty();
-                }
-            }
 
             if (layoutMatches)
             {
@@ -1261,7 +1248,7 @@ namespace AZ
                         AZ_Warning(s_builderName, mismatchedVertexLayoutsAreErrors, "%s", errorMessage.c_str());
                     }
                 }
-                layoutMatches &= namesMatch;
+                layoutMatches = namesMatch;
             }
             else
             {
@@ -1311,18 +1298,11 @@ namespace AZ
             }
             for (size_t i = 0; i < mesh.m_uvSets.size(); ++i)
             {
-                if (!mesh.m_uvSets[i].empty())
-                {
-                    success &= ValidateStreamSize(expectedVertexCount, mesh.m_uvSets[i], UVFormat, mesh.m_uvCustomNames[i].GetCStr());
-                }
+                success &= ValidateStreamSize(expectedVertexCount, mesh.m_uvSets[i], UVFormat, mesh.m_uvCustomNames[i].GetCStr());
             }
             for (size_t i = 0; i < mesh.m_colorSets.size(); ++i)
             {
-                if (!mesh.m_colorSets[i].empty())
-                {
-                    success &=
-                        ValidateStreamSize(expectedVertexCount, mesh.m_colorSets[i], ColorFormat, mesh.m_colorCustomNames[i].GetCStr());
-                }
+                success &= ValidateStreamSize(expectedVertexCount, mesh.m_colorSets[i], ColorFormat, mesh.m_colorCustomNames[i].GetCStr());
             }
             if (!mesh.m_clothData.empty())
             {
