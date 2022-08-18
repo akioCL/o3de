@@ -114,7 +114,7 @@ namespace AZ
             if (auto* serialize = azrtti_cast<SerializeContext*>(context))
             {
                 serialize->Class<ModelAssetBuilderComponent, SceneAPI::SceneCore::ExportingComponent>()
-                    ->Version(33);  // Fix parent-child relationship in scene
+                    ->Version(35);  // Fix mismatched vertex format merging
             }
         }
 
@@ -1186,7 +1186,7 @@ namespace AZ
 
         bool ModelAssetBuilderComponent::VertexStreamLayoutMatches(const ProductMeshContent& lhs, const ProductMeshContent& rhs) const
         {
-            bool mismatchedVertexLayoutsAreErrors = MismatchedVertexLayoutsAreErrors();
+            [[maybe_unused]] bool mismatchedVertexLayoutsAreErrors = MismatchedVertexLayoutsAreErrors();
 
             // Check that the stream counts and types match
             bool layoutMatches =
@@ -1228,7 +1228,7 @@ namespace AZ
                 }
                 for (size_t i = 0; i < lhs.m_colorCustomNames.size(); ++i)
                 {
-                    if (lhs.m_colorCustomNames[i] != rhs.m_uvCustomNames[i])
+                    if (lhs.m_colorCustomNames[i] != rhs.m_colorCustomNames[i])
                     {
                         namesMatch = false;
                         AZStd::string errorMessage = AZStd::string::format(
