@@ -34,6 +34,8 @@ set(FILES
     native/AssetManager/ExcludedFolderCache.cpp
     native/AssetManager/ExcludedFolderCache.h
     native/AssetManager/ExcludedFolderCacheInterface.h
+    native/AssetManager/SourceAssetReference.h
+    native/AssetManager/SourceAssetReference.cpp
     native/assetprocessor.h
     native/connection/connection.cpp
     native/connection/connection.h
@@ -104,6 +106,7 @@ set(FILES
     native/utilities/ThreadHelper.h
     native/utilities/UuidManager.h
     native/utilities/UuidManager.cpp
+    native/utilities/IPathConversion.h
 )
 
 set(SKIP_UNITY_BUILD_INCLUSION_FILES
