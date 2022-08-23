@@ -51,5 +51,7 @@ namespace AzToolsFramework::Prefab
         //! @param providedPatch The provided path array to be appended to.
         //! @return LinkId stored in the instance closest to the focused instance in hierarchy.
         virtual LinkId AppendPathFromFocusedInstanceToPatchPaths(PrefabDom& providedPatch, AZ::EntityId entityId) const = 0;
+
+        virtual LinkId AppendPathFromFocusedInstanceToPatchPaths_Old(PrefabDom& providedPatch, AZ::EntityId entityId) const = 0;
     };
 } // namespace AzToolsFramework::Prefab

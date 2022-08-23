@@ -83,6 +83,11 @@ namespace AzToolsFramework
 
             instanceDom.CopyFrom(*instanceDomFromTemplate, instanceDom.GetAllocator());
 
+            if (!focusedInstance.has_value())
+            {
+                return true;
+            }
+
             // Additional processing on focused instance DOM...
 
             // If the focused instance is the given instance, then update the container entity in focused instance DOM

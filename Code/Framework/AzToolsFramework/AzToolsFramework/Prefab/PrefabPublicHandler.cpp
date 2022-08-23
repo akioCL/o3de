@@ -822,7 +822,7 @@ namespace AzToolsFramework
                     {
                         PrefabDom newPatch;
                         m_instanceToTemplateInterface->GeneratePatch(newPatch, beforeState, afterState);
-                        LinkId linkId = m_prefabFocusInterface->AppendPathFromFocusedInstanceToPatchPaths(newPatch, entityId);
+                        LinkId linkId = m_prefabFocusInterface->AppendPathFromFocusedInstanceToPatchPaths_Old(newPatch, entityId);
 
                         Internal_HandleContainerOverride(parentUndoBatch, entityId, newPatch, linkId);
                     }
