@@ -93,7 +93,7 @@ namespace AzToolsFramework
 
                     // Replace the container entity with the one as seen by the root
                     // TODO - this function should only replace the transform!
-                    ReplaceFocusedContainerTransformAccordingToRoot(&focusedInstance->get(), focusedInstanceDom);
+                    UpdateContainerEntityInDomFromRoot(focusedInstanceDom, focusedInstance->get());
                     
                     // Copy the focused instance dom inside the dom that will be used to refresh the instance.
                     PrefabDomPath domSourceToFocusPath(relativePathToFocusedInstanceAncestor.c_str());
@@ -111,7 +111,7 @@ namespace AzToolsFramework
             {
                 // Replace the container entity with the one as seen by the root
                 // TODO - this function should only replace the transform!
-                ReplaceFocusedContainerTransformAccordingToRoot(instance, instanceDom);
+                UpdateContainerEntityInDomFromRoot(instanceDom, *instance);
             }
 
             PrefabDomValueReference instanceDomFromRoot = instanceDom;
