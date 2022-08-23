@@ -49,18 +49,12 @@ namespace AzToolsFramework
             auto prefabFocusInterface = AZ::Interface<PrefabFocusInterface>::Get();
             if (!prefabFocusInterface)
             {
-                AZ_Assert(prefabFocusInterface, "Prefab - InstanceDomGenerator::GenerateInstanceDom - "
+                AZ_Assert(false, "Prefab - InstanceDomGenerator::GenerateInstanceDom - "
                     "Prefab Focus Interface couldn not be found.");
                 return false;
             }
 
             InstanceOptionalConstReference focusedInstance = prefabFocusInterface->GetFocusedPrefabInstance(s_editorEntityContextId);
-            if (!focusedInstance.has_value())
-            {
-                AZ_Assert(false, "Prefab - InstanceDomGenerator::GenerateInstanceDom - "
-                    "Could not get the focused instance. It should not be null.");
-                return false;
-            }
 
             // Climbs up from the given instance to root instance, but stops at the focused instance if they can meet.
             InstanceClimbUpResult climbUpResult = PrefabInstanceUtils::ClimbUpToTargetOrRootInstance(instance, focusedInstance);
