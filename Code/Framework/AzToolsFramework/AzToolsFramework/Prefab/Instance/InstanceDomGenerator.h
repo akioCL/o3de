@@ -30,6 +30,8 @@ namespace AzToolsFramework
             void RegisterInstanceDomGeneratorInterface();
             void UnregisterInstanceDomGeneratorInterface();
 
+            bool GenerateInstanceDom_Old(const Instance* instance, PrefabDom& instanceDom) override;
+
             //! Generates an instance DOM for a given instance object based on the currently focused instance.
             //! If the given instance is descendant of the focused instance, instance DOM stored in focused
             //! template DOM is used; otherwise, the instance DOM stored in the root template DOM is used.

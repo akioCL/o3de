@@ -21,6 +21,8 @@ namespace AzToolsFramework
             AZ_RTTI(InstanceDomGeneratorInterface, "{269DE807-64B2-4157-93B0-BEDA4133C9A0}");
             virtual ~InstanceDomGeneratorInterface() = default;
 
+            virtual bool GenerateInstanceDom_Old(const Instance* instance, PrefabDom& instanceDom) = 0;
+
             //! Generates an instance DOM that represents a given instance object.
             //! @param[out] instanceDom The output instance DOM that will be modified.
             //! @param instance The given instance object.
