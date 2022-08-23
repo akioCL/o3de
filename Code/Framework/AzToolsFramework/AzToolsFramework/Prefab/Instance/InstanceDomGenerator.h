@@ -50,6 +50,8 @@ namespace AzToolsFramework
             //! @param instance The given instance object.
             void UpdateContainerEntityInDomFromRoot(PrefabDom& instanceDom, const Instance& instance) const;
 
+            void ReplaceFocusedContainerTransformAccordingToRoot(const Instance* instance, PrefabDom& instanceDom) const;
+
             static AzFramework::EntityContextId s_editorEntityContextId;
 
             PrefabSystemComponentInterface* m_prefabSystemComponentInterface = nullptr;

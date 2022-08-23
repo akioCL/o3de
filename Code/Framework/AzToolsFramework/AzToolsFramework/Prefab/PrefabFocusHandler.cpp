@@ -411,8 +411,7 @@ namespace AzToolsFramework::Prefab
         }
     }
 
-
-    LinkId PrefabFocusHandler::AppendPathFromFocusedInstanceToPatchPaths_Old(PrefabDom& providedPatch, AZ::EntityId entityId) const
+    LinkId PrefabFocusHandler::AppendPathFromFocusedInstanceToPatchPaths_Old(PrefabDom& providedPatch, const AZ::EntityId& entityId) const
     {
         LinkId linkId = InvalidLinkId;
 
@@ -435,27 +434,24 @@ namespace AzToolsFramework::Prefab
             InstanceOptionalConstReference instance = owningInstance;
             AZStd::vector<InstanceOptionalConstReference> instancePath;
 
-            auto climbUpResult = PrefabInstanceUtils::ClimbUpToTargetOrRootInstance(instance->get(), focusedPrefabInstance->get());
-            if (climbUpResult.m_reachedInstance != &focusedPrefabInstance->get())
+            auto climbUpResult = PrefabInstanceUtils::ClimbUpToTargetOrRootInstance_Old(&instance->get(), &focusedPrefabInstance->get());
+            if (climbUpResult.first != &focusedPrefabInstance->get())
             {
                 AZ_Error(
-                    "Prefab",
-                    false,
+                    "Prefab", false,
                     "AppendPathFromFocusedInstanceToPatchPaths - entityId is not owned by a descendant of the focused prefab instance.");
                 return linkId;
             }
 
-            if (!climbUpResult.m_climbedInstances.empty())
+            if (!climbUpResult.second.empty())
             {
-                for (auto instanceIter = ++climbUpResult.m_climbedInstances.rbegin();
-                     instanceIter != climbUpResult.m_climbedInstances.rend();
-                     ++instanceIter)
+                for (auto instanceIter = ++climbUpResult.second.rbegin(); instanceIter != climbUpResult.second.rend(); ++instanceIter)
                 {
                     prefix.append("/Instances/");
                     prefix.append((*instanceIter)->get().GetInstanceAlias());
                 }
 
-                linkId = climbUpResult.m_climbedInstances.back()->get().GetLinkId();
+                linkId = climbUpResult.second.back()->get().GetLinkId();
             }
         }
 
@@ -463,8 +459,6 @@ namespace AzToolsFramework::Prefab
 
         return linkId;
     }
-
-
 
 
     AZ::EntityId PrefabFocusHandler::GetFocusedPrefabContainerEntityId(
