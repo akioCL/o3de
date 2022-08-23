@@ -411,7 +411,7 @@ namespace AzToolsFramework::Prefab
         }
     }
 
-    LinkId PrefabFocusHandler::AppendPathFromFocusedInstanceToPatchPaths_Old(PrefabDom& providedPatch, const AZ::EntityId& entityId) const
+    LinkId PrefabFocusHandler::AppendPathFromFocusedInstanceToPatchPaths_Old(PrefabDom& providedPatch, AZ::EntityId entityId) const
     {
         LinkId linkId = InvalidLinkId;
 

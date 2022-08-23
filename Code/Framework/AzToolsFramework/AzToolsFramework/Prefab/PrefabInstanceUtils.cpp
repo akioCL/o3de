@@ -116,7 +116,7 @@ namespace AzToolsFramework
                     return AZStd::make_pair(nullptr, "");
                 }
 
-                auto climbUpToTargetOrRootInstanceResult = ClimbUpToTargetOrRootInstance(startInstance, targetInstance);
+                auto climbUpToTargetOrRootInstanceResult = ClimbUpToTargetOrRootInstance_Old(startInstance, targetInstance);
 
                 AZStd::string relativePathToStartInstance;
                 const auto& instancePath = climbUpToTargetOrRootInstanceResult.second;
