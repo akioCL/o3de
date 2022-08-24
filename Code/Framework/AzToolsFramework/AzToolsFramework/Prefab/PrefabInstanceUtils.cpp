@@ -23,10 +23,21 @@ namespace AzToolsFramework
                 // Climbs up the instance hierarchy from the start instance until it hits the target or the root instance.
                 const Instance* instancePtr = &startInstance;
 
-                while (instancePtr != &(targetInstance->get()) && instancePtr->HasParentInstance())
+                if (targetInstance.has_value())
                 {
-                    result.m_climbedInstances.emplace_back(*instancePtr);
-                    instancePtr = &(instancePtr->GetParentInstance()->get());
+                    while (instancePtr != &(targetInstance->get()) && instancePtr->HasParentInstance())
+                    {
+                        result.m_climbedInstances.emplace_back(*instancePtr);
+                        instancePtr = &(instancePtr->GetParentInstance()->get());
+                    }
+                }
+                else
+                {
+                    while (instancePtr->HasParentInstance())
+                    {
+                        result.m_climbedInstances.emplace_back(*instancePtr);
+                        instancePtr = &(instancePtr->GetParentInstance()->get());
+                    }
                 }
 
                 result.m_reachedInstance = instancePtr;
