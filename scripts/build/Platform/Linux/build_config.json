@@ -13,9 +13,9 @@
       "snapshot"
     ],
     "steps": [
-      "test_profile_nounity",
       "profile_nounity",
-      "asset_profile_nounity"
+      "asset_profile_nounity",
+      "test_profile_nounity"
     ]
   },
   "metrics": {
