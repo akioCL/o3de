@@ -209,14 +209,14 @@ namespace AzToolsFramework
             // TODO: Modifies the function so it updates the transform only.
 
             // New
-            //InstanceClimbUpResult climbUpResult = PrefabInstanceUtils::ClimbUpToTargetOrRootInstance(instance);
-            //const Instance* rootInstancePtr = climbUpResult.m_reachedInstance;
-            //AZStd::string relativePathFromRoot = PrefabInstanceUtils::GetRelativePathFromClimbedInstances(climbUpResult.m_climbedInstances);
+            InstanceClimbUpResult climbUpResult = PrefabInstanceUtils::ClimbUpToTargetOrRootInstance(instance);
+            const Instance* rootInstancePtr = climbUpResult.m_reachedInstance;
+            AZStd::string relativePathFromRoot = PrefabInstanceUtils::GetRelativePathFromClimbedInstances(climbUpResult.m_climbedInstances);
 
             // Climb from the focused instance to the root and store the path.
-            auto climbUpToFocusedInstanceResult = PrefabInstanceUtils::GetRelativePathBetweenInstances_Old(&instance, nullptr);
-            auto rootInstancePtr = climbUpToFocusedInstanceResult.first;
-            AZStd::string& relativePathFromRoot = climbUpToFocusedInstanceResult.second;
+            //auto climbUpToFocusedInstanceResult = PrefabInstanceUtils::GetRelativePathBetweenInstances_Old(&instance, nullptr);
+            //auto rootInstancePtr = climbUpToFocusedInstanceResult.first;
+            //AZStd::string& relativePathFromRoot = climbUpToFocusedInstanceResult.second;
 
             // No need to update the instance DOM if the given instance is the root instance.
             if (rootInstancePtr == &instance)
