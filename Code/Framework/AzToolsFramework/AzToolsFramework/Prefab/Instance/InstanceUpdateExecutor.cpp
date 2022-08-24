@@ -219,8 +219,8 @@ namespace AzToolsFramework
                         }
 
                         // Generates instance DOM for a given instance object.
-                        //if (!m_instanceDomGeneratorInterface->GenerateInstanceDom(instanceDom, *instanceToUpdate))
-                        if (!m_instanceDomGeneratorInterface->GenerateInstanceDom_Old(instanceToUpdate, instanceDom))
+                        if (!m_instanceDomGeneratorInterface->GenerateInstanceDom(instanceDom, *instanceToUpdate))
+                        // if (!m_instanceDomGeneratorInterface->GenerateInstanceDom_Old(instanceToUpdate, instanceDom))
                         {
                             AZ_Assert(
                                 false,
