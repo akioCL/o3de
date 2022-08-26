@@ -16,6 +16,7 @@
 #include <AzCore/std/containers/containers_concepts.h>
 #include <AzCore/std/base.h>
 #include <AzCore/std/iterator.h>
+#include <AzCore/std/ranges/common_view.h>
 #include <AzCore/std/allocator.h>
 #include <AzCore/std/allocator_traits.h>
 #include <AzCore/std/algorithm.h>
@@ -65,8 +66,6 @@ namespace AZStd
 
         using reference = Element&;
         using const_reference = const Element&;
-        using difference_type = typename Allocator::difference_type;
-        using size_type = typename Allocator::size_type;
 
         using iterator_impl = pointer;
         using const_iterator_impl = const_pointer;
@@ -77,6 +76,8 @@ namespace AZStd
         using iterator = iterator_impl;
         using const_iterator = const_iterator_impl;
 #endif
+        using difference_type = iter_difference_t<iterator>;
+        using size_type = make_unsigned_t<difference_type>;
         using reverse_iterator = AZStd::reverse_iterator<iterator>;
         using const_reverse_iterator = AZStd::reverse_iterator<const_iterator>;
         using value_type = Element;
@@ -462,7 +463,8 @@ namespace AZStd
         template<class R>
         auto assign_range(R&& rg) -> enable_if_t<Internal::container_compatible_range<R, value_type>, basic_string&>
         {
-            return assign(ranges::begin(rg), ranges::end(rg));
+            auto rangeView = rg | views::common;
+            return assign(ranges::begin(rangeView), ranges::end(rangeView));
         }
 
         basic_string& assign(initializer_list<Element> iList)
@@ -1036,6 +1038,16 @@ namespace AZStd
                 m_storage.first().SetSize(newSize);
                 Traits::assign(data[newSize], Element());  // terminate
             }
+        }
+
+        template<class Operation>
+        void resize_and_overwrite(size_type n, Operation op)
+        {
+            resize_no_construct(n);
+            const auto newSize = AZStd::move(op)(data(), n);
+            AZSTD_CONTAINER_ASSERT(newSize >= 0 && newSize <= n,
+                "resize_and_operation operation returned a new size that is outside the bounds of [0, %zu]", n);
+            resize_no_construct(newSize);
         }
 
         inline void resize(size_type newSize, Element ch)

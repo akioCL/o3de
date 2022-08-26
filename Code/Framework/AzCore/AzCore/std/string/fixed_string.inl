@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include <AzCore/std/algorithm.h>
+#include <AzCore/std/ranges/common_view.h>
 
 #include <AzCore/std/string/fixed_string_Platform.inl>
 
@@ -522,7 +523,8 @@ namespace AZStd
     inline constexpr auto basic_fixed_string<Element, MaxElementCount, Traits>::assign_range(R&& rg)
         -> enable_if_t<Internal::container_compatible_range<R, value_type>, basic_fixed_string&>
     {
-        return assign(ranges::begin(rg), ranges::end(rg));
+        auto rangeView = rg | views::common;
+        return assign(ranges::begin(rangeView), ranges::end(rangeView));
     }
 
     template<class Element, size_t MaxElementCount, class Traits>
@@ -1164,6 +1166,17 @@ namespace AZStd
             m_size = static_cast<internal_size_type>(newSize);
             Traits::assign(data[m_size], Element());  // terminate
         }
+    }
+
+    template<class Element, size_t MaxElementCount, class Traits>
+    template<class Operation>
+    inline constexpr auto basic_fixed_string<Element, MaxElementCount, Traits>::resize_and_overwrite(size_type n, Operation op) -> void
+    {
+        resize_no_construct(n);
+        const auto newSize = AZStd::move(op)(data(), n);
+        AZSTD_CONTAINER_ASSERT(newSize >= 0 && newSize <= n,
+            "resize_and_operation operation returned a new size that is outside the bounds of [0, %zu]", n);
+        resize_no_construct(newSize);
     }
 
     template<class Element, size_t MaxElementCount, class Traits>
