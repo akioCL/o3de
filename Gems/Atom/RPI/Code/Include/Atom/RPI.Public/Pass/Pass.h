@@ -488,6 +488,10 @@ namespace AZ
 
                         // Whether this pass contains a binding that is referenced globally through the pipeline
                         uint64_t m_containsGlobalReference : 1;
+
+                        uint64_t m_mergeChildrenAsSubpasses : 1;
+
+                        uint64_t m_lastEnabled : 1;
                     };
                     uint64_t m_allFlags = 0;
                 };

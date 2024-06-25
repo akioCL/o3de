@@ -331,7 +331,6 @@ namespace AZ
         void Scope::ActivateInternal()
         {
             bool haveRenderAttachments = false;
-            bool haveClearLoadOps = false;
             const auto& imageAttachments = GetImageAttachments();
             for (auto attachment : imageAttachments)
             {
@@ -339,14 +338,9 @@ namespace AZ
                     attachment->GetUsage() == RHI::ScopeAttachmentUsage::RenderTarget ||
                     attachment->GetUsage() == RHI::ScopeAttachmentUsage::DepthStencil ||
                     attachment->GetUsage() == RHI::ScopeAttachmentUsage::Resolve;
-
-                haveClearLoadOps |=
-                    attachment->GetDescriptor().m_loadStoreAction.m_loadAction == RHI::AttachmentLoadAction::Clear ||
-                    attachment->GetDescriptor().m_loadStoreAction.m_loadActionStencil == RHI::AttachmentLoadAction::Clear;
             }
 
-            if (haveRenderAttachments &&
-                (haveClearLoadOps || GetEstimatedItemCount() > 0))
+            if (haveRenderAttachments)
             {
                 m_usesRenderpass = true;
             }

@@ -12,6 +12,7 @@
 #include <Atom/RHI.Reflect/Limits.h>
 #include <Atom/RHI.Reflect/ImageScopeAttachmentDescriptor.h>
 #include <Atom/RHI.Reflect/Format.h>
+#include <RHI/Conversion.h>
 #include <AzCore/std/containers/array.h>
 
 namespace AZ
@@ -84,6 +85,24 @@ namespace AZ
                 AZStd::array<uint32_t, RHI::Limits::Pipeline::AttachmentColorCountMax> m_preserveAttachments;
                 SubpassAttachment m_depthStencilAttachment;
                 SubpassAttachment m_fragmentShadingRateAttachment;
+            };
+
+            struct AttachmentUsageInfo
+            {
+                uint32_t m_subpassIndex = 0;
+                VkPipelineStageFlags m_stageMask = 0;
+                VkAccessFlags m_accessMask = 0;
+
+                void AddUsage(RHI::ScopeAttachmentUsage usage, RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown)
+                {
+                    m_stageMask |= GetResourcePipelineStateFlags(usage, RHI::ScopeAttachmentStage::Any);
+                    m_accessMask |= GetResourceAccessFlags(usage, access);
+                }
+
+                bool IsValid() const
+                {
+                    return m_stageMask != 0;
+                }
             };
 
             struct Descriptor

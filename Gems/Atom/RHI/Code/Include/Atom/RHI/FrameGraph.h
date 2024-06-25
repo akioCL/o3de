@@ -94,41 +94,55 @@ namespace AZ::RHI
         //! calls.
         void BeginScope(Scope& scope);
 
+        enum AttachmentFlags : uint32_t
+        {
+            None = 0,
+            ContinueGroup = AZ_BIT(1)
+        };
+
         // See RHI::FrameGraphInterface for detailed comments
         ResultCode UseAttachment(
             const BufferScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
             ScopeAttachmentUsage usage,
-            ScopeAttachmentStage stage);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
         ResultCode UseAttachment(
             const ImageScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
             ScopeAttachmentUsage usage,
-            ScopeAttachmentStage stage);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
         ResultCode UseAttachments(
             AZStd::span<const ImageScopeAttachmentDescriptor> descriptors,
             ScopeAttachmentAccess access,
             ScopeAttachmentUsage usage,
-            ScopeAttachmentStage stage);
-        ResultCode UseResolveAttachment(const ResolveScopeAttachmentDescriptor& descriptor);
-        ResultCode UseColorAttachments(AZStd::span<const ImageScopeAttachmentDescriptor> descriptors);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
+        ResultCode UseResolveAttachment(const ResolveScopeAttachmentDescriptor& descriptor, AttachmentFlags flags);
+        ResultCode UseColorAttachments(AZStd::span<const ImageScopeAttachmentDescriptor> descriptors, AttachmentFlags flags);
         ResultCode UseDepthStencilAttachment(
             const ImageScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
-            ScopeAttachmentStage stage);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
         ResultCode UseSubpassInputAttachments(
             AZStd::span<const ImageScopeAttachmentDescriptor> descriptors,
-            ScopeAttachmentStage stage);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
         ResultCode UseShaderAttachment(
             const BufferScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
-            ScopeAttachmentStage stage);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
         ResultCode UseShaderAttachment(
             const ImageScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
-            ScopeAttachmentStage stage);
-        ResultCode UseCopyAttachment(const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access);
-        ResultCode UseCopyAttachment(const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access);
+            ScopeAttachmentStage stage,
+            AttachmentFlags flags);
+        ResultCode UseCopyAttachment(
+            const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, AttachmentFlags flags);
+        ResultCode UseCopyAttachment(const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, AttachmentFlags flags);
         ResultCode UseQueryPool(Ptr<QueryPool> queryPool, const RHI::Interval& interval, QueryPoolScopeAttachmentType type, ScopeAttachmentAccess access);
         void ExecuteAfter(const ScopeId& scopeId);
         void ExecuteBefore(const ScopeId& scopeId);
@@ -138,18 +152,19 @@ namespace AZ::RHI
         void SetHardwareQueueClass(HardwareQueueClass hardwareQueueClass);
 
         //! Declares a single color attachment for use on the current scope.             
-        ResultCode UseColorAttachment(const ImageScopeAttachmentDescriptor& descriptor)
+        ResultCode UseColorAttachment(const ImageScopeAttachmentDescriptor& descriptor, AttachmentFlags flags)
         {
-            return UseColorAttachments({ &descriptor, 1 });
+            return UseColorAttachments({ &descriptor, 1 }, flags);
         }
 
         //! Declares a single subpass input attachment for use on the current scope.
         //! Subpass input attachments are image views that can be used for pixel local load operations inside a fragment shader.
         //! This means that framebuffer attachments written in one subpass can be read from at the exact same pixel
         //! in subsequent subpasses. Certain platform have optimization for this type of attachments.             
-        ResultCode UseSubpassInputAttachment(const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentStage stage)
+        ResultCode UseSubpassInputAttachment(
+            const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentStage stage, AttachmentFlags flags)
         {
-            return UseSubpassInputAttachments({ &descriptor, 1 }, stage);
+            return UseSubpassInputAttachments({ &descriptor, 1 }, stage, flags);
         }
 
         //! Ends building of the current scope.
@@ -212,10 +227,12 @@ namespace AZ::RHI
             ScopeAttachmentUsage usage,
             ScopeAttachmentAccess access,
             ScopeAttachmentStage stage,
+            AttachmentFlags flags,
             const ImageScopeAttachmentDescriptor& descriptor);
 
         void UseAttachmentInternal(
             ImageFrameAttachment& frameAttachment,
+            AttachmentFlags flags,
             const ResolveScopeAttachmentDescriptor& descriptor);
 
         void UseAttachmentInternal(
@@ -223,6 +240,7 @@ namespace AZ::RHI
             ScopeAttachmentUsage usage,
             ScopeAttachmentAccess access,
             ScopeAttachmentStage stage,
+            AttachmentFlags flags,
             const BufferScopeAttachmentDescriptor& descriptor);
 
         ResultCode TopologicalSort();            
@@ -290,4 +308,7 @@ namespace AZ::RHI
             }
         }
     }
+
+    AZ_DEFINE_ENUM_BITWISE_OPERATORS(AZ::RHI::FrameGraph::AttachmentFlags)
+
 } // namespace AZ::RHI

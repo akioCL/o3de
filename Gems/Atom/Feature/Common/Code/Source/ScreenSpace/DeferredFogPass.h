@@ -67,9 +67,6 @@ namespace AZ
             //! Bind SRG constants - done via macro reflection
             void SetSrgConstants();
 
-            //! Check if the pass should be enabled or disabled 
-            void UpdateEnable(DeferredFogSettings* fogSettings);
-
             void UpdateShaderOptions();
 
         private:

@@ -16,6 +16,7 @@
 #include <RHI/ImageView.h>
 #include <RHI/MemoryView.h>
 #include <RHI/NullDescriptorManager.h>
+#include <RHI/Conversion.h>
 
 namespace AZ
 {
@@ -151,19 +152,11 @@ namespace AZ
                 else
                 {
                     imageInfo.imageView = imageView->GetNativeImageView();
-
-                    // always set VK_IMAGE_LAYOUT_GENERAL if the Image is ShaderWrite, even if the descriptor layout wants a read-only input
-                    if (layout.GetDescriptorType(layoutIndex) == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ||
-                        RHI::CheckBitsAny(imageView->GetImage().GetDescriptor().m_bindFlags, RHI::ImageBindFlags::ShaderWrite))
-                    {
-                        imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-                    }
-                    else
-                    {
-                        // if we are reading from a depth/stencil texture, then we use the depth/stencil read optimal layout instead of the generic shader read one
-                        imageInfo.imageLayout = RHI::CheckBitsAny(imageView->GetImage().GetAspectFlags(), RHI::ImageAspectFlags::DepthStencil) ?
-                            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                    }
+                    imageInfo.imageLayout = GetImageAttachmentLayout(
+                        RHI::ScopeAttachmentUsage::Shader,
+                        layout.GetDescriptorType(layoutIndex) == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE ? RHI::ScopeAttachmentAccess::ReadWrite
+                                                                                                  : RHI::ScopeAttachmentAccess::Read,
+                        imageView);
                 }
                 
                 data.m_imageViewsInfo[i]  = imageInfo;

@@ -40,6 +40,7 @@ namespace AZ::RHI
         uint32_t m_resolveAttachmentIndex = InvalidRenderAttachmentIndex;
         //! Load and store action of the attachment.
         AttachmentLoadStoreAction m_loadStoreAction;
+        ScopeAttachmentAccess m_access;
     };
 
     //! Describes a subpass input attachment.

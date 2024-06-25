@@ -21,6 +21,8 @@
 #include <Atom/RPI.Reflect/Asset/AssetUtils.h>
 #include <Atom/RPI.Reflect/Pass/RasterPassData.h>
 
+#include <Atom/RHI.Reflect/RenderAttachmentLayout.h>
+
 namespace AZ
 {
     namespace RPI
@@ -120,7 +122,7 @@ namespace AZ
         uint32_t RasterPass::GetDrawItemCount()
         {
             return m_drawItemCount;
-        }
+        }        
 
         // --- Pass behaviour overrides ---
 

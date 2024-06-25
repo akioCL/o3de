@@ -12,6 +12,11 @@
 
 namespace AZ
 {
+    namespace RHI
+    {
+        class RenderAttachmentLayoutBuilder;
+        struct RenderAttachmentConfiguration;
+    }
     namespace RPI
     {
         class SwapChainPass;
@@ -19,8 +24,7 @@ namespace AZ
         //! A parent pass doesn't do any rendering itself, but instead contains child passes that it delegates functionality to.
         //! A child can be a RenderPass or it can be a ParentPass itself. This creates a pass tree hierarchy that defines the
         //! the order in which passes and their logic are executed in.
-        class ParentPass
-            : public Pass
+        class ParentPass : public Pass
         {
             friend class PassFactory;
             friend class PassLibrary;
@@ -44,11 +48,12 @@ namespace AZ
             //! This is used in scenarios like hot reloading where some of the templates in the pass library might have changed.
             virtual Ptr<ParentPass> Recreate() const;
 
-            //! Recursively collects all different view tags from this pass's children 
+            //! Recursively collects all different view tags from this pass's children
             void GetPipelineViewTags(PipelineViewTags& outTags) const override;
 
             //! Recursively searches children for given viewTag, and collects their DrawListTags in outDrawListMask.
-            void GetViewDrawListInfo(RHI::DrawListMask& outDrawListMask, PassesByDrawList& outPassesByDrawList, const PipelineViewTag& viewTag) const override;
+            void GetViewDrawListInfo(
+                RHI::DrawListMask& outDrawListMask, PassesByDrawList& outPassesByDrawList, const PipelineViewTag& viewTag) const override;
 
             //! Set render pipeline this pass belongs to recursively
             void SetRenderPipeline(RenderPipeline* pipeline) override;
@@ -58,7 +63,8 @@ namespace AZ
 
             // --- Children related functions ---
 
-            //! Adds pass to list of children. NOTE: skipStateCheckWhenRunningTests is only used to support manual adding of passing in unit tests, do not use this variable otherwise
+            //! Adds pass to list of children. NOTE: skipStateCheckWhenRunningTests is only used to support manual adding of passing in unit
+            //! tests, do not use this variable otherwise
             void AddChild(const Ptr<Pass>& child, bool skipStateCheckWhenRunningTests = false);
 
             //! Inserts a pass at specified position
@@ -74,7 +80,7 @@ namespace AZ
 
             //! Find a child pass with a matching name and returns it. Return nullptr if none found.
             Ptr<Pass> FindChildPass(const Name& passName) const;
-            
+
             template<typename PassType>
             Ptr<PassType> FindChildPass() const;
 
@@ -96,6 +102,8 @@ namespace AZ
 
             //! Prints the pass and all of it's children
             void DebugPrint() const override;
+
+            void OnChildEnableChange(Pass* pass);
 
         protected:
             explicit ParentPass(const PassDescriptor& descriptor);
@@ -154,6 +162,11 @@ namespace AZ
             // So now we detect clear actions on parent slots and generate a clear pass for them.
             void CreateClearPassFromBinding(PassAttachmentBinding& binding, PassRequest& clearRequest);
             void CreateClearPassesFromBindings();
+
+            bool BuildSubpassConfiguration();
+            bool BuildSubpassConfiguration(RHI::RenderAttachmentLayoutBuilder& builder);
+
+            void SetRenderAttachmentConfiguration(RHI::RenderAttachmentConfiguration& configuration);
         };
 
         template<typename PassType>

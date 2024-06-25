@@ -16,18 +16,6 @@
                     "ScopeAttachmentStage": "FragmentShader"
                 },
                 {
-                    "Name": "InputDepth",
-                    "SlotType": "Input",
-                    "ShaderInputName": "m_linearDepthTexture",
-                    "ScopeAttachmentUsage": "Shader",
-                    "ScopeAttachmentStage": "FragmentShader",
-                    "ImageViewDesc": {
-                        "AspectFlags": [
-                            "Depth"
-                        ]
-                    }
-                },
-                {
                     "Name": "DepthStencil",
                     "SlotType": "Input",
                     "ScopeAttachmentUsage": "DepthStencil"

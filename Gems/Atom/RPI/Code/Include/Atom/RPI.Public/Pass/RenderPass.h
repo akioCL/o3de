@@ -16,6 +16,8 @@
 #include <Atom/RPI.Public/Pass/Pass.h>
 #include <Atom/RPI.Public/Shader/ShaderResourceGroup.h>
 
+#include <Atom/RHI.Reflect/RenderAttachmentLayoutBuilder.h>
+
 namespace AZ
 {
     namespace RHI
@@ -47,7 +49,10 @@ namespace AZ
 
             //! Build and return RenderAttachmentConfiguration of this pass from its render attachments
             //! This function usually need to be called after pass attachments rebuilt to reflect latest layout
-            RHI::RenderAttachmentConfiguration GetRenderAttachmentConfiguration() const;
+            const RHI::RenderAttachmentConfiguration& GetRenderAttachmentConfiguration() const;
+            const RHI::RenderAttachmentConfiguration& GetRenderAttachmentConfiguration();
+
+            void SetRenderAttachmentConfiguration(const RHI::RenderAttachmentConfiguration& configuration);
 
             //! Get MultisampleState of this pass from its output attachments
             RHI::MultisampleState GetMultisampleState() const;
@@ -61,7 +66,8 @@ namespace AZ
 
             // Add a srg to srg list to be bound for this pass
             void BindSrg(const RHI::ShaderResourceGroup* srg);
-            
+
+            bool BuildSubpassLayout(RHI::RenderAttachmentLayoutBuilder::SubpassAttachmentLayoutBuilder& subpassLayoutBuilder);         
 
         protected:
             explicit RenderPass(const PassDescriptor& descriptor);
@@ -88,6 +94,7 @@ namespace AZ
             void InitializeInternal() override;
             void FrameBeginInternal(FramePrepareParams params) override;
             void FrameEndInternal() override;
+            void ResetInternal() override;
 
             // Helper functions for srgs used for pass
             // Collect low frequency srgs for draw or compute. These srgs include scene srg, view srg and pass srg
@@ -139,6 +146,8 @@ namespace AZ
             // Readback the results from the ScopeQueries
             void ReadbackScopeQueryResults();
 
+            void BuildRenderAttachmentConfiguration();
+
             // Readback results from the Timestamp queries
             TimestampResult m_timestampResult;
             // Readback results from the PipelineStatistics queries
@@ -151,6 +160,9 @@ namespace AZ
             // List of all ShaderResourceGroups to be bound during rendering or computing
             // Derived classed may call BindSrg function to add other srgs the list
             AZStd::unordered_map<uint8_t, const RHI::ShaderResourceGroup*> m_shaderResourceGroupsToBind;
+
+            RHI::RenderAttachmentConfiguration m_renderAttachmentConfiguration;
+            bool m_buildRenderAttachmentConfiguration = true;
         };
     }   // namespace RPI
 }   // namespace AZ

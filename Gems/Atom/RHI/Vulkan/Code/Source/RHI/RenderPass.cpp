@@ -478,6 +478,26 @@ namespace AZ
             Descriptor renderPassDesc;
             renderPassDesc.m_device = &device;
             renderPassDesc.m_attachmentCount = layout.m_attachmentCount;
+            
+            AZStd::unordered_map<uint32_t, AttachmentUsageInfo> lastAttachmentUsage;
+            auto AddSubpassDependenciesFunc = [&](uint32_t attachmentIndex, const AttachmentUsageInfo& dstInfo)
+            {
+                auto findIter = lastAttachmentUsage.find(attachmentIndex);
+                if (findIter != lastAttachmentUsage.end())
+                {
+                    const AttachmentUsageInfo& srcInfo = findIter->second;
+                    VkSubpassDependency& dependency = renderPassDesc.m_subpassDependencies.emplace_back();
+                    dependency = {};
+                    dependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+                    dependency.srcSubpass = srcInfo.m_subpassIndex;
+                    dependency.srcStageMask = srcInfo.m_stageMask;
+                    dependency.srcAccessMask = srcInfo.m_accessMask;
+                    dependency.dstSubpass = dstInfo.m_subpassIndex;
+                    dependency.dstStageMask = dstInfo.m_stageMask;
+                    dependency.dstAccessMask = dstInfo.m_accessMask;
+                }
+                lastAttachmentUsage[attachmentIndex] = dstInfo;
+            };
 
             for (uint32_t index = 0; index < renderPassDesc.m_attachmentCount; ++index)
             {
@@ -491,34 +511,37 @@ namespace AZ
             renderPassDesc.m_subpassCount = layout.m_subpassCount;
             for (uint32_t subpassIndex = 0; subpassIndex < layout.m_subpassCount; ++subpassIndex)
             {
-                AZStd::bitset<RHI::Limits::Pipeline::RenderAttachmentCountMax> usedAttachments;
+                AZStd::array<AttachmentUsageInfo, RHI::Limits::Pipeline::RenderAttachmentCountMax> usedAttachments;
                 const auto& subpassLayout = layout.m_subpassLayouts[subpassIndex];
                 auto& subpassDescriptor = renderPassDesc.m_subpassDescriptors[subpassIndex];
                 subpassDescriptor.m_rendertargetCount = subpassLayout.m_rendertargetCount;
                 subpassDescriptor.m_subpassInputCount = subpassLayout.m_subpassInputCount;
-                if (subpassLayout.m_depthStencilDescriptor.IsValid())
-                {
-                    subpassDescriptor.m_depthStencilAttachment = RenderPass::SubpassAttachment{
-                        subpassLayout.m_depthStencilDescriptor.m_attachmentIndex,
-                        VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
-                    usedAttachments.set(subpassLayout.m_depthStencilDescriptor.m_attachmentIndex);
-                }
 
                 for (uint32_t colorAttachmentIndex = 0; colorAttachmentIndex < subpassLayout.m_rendertargetCount; ++colorAttachmentIndex)
                 {
                     RenderPass::SubpassAttachment& subpassAttachment = subpassDescriptor.m_rendertargetAttachments[colorAttachmentIndex];
                     subpassAttachment.m_attachmentIndex = subpassLayout.m_rendertargetDescriptors[colorAttachmentIndex].m_attachmentIndex;
                     subpassAttachment.m_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                    usedAttachments.set(subpassAttachment.m_attachmentIndex);
                     RenderPass::SubpassAttachment& resolveSubpassAttachment = subpassDescriptor.m_resolveAttachments[colorAttachmentIndex];
                     resolveSubpassAttachment.m_attachmentIndex = subpassLayout.m_rendertargetDescriptors[colorAttachmentIndex].m_resolveAttachmentIndex;
                     resolveSubpassAttachment.m_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                    usedAttachments[subpassAttachment.m_attachmentIndex].AddUsage(
+                        RHI::ScopeAttachmentUsage::RenderTarget, subpassLayout.m_rendertargetDescriptors[colorAttachmentIndex].m_access);
                     if (resolveSubpassAttachment.IsValid())
                     {
                         // Set the number of samples for resolve attachments to 1.
                         renderPassDesc.m_attachments[resolveSubpassAttachment.m_attachmentIndex].m_multisampleState.m_samples = 1;
-                        usedAttachments.set(resolveSubpassAttachment.m_attachmentIndex);
+                        usedAttachments[resolveSubpassAttachment.m_attachmentIndex].AddUsage(RHI::ScopeAttachmentUsage::Resolve);
                     }
+                }
+
+                if (subpassLayout.m_depthStencilDescriptor.IsValid())
+                {
+                    subpassDescriptor.m_depthStencilAttachment =
+                        RenderPass::SubpassAttachment{ subpassLayout.m_depthStencilDescriptor.m_attachmentIndex,
+                                                       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+                    usedAttachments[subpassDescriptor.m_depthStencilAttachment.m_attachmentIndex].AddUsage(
+                        RHI::ScopeAttachmentUsage::DepthStencil, subpassLayout.m_depthStencilDescriptor.m_access);
                 }
 
                 for (uint32_t inputAttachmentIndex = 0; inputAttachmentIndex < subpassLayout.m_subpassInputCount; ++inputAttachmentIndex)
@@ -528,7 +551,7 @@ namespace AZ
                     subpassAttachment.m_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                     subpassAttachment.m_imageAspectFlags =
                         ConvertImageAspectFlags(subpassLayout.m_subpassInputDescriptors[inputAttachmentIndex].m_aspectFlags);
-                    usedAttachments.set(subpassAttachment.m_attachmentIndex);
+                    usedAttachments[subpassAttachment.m_attachmentIndex].AddUsage(RHI::ScopeAttachmentUsage::SubpassInput);
                 }
 
                 if (subpassLayout.m_shadingRateDescriptor.IsValid())
@@ -552,15 +575,22 @@ namespace AZ
                         subpassLayout.m_shadingRateDescriptor.m_attachmentIndex,
                         imageLayout
                     };
-                    usedAttachments.set(subpassLayout.m_shadingRateDescriptor.m_attachmentIndex);
                     renderPassDesc.m_attachments[subpassLayout.m_shadingRateDescriptor.m_attachmentIndex].m_loadStoreAction =
                         subpassLayout.m_shadingRateDescriptor.m_loadStoreAction;
+                    usedAttachments[subpassLayout.m_shadingRateDescriptor.m_attachmentIndex].AddUsage(
+                        RHI::ScopeAttachmentUsage::ShadingRate);
                 }
 
                 // [GFX_TODO][ATOM-3948] Implement preserve attachments. For now preserve all attachments.
                 for (uint32_t attachmentIndex = 0; attachmentIndex < renderPassDesc.m_attachmentCount; ++attachmentIndex)
                 {
-                    if (!usedAttachments[attachmentIndex])
+                    AttachmentUsageInfo& usageInfo = usedAttachments[attachmentIndex];
+                    usageInfo.m_subpassIndex = subpassIndex;
+                    if (usageInfo.m_stageMask != VkPipelineStageFlags(0))
+                    {
+                        AddSubpassDependenciesFunc(attachmentIndex, usageInfo);
+                    }
+                    else
                     {
                         subpassDescriptor.m_preserveAttachments[subpassDescriptor.m_preserveAttachmentCount++] = attachmentIndex;
                     }

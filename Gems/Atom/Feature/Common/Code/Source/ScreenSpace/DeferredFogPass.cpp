@@ -177,33 +177,14 @@ namespace AZ
         }
         //---------------------------------------------------------------------
 
-
-        void DeferredFogPass::UpdateEnable(DeferredFogSettings* fogSettings)
-        {
-            if (!m_pipeline || !fogSettings)
-            {
-                SetEnabled(false);
-                return;
-            }
-
-            AZ_Assert(m_pipeline->GetScene(), "Scene shouldn't nullptr");
-
-            if (IsEnabled() == fogSettings->GetEnabled())
-            {
-                return;
-            }
-
-            SetEnabled( fogSettings->GetEnabled() );
-        }
-
         bool DeferredFogPass::IsEnabled() const 
         {
-            if (!r_enableFog)
+            const DeferredFogSettings* constFogSettings = const_cast<DeferredFogPass*>(this)->GetPassFogSettings();
+            if (!r_enableFog || !constFogSettings || !m_pipeline)
             {
                 return false;
             }
 
-            const DeferredFogSettings* constFogSettings = const_cast<DeferredFogPass*>(this)->GetPassFogSettings();
             return constFogSettings->GetEnabled();
         }
 
@@ -243,11 +224,6 @@ namespace AZ
         void DeferredFogPass::SetupFrameGraphDependencies(RHI::FrameGraphInterface frameGraph)
         {
             FullscreenTrianglePass::SetupFrameGraphDependencies(frameGraph);
-
-            // If any change was made, make sure to bind it.
-            DeferredFogSettings* fogSettings = GetPassFogSettings();
-
-            UpdateEnable(fogSettings);
 
             // Update and set the per pass shader options - this will update the current required
             // shader variant and if doesn't exist, it will be created via the compile stage

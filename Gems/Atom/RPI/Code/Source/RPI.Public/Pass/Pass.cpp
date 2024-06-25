@@ -81,7 +81,7 @@ namespace AZ
                 m_flags.m_createdByPassRequest = true;
                 m_flags.m_enabled = m_request.m_passEnabled;
             }
-
+            m_flags.m_lastEnabled = m_flags.m_enabled;
             PassSystemInterface::Get()->RegisterPass(this);
             QueueForBuildAndInitialization();
 
@@ -1333,6 +1333,11 @@ namespace AZ
 
             bool earlyOut = !IsEnabled();
 
+            if (m_flags.m_lastEnabled != IsEnabled() && m_parent)
+            {
+                m_parent->OnChildEnableChange(this);
+            }
+            m_flags.m_lastEnabled = IsEnabled();
             // Skip if this pass is the root of the pipeline and the pipeline is set to not render
             if (m_flags.m_isPipelineRoot)
             {

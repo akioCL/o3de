@@ -62,9 +62,10 @@ namespace AZ::RHI
             const BufferScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
             ScopeAttachmentUsage usage,
-            ScopeAttachmentStage stage)
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseAttachment(descriptor, access, usage, stage);
+            return m_frameGraph.UseAttachment(descriptor, access, usage, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseAttachment with a ScopeAttachmentStage parameter")
@@ -79,9 +80,10 @@ namespace AZ::RHI
             const ImageScopeAttachmentDescriptor& descriptor,
             ScopeAttachmentAccess access,
             ScopeAttachmentUsage usage,
-            ScopeAttachmentStage stage)
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseAttachment(descriptor, access, usage, stage);
+            return m_frameGraph.UseAttachment(descriptor, access, usage, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseAttachment with a ScopeAttachmentStage parameter")
@@ -95,9 +97,10 @@ namespace AZ::RHI
             AZStd::span<const ImageScopeAttachmentDescriptor> descriptors,
             ScopeAttachmentAccess access,
             ScopeAttachmentUsage usage,
-            ScopeAttachmentStage stage)
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseAttachments(descriptors, access, usage, stage);
+            return m_frameGraph.UseAttachments(descriptors, access, usage, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseAttachments with a ScopeAttachmentStage parameter")
@@ -108,22 +111,28 @@ namespace AZ::RHI
         }
             
         //! Declares an array of color attachments for use on the current scope.
-        ResultCode UseColorAttachments(AZStd::span<const ImageScopeAttachmentDescriptor> descriptors)
+        ResultCode UseColorAttachments(
+            AZStd::span<const ImageScopeAttachmentDescriptor> descriptors,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseColorAttachments(descriptors);
+            return m_frameGraph.UseColorAttachments(descriptors, flags);
         }
             
         //! Declares a single color attachment for use on the current scope.
-        ResultCode UseColorAttachment(const ImageScopeAttachmentDescriptor& descriptor)
+        ResultCode UseColorAttachment(
+            const ImageScopeAttachmentDescriptor& descriptor, FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseColorAttachment(descriptor);
+            return m_frameGraph.UseColorAttachment(descriptor, flags);
         }
             
         //! Declares an array of subpass input attachments for use on the current scope.
         //! See UseSubpassInputAttachment for a definition about a SubpassInput.
-        ResultCode UseSubpassInputAttachments(AZStd::span<const ImageScopeAttachmentDescriptor> descriptors, ScopeAttachmentStage stage)
+        ResultCode UseSubpassInputAttachments(
+            AZStd::span<const ImageScopeAttachmentDescriptor> descriptors,
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseSubpassInputAttachments(descriptors, stage);
+            return m_frameGraph.UseSubpassInputAttachments(descriptors, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseSubpassInputAttachments with a ScopeAttachmentStage parameter")
@@ -136,9 +145,12 @@ namespace AZ::RHI
         //! Subpass input attachments are image views that can be used for pixel local load operations inside a fragment shader.
         //! This means that framebuffer attachments written in one subpass can be read from at the exact same pixel
         //! in subsequent subpasses. Certain platform have optimization for this type of attachments.
-        ResultCode UseSubpassInputAttachment(const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentStage stage)
+        ResultCode UseSubpassInputAttachment(
+            const ImageScopeAttachmentDescriptor& descriptor,
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseSubpassInputAttachment(descriptor, stage);
+            return m_frameGraph.UseSubpassInputAttachment(descriptor, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseSubpassInputAttachment with a ScopeAttachmentStage parameter")
@@ -148,9 +160,10 @@ namespace AZ::RHI
         }
             
         //! Declares a single resolve attachment for use on the current scope.
-        ResultCode UseResolveAttachment(const ResolveScopeAttachmentDescriptor& descriptor)
+        ResultCode UseResolveAttachment(
+            const ResolveScopeAttachmentDescriptor& descriptor, FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseResolveAttachment(descriptor);
+            return m_frameGraph.UseResolveAttachment(descriptor, flags);
         }
             
         //! Declares a depth-stencil attachment for use on the current scope.
@@ -158,9 +171,11 @@ namespace AZ::RHI
         //! @param access How the attachment is accessed by the scope. Must be read-write if a clear action is specified.
         ResultCode UseDepthStencilAttachment(
             const ImageScopeAttachmentDescriptor& descriptor,
-            ScopeAttachmentAccess access, ScopeAttachmentStage stage)
+            ScopeAttachmentAccess access,
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseDepthStencilAttachment(descriptor, access, stage);
+            return m_frameGraph.UseDepthStencilAttachment(descriptor, access, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseDepthStencilAttachment with a ScopeAttachmentStage parameter")
@@ -174,9 +189,12 @@ namespace AZ::RHI
         //! @param descriptor The buffer scope attachment.
         //! @param access How the attachment is accessed by the scope. Must be read-write if a clear action is specified.
         ResultCode UseShaderAttachment(
-            const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage)
+            const BufferScopeAttachmentDescriptor& descriptor,
+            ScopeAttachmentAccess access,
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseShaderAttachment(descriptor, access, stage);
+            return m_frameGraph.UseShaderAttachment(descriptor, access, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseShaderAttachment with a ScopeAttachmentStage parameter")
@@ -190,9 +208,11 @@ namespace AZ::RHI
         //! @param access How the attachment is accessed by the scope. Must be read-write if a clear action is specified.
         ResultCode UseShaderAttachment(
             const ImageScopeAttachmentDescriptor& descriptor,
-            ScopeAttachmentAccess access, ScopeAttachmentStage stage)
+            ScopeAttachmentAccess access,
+            ScopeAttachmentStage stage,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseShaderAttachment(descriptor, access, stage);
+            return m_frameGraph.UseShaderAttachment(descriptor, access, stage, flags);
         }
 
         AZ_DEPRECATED_MESSAGE("Deprecated. Please use UseShaderAttachment with a ScopeAttachmentStage parameter")
@@ -206,9 +226,10 @@ namespace AZ::RHI
         //! @param access How the attachment is accessed by the scope. Must be read-write if a clear action is specified.
         ResultCode UseCopyAttachment(
             const BufferScopeAttachmentDescriptor& descriptor,
-            ScopeAttachmentAccess access)
+            ScopeAttachmentAccess access,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseCopyAttachment(descriptor, access);
+            return m_frameGraph.UseCopyAttachment(descriptor, access, flags);
         }
             
         //! Declares an image copy attachment for use on the current scope.
@@ -216,18 +237,19 @@ namespace AZ::RHI
         //! @param access How the attachment is accessed by the scope. Must be read-write if a clear action is specified.
         ResultCode UseCopyAttachment(
             const ImageScopeAttachmentDescriptor& descriptor,
-            ScopeAttachmentAccess access)
+            ScopeAttachmentAccess access,
+            FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
-            return m_frameGraph.UseCopyAttachment(descriptor, access);
+            return m_frameGraph.UseCopyAttachment(descriptor, access, flags);
         }
 
         //! Declares a buffer input assembly attachment for use on the current scope.
         //! @param descriptor The buffer scope attachment.
         ResultCode UseInputAssemblyAttachment(
-            const BufferScopeAttachmentDescriptor& descriptor)
+            const BufferScopeAttachmentDescriptor& descriptor, FrameGraph::AttachmentFlags flags = FrameGraph::AttachmentFlags::None)
         {
             return m_frameGraph.UseAttachment(
-                descriptor, ScopeAttachmentAccess::Read, ScopeAttachmentUsage::InputAssembly, ScopeAttachmentStage::VertexInput);
+                descriptor, ScopeAttachmentAccess::Read, ScopeAttachmentUsage::InputAssembly, ScopeAttachmentStage::VertexInput, flags);
         }
             
         //! Declares a query pool for use on the current scope.

@@ -30,11 +30,15 @@ namespace AZ
         VkPipelineStageFlags GetResourcePipelineStateFlags(const RHI::ScopeAttachment& scopeAttachment);
         VkPipelineStageFlags GetResourcePipelineStateFlags(const RHI::BufferBindFlags& bindFlags);
         VkPipelineStageFlags GetResourcePipelineStateFlags(const RHI::ImageBindFlags& bindFlags);
+        VkPipelineStageFlags GetResourcePipelineStateFlags(RHI::ScopeAttachmentUsage usage, RHI::ScopeAttachmentStage stage);
         VkPipelineStageFlags GetSupportedPipelineStages(RHI::PipelineStateType type);
         VkAccessFlags GetResourceAccessFlags(const RHI::ScopeAttachment& scopeAttachment);
         VkAccessFlags GetResourceAccessFlags(const RHI::BufferBindFlags& bindFlags);
         VkAccessFlags GetResourceAccessFlags(const RHI::ImageBindFlags& bindFlags);
+        VkAccessFlags GetResourceAccessFlags(RHI::ScopeAttachmentUsage usage, RHI::ScopeAttachmentAccess access);
         VkImageLayout GetImageAttachmentLayout(const RHI::ImageScopeAttachment& imageScopeAttachment);
+        VkImageLayout GetImageAttachmentLayout(
+            RHI::ScopeAttachmentUsage usage, RHI::ScopeAttachmentAccess access, const RHI::ImageView* imageView);
         bool HasExplicitClear(const RHI::ScopeAttachment& scopeAttachment);
         VmaAllocationCreateInfo GetVmaAllocationCreateInfo(const RHI::HeapMemoryLevel level);
         VkImageLayout CombineImageLayout(VkImageLayout lhs, VkImageLayout rhs);

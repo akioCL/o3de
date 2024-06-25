@@ -78,25 +78,29 @@ namespace AZ::RHI
             //! Adds the use of a new render target with resolve information.
             SubpassAttachmentLayoutBuilder* RenderTargetAttachment(
                 Format format,
-                bool resolve);
+                bool resolve,
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             //! Adds the use of a previously added render target  with resolve information.
             SubpassAttachmentLayoutBuilder* RenderTargetAttachment(
                 const AZ::Name& name,
-                bool resolve);
+                bool resolve,
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             //! Adds the use of a previously added render target.
             SubpassAttachmentLayoutBuilder* RenderTargetAttachment(
                 const AZ::Name& name,
                 const AttachmentLoadStoreAction& loadStoreAction = AttachmentLoadStoreAction(),
-                bool resolve = false);
+                bool resolve = false,
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             //! Adds the use of a new render target.
             SubpassAttachmentLayoutBuilder* RenderTargetAttachment(
                 Format format,                    
                 const AZ::Name& name = {},
                 const AttachmentLoadStoreAction& loadStoreAction = AttachmentLoadStoreAction(),
-                bool resolve = false);
+                bool resolve = false,
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             //! Adds the use of a new resolve attachment. The "sourceName" attachment must
             // be already be added as by this pass.
@@ -108,17 +112,20 @@ namespace AZ::RHI
             SubpassAttachmentLayoutBuilder* DepthStencilAttachment(
                 Format format,
                 const AZ::Name& name = {},
-                const AttachmentLoadStoreAction& loadStoreAction = AttachmentLoadStoreAction());
+                const AttachmentLoadStoreAction& loadStoreAction = AttachmentLoadStoreAction(),
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             //! Adds the use of a previously added depth/stencil attachment. The "name" attachment must
             // be already be added as by a previous pass.
             SubpassAttachmentLayoutBuilder* DepthStencilAttachment(
                 const AZ::Name name = {},
-                const AttachmentLoadStoreAction& loadStoreAction = AttachmentLoadStoreAction());
+                const AttachmentLoadStoreAction& loadStoreAction = AttachmentLoadStoreAction(),
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             //! Adds the use of a previously added depth/stencil attachment.
             SubpassAttachmentLayoutBuilder* DepthStencilAttachment(
-                const AttachmentLoadStoreAction& loadStoreAction);
+                const AttachmentLoadStoreAction& loadStoreAction,
+                RHI::ScopeAttachmentAccess access = RHI::ScopeAttachmentAccess::Unknown);
 
             // Adds the use of a subpass input attachment. The "name" attachment must
             // be already be added as by a previous pass.
@@ -132,6 +139,8 @@ namespace AZ::RHI
                 Format format,
                 const AZ::Name& name = {});
 
+            bool HasAttachments() const;
+
         private:
             struct RenderAttachmentEntry
             {
@@ -139,6 +148,7 @@ namespace AZ::RHI
                 Format m_format = Format::Unknown;
                 AttachmentLoadStoreAction m_loadStoreAction;
                 AZ::Name m_resolveName;
+                RHI::ScopeAttachmentAccess m_access = RHI::ScopeAttachmentAccess::Unknown;
             };
 
             struct SubpassAttachmentEntry

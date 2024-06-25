@@ -94,7 +94,8 @@ namespace AZ
                 serializeContext->Class<PassData>()
                     ->Version(1)
                     ->Field("PipelineViewTag", &PassData::m_pipelineViewTag)
-                    ->Field("PipelineGlobalConnections", &PassData::m_pipelineGlobalConnections);
+                    ->Field("PipelineGlobalConnections", &PassData::m_pipelineGlobalConnections)
+                    ->Field("MergeChildrenAsSubpasses", &PassData::m_mergeChildrenAsSubpasses);
             }
         }
 

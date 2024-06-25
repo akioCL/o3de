@@ -6,5 +6,5 @@
  *
  */
 
-#define AZ_TRAIT_BOOTSTRAPSYSTEMCOMPONENT_PIPELINE_NAME     "passes/MainRenderPipeline.azasset"
+#define AZ_TRAIT_BOOTSTRAPSYSTEMCOMPONENT_PIPELINE_NAME     "passes/mobile/mobilerenderpipeline.azasset"
 #define AZ_TRAIT_BOOTSTRAPSYSTEMCOMPONENT_EXIT_ON_WINDOW_CLOSE 1

@@ -557,6 +557,18 @@
                 "Path": "Passes/Mobile/Forward.pass"
             },
             {
+                "Name": "MobileForwardParentPassTemplate",
+                "Path": "Passes/Mobile/ForwardParent.pass"
+            },
+            {
+                "Name": "MobileSubpass2ParentPassTemplate",
+                "Path": "Passes/Mobile/Subpass2Parent.pass"
+            },
+            {
+                "Name": "MobileSubpass3ParentPassTemplate",
+                "Path": "Passes/Mobile/Subpass3Parent.pass"
+            },
+            {
                 "Name": "MobilePipelineTemplate",
                 "Path": "Passes/Mobile/Pipeline.pass"
             },

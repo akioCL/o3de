@@ -20,12 +20,17 @@
                     "Name": "InputDepthStencil",
                     "SlotType": "Input",
                     "ShaderInputName": "m_depthStencilTexture",
-                    "ScopeAttachmentUsage": "Shader",
+                    "ScopeAttachmentUsage": "SubpassInput",
                     "ImageViewDesc": {
                         "AspectFlags": [
                             "Depth"
                         ]
                     }
+                },
+                {
+                    "Name": "DepthStencil",
+                    "SlotType": "Input",
+                    "ScopeAttachmentUsage": "DepthStencil"
                 }
             ],
             "PassData": {

@@ -51,6 +51,8 @@ namespace AZ
             PipelineGlobalConnectionList m_pipelineGlobalConnections;
 
             Name m_pipelineViewTag;
+
+            bool m_mergeChildrenAsSubpasses = false;
         };
     } // namespace RPI
 } // namespace AZ

@@ -168,7 +168,9 @@ namespace LyShine
     void LyShineChildPass::SetupFrameGraphDependencies(AZ::RHI::FrameGraphInterface frameGraph)
     {
         AZ::RPI::RasterPass::SetupFrameGraphDependencies(frameGraph);
-
+        AZ::RHI::FrameGraph::AttachmentFlags flags = GetRenderAttachmentConfiguration().m_subpassIndex > 0
+            ? AZ::RHI::FrameGraph::AttachmentFlags::ContinueGroup
+            : AZ::RHI::FrameGraph::AttachmentFlags::None;
         for (auto attachmentImage : m_attachmentImageDependencies)
         {
             // Ensure that the image is imported into the attachment database.
@@ -184,7 +186,8 @@ namespace LyShine
             desc.m_imageViewDescriptor = attachmentImage->GetImageView()->GetDescriptor();
             desc.m_loadStoreAction.m_loadAction = AZ::RHI::AttachmentLoadAction::Load;
 
-            frameGraph.UseShaderAttachment(desc, AZ::RHI::ScopeAttachmentAccess::Read, AZ::RHI::ScopeAttachmentStage::FragmentShader);
+            frameGraph.UseShaderAttachment(
+                desc, AZ::RHI::ScopeAttachmentAccess::Read, AZ::RHI::ScopeAttachmentStage::FragmentShader, flags);
         }
     }
 

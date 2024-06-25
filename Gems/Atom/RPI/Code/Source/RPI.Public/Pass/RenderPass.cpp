@@ -50,51 +50,42 @@ namespace AZ
         {
         }
 
-        RHI::RenderAttachmentConfiguration RenderPass::GetRenderAttachmentConfiguration() const
+        void RenderPass::BuildRenderAttachmentConfiguration()
         {
-            RHI::RenderAttachmentLayoutBuilder builder;
-            auto* layoutBuilder = builder.AddSubpass();
-
-            for (size_t slotIndex = 0; slotIndex < m_attachmentBindings.size(); ++slotIndex)
+            if (!m_buildRenderAttachmentConfiguration)
             {
-                const PassAttachmentBinding& binding = m_attachmentBindings[slotIndex];
-
-                if (!binding.GetAttachment())
-                {
-                    continue;
-                }
-
-                // Handle the depth-stencil attachment. There should be only one.
-                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::DepthStencil)
-                {
-                    layoutBuilder->DepthStencilAttachment(binding.GetAttachment()->m_descriptor.m_image.m_format);
-                    continue;
-                }
-
-                // Handle shading rate attachment. There should be only one.
-                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::ShadingRate)
-                {
-                    layoutBuilder->ShadingRateAttachment(binding.GetAttachment()->m_descriptor.m_image.m_format);
-                    continue;
-                }
-
-                // Skip bindings that aren't outputs or inputOutputs
-                if (binding.m_slotType != PassSlotType::Output && binding.m_slotType != PassSlotType::InputOutput)
-                {
-                    continue;
-                }
-
-                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::RenderTarget)
-                {
-                    RHI::Format format = binding.GetAttachment()->m_descriptor.m_image.m_format;
-                    layoutBuilder->RenderTargetAttachment(format);
-                }
+                return;
             }
 
-            RHI::RenderAttachmentLayout layout;
-            [[maybe_unused]] RHI::ResultCode result = builder.End(layout);
-            AZ_Assert(result == RHI::ResultCode::Success, "RenderPass [%s] failed to create render attachment layout", GetPathName().GetCStr());
-            return RHI::RenderAttachmentConfiguration{ layout, 0 };
+            RHI::RenderAttachmentLayoutBuilder builder;
+            auto* layoutBuilder = builder.AddSubpass();
+            BuildSubpassLayout(*layoutBuilder);
+            if (!layoutBuilder->HasAttachments())
+            {
+                return;
+            }
+
+            RHI::RenderAttachmentLayout subpassLayout;
+            [[maybe_unused]] RHI::ResultCode result = builder.End(subpassLayout);
+            AZ_Assert(
+                result == RHI::ResultCode::Success, "RenderPass [%s] failed to create render attachment layout", GetPathName().GetCStr());
+            m_renderAttachmentConfiguration = RHI::RenderAttachmentConfiguration{ AZStd::move(subpassLayout), 0 };
+        }
+
+        const RHI::RenderAttachmentConfiguration& RenderPass::GetRenderAttachmentConfiguration() const
+        {
+            return m_renderAttachmentConfiguration;
+        }
+
+        const RHI::RenderAttachmentConfiguration& RenderPass::GetRenderAttachmentConfiguration()
+        {
+            return m_renderAttachmentConfiguration;
+        }
+
+        void RenderPass::SetRenderAttachmentConfiguration(const RHI::RenderAttachmentConfiguration& configuration)
+        {
+            m_renderAttachmentConfiguration = configuration;
+            m_buildRenderAttachmentConfiguration = false;
         }
 
         RHI::MultisampleState RenderPass::GetMultisampleState() const
@@ -141,6 +132,66 @@ namespace AZ
             return outputMultiSampleState;
         }
 
+        bool RenderPass::BuildSubpassLayout(RHI::RenderAttachmentLayoutBuilder::SubpassAttachmentLayoutBuilder& subpassLayoutBuilder)
+        {
+            for (size_t slotIndex = 0; slotIndex < m_attachmentBindings.size(); ++slotIndex)
+            {
+                const PassAttachmentBinding& binding = m_attachmentBindings[slotIndex];
+                const Ptr<PassAttachment> attachment = binding.GetAttachment();
+                if (!attachment)
+                {
+                    continue;
+                }
+
+                // Handle the depth-stencil attachment. There should be only one.
+                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::DepthStencil)
+                {
+                    subpassLayoutBuilder.DepthStencilAttachment(
+                        attachment->m_descriptor.m_image.m_format,
+                        attachment->GetAttachmentId(),
+                        RHI::AttachmentLoadStoreAction(),
+                        binding.GetAttachmentAccess());
+                    continue;
+                }
+
+                // Handle shading rate attachment. There should be only one.
+                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::ShadingRate)
+                {
+                    subpassLayoutBuilder.ShadingRateAttachment(attachment->m_descriptor.m_image.m_format, attachment->GetAttachmentId());
+                    continue;
+                }
+
+                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::SubpassInput)
+                {
+                    AZ_Assert(
+                        binding.m_unifiedScopeDesc.GetType() == RHI::AttachmentType::Image,
+                        "Only image attachments are allowed as SubpassInput.");
+                    const auto aspectFlags = binding.m_unifiedScopeDesc.GetAsImage().m_imageViewDescriptor.m_aspectFlags;
+                    subpassLayoutBuilder.SubpassInputAttachment(attachment->GetAttachmentId(), aspectFlags);
+                    continue;
+                }
+
+                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::Resolve)
+                {
+                    const AZ::RPI::PassAttachmentBinding& copySource = GetInputBinding(0);
+                    subpassLayoutBuilder.ResolveAttachment(copySource.GetAttachment()->GetAttachmentId(), attachment->GetAttachmentId());
+                    continue;
+                }
+
+                if (binding.m_scopeAttachmentUsage == RHI::ScopeAttachmentUsage::RenderTarget)
+                {
+                    RHI::Format format = attachment->m_descriptor.m_image.m_format;
+                    subpassLayoutBuilder.RenderTargetAttachment(format, attachment->GetAttachmentId(),
+                        RHI::AttachmentLoadStoreAction(),
+                        false,
+                        binding.GetAttachmentAccess());
+                    continue;
+                }
+            }
+
+            return true;
+        }
+
 
         void RenderPass::InitializeInternal()
         {
@@ -184,6 +235,7 @@ namespace AZ
                     }
                 }
             }
+            BuildRenderAttachmentConfiguration();
         }
 
         void RenderPass::FrameBeginInternal(FramePrepareParams params)
@@ -210,6 +262,11 @@ namespace AZ
             ResetSrgs();
         }
 
+        void RenderPass::ResetInternal()
+        {
+            //m_buildRenderAttachmentConfiguration = true;
+        }
+
         void RenderPass::SetupFrameGraphDependencies(RHI::FrameGraphInterface frameGraph)
         {
             DeclareAttachmentsToFrameGraph(frameGraph);
@@ -226,6 +283,8 @@ namespace AZ
 
         void RenderPass::DeclareAttachmentsToFrameGraph(RHI::FrameGraphInterface frameGraph) const
         {
+            RHI::FrameGraph::AttachmentFlags flags = m_renderAttachmentConfiguration.m_subpassIndex > 0
+                ? RHI::FrameGraph::AttachmentFlags::ContinueGroup : RHI::FrameGraph::AttachmentFlags::None;
             for (const PassAttachmentBinding& attachmentBinding : m_attachmentBindings)
             {
                 if (attachmentBinding.GetAttachment() != nullptr &&
@@ -239,7 +298,8 @@ namespace AZ
                             attachmentBinding.m_unifiedScopeDesc.GetAsImage(),
                             attachmentBinding.GetAttachmentAccess(),
                             attachmentBinding.m_scopeAttachmentUsage,
-                            attachmentBinding.m_scopeAttachmentStage);
+                            attachmentBinding.m_scopeAttachmentStage,
+                            flags);
                         break;
                     }
                     case RHI::AttachmentType::Buffer:
@@ -248,7 +308,8 @@ namespace AZ
                             attachmentBinding.m_unifiedScopeDesc.GetAsBuffer(),
                             attachmentBinding.GetAttachmentAccess(),
                             attachmentBinding.m_scopeAttachmentUsage,
-                            attachmentBinding.m_scopeAttachmentStage);
+                            attachmentBinding.m_scopeAttachmentStage,
+                            flags);
                         break;
                     }
                     default:
@@ -351,10 +412,10 @@ namespace AZ
             {
                 PassAttachmentBinding& binding = GetInputBinding(idx);
 
-                AZ_Assert(binding.m_scopeAttachmentUsage != RHI::ScopeAttachmentUsage::RenderTarget,
+               /* AZ_Assert(binding.m_scopeAttachmentUsage != RHI::ScopeAttachmentUsage::RenderTarget,
                     "Attachment bindings that are inputs cannot have their type set to 'RenderTarget'. Binding in question is %s on pass %s.",
                     binding.m_name.GetCStr(),
-                    GetPathName().GetCStr());
+                    GetPathName().GetCStr());*/
 
                 BindAttachment(context, binding, imageIndex, bufferIndex);
             }

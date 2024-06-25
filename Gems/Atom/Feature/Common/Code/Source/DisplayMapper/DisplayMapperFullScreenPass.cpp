@@ -37,6 +37,8 @@ namespace AZ
             inConnection.m_attachmentRef.m_pass = m_inputReferencePassName;
             inConnection.m_attachmentRef.m_attachment = m_inputReferenceAttachmentName;
             ProcessConnection(inConnection);
+
+            RPI::FullscreenTrianglePass::BuildInternal();
         }
 
         void DisplayMapperFullScreenPass::SetInputReferencePassName(const Name& passName)

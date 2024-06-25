@@ -71,7 +71,7 @@ namespace AZ
             const uint32_t subpassIndex = m_renderpassDesc.m_subpassCount++;
             auto& subpassDescriptor = m_renderpassDesc.m_subpassDescriptors[subpassIndex];
             AZStd::unordered_map<RHI::AttachmentId, RenderPass::SubpassAttachment> subpassResolveAttachmentsMap;
-            AZStd::bitset<RHI::Limits::Pipeline::RenderAttachmentCountMax>& usedAttachments = m_usedAttachmentsPerSubpass[subpassIndex];
+            auto& usedAttachments = m_usedAttachmentsPerSubpass[subpassIndex];
             struct RenderAttachment
             {
                 const RHI::ImageScopeAttachment* m_scopeAttachment;
@@ -121,8 +121,7 @@ namespace AZ
                 const RHI::Format imageViewFormat = attachmentImageView->GetFormat();
                 auto scopeAttachmentId = scopeAttachment->GetDescriptor().m_attachmentId;
                 AZ_Assert(imageViewFormat != RHI::Format::Unknown, "Invalid image view format.");
-                // Add any subpass dependency from the use of this resource.
-                AddResourceDependency<ImageView>(subpassIndex, scope, attachmentImageView);
+                uint32_t attachmentIndex = ~0u;
 
                 switch (attachment.m_usage)
                 {
@@ -131,7 +130,7 @@ namespace AZ
                     auto layout = GetImageAttachmentLayout(*scopeAttachment);
                     auto finalLayout = GetFinalLayout(scope, *scopeAttachment);
                     auto findIter = m_attachmentsMap.find(scopeAttachmentId);
-                    uint32_t attachmentIndex = 0;
+
                     // Find if we already added this attachment
                     if (findIter == m_attachmentsMap.end())
                     {
@@ -162,11 +161,9 @@ namespace AZ
                         subpassDescriptor.m_resolveAttachments[subpassRendertargetIndex] = findResolveIt->second;
                     }
 
-                    m_lastSubpassResourceUse[attachmentImageView] = subpassIndex;
                     m_renderpassDesc.m_attachments[attachmentIndex].m_finalLayout = finalLayout;
                     setAttachmentStoreActionFunc(attachmentIndex, bindingDescriptor.m_loadStoreAction);
                     m_attachmentsMap[scopeAttachmentId] = attachmentIndex;
-                    usedAttachments.set(attachmentIndex);
                     break;
                 }
                 case RHI::ScopeAttachmentUsage::DepthStencil:
@@ -175,7 +172,6 @@ namespace AZ
                     auto initialLayout = GetInitialLayout(scope, *scopeAttachment);
                     auto finalLayout = GetFinalLayout(scope, *scopeAttachment);
                     auto findIter = m_attachmentsMap.find(scopeAttachmentId);
-                    uint32_t attachmentIndex = 0;
                     if (findIter == m_attachmentsMap.end())
                     {
                         attachmentIndex = m_renderpassDesc.m_attachmentCount++;
@@ -233,9 +229,7 @@ namespace AZ
                     subpassDescriptor.m_depthStencilAttachment = RenderPass::SubpassAttachment{ attachmentIndex, layout };
                     m_renderpassDesc.m_attachments[attachmentIndex].m_finalLayout = finalLayout;
                     setAttachmentStoreActionFunc(attachmentIndex, bindingDescriptor.m_loadStoreAction);
-                    m_lastSubpassResourceUse[m_framebufferDesc.m_attachmentImageViews[attachmentIndex]] = subpassIndex;
                     m_attachmentsMap[scopeAttachmentId] = attachmentIndex;
-                    usedAttachments.set(attachmentIndex);
                     break;
                 }
                 case RHI::ScopeAttachmentUsage::Resolve:
@@ -246,7 +240,6 @@ namespace AZ
 
                     // This is the index of the resolve attachment in the renderpass.
                     auto findIter = m_attachmentsMap.find(scopeAttachmentId);
-                    uint32_t attachmentIndex = 0;
                     if (findIter == m_attachmentsMap.end())
                     {
                         attachmentIndex = m_renderpassDesc.m_attachmentCount++;
@@ -268,11 +261,9 @@ namespace AZ
                     // Add the SubPassAttchment information for the color attachment that will be resolved.
                     auto resolveAttachmentId = resolveScopeAttachment->GetDescriptor().m_resolveAttachmentId;
                     subpassResolveAttachmentsMap[resolveAttachmentId] = RenderPass::SubpassAttachment{ attachmentIndex, layout };
-                    m_lastSubpassResourceUse[attachmentImageView] = subpassIndex;
                     m_renderpassDesc.m_attachments[attachmentIndex].m_finalLayout = finalLayout;
                     setAttachmentStoreActionFunc(attachmentIndex, bindingDescriptor.m_loadStoreAction);
                     m_attachmentsMap[scopeAttachmentId] = attachmentIndex;
-                    usedAttachments.set(attachmentIndex);
                     break;
                 }
                 case RHI::ScopeAttachmentUsage::SubpassInput:
@@ -282,12 +273,10 @@ namespace AZ
                         auto scopeAttachmentId2 = scopeAttachment->GetDescriptor().m_attachmentId;
                         auto findIter = m_attachmentsMap.find(scopeAttachmentId2);
                         AZ_Assert(findIter != m_attachmentsMap.end(), "Could not find input attachment %s", scopeAttachmentId2.GetCStr());
-                    const uint32_t attachmentIndex = findIter->second;
+                    attachmentIndex = findIter->second;
                     subpassDescriptor.m_subpassInputAttachments[subpassDescriptor.m_subpassInputCount++] =
                         RenderPass::SubpassAttachment{ attachmentIndex , layout, ConvertImageAspectFlags(attachmentImageView->GetDescriptor().m_aspectFlags) };
-                    m_lastSubpassResourceUse[attachmentImageView] = subpassIndex;
                     m_renderpassDesc.m_attachments[attachmentIndex].m_finalLayout = finalLayout;
-                    usedAttachments.set(attachmentIndex);
                     break;
                 }
                 case RHI::ScopeAttachmentUsage::ShadingRate:
@@ -295,7 +284,6 @@ namespace AZ
                     auto layout = GetImageAttachmentLayout(*scopeAttachment);
                     auto finalLayout = GetFinalLayout(scope, *scopeAttachment);
                     auto findIter = m_attachmentsMap.find(scopeAttachmentId);
-                    uint32_t attachmentIndex = 0;
                     if (findIter == m_attachmentsMap.end())
                     {
                         attachmentIndex = m_renderpassDesc.m_attachmentCount++;
@@ -316,27 +304,45 @@ namespace AZ
                         RenderPass::SubpassAttachment{ attachmentIndex, layout };
                     m_renderpassDesc.m_attachments[attachmentIndex].m_finalLayout = finalLayout;
                     setAttachmentStoreActionFunc(attachmentIndex, bindingDescriptor.m_loadStoreAction);
-                    m_lastSubpassResourceUse[attachmentImageView] = subpassIndex;
                     m_attachmentsMap[scopeAttachmentId] = attachmentIndex;
-                    usedAttachments.set(attachmentIndex);
                     break;
                 }
                 case RHI::ScopeAttachmentUsage::Shader:
                 case RHI::ScopeAttachmentUsage::Copy:
                     // do nothing
-                    break;
+                    continue;
                 default:
                     AZ_Assert(false, "ScopeAttachmentUsage %d is invalid.", attachment.m_usage);
                 }
-            }            
 
-            // Add the subpass dependencies from the buffer attachments.
-            for (size_t index = 0; index < scope.GetBufferAttachments().size(); ++index)
-            {
-                const RHI::BufferScopeAttachment* scopeAttachment = scope.GetBufferAttachments()[index];
-                const BufferView* bufferView = static_cast<const BufferView*>(scopeAttachment->GetBufferView());
-                AddResourceDependency(subpassIndex, scope, bufferView);
+                usedAttachments[attachmentIndex].AddUsage(scopeAttachment->GetUsage(), scopeAttachment->GetAccess());                
             }
+
+            // Add subpass dependencies
+            for (uint32_t i = 0; i < usedAttachments.size(); ++i)
+            {
+                auto& dstInfo = usedAttachments[i];
+                dstInfo.m_subpassIndex = subpassIndex;
+                if (dstInfo.IsValid())
+                {
+                    if (m_lastSubpassResourceUse[i].IsValid())
+                    {
+                        const auto& srcInfo = m_lastSubpassResourceUse[i];
+                        m_renderpassDesc.m_subpassDependencies.emplace_back();
+                        VkSubpassDependency& dependency = m_renderpassDesc.m_subpassDependencies.back();
+                        dependency = {};
+                        dependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+                        dependency.srcSubpass = srcInfo.m_subpassIndex;
+                        dependency.srcStageMask = srcInfo.m_stageMask;
+                        dependency.srcAccessMask = srcInfo.m_accessMask;
+                        dependency.dstSubpass = dstInfo.m_subpassIndex;
+                        dependency.dstStageMask = dstInfo.m_stageMask;
+                        dependency.dstAccessMask = dstInfo.m_accessMask;
+                    }
+
+                    m_lastSubpassResourceUse[i] = dstInfo;
+                }
+            }            
         }
 
         RHI::ResultCode RenderPassBuilder::End(RenderPassContext& builtContext)
@@ -348,7 +354,7 @@ namespace AZ
                 auto& subpassDescriptor = m_renderpassDesc.m_subpassDescriptors[subpassIndex];
                 for (uint32_t attachmentIndex = 0; attachmentIndex < m_renderpassDesc.m_attachmentCount; ++attachmentIndex)
                 {
-                    if (!usedAttachments[attachmentIndex])
+                    if (!usedAttachments[attachmentIndex].IsValid())
                     {
                         subpassDescriptor.m_preserveAttachments[subpassDescriptor.m_preserveAttachmentCount++] = attachmentIndex;
                     }
@@ -377,36 +383,6 @@ namespace AZ
         bool RenderPassBuilder::CanBuild() const
         {
             return m_renderpassDesc.m_subpassCount > 0;
-        }
-
-        void RenderPassBuilder::AddSubpassDependency(uint32_t srcSubpass, uint32_t dstSubpass, const Scope::Barrier& barrier)
-        {          
-            m_renderpassDesc.m_subpassDependencies.emplace_back();
-            VkSubpassDependency& dependency = m_renderpassDesc.m_subpassDependencies.back();
-            dependency = {};
-            dependency.dependencyFlags = barrier.m_dependencyFlags;
-            dependency.srcSubpass = srcSubpass;
-            dependency.srcStageMask = barrier.m_srcStageMask;
-            dependency.dstSubpass = dstSubpass;
-            dependency.dstStageMask = barrier.m_dstStageMask;
-            switch (barrier.m_type)
-            {
-            case VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER:
-                dependency.srcAccessMask = barrier.m_imageBarrier.srcAccessMask;
-                dependency.dstAccessMask = barrier.m_imageBarrier.dstAccessMask;
-                break;
-            case VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER:
-                dependency.srcAccessMask = barrier.m_bufferBarrier.srcAccessMask;
-                dependency.dstAccessMask = barrier.m_bufferBarrier.dstAccessMask;
-                break;
-            case VK_STRUCTURE_TYPE_MEMORY_BARRIER:
-                dependency.srcAccessMask = barrier.m_memoryBarrier.srcAccessMask;
-                dependency.dstAccessMask = barrier.m_memoryBarrier.dstAccessMask;
-                break;
-            default:
-                AZ_Assert(false, "Invalid barrier type %d", barrier.m_type);
-                break;
-            }
         }
 
         VkImageLayout RenderPassBuilder::GetInitialLayout(const Scope& scope, const RHI::ImageScopeAttachment& attachment) const

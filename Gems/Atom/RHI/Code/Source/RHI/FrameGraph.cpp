@@ -141,6 +141,8 @@ namespace AZ::RHI
                         "Multiple usages of same type RenderTarget getting added for resource %s",
                         attachmentId.GetCStr());
                     break;
+                case ScopeAttachmentUsage::SubpassInput:
+                    break;
                 default:
                     AZ_Assert(
                         false,
@@ -358,6 +360,7 @@ namespace AZ::RHI
         ScopeAttachmentUsage usage,
         ScopeAttachmentAccess access,
         ScopeAttachmentStage stage,
+        AttachmentFlags flags,
         const ImageScopeAttachmentDescriptor& descriptor)
     {
         AZ_Assert(usage != ScopeAttachmentUsage::Uninitialized, "ScopeAttachmentUsage is Uninitialized");
@@ -369,9 +372,10 @@ namespace AZ::RHI
         }
 
         // TODO:[ATOM-1267] Replace with writer / reader dependencies.
-        GraphEdgeType edgeType = usage == ScopeAttachmentUsage::SubpassInput ? GraphEdgeType::SameGroup : GraphEdgeType::DifferentGroup;
         if (Scope* producer = frameAttachment.GetLastScope())
         {
+            GraphEdgeType edgeType =
+                RHI::CheckBitsAll(flags, AttachmentFlags::ContinueGroup) ? GraphEdgeType::SameGroup : GraphEdgeType::DifferentGroup;
             InsertEdge(*producer, *m_currentScope, edgeType);
         }
 
@@ -390,6 +394,7 @@ namespace AZ::RHI
 
     void FrameGraph::UseAttachmentInternal(
         ImageFrameAttachment& frameAttachment,
+        AttachmentFlags flags,
         const ResolveScopeAttachmentDescriptor& descriptor)
     {
 #if defined(AZ_ENABLE_TRACING)
@@ -411,7 +416,9 @@ namespace AZ::RHI
         // TODO:[ATOM-1267] Replace with writer / reader dependencies.
         if (Scope* producer = frameAttachment.GetLastScope())
         {
-            InsertEdge(*producer, *m_currentScope);
+            GraphEdgeType edgeType =
+                RHI::CheckBitsAll(flags, AttachmentFlags::ContinueGroup) ? GraphEdgeType::SameGroup : GraphEdgeType::DifferentGroup;
+            InsertEdge(*producer, *m_currentScope, edgeType);
         }
 
         ResolveScopeAttachment* scopeAttachment =
@@ -432,6 +439,7 @@ namespace AZ::RHI
         ScopeAttachmentUsage usage,
         ScopeAttachmentAccess access,
         ScopeAttachmentStage stage,
+        AttachmentFlags flags,
         const BufferScopeAttachmentDescriptor& descriptor)
     {
         AZ_Assert(usage != ScopeAttachmentUsage::Uninitialized, "ScopeAttachmentUsage is Uninitialized");
@@ -445,7 +453,9 @@ namespace AZ::RHI
         // TODO:[ATOM-1267] Replace with writer / reader dependencies.
         if (Scope* producer = frameAttachment.GetLastScope())
         {
-            InsertEdge(*producer, *m_currentScope);
+            GraphEdgeType edgeType =
+                RHI::CheckBitsAll(flags, AttachmentFlags::ContinueGroup) ? GraphEdgeType::SameGroup : GraphEdgeType::DifferentGroup;
+            InsertEdge(*producer, *m_currentScope, edgeType);
         }
 
         BufferScopeAttachment* scopeAttachment =
@@ -464,14 +474,15 @@ namespace AZ::RHI
         const BufferScopeAttachmentDescriptor& descriptor,
         ScopeAttachmentAccess access,
         ScopeAttachmentUsage usage,
-        ScopeAttachmentStage stage)
+        ScopeAttachmentStage stage,
+        AttachmentFlags flags)
     {
         AZ_Assert(!descriptor.m_attachmentId.IsEmpty(), "Calling FrameGraph::UseAttachment with an empty attachment ID");
 
         BufferFrameAttachment* attachment = m_attachmentDatabase.FindAttachment<BufferFrameAttachment>(descriptor.m_attachmentId);
         if (attachment)
         {
-            UseAttachmentInternal(*attachment, usage, access, stage, descriptor);
+            UseAttachmentInternal(*attachment, usage, access, stage, flags, descriptor);
             return ResultCode::Success;
         }
 
@@ -483,14 +494,15 @@ namespace AZ::RHI
         const ImageScopeAttachmentDescriptor& descriptor,
         ScopeAttachmentAccess access,
         ScopeAttachmentUsage usage,
-        ScopeAttachmentStage stage)
+        ScopeAttachmentStage stage,
+        AttachmentFlags flags)
     {
         AZ_Assert(!descriptor.m_attachmentId.IsEmpty(), "Calling FrameGraph::UseAttachment with an empty attachment ID");
 
         ImageFrameAttachment* attachment = m_attachmentDatabase.FindAttachment<ImageFrameAttachment>(descriptor.m_attachmentId);
         if (attachment)
         {
-            UseAttachmentInternal(*attachment, usage, access, stage, descriptor);
+            UseAttachmentInternal(*attachment, usage, access, stage, flags, descriptor);
             return ResultCode::Success;
         }
 
@@ -502,11 +514,12 @@ namespace AZ::RHI
         AZStd::span<const ImageScopeAttachmentDescriptor> descriptors,
         ScopeAttachmentAccess access,
         ScopeAttachmentUsage usage,
-        ScopeAttachmentStage stage)
+        ScopeAttachmentStage stage,
+        AttachmentFlags flags)
     {
         for (const ImageScopeAttachmentDescriptor& descriptor : descriptors)
         {
-            ResultCode resultCode = UseAttachment(descriptor, access, usage, stage);
+            ResultCode resultCode = UseAttachment(descriptor, access, usage, stage, flags);
             if (resultCode != ResultCode::Success)
             {
                 AZ_Error("FrameGraph", false, "Error loading image scope attachment array. Attachment that errored is '%s'", descriptor.m_attachmentId.GetCStr());
@@ -516,12 +529,12 @@ namespace AZ::RHI
         return ResultCode::Success;
     }
 
-    ResultCode FrameGraph::UseResolveAttachment(const ResolveScopeAttachmentDescriptor& descriptor)
+    ResultCode FrameGraph::UseResolveAttachment(const ResolveScopeAttachmentDescriptor& descriptor, AttachmentFlags flags)
     {
         ImageFrameAttachment* attachment = m_attachmentDatabase.FindAttachment<ImageFrameAttachment>(descriptor.m_attachmentId);
         if (attachment)
         {
-            UseAttachmentInternal(*attachment, descriptor);
+            UseAttachmentInternal(*attachment, flags, descriptor);
             return ResultCode::Success;
         }
 
@@ -529,44 +542,50 @@ namespace AZ::RHI
         return ResultCode::InvalidArgument;
     }
 
-    ResultCode FrameGraph::UseColorAttachments(AZStd::span<const ImageScopeAttachmentDescriptor> descriptors)
+    ResultCode FrameGraph::UseColorAttachments(AZStd::span<const ImageScopeAttachmentDescriptor> descriptors, AttachmentFlags flags)
     {
         return UseAttachments(
-            descriptors, ScopeAttachmentAccess::Write, ScopeAttachmentUsage::RenderTarget, ScopeAttachmentStage::ColorAttachmentOutput);
+            descriptors,
+            ScopeAttachmentAccess::Write,
+            ScopeAttachmentUsage::RenderTarget,
+            ScopeAttachmentStage::ColorAttachmentOutput,
+            flags);
     }
 
     ResultCode FrameGraph::UseDepthStencilAttachment(
-        const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage)
+        const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage, AttachmentFlags flags)
     {
-        return UseAttachment(descriptor, access, ScopeAttachmentUsage::DepthStencil, stage);
+        return UseAttachment(descriptor, access, ScopeAttachmentUsage::DepthStencil, stage, flags);
     }
 
     ResultCode FrameGraph::UseSubpassInputAttachments(
-        AZStd::span<const ImageScopeAttachmentDescriptor> descriptors, ScopeAttachmentStage stage)
+        AZStd::span<const ImageScopeAttachmentDescriptor> descriptors, ScopeAttachmentStage stage, AttachmentFlags flags)
     {
-        return UseAttachments(descriptors, ScopeAttachmentAccess::Read, ScopeAttachmentUsage::SubpassInput, stage);
+        return UseAttachments(descriptors, ScopeAttachmentAccess::Read, ScopeAttachmentUsage::SubpassInput, stage, flags);
     }
 
     ResultCode FrameGraph::UseShaderAttachment(
-        const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage)
+        const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage, AttachmentFlags flags)
     {
-        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Shader, stage);
+        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Shader, stage, flags);
     }
 
     ResultCode FrameGraph::UseShaderAttachment(
-        const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage)
+        const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, ScopeAttachmentStage stage, AttachmentFlags flags)
     {
-        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Shader, stage);
+        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Shader, stage, flags);
     }
 
-    ResultCode FrameGraph::UseCopyAttachment(const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access)
+    ResultCode FrameGraph::UseCopyAttachment(
+        const BufferScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, AttachmentFlags flags)
     {
-        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Copy, ScopeAttachmentStage::Copy);
+        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Copy, ScopeAttachmentStage::Copy, flags);
     }
 
-    ResultCode FrameGraph::UseCopyAttachment(const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access)
+    ResultCode FrameGraph::UseCopyAttachment(
+        const ImageScopeAttachmentDescriptor& descriptor, ScopeAttachmentAccess access, AttachmentFlags flags)
     {
-        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Copy, ScopeAttachmentStage::Copy);
+        return UseAttachment(descriptor, access, ScopeAttachmentUsage::Copy, ScopeAttachmentStage::Copy, flags);
     }
 
     ResultCode FrameGraph::UseQueryPool(Ptr<QueryPool> queryPool, const RHI::Interval& interval, QueryPoolScopeAttachmentType type, ScopeAttachmentAccess access)
@@ -688,6 +707,14 @@ namespace AZ::RHI
             }
             graphEdges[producerIndex].clear();
         }
+
+        AZStd::stable_sort(
+            m_scopes.begin(),
+            m_scopes.end(),
+            [](const AZ::RHI::Scope* a, const AZ::RHI::Scope* b)
+            {
+                return (a->GetFrameGraphGroupId() < b->GetFrameGraphGroupId());
+            });
 
         if (m_graphNodes.size() == m_scopes.size())
         {

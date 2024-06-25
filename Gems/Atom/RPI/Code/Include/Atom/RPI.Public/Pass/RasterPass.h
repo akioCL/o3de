@@ -10,6 +10,7 @@
 #include <Atom/RHI.Reflect/Handle.h>
 #include <Atom/RHI.Reflect/Scissor.h>
 #include <Atom/RHI.Reflect/Viewport.h>
+#include <Atom/RHI.Reflect/RenderAttachmentLayoutBuilder.h>
 
 #include <Atom/RPI.Public/Pass/PassUtils.h>
 #include <Atom/RPI.Public/Pass/RenderPass.h>
